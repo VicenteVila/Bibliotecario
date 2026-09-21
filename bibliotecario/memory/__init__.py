@@ -1,0 +1,1 @@
+"""Bibliotecario: memoria H-Mem (MemoryTree, EntityGraph, retrieval híbrido)."""

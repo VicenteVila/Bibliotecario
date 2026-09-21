@@ -1,0 +1,1 @@
+"""Bibliotecario: ingesta completa de fuentes (URL, YouTube, PDF, imagen, txt, docx)."""

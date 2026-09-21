@@ -1,0 +1,1 @@
+"""Bibliotecario: agente de búsqueda tipo ReASearch sobre Gemini."""

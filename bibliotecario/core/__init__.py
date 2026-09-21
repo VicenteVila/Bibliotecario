@@ -1,0 +1,1 @@
+"""Bibliotecario: core infrastructure (storage, embeddings, hybrid retrieval)."""

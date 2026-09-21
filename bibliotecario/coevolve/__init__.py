@@ -1,0 +1,1 @@
+"""Bibliotecario: co-evolución (Task-CoEvolve, WikiSkill, validación)."""

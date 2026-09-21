@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bibliotecario"
+version = "0.1.0"
+description = "ReASearch-style agente de búsqueda sobre papers con grafo de conocimiento autoevolutivo"
+requires-python = ">=3.12"
+dependencies = [
+    "google-genai>=1.0",
+    "sentence-transformers>=4.0",
+    "PyMuPDF>=1.24",
+    "yt-dlp>=2025.1",
+    "python-docx>=1.1",
+    "requests>=2.32",
+    "beautifulsoup4>=4.12",
+    "Pillow>=10.4",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "ruff>=0.8",
+]
+
+[project.scripts]
+bibliotecario = "bibliotecario.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["bibliotecario*"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 99
+
+[tool.ruff.lint.per-file-ignores]
+# La ingesta y el LLM deben degradarse con gracia ante red/archivos/modelos:
+# capturar Exception amplia es diseño, no descuido.
+"bibliotecario/ingest/*.py" = ["BLE001"]
+"bibliotecario/core/llm.py" = ["BLE001"]
+"bibliotecario/memory/retriever.py" = ["BLE001", "S110"]
+# Un PF que falla no debe tumbar el loop: captura amplia deliberada.
+"bibliotecario/harness/pfs.py" = ["BLE001"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
