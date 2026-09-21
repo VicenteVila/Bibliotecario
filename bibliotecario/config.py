@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 
 _DEFAULT_DATA_DIR = Path("data")
-_LLM_MODEL = "gemini-2.5-flash"
+_LLM_MODEL = "gemini-3.6-flash"
 _EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 _EMBED_DIM = 384
 
@@ -25,7 +25,19 @@ _load_env()
 
 
 def gemini_api_key() -> str | None:
-    return os.environ.get("GEMINI_API_KEY")
+    keys = gemini_api_keys()
+    return keys[0] if keys else None
+
+
+def gemini_api_keys() -> list[str]:
+    """Cadena de keys: principal + fallbacks (GEMINI_API_KEY, GEMINI_API_KEY_2, ...)."""
+    keys: list[str] = []
+    for i in range(1, 6):
+        suffix = "" if i == 1 else f"_{i}"
+        v = os.environ.get(f"GEMINI_API_KEY{suffix}")
+        if v and v not in keys:
+            keys.append(v)
+    return keys
 
 
 def github_token() -> str | None:

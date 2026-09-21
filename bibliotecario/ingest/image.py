@@ -2,33 +2,14 @@
 from __future__ import annotations
 
 import io
-import logging
 from pathlib import Path
 
-from bibliotecario.config import _LLM_MODEL, gemini_api_key
 from bibliotecario.ingest.base import Document
-
-logger = logging.getLogger(__name__)
 
 
 def ocr_image_bytes(png_bytes: bytes) -> str:
-    key = gemini_api_key()
-    if not key:
-        return ""
-    try:
-        from google import genai
-        from google.genai import types
-        client = genai.Client(api_key=key)
-        resp = client.models.generate_content(
-            model=_LLM_MODEL,
-            contents=["Extrae TODO el texto visible. Solo el texto, sin comentarios.",
-                      types.Part.from_bytes(data=png_bytes, mime_type="image/png")],
-            config={"max_output_tokens": 2048, "temperature": 0.0},
-        )
-        return (resp.text or "").strip()
-    except Exception as e:
-        logger.warning("OCR visión falló: %s", e)
-        return ""
+    from bibliotecario.core.llm import generate_vision
+    return generate_vision("Extrae TODO el texto visible. Solo el texto, sin comentarios.", png_bytes)
 
 
 def extract_image(path: str | Path) -> Document:
