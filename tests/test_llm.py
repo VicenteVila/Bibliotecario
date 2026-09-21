@@ -1,5 +1,14 @@
 """Failover de keys: 429 agota reintentos y salta; 401 salta directo sin esperar."""
+import pytest
+
 import bibliotecario.core.llm as LLM
+
+
+@pytest.fixture(autouse=True)
+def _deterministic(monkeypatch):
+    monkeypatch.setattr(LLM, "_RR_INDEX", 0)
+    monkeypatch.setattr(LLM, "_LAST_CALL", {})
+    monkeypatch.setattr("time.sleep", lambda s: None)
 
 
 class _Resp:
@@ -29,6 +38,20 @@ def _patch(monkeypatch, behaviors):
         return _FakeClient(fn)
 
     monkeypatch.setattr(LLM, "_new_client", factory)
+
+
+def test_rotacion_alterna_keys(monkeypatch):
+    seen = []
+    monkeypatch.setattr(LLM, "gemini_api_keys", lambda: ["K1", "K2"])
+
+    def factory(key):
+        seen.append(key)
+        return _FakeClient(lambda: _Resp("ok"))
+
+    monkeypatch.setattr(LLM, "_new_client", factory)
+    assert LLM.generate("a") == "ok"
+    assert LLM.generate("b") == "ok"
+    assert seen == ["K1", "K2"]
 
 
 def test_429_salta_a_segunda_key(monkeypatch):

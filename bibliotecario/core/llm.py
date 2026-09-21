@@ -18,6 +18,20 @@ class _KeyInvalid(Exception):
     pass
 
 
+# Rotación round-robin + pacing: reparte carga entre keys y respeta ~5 req/min/key.
+_RR_INDEX = 0
+_LAST_CALL: dict[int, float] = {}
+_MIN_INTERVAL = 12.0
+
+
+def _pace(idx: int) -> None:
+    import time as _t
+    wait = _MIN_INTERVAL - (_t.monotonic() - _LAST_CALL.get(idx, 0.0))
+    if wait > 0:
+        _t.sleep(wait)
+    _LAST_CALL[idx] = _t.monotonic()
+
+
 def _retry_delay(exc: Exception, default: float = 30.0) -> float:
     import re
     m = re.search(r"retry in ([\d.]+)s", str(exc))
@@ -52,10 +66,17 @@ def _classify(exc: Exception) -> str:
 
 
 def generate(prompt: str, max_tokens: int = 512, retries: int = 2) -> str:
+    global _RR_INDEX
     keys = gemini_api_keys()
     if not keys:
         return ""
-    for ki, key in enumerate(keys):
+    n = len(keys)
+    start = _RR_INDEX % n
+    _RR_INDEX += 1
+    for off in range(n):
+        ki = (start + off) % n
+        key = keys[ki]
+        _pace(ki)
         try:
             client = _new_client(key)
         except Exception as e:
@@ -85,10 +106,17 @@ def generate(prompt: str, max_tokens: int = 512, retries: int = 2) -> str:
 
 
 def generate_vision(prompt: str, png_bytes: bytes, max_tokens: int = 2048) -> str:
+    global _RR_INDEX
     keys = gemini_api_keys()
     if not keys:
         return ""
-    for ki, key in enumerate(keys):
+    n = len(keys)
+    start = _RR_INDEX % n
+    _RR_INDEX += 1
+    for off in range(n):
+        ki = (start + off) % n
+        key = keys[ki]
+        _pace(ki)
         try:
             from google import genai
             from google.genai import types
