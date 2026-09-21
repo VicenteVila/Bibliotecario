@@ -26,6 +26,7 @@ __all__ = [
     "get_paper",
     "implement",
     "ingest",
+    "ingest_dir",
     "init",
     "instantiate_agent_template",
     "register_skill",
@@ -42,6 +43,10 @@ def init() -> dict:
 
 def ingest(source: str, ocr: bool = False):
     return pipeline.ingest(source, ocr=ocr)
+
+
+def ingest_dir(directory: str, ocr: bool = False) -> dict:
+    return pipeline.ingest_dir(directory, ocr=ocr)
 
 
 def ask(question: str, max_turns: int = 10) -> dict:

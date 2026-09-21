@@ -78,3 +78,23 @@ def ingest(source: str, ocr: bool = False) -> base.IngestResult:
     except Exception as e:
         logger.error("Ingesta falló para %s: %s", source, e)
         return base.IngestResult(ok=False, error=str(e))
+
+
+_INBOX_EXTS = {".pdf", ".docx", ".txt", ".md", ".csv", ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"}
+
+
+def ingest_dir(directory: str | Path, ocr: bool = False) -> dict:
+    """Ingesta por lotes de una carpeta inbox: omite no-soportados y duplicados (por hash)."""
+    d = Path(directory)
+    if not d.is_dir():
+        return {"ok": False, "error": f"No es directorio: {directory}", "files": []}
+    files = sorted(p for p in d.iterdir() if p.is_file() and p.suffix.lower() in _INBOX_EXTS)
+    results = []
+    for f in files:
+        r = ingest(str(f), ocr=ocr)
+        results.append({"file": f.name, "ok": r.ok, "title": r.title,
+                        "chunks": r.chunks, "error": r.error})
+    ok_n = sum(1 for r in results if r["ok"])
+    return {"ok": True, "total": len(files), "ingested": ok_n,
+            "skipped_unsupported": sum(1 for p in d.iterdir() if p.is_file() and p.suffix.lower() not in _INBOX_EXTS),
+            "files": results}

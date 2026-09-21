@@ -33,6 +33,7 @@ bibliotecario repl
 ```
 
 Comandos: `status` · `ingest <pdf|url|youtube|img|txt|docx> [--ocr]` ·
+`ingest-dir <carpeta> [--ocr]` (lote: omite no-soportados y duplicados por hash) ·
 `ask "<pregunta>" [--turns N]` · `blueprint <técnica> <objetivo>` ·
 `implement <técnica> <objetivo>` · `evolve` (co-evolución en background).
 

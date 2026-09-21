@@ -84,6 +84,27 @@ def test_citations():
     assert c["urls"] == ["https://example.com/a"]
 
 
+def test_ingest_dir_lote(tmp_path, monkeypatch):
+    from bibliotecario.core import storage
+    db = tmp_path / "dir.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    monkeypatch.setattr(pipeline, "encode", lambda chunks: np.zeros((len(chunks), 4), dtype="float32"))
+    inbox = tmp_path / "documentos"
+    inbox.mkdir()
+    (inbox / "a.txt").write_text("contenido alfa " * 200)
+    (inbox / "b.txt").write_text("contenido beta " * 200)
+    (inbox / "nota.xyz").write_text("ignorado")
+    r1 = pipeline.ingest_dir(str(inbox))
+    assert r1["ok"] and r1["total"] == 2 and r1["ingested"] == 2 and r1["skipped_unsupported"] == 1
+    r2 = pipeline.ingest_dir(str(inbox))
+    assert r2["ingested"] == 2  # re-ingerir no duplica (hash), ambos reconocidos
+    with storage.get_conn(db) as conn:
+        n = conn.execute("SELECT COUNT(*) c FROM documents").fetchone()["c"]
+    assert n == 2
+    assert pipeline.ingest_dir(str(tmp_path / "noexiste"))["ok"] is False
+
+
 def test_store_dedup(tmp_path, monkeypatch):
     from bibliotecario.core import storage
     monkeypatch.setattr(storage, "db_path", lambda: tmp_path / "t.db")
