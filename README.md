@@ -48,16 +48,39 @@ API.implement("Task-CoEvolve", "validar mi agente")
 ## Tests
 
 ```bash
-python -m pytest tests/ -q   # 42 tests
+python -m pytest tests/ -q   # 72 tests
 ruff check bibliotecario tests
 ```
+
+## Evaluación
+
+```bash
+python evals/eval_retrieval.py                    # métricas mecánicas de retrieval
+python evals/eval_end2end.py --turns 5            # loop completo + judge
+```
+
+El golden set (`evals/golden_qa.jsonl`) son 15 preguntas de dificultad creciente.
+Retrieval a nivel de documento: recall@1 `0.933`, recall@3/5 `1.0`, MRR `0.956`.
+End-to-end: `judge_mean 4.38`, `provenance 0.90`, 93 % de respuestas con cita,
+0 truncadas, 0 fallbacks de proveedor.
+
+El `judge_mean` es **estocástico** (mismo modelo, temperatura > 0): tres runs
+idénticos dieron 3.33–3.71 antes del barrido profundo, con σ ≈ 0.19. Para judging
+de cambios pequeños hay que comparar varios runs, no uno. Las métricas
+deterministas (`recall`, `provenance`, `truncadas`) sí son señal fiable.
 
 ## Notas operativas
 
 - Cadena de proveedores con failover, en orden: **Groq** (`GROQ_API_KEY`, `llama-3.3-70b-versatile`)
-  → **NVIDIA NIM** (`NVIDIA_API_KEY`, `nvidia/llama-3.1-nemotron-70b-instruct`) →
+  → **NVIDIA NIM** (`NVIDIA_API_KEY`, `nvidia/nemotron-3-super-120b-a12b`, fallback
+  `openai/gpt-oss-20b`) →
   **Gemini** (`GEMINI_API_KEY[_N]`, `gemini-3.6-flash`; `gemini-2.5-flash` fue retirado por Google).
   Modelos configurables con `GROQ_MODEL` / `NVIDIA_MODEL`.
+- El cierre del loop añade un **barrido profundo** determinista (`deep_sweep`): mejores
+  chunks por relevancia, por léxico de la pregunta y por cobertura uniforme del paper.
+  Sin coste de LLM ni varianza. Es lo que permite responder preguntas de detalle
+  concreto (una cifra, una regla de desempate) que viven en un apéndice y no aparecen
+  en el top-8 por relevancia.
 - Solo se usan los proveedores con key presente en `.env`; 401/403 salta de proveedor,
   429/500/503 reintenta con backoff y luego salta. Pacing de 10 s por proveedor.
 - OCR por visión sigue en Gemini (Groq/NVIDIA no exponen visión aquí).

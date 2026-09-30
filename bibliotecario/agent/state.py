@@ -29,6 +29,8 @@ TOOLS:
 - search_papers(query, top_k): búsqueda híbrida sobre chunks.
 - retrieve_evidence(query, top_m): caminos de razonamiento PEARL.
 - get_subgraph(query, depth): subgrafo contextual.
+- deep_sweep(question, per_doc): barrido profundo de los mejores chunks de cada paper
+  (para detalles que el top-6 no alcanza; no consume LLM). Úsalo si la evidencia es débil.
 - get_paper(doc_id): metadata y citas de un documento.
 - answer_multi_hop(question, top_k): síntesis multi-documento con citas.
 - build_blueprint(technique, goal): guía de implementación.

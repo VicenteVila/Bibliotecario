@@ -68,8 +68,56 @@ def parse_tool_call(text: str) -> tuple[str | None, dict]:
 def _toolish(text: str) -> bool:
     if TOOL_BLOCK.search(text):
         return True
-    return any(("tool" in o or any(k in o for k in ("query", "top_k", "top_m", "technique")))
-               for o in _bare_objects(text))
+    if any(("tool" in o or any(k in o for k in ("query", "top_k", "top_m", "technique")))
+           for o in _bare_objects(text)):
+        return True
+    # JSON malformado: el modelo empezó a emitir una llamada de tool y se cortó a
+    # media estructura (p. ej. '"top_k": 5": 5}}'). No puede ser una respuesta.
+    return _has_broken_json(text or "")
+
+
+_BROKEN_KEYS = ("tool", "query", "top_k", "top_m", "args", "technique", "blueprint")
+
+
+def _has_broken_json(text: str) -> bool:
+    """True si `text` parece JSON de tool corrupto o malformado."""
+    if "{" not in text or "}" not in text:
+        return False
+    # El texto es casi todo JSON (poco texto en medio), no prosa con un fragmento.
+    # Una respuesta real tiene varias frases; un volcado tiene casi ninguna.
+    prose = " ".join(_strip_json_blobs(text).split())
+    if len(prose) > 40:  # hay prosa de verdad alrededor del JSON
+        return False
+    try:
+        json.loads(text)
+        return True  # JSON bien formado: volcado, no respuesta
+    except (json.JSONDecodeError, ValueError):
+        pass
+    return any(f'"{k}"' in text for k in _BROKEN_KEYS)
+
+
+def _strip_json_blobs(text: str) -> str:
+    """Quita los mayores objetos/arrays JSON balanceados y devuelve la prosa restante.
+
+    Se conserva el texto antes y después de cada blob: una respuesta real puede
+    citar un fragmento JSON dentro de una frase.
+    """
+    prose, depth, start, pos = [], 0, None, 0
+    for i, ch in enumerate(text):
+        if ch in "{[":
+            if depth == 0:
+                start = i
+            depth += 1
+        elif ch in "}]":
+            if depth == 0:  # cierre huérfano: es prosa
+                continue
+            depth -= 1
+            if depth == 0 and start is not None:
+                prose.append(text[pos:start])  # prosa anterior al blob
+                pos = i + 1                  # el blob se descarta
+                start = None
+    prose.append(text[pos:])  # prosa final (o el resto si quedó JSON sin cerrar)
+    return " ".join(prose)
 
 
 def load_lessons(scope: str = "qa", limit: int = 5) -> str:
@@ -88,19 +136,50 @@ def compact(transcript: list[str], snapshot: str) -> list[str]:
     return [f"[SNAPSHOT] {snapshot}", f"[RESUMEN] {summary}", f"[LESSONS]\n{load_lessons()}"]
 
 
+def _deep_evidence(question: str, per_doc: int = 4, n_docs: int = 2) -> str:
+    """Barrido profundo determinista: chunks del cierre que el top-8 no trajo.
+
+    Sin coste LLM y sin varianza. Se limita a los `n_docs` papers con mejor score
+    porque el barrido completo de los 5 papers serían ~80k caracteres, más que el
+    resumen y el resto de la evidencia juntos.
+    """
+    try:
+        res = TOOLS["deep_sweep"]["fn"](question=question, per_doc=per_doc)
+    except Exception as e:  # degradación con gracia
+        logger.warning("Barrido profundo falló: %s", str(e)[:120])
+        return ""
+    lines = []
+    for d in res.get("docs", [])[:n_docs]:
+        for c in d["chunks"]:
+            # sin truncar: el dato concreto suele estar al final del chunk
+            lines.append(f"[{d['doc_id']}:{c['chunk']}] {d['title']}\n{c['text']}")
+    return "\n\n".join(lines)
+
+
 def _final_answer(question: str, best: str, evidence: list[str], flat: int, retries: int = 1) -> str:
     """Cierre forzado: pide una respuesta en prosa a partir de la evidencia reunida.
 
     Evita que el loop termine con el volcado JSON de un tool como 'respuesta'.
+    El barrido profundo es determinista y barato (4-11k chars, sin cuota), así que
+    se aplica siempre: los detalles concretos viven en apéndices que el top-8 por
+    relevancia no trae, y sin ellos el agente citaba el chunk equivocado.
     """
+    deep = _deep_evidence(question)
+    ctx = ("\n".join(evidence[-8:]) or "(ninguna)") + ("\n\nEVIDENCIA PROFUNDA (barrido por documento):\n" + deep if deep else "")
     prompt = (ST.STATIC_PROMPT + "\n\nPREGUNTA: " + question +
-              "\n\nEVIDENCIA REUNIDA:\n" + ("\n".join(evidence[-8:]) or "(ninguna)") +
+              "\n\nEVIDENCIA REUNIDA:\n" + ctx +
               f"\n\nMejor resultado parcial:\n{best or '(ninguno)'}\n"
               f"\nTurnos sin progreso: {flat}.\n"
               "CIERRE OBLIGADO: responde YA en prosa (máx 150 palabras) usando solo esta evidencia.\n"
               "REGLAS DE CIERRE:\n"
               "- CITA obligatoriamente cada afirmación con el formato [doc_id:chunk] "
-              "(ej. [5:7]); si no indicas chunk, usa [doc:chunk] con el número del paper.\n"
+              "(ej. [5:7]).\n"
+              "- La pregunta pide un dato concreto (una cifra, un tope, una regla). "
+              "BÚSCA ese dato explícito en toda la evidencia, también en el barrido: "
+              "no te quedes con el primer chunk parecido.\n"
+              "- Cifras exactas: copia el número literal de la evidencia. Si dos fuentes "
+              "se contradicen, cita la que responde a la pregunta concreta.\n"
+              "- No inventes cifras ni reglas que no aparezcan literalmente en la evidencia.\n"
               "- No termines a media frase: completa la idea y cierra con punto.\n"
               "- No emitas ningún bloque json ni vuelques resultados crudos.")
     out = generate(prompt, max_tokens=900, retries=retries).strip()
@@ -108,7 +187,7 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
         return ""
     out = _fix_truncation(out)
     if evidence and not CITE_FMT.has_citation(out):
-        out = out.rstrip() + "  [doc:?]"  # marca de缺口: el cierre debe citar
+        out = out.rstrip() + "  [doc:?]"  # marca de hueco: el cierre debe citar
     return CITE_FMT.normalize_citations(out)
 
 

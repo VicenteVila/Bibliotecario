@@ -50,3 +50,38 @@ def search(query: str, top_k: int = 8) -> list[dict]:
     return [{"score": round(s, 3), "doc_id": d, "chunk": c, "title": t, "text": tx,
              "parts": {"dense": round(dn, 3), "keyword": round(k, 3), "graph": round(g, 3)}}
             for s, d, c, t, tx, dn, k, g in scored[:top_k]]
+
+
+def search_with_neighbours(query: str, top_k: int = 6, window: int = 1) -> list[dict]:
+    """Búsqueda + expansión a chunks vecinos.
+
+    Los papers troceados pierden continuidad: el detalle que responde a la pregunta
+    (un tope, una regla de desempate) suele estar en el chunk inmediatamente
+    anterior o posterior al hit principal. Se añaden los vecinos con score
+    decaído para que el agente los vea sin que dominen el ranking.
+    """
+    hits = search(query, top_k=top_k)
+    if not hits or window <= 0:
+        return hits
+    seen = {(h["doc_id"], h["chunk"]) for h in hits}
+    out = list(hits)
+    try:
+        with storage.get_conn() as conn:
+            for h in hits:
+                rows = conn.execute(
+                    "SELECT c.chunk_idx, c.text, d.title FROM chunks c "
+                    "JOIN documents d ON d.id=c.doc_id WHERE c.doc_id=? "
+                    "AND c.chunk_idx BETWEEN ? AND ? ORDER BY c.chunk_idx",
+                    (h["doc_id"], h["chunk"] - window, h["chunk"] + window)).fetchall()
+                for r in rows:
+                    key = (h["doc_id"], r["chunk_idx"])
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                    out.append({"score": round(h["score"] * 0.6, 3), "doc_id": h["doc_id"],
+                                "chunk": r["chunk_idx"], "title": r["title"], "text": r["text"],
+                                "neighbour_of": h["chunk"],
+                                "parts": {"dense": 0, "keyword": 0, "graph": 0}})
+    except Exception as e:  # degradación con gracia: la búsqueda base yaOk
+        logger.warning("Expansión a vecinos no disponible: %s", str(e)[:120])
+    return out

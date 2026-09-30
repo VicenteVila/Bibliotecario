@@ -1,6 +1,8 @@
 """Loop end-to-end con LLM simulado: verifica maquinaria sin gastar cuota."""
 import json
 
+import pytest
+
 from bibliotecario.agent import loop as LOOP
 from bibliotecario.core import storage
 
@@ -85,3 +87,26 @@ def test_presupuesto_agotado_sintetiza(tmp_path, monkeypatch):
     r = LOOP.run("q", max_turns=2)
     assert r["answer"] == "Síntesis final en prosa con cita [1:0]."
     assert not r["answer"].lstrip().startswith("(")
+
+
+@pytest.mark.parametrize("text,expected", [
+    # volcados: no son respuestas válidas y hay que reintentar el cierre
+    ('{"tool": "search_papers", "args": {"query": "x", "top_k": 5}}', True),
+    ('{"query": "x", "top_k": 5}', True),
+    ('{"hits": [{"doc_id": 3, "chunk": 40, "text": "x"}]}', True),
+    # JSON malformado (el modelo se cortó a media estructura)
+    ('{"tool": "search_papers", "args": {"query": "ReASearch over", "top_k": 5": 5}}', True),
+    # respuestas reales en prosa
+    ("WikiSkill samples up to 8 traces per iteration [5:57].", False),
+    ("ReASearch persists learning via lessons.md read on later runs.", False),
+    ("A valid json {\"a\": 1} mentioned in prose.", False),
+])
+def test_toolish_detecta_volcajes_json(text, expected):
+    """El cierre no debe devolver un volcado de tool como respuesta.
+
+    Regresión de reas-1: el modelo emitted una llamada de tool truncada y el
+    guardián la dejó pasar como respuesta, así que el judge marcaba la pregunta
+    como fallida aunque el agente no hubiera dicho nada del tema.
+    """
+    from bibliotecario.agent.loop import _toolish
+    assert _toolish(text) is expected
