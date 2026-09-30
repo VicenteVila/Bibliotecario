@@ -15,10 +15,9 @@ from pathlib import Path
 EVALS = Path(__file__).parent
 sys.path.insert(0, str(EVALS.parent))
 
-from bibliotecario.agent import loop as LOOP  # noqa: E402
-from bibliotecario.core.llm import generate  # noqa: E402
-
-CITE = re.compile(r"\[(\d+):(\d+)\]")
+from bibliotecario.agent import loop as LOOP
+from bibliotecario.core.llm import generate
+from bibliotecario.ingest import citations_format as CITE_FMT
 
 JUDGE_PROMPT = """Puntúa del 1 al 5 si la RESPUESTA responde correctamente la PREGUNTA según la REFERENCIA.
 5 = correcta y completa; 3 = parcial; 1 = incorrecta o vacía. Responde SOLO JSON {{"score": N, "verdict": "..."}}.
@@ -77,16 +76,20 @@ def main() -> None:
             r = LOOP.run(q["question"], max_turns=args.turns)
         except Exception as e:
             r = {"answer": "", "evidence": [], "turns": 0, "error": str(e)[:120]}
-        cites = CITE.findall(r.get("answer", ""))
+        # Provenance medido con el parser real del sistema (acepta [5:7], [doc:1:chunk:42],
+        # [doc:1, chunk:42]...): así la métrica refleja el contenido, no el formato.
+        cites = CITE_FMT.parse_citations(r.get("answer", ""))
         ev_docs = [e.get("doc_id") for e in r.get("evidence", []) if isinstance(e, dict)]
-        all_docs = [int(d) for d, _ in cites] + ev_docs
+        all_docs = [d for d, _ in cites] + ev_docs
         hit = sum(1 for d in all_docs if d == q["doc_id"])
         prov = round(hit / len(all_docs), 3) if all_docs else 0.0
         ans = r.get("answer", "")
-        fallback = ans.startswith("(presupuesto agotado)") or ans.startswith("(extractivo)")
+        fallback = ans.startswith(("(presupuesto agotado)", "(extractivo)"))
         j = {"score": None, "verdict": "omitido (fallback sin LLM)"} if fallback or not ans else judge(q, ans)
         row = {"id": q["id"], "doc_id": q["doc_id"], "turns": r.get("turns"),
                "citation_precision": prov, "n_cites": len(all_docs),
+               "answer_cites": len(cites), "answer_has_cite": CITE_FMT.has_citation(ans),
+               "truncated": ans.rstrip().endswith("[…truncado]"),
                "judge": j["score"], "verdict": j["verdict"],
                "fallback": fallback, "latency_s": round(time.time() - t0),
                "answer": ans[:400]}
@@ -95,13 +98,17 @@ def main() -> None:
         print(f"{q['id']:8} citas={prov:.2f} judge={j['score']} fb={fallback} {str(j['verdict'])[:60]}", flush=True)
     scored = [r["judge"] for r in out if r["judge"]]
     provs = [r["citation_precision"] for r in out]
+    cited = [r for r in out if r["answer_has_cite"]]
     agg = {"n": len(out),
            "citation_precision_mean": round(sum(provs) / len(provs), 3) if provs else 0,
+           "answer_cite_rate": round(len(cited) / len(out), 3) if out else 0,
+           "truncated": sum(1 for r in out if r["truncated"]),
            "judge_mean": round(sum(scored) / len(scored), 2) if scored else None,
            "judge_n": len(scored), "fallbacks": sum(1 for r in out if r["fallback"]),
            "turns": args.turns, "retries": args.retries}
-    print(f"\nprovenienca_citas={agg['citation_precision_mean']} judge_mean={agg['judge_mean']} "
-          f"(n={agg['judge_n']}) fallbacks={agg['fallbacks']}")
+    print(f"\nprovenienca_citas={agg['citation_precision_mean']} "
+          f"respuestas_con_cita={agg['answer_cite_rate']} truncadas={agg['truncated']} "
+          f"judge_mean={agg['judge_mean']} (n={agg['judge_n']}) fallbacks={agg['fallbacks']}")
     save(out, agg)
 
 

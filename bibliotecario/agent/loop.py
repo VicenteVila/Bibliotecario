@@ -15,6 +15,7 @@ from bibliotecario.agent import state as ST
 from bibliotecario.agent.tools import TOOLS, tool_schemas
 from bibliotecario.core.llm import generate
 from bibliotecario.harness.runtime import get_harness
+from bibliotecario.ingest import citations_format as CITE_FMT
 from bibliotecario.knowledge import refiner as REF
 
 logger = logging.getLogger(__name__)
@@ -96,12 +97,27 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
               "\n\nEVIDENCIA REUNIDA:\n" + ("\n".join(evidence[-8:]) or "(ninguna)") +
               f"\n\nMejor resultado parcial:\n{best or '(ninguno)'}\n"
               f"\nTurnos sin progreso: {flat}.\n"
-              "CIERRE OBLIGADO: responde YA en prosa (máx 150 palabras) usando solo esta evidencia y "
-              "citando [doc:chunk]. No emitas ningún bloque json ni vuelques resultados crudos.")
-    out = generate(prompt, max_tokens=512, retries=retries).strip()
+              "CIERRE OBLIGADO: responde YA en prosa (máx 150 palabras) usando solo esta evidencia.\n"
+              "REGLAS DE CIERRE:\n"
+              "- CITA obligatoriamente cada afirmación con el formato [doc_id:chunk] "
+              "(ej. [5:7]); si no indicas chunk, usa [doc:chunk] con el número del paper.\n"
+              "- No termines a media frase: completa la idea y cierra con punto.\n"
+              "- No emitas ningún bloque json ni vuelques resultados crudos.")
+    out = generate(prompt, max_tokens=900, retries=retries).strip()
     if _toolish(out):
         return ""
-    return out
+    out = _fix_truncation(out)
+    if evidence and not CITE_FMT.has_citation(out):
+        out = out.rstrip() + "  [doc:?]"  # marca de缺口: el cierre debe citar
+    return CITE_FMT.normalize_citations(out)
+
+
+def _fix_truncation(text: str) -> str:
+    """Si la respuesta se cortó a media frase, marca el final en vez de dejarla colgada."""
+    t = (text or "").rstrip()
+    if not t or t[-1] in ".!?)]}\"'`:;":
+        return t
+    return t + " […truncado]"
 
 
 def _synthesize(question: str, retries: int = 1) -> str:
@@ -146,7 +162,7 @@ def run(question: str, max_turns: int = MAX_TURNS) -> dict:
                 history.append(msg)
                 failed.append(msg)
                 continue
-            answer = out.strip()
+            answer = _fix_truncation(CITE_FMT.normalize_citations(out.strip()))
             succeeded.append(f"respuesta final en turno {turn}")
             break
         if name == "":

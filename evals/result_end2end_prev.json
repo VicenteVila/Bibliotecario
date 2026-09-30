@@ -1,0 +1,193 @@
+{
+ "aggregate": {
+  "n": 15,
+  "citation_precision_mean": 0.133,
+  "judge_mean": 3.71,
+  "judge_n": 14,
+  "fallbacks": 0,
+  "turns": 5,
+  "retries": 1
+ },
+ "rows": [
+  {
+   "id": "pearl-1",
+   "doc_id": 1,
+   "turns": 2,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 5,
+   "verdict": "La respuesta es totalmente correcta y completa, ya que indica exactamente el significado del acrónimo PEARL tal como se describe en la referencia.",
+   "fallback": false,
+   "latency_s": 15,
+   "answer": "In knowledge graph completion, **PEARL** stands for **Path-Entity Aligned Relational Learning** (from the paper titled *\"PEARL: Path-Entity Aligned Relational Learning with Contextual Subgraphs for Inductive Knowledge Graph Completion\"*) [doc:1:chunk:42]."
+  },
+  {
+   "id": "pearl-2",
+   "doc_id": 1,
+   "turns": 4,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 3,
+   "verdict": "",
+   "fallback": false,
+   "latency_s": 25,
+   "answer": "En el marco de **PEARL** (*Path-Entity Aligned Relational Learning with Contextual Subgraphs for Inductive Knowledge Graph Completion*) [doc:1, chunk:42], los **subgrafos contextuales** (*contextual subgraphs*) son subestructuras locales extraídas alrededor de las entidades y relaciones objetivo para capturar la topología relacional y el contexto de vecindad sin depender de identificadores fijos d"
+  },
+  {
+   "id": "pearl-3",
+   "doc_id": 1,
+   "turns": 5,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 5,
+   "verdict": "La respuesta es correcta y completa. Describe adecuadamente cómo PEARL combina señales a nivel de camino y entidad mediante la agregación path-entity y alineación de representaciones, y explica que la",
+   "fallback": false,
+   "latency_s": 58,
+   "answer": "Based on the retrieved evidence from the paper *PEARL: Path-Entity Aligned Relational Learning with Contextual Subgraphs for Inductive Knowledge Graph Completion* [doc:1, chunk:35, chunk:43]:\n\n1. **Combining Path-Level and Entity-Level Signals:**\n   * **Path-Level Signals:** PEARL captures multi-hop relational path semantics and logical rule patterns connecting entities across contextual subgraphs"
+  },
+  {
+   "id": "proc-1",
+   "doc_id": 2,
+   "turns": 4,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 3,
+   "verdict": "",
+   "fallback": false,
+   "latency_s": 21,
+   "answer": "Un **Procedural Graph** es una estructura de ejecución auto-evolutiva (*self-evolving execution structure*) diseñada para agentes basados en LLM, la cual representa y mantiene dinámicamente el conocimiento procedimental y las secuencias de ejecución [doc:2, chunk:9].\n\n### Tripletas y campos que almacena\n\nLos Procedural Graphs estructuran el conocimiento mediante nodos y tripletas relacionales (con"
+  },
+  {
+   "id": "proc-2",
+   "doc_id": 2,
+   "turns": 4,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 5,
+   "verdict": "",
+   "fallback": false,
+   "latency_s": 27,
+   "answer": "Based on the ingested research on **Procedural Graphs** [doc:2:chunk:12], the self-evolution process from agent execution trajectories occurs through an offline iterative loop:\n\n1. **Trajectory & Trace Collection**: During an execution round on training tasks, the agent solver executes using the current procedural graph. The system records diagnostic execution trajectories, capturing step-by-step "
+  },
+  {
+   "id": "proc-3",
+   "doc_id": 2,
+   "turns": 4,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": null,
+   "verdict": "judge sin score, raw=\n{",
+   "fallback": false,
+   "latency_s": 20,
+   "answer": "Based on the paper *\"Procedural Graphs: Self-Evolving Execution Structures for LLM Agents\"* [doc: 2, chunk: 86], the Refiner contrasts failed and successful execution trajectories through the following mechanism to update procedural knowledge:\n\n1. **Failure Analysis (Detecting Error Patterns):** The refiner inspects failed trajectories to isolate repeated error loops, incorrect tool calls, or inva"
+  },
+  {
+   "id": "tce-1",
+   "doc_id": 3,
+   "turns": 4,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 5,
+   "verdict": "",
+   "fallback": false,
+   "latency_s": 51,
+   "answer": "In **Task-CoEvolve** (*Task-CoEvolve: Efficient Harness Optimization via Adaptive Validation Task Selection*), **variance-weighted task selection** is an adaptive validation technique used to select an informative subset of validation tasks during prompt and harness optimization [doc:3:chunk_13]. \n\nSpecifically:\n- **Task Informativeness & Variance Weighting**: Instead of evaluating candidate harne"
+  },
+  {
+   "id": "tce-2",
+   "doc_id": 3,
+   "turns": 5,
+   "citation_precision": 1.0,
+   "n_cites": 4,
+   "judge": 5,
+   "verdict": "",
+   "fallback": false,
+   "latency_s": 80,
+   "answer": "In **Task-CoEvolve**, the **Hájek estimator** and **anchored-difference estimator** are used for **efficient performance estimation** [3:39]. \n\nSpecifically, they serve to:\n1. **Estimate Full Validation Benchmark Scores**: When evaluating candidate harness/agent iterations on a dynamically selected subset (subsample) of validation tasks rather than the complete benchmark suite, these statistical e"
+  },
+  {
+   "id": "tce-3",
+   "doc_id": 3,
+   "turns": 4,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 1,
+   "verdict": "La respuesta está incompleta y se corta a mitad de frase, por lo que no responde a la pregunta.",
+   "fallback": false,
+   "latency_s": 28,
+   "answer": "En **Task-CoEvolve** [doc:3, chunk:15], la selección $\\hat{S}_{\\max}$ (*S-hat-max*) con resolución temprana de empates (*"
+  },
+  {
+   "id": "reas-1",
+   "doc_id": 4,
+   "turns": 4,
+   "citation_precision": 1.0,
+   "n_cites": 3,
+   "judge": 5,
+   "verdict": "La respuesta es completa y precisa. Define correctamente qué es ReASearch y detalla exactamente los tres elementos sobre los que busca el agente (prompts, programas y flujos de trabajo de ML) de acuer",
+   "fallback": false,
+   "latency_s": 29,
+   "answer": "**ReASearch** is a framework and reasoning-driven optimization methodology introduced in the paper *\"The Optimizer Is the Agent: Reasoning-Driven Search across Prompts, Programs, and ML Workflows\"* [4:7]. Under this approach, the LLM agent itself acts as the optimizer, utilizing a reasoning-driven keep/discard loop, time budget management, and iterative trial evaluation to search for optimal confi"
+  },
+  {
+   "id": "reas-2",
+   "doc_id": 4,
+   "turns": 5,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 5,
+   "verdict": "",
+   "fallback": false,
+   "latency_s": 56,
+   "answer": "In the **ReASearch** framework (\"The Optimizer Is the Agent\") [doc:4, chunk:64], context management across extended reasoning-driven search iterations is handled through state re-emission and context compaction:\n\n1. **Re-Emitted State**: To prevent context exhaustion during long search loops across prompts, programs, and workflows, the optimizer periodically re-emits a compacted, structured summar"
+  },
+  {
+   "id": "reas-3",
+   "doc_id": 4,
+   "turns": 5,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 3,
+   "verdict": "La respuesta menciona que las lecciones se persisten mediante auto-memorización y se almacenan como conocimiento episódico o procedural, lo cual es parcialmente correcto, pero no especifica explícitam",
+   "fallback": false,
+   "latency_s": 144,
+   "answer": "En ReASearch, las lecciones se persisten a través de ejecuciones mediante un mecanismo de auto-memorización que almacena conocimientos derivados de la experiencia, como scripts Bash, servidores MCP, habilidades y ganchos, permitiendo que el agente reutilice lo aprendido en futuras ejecuciones [doc:64]. Estas lecciones difieren de las habilidades transferibles en que estas últimas son componentes r"
+  },
+  {
+   "id": "wiki-1",
+   "doc_id": 5,
+   "turns": 5,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 3,
+   "verdict": "La respuesta menciona correctamente los tres splits (train, validation, test) y sus usos generales, pero no utiliza los nombres específicos de la referencia: Dtrain, Dval, Dtest. Además, aunque descri",
+   "fallback": false,
+   "latency_s": 88,
+   "answer": "WikiSkill uses three task splits: train, validation, and test. The train split is used for skill acquisition and model training, the validation split for hyperparameter tuning and early stopping, and the test split for final evaluation of skill performance and generalization [doc:5, chunk:57]."
+  },
+  {
+   "id": "wiki-2",
+   "doc_id": 5,
+   "turns": 5,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 1,
+   "verdict": "The answer does not address the sampling method or caps mentioned in the reference. It discusses conditioning the Inference Agent on skill sets and trajectory generation via skill repertoire, but fail",
+   "fallback": false,
+   "latency_s": 101,
+   "answer": "WikiSkill samples trajectories by conditioning the Inference Agent π on the active skill set 𝑘, where skills are compiled from agent experience into persistent knowledge for skill evolution. The sampling process leverages this conditioned inference to generate trajectories that reflect the current skill repertoire. While the text does not explicitly state numerical caps on trajectory sampling, it "
+  },
+  {
+   "id": "wiki-3",
+   "doc_id": 5,
+   "turns": 5,
+   "citation_precision": 0.0,
+   "n_cites": 0,
+   "judge": 3,
+   "verdict": "La respuesta menciona el registro de experiencias fallidas y la protección mediante trazas exitosas, lo cual es parcialmente correcto, pero omite explícitamente el mecanismo clave de la referencia: el",
+   "fallback": false,
+   "latency_s": 92,
+   "answer": "El Wiki Maintainer evita re-agregar patrones que ya fallaron manteniendo un registro de experiencias fallidas en el conocimiento persistente (WikiSkill), donde se compilan las trazas de agentes y se filtran aquellas que no llevaron al éxito. Esto protege al wiki de actualizaciones malas al asegurar que solo se añaden patrones validados por trazas exitosas, evitando la reincorporación de conocimien"
+  }
+ ]
+}

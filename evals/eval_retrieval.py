@@ -13,7 +13,7 @@ from pathlib import Path
 EVALS = Path(__file__).parent
 sys.path.insert(0, str(EVALS.parent))
 
-from bibliotecario.memory import retriever  # noqa: E402
+from bibliotecario.memory import retriever
 
 TOP_K = 10
 
@@ -35,7 +35,7 @@ def main() -> dict:
         got = hits[0]["doc_id"] if hits else None
         out.append({"id": q["id"], "paper": q["paper"], "difficulty": q["difficulty"],
                     "rank": rank, "top1_doc": got, "latency_s": round(dt, 1)})
-        print(f"{q['id']:8} [{q['difficulty']:7}] rank={str(rank):4} top1=doc{got} ({dt:.0f}s) {'OK' if rank == 1 else 'FALLO' if rank is None else 'parcial'}")
+        print(f"{q['id']:8} [{q['difficulty']:7}] rank={rank!s:4} top1=doc{got} ({dt:.0f}s) {'OK' if rank == 1 else 'FALLO' if rank is None else 'parcial'}")
     n = len(rows)
     agg = {"n": n, "recall@1": round(r1 / n, 3), "recall@3": round(r3 / n, 3),
            "recall@5": round(r5 / n, 3), "MRR@10": round(rr_sum / n, 3)}
