@@ -49,3 +49,39 @@ def test_loop_tool_invalida_recupera(tmp_path, monkeypatch):
     monkeypatch.setattr(PFS, "_registry", None)
     r = LOOP.run("q", max_turns=4)
     assert r["answer"] == "Listo tras error."
+
+
+def test_parser_tolera_json_suelto_y_malformado():
+    # JSON sin vallas y con prefijo de razonamiento (Nemotron/gpt-oss)
+    assert LOOP.parse_tool_call('Vamos a buscar.\n{"tool": "search_papers", "args": {"query": "x"}}') \
+        == ("search_papers", {"query": "x"})
+    # args sin clave "tool" → llamada malformada ("")
+    assert LOOP.parse_tool_call('razonamiento...\n{"query": "x", "top_k": 5}')[0] == ""
+    # prosa normal → no es llamada
+    assert LOOP.parse_tool_call("La respuesta es 42.") == (None, {})
+
+
+def test_presupuesto_agotado_sintetiza(tmp_path, monkeypatch):
+    """Si se agotan turnos con tool calls, el cierre produce prosa, no JSON crudo."""
+    db = tmp_path / "loop3.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    with storage.get_conn(db) as conn:
+        conn.execute("INSERT INTO documents (path, title, paper_hash) VALUES (?,?,?)",
+                     ("f", "Paper Test", "abc123"))
+    calls = {"n": 0}
+
+    def fake_gen(prompt, max_tokens=512, retries=2):
+        calls["n"] += 1
+        if calls["n"] <= 2:
+            return '```json\n{"tool": "get_status", "args": {}}\n```'
+        return "Síntesis final en prosa con cita [1:0]."
+
+    monkeypatch.setattr(LOOP, "generate", fake_gen)
+    from bibliotecario.harness import runtime as RT
+    monkeypatch.setattr(RT, "_harness", None)
+    import bibliotecario.harness.pfs as PFS
+    monkeypatch.setattr(PFS, "_registry", None)
+    r = LOOP.run("q", max_turns=2)
+    assert r["answer"] == "Síntesis final en prosa con cita [1:0]."
+    assert not r["answer"].lstrip().startswith("(")

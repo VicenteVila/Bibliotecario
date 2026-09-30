@@ -8,6 +8,7 @@ import bibliotecario.core.llm as LLM
 def _deterministic(monkeypatch):
     monkeypatch.setattr(LLM, "_RR_INDEX", 0)
     monkeypatch.setattr(LLM, "_LAST_CALL", {})
+    monkeypatch.setattr(LLM, "_DEAD_UNTIL", {})
     monkeypatch.setattr("time.sleep", lambda s: None)
 
 
@@ -26,6 +27,9 @@ class _FakeClient:
 
 
 def _patch(monkeypatch, behaviors):
+    # fuerza solo Gemini para que los tests existentes sigan válidos
+    monkeypatch.setattr(LLM, "groq_api_key", lambda: None)
+    monkeypatch.setattr(LLM, "nvidia_api_key", lambda: None)
     monkeypatch.setattr(LLM, "gemini_api_keys", lambda: ["K1", "K2"])
     iters = {k: iter(v) for k, v in behaviors.items()}
 
@@ -42,6 +46,8 @@ def _patch(monkeypatch, behaviors):
 
 def test_rotacion_alterna_keys(monkeypatch):
     seen = []
+    monkeypatch.setattr(LLM, "groq_api_key", lambda: None)
+    monkeypatch.setattr(LLM, "nvidia_api_key", lambda: None)
     monkeypatch.setattr(LLM, "gemini_api_keys", lambda: ["K1", "K2"])
 
     def factory(key):
@@ -78,6 +84,72 @@ def test_401_salta_sin_esperar(monkeypatch):
     assert sleeps == []
 
 
+def test_proveedor_agotado_se_aparca(tmp_path, monkeypatch):
+    calls = {"K1": 0, "K2": 0}
+
+    def factory(key):
+        def fn():
+            calls[key] += 1
+            if key == "K1":
+                raise RuntimeError("429 quota")
+            return _Resp("ok-K2")
+        return _FakeClient(fn)
+
+    monkeypatch.setattr(LLM, "groq_api_key", lambda: None)
+    monkeypatch.setattr(LLM, "nvidia_api_key", lambda: None)
+    monkeypatch.setattr(LLM, "gemini_api_keys", lambda: ["K1", "K2"])
+    monkeypatch.setattr(LLM, "_new_client", factory)
+    for _ in range(4):
+        assert LLM.generate("x", retries=0) == "ok-K2"
+    # K1 aparcada: solo se sondea en la 1ª llamada
+    assert calls["K1"] == 1
+
+
+def test_cooldown_escalona_hasta_1h(monkeypatch):
+    LLM._mark_dead("nvidia")
+    b1 = LLM._DEAD_UNTIL["nvidia#b"]
+    LLM._mark_dead("nvidia")
+    b2 = LLM._DEAD_UNTIL["nvidia#b"]
+    assert b2 == min(3600.0, b1 * 2) and b1 == 900.0
+    LLM._mark_alive("nvidia")
+    assert "nvidia" not in LLM._DEAD_UNTIL
+
+
 def test_sin_keys_devuelve_vacio(monkeypatch):
+    monkeypatch.setattr(LLM, "groq_api_key", lambda: None)
+    monkeypatch.setattr(LLM, "nvidia_api_key", lambda: None)
     monkeypatch.setattr(LLM, "gemini_api_keys", list)
     assert LLM.generate("hola") == ""
+
+
+def test_nvidia_prueba_modelo_respaldo(monkeypatch):
+    used = []
+    monkeypatch.setattr(LLM, "groq_api_key", lambda: None)
+    monkeypatch.setattr(LLM, "nvidia_api_key", lambda: "N")
+    monkeypatch.setattr(LLM, "_models", lambda n: ["m1", "m2"])
+
+    def fake(base, key, model, p, mt, **kw):
+        used.append(model)
+        if model == "m1":
+            raise RuntimeError("HTTP 503: Service temporarily overloaded")
+        return "ok-fallback"
+    monkeypatch.setattr(LLM, "_openai_compat", fake)
+    assert LLM.generate("x", retries=1) == "ok-fallback"
+    assert used == ["m1", "m2"]
+
+
+def test_cadena_orden_y_rotacion(monkeypatch):
+    import inspect
+    real = LLM._openai_compat
+    assert inspect.signature(real).parameters["no_think"].default is True
+    monkeypatch.setattr(LLM, "groq_api_key", lambda: "G")
+    monkeypatch.setattr(LLM, "nvidia_api_key", lambda: "N")
+    monkeypatch.setattr(LLM, "gemini_api_keys", lambda: ["K1"])
+    seen = []
+    monkeypatch.setattr(LLM, "_openai_compat",
+                        lambda base, key, model, p, mt, **kw: (seen.append((key, model)), "ok")[1])
+    assert LLM.generate("x") == "ok"
+    assert LLM.generate("x") == "ok"
+    # round-robin reparte G→N; ambos por delante de Gemini
+    assert [k for k, _ in seen] == ["G", "N"]
+    assert LLM._providers()[0] == ("groq", "openai")

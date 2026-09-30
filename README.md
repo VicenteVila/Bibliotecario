@@ -54,9 +54,13 @@ ruff check bibliotecario tests
 
 ## Notas operativas
 
-- Modelo: `gemini-3.6-flash` (`gemini-2.5-flash` fue retirado por Google).
-- Keys en cadena con failover: `GEMINI_API_KEY`, `GEMINI_API_KEY_2`, … — ante 429/503
-  con backoff y salto de key; 401/403 salto directo. Cuota free ≈ 5 req/min.
-- Sin cuota LLM el sistema degrada con gracia: ingesta digital, búsquedas híbridas
+- Cadena de proveedores con failover, en orden: **Groq** (`GROQ_API_KEY`, `llama-3.3-70b-versatile`)
+  → **NVIDIA NIM** (`NVIDIA_API_KEY`, `nvidia/llama-3.1-nemotron-70b-instruct`) →
+  **Gemini** (`GEMINI_API_KEY[_N]`, `gemini-3.6-flash`; `gemini-2.5-flash` fue retirado por Google).
+  Modelos configurables con `GROQ_MODEL` / `NVIDIA_MODEL`.
+- Solo se usan los proveedores con key presente en `.env`; 401/403 salta de proveedor,
+  429/500/503 reintenta con backoff y luego salta. Pacing de 10 s por proveedor.
+- OCR por visión sigue en Gemini (Groq/NVIDIA no exponen visión aquí).
+- Sin cuota el sistema degrada con gracia: ingesta digital, búsquedas híbridas
   (ranking estructural local), `status` y `evolve` siguen operativos.
 - `data/`, `.env`, `*.db`, PDFs/DOCX fuente: fuera de git por diseño.

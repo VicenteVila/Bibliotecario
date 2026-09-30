@@ -19,6 +19,12 @@ REGLAS:
 LOOP: piensa → emite UN bloque ```json {"tool": nombre, "args": {...}}``` → recibe resultado → repite.
 Cuando tengas la respuesta final, escríbela SIN bloque json.
 
+CIERRE (obligatorio):
+- Con 1-2 tools ya tienes evidencia suficiente: RESPONDE de inmediato.
+- Máximo 3 llamadas a tools por pregunta; después responde con lo que tengas.
+- Nunca devuelvas JSON crudo como respuesta final: es una llamada a tool, no una respuesta.
+- Si algún tool falla o no hay evidencia, dilo con una frase y pasa a la respuesta final.
+
 TOOLS:
 - search_papers(query, top_k): búsqueda híbrida sobre chunks.
 - retrieve_evidence(query, top_m): caminos de razonamiento PEARL.
@@ -41,9 +47,10 @@ def render_state(question: str, evidence: list[str], history: list[str], lessons
     lines += [f"- {h}" for h in history[-8:]] or ["(inicio)"]
     lines += ["", f"LESSONS:\n{lessons or '(ninguna)'}"]
     if flat_count >= 7:
-        lines.append("\n[AVISO ESTANCAMIENTO 7+] Llevas 7 turnos sin progreso: haz DIAGNÓSTICO "
-                     "(get_subgraph con otra formulación) o responde con lo disponible.")
+        lines.append("\n[AVISO ESTANCAMIENTO 7+] Llevas 7 turnos sin progreso: responde AHORA con la "
+                     "evidencia acumulada, citing [doc:chunk]. No lances más tools.")
     elif flat_count >= 3:
-        lines.append("\n[AVISO ESTANCAMIENTO 3+] Sin progreso en 3 turnos: cambia de tool o de consulta.")
-    lines.append("\nResponde con UN bloque json de tool o con la respuesta final.")
+        lines.append("\n[AVISO ESTANCAMIENTO 3+] Sin progreso en 3 turnos: cambia de tool o responde ya.")
+    lines.append("\nAcción: UN bloque json de tool, o la respuesta final en prosa. "
+                 "Si ya tienes evidencia, la respuesta final es la opción correcta.")
     return "\n".join(lines)

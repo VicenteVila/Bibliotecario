@@ -1,15 +1,28 @@
-"""Cliente LLM mínimo (Gemini cloud) con rotación de keys y backoff ante 429.
+"""Cliente LLM multi-proveedor: Groq → NVIDIA → Gemini, con failover.
 
-- Sin keys → "" (el pipeline sigue sin enriquecimiento).
-- Ante 429: espera retryDelay y reintenta en la misma key; si se agotan los
-  reintentos, salta a la siguiente key (cuota fresca). 401/403 salta directo.
+- Cada proveedor configurado por env var se añade a la cadena en este orden:
+  GROQ_API_KEY, NVIDIA_API_KEY, GEMINI_API_KEY[_N] (round-robin entre las Gemini).
+- Toda llamada va a /chat/completions estilo OpenAI (Groq y NVIDIA) excepto las
+  Gemini (SDK nativo). 401/403 salta de proveedor; 429/503/500 con backoff.
+- Sin proveedor configurado → "" (el pipeline sigue sin LLM).
 """
 from __future__ import annotations
 
+import json
 import logging
 import time
+import urllib.error
+import urllib.request
 
-from bibliotecario.config import _LLM_MODEL, gemini_api_keys
+from bibliotecario.config import (
+    _GROQ_MODEL,
+    _LLM_MODEL,
+    _NVIDIA_FALLBACK,
+    _NVIDIA_MODEL,
+    gemini_api_keys,
+    groq_api_key,
+    nvidia_api_key,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -18,18 +31,39 @@ class _KeyInvalid(Exception):
     pass
 
 
-# Rotación round-robin + pacing: reparte carga entre keys y respeta ~5 req/min/key.
+# Pacing por proveedor: respeta rate limits de cada endpoint.
 _RR_INDEX = 0
-_LAST_CALL: dict[int, float] = {}
-_MIN_INTERVAL = 12.0
+_LAST_CALL: dict[str, float] = {}
+_MIN_INTERVAL = 10.0
+
+# Cooldown adaptativo: un proveedor agotado se aparca (evita sondearlo cada llamada).
+_DEAD_UNTIL: dict[str, float] = {}
+_DEAD_BACKOFF = 900.0  # 15 min, se duplica hasta 1h por fallos consecutivos
+_MAX_BACKOFF = 3600.0
 
 
-def _pace(idx: int) -> None:
-    import time as _t
-    wait = _MIN_INTERVAL - (_t.monotonic() - _LAST_CALL.get(idx, 0.0))
+def _is_dead(name: str) -> bool:
+    return _DEAD_UNTIL.get(name, 0.0) > time.monotonic()
+
+
+def _mark_dead(name: str) -> None:
+    prev = _DEAD_UNTIL.get(name + "#b")
+    back = _DEAD_BACKOFF if prev is None else min(_MAX_BACKOFF, prev * 2)
+    _DEAD_UNTIL[name] = time.monotonic() + back
+    _DEAD_UNTIL[name + "#b"] = back
+    logger.warning("LLM %s aparcado %.0f min", name, back / 60)
+
+
+def _mark_alive(name: str) -> None:
+    _DEAD_UNTIL.pop(name, None)
+    _DEAD_UNTIL.pop(name + "#b", None)
+
+
+def _pace(name: str) -> None:
+    wait = _MIN_INTERVAL - (time.monotonic() - _LAST_CALL.get(name, 0.0))
     if wait > 0:
-        _t.sleep(wait)
-    _LAST_CALL[idx] = _t.monotonic()
+        time.sleep(wait)
+    _LAST_CALL[name] = time.monotonic()
 
 
 def _retry_delay(exc: Exception, default: float = 30.0) -> float:
@@ -39,6 +73,37 @@ def _retry_delay(exc: Exception, default: float = 30.0) -> float:
         return min(120.0, float(m.group(1)) + 2.0) if m else default
     except ValueError:
         return default
+
+
+def _classify(exc: Exception) -> str:
+    s = str(exc)
+    code = getattr(exc, "code", None)
+    if code == 401 or code == 403 or "401" in s or "403" in s or "API_KEY_INVALID" in s:
+        return "invalid"
+    if (code in (429, 500, 503) or "429" in s or "500" in s or "503" in s
+            or "UNAVAILABLE" in s or "overloaded" in s.lower() or "high demand" in s.lower()):
+        return "retryable"
+    return "other"
+
+
+def _openai_compat(base_url: str, api_key: str, model: str, prompt: str,
+                   max_tokens: int, temperature: float = 0.2, no_think: bool = True) -> str:
+    payload = {"model": model,
+               "messages": [{"role": "user", "content": prompt}],
+               "max_tokens": max_tokens, "temperature": temperature}
+    if no_think:  # Nemotron/GLM: sin esto el razonamiento se filtra en content
+        payload["chat_template_kwargs"] = {"enable_thinking": False}
+    req = urllib.request.Request(
+        base_url.rstrip("/") + "/chat/completions", data=json.dumps(payload).encode(),
+        headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json",
+                 "User-Agent": "bibliotecario/1.0 (+https://github.com/VicenteVila/Bibliotecario)"})
+    try:
+        with urllib.request.urlopen(req, timeout=300) as r:
+            d = json.loads(r.read().decode())
+    except urllib.error.HTTPError as e:
+        raise RuntimeError(f"HTTP {e.code}: {e.read()[:300].decode(errors='replace')}") from e
+    msg = d["choices"][0]["message"]
+    return (msg.get("content") or msg.get("reasoning_content") or "").strip()
 
 
 def _new_client(key: str):
@@ -55,52 +120,74 @@ def _call_text(client, prompt: str, max_tokens: int) -> str:
     return (resp.text or "").strip()
 
 
-def _classify(exc: Exception) -> str:
-    s = str(exc)
-    if "401" in s or "403" in s or "API_KEY_INVALID" in s:
-        return "invalid"
-    if ("429" in s or "500" in s or "503" in s or "UNAVAILABLE" in s
-            or "overloaded" in s.lower() or "high demand" in s.lower()):
-        return "retryable"
-    return "other"
+def _endpoint(name: str) -> tuple[str, str | None]:
+    return {"groq": ("https://api.groq.com/openai/v1", groq_api_key()),
+            "nvidia": ("https://integrate.api.nvidia.com/v1", nvidia_api_key())}[name]
+
+
+def _models(name: str) -> list[str]:
+    """Modelos por proveedor, en orden de preferencia (el último es el respaldo)."""
+    if name == "groq":
+        return [_GROQ_MODEL]
+    return [_NVIDIA_MODEL] + ([_NVIDIA_FALLBACK] if _NVIDIA_FALLBACK != _NVIDIA_MODEL else [])
+
+
+def _providers() -> list[tuple[str, str]]:
+    """[(nombre, rol)] en orden de prioridad; rol: openai|gemini."""
+    prov: list[tuple[str, str]] = []
+    if groq_api_key():
+        prov.append(("groq", "openai"))
+    if nvidia_api_key():
+        prov.append(("nvidia", "openai"))
+    for i, _k in enumerate(gemini_api_keys(), start=1):
+        prov.append((f"gemini{i}", "gemini"))
+    return prov
 
 
 def generate(prompt: str, max_tokens: int = 512, retries: int = 2) -> str:
     global _RR_INDEX
-    keys = gemini_api_keys()
-    if not keys:
+    provs = _providers()
+    if not provs:
         return ""
-    n = len(keys)
-    start = _RR_INDEX % n
+    live = [p for p in provs if not _is_dead(p[0])] or provs
+    start = _RR_INDEX % len(live)
     _RR_INDEX += 1
-    for off in range(n):
-        ki = (start + off) % n
-        key = keys[ki]
-        _pace(ki)
-        try:
-            client = _new_client(key)
-        except Exception as e:
-            logger.warning("LLM key %d inutilizable: %s", ki + 1, str(e)[:120])
-            continue
+    for off in range(len(live)):
+        name, role = live[(start + off) % len(live)]
+        _pace(name)
         attempt = 0
+        mi = 0  # índice de modelo: el reintento cae al modelo de respaldo
         while True:
             try:
-                return _call_text(client, prompt, max_tokens)
+                if role == "gemini":
+                    idx = int(name[len("gemini"):]) - 1
+                    client = _new_client(gemini_api_keys()[idx])
+                    out = _call_text(client, prompt, max_tokens)
+                else:
+                    base, key = _endpoint(name)
+                    models = _models(name)
+                    out = _openai_compat(base, key or "", models[min(mi, len(models) - 1)],
+                                        prompt, max_tokens)
+                _mark_alive(name)
+                return out
             except Exception as e:
                 kind = _classify(e)
                 if kind == "invalid":
-                    logger.warning("LLM key %d rechazada, paso a siguiente", ki + 1)
+                    logger.warning("LLM %s rechazada, paso a siguiente", name)
+                    _mark_dead(name)
                     break
                 if kind == "retryable" and attempt < retries:
                     wait = _retry_delay(e)
-                    logger.warning("LLM reintentable key %d: esperando %.0fs (%d)", ki + 1, wait, retries - attempt)
+                    logger.warning("LLM reintentable %s: esperando %.0fs (%d)", name, wait, retries - attempt)
+                    mi += 1  # prueba el modelo de respaldo en el siguiente intento
                     time.sleep(wait)
                     attempt += 1
                     continue
                 if kind == "retryable":
-                    logger.warning("LLM key %d agotada/sobrecargada, paso a siguiente", ki + 1)
+                    logger.warning("LLM %s agotada/sobrecargada, paso a siguiente", name)
+                    _mark_dead(name)
                     break
-                logger.warning("LLM generate failed: %s", str(e)[:200])
+                logger.warning("LLM %s failed: %s", name, str(e)[:200])
                 return ""
     return ""
 
@@ -116,7 +203,7 @@ def generate_vision(prompt: str, png_bytes: bytes, max_tokens: int = 2048) -> st
     for off in range(n):
         ki = (start + off) % n
         key = keys[ki]
-        _pace(ki)
+        _pace(f"ocr{ki}")
         try:
             from google import genai
             from google.genai import types

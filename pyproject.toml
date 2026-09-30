@@ -42,6 +42,8 @@ line-length = 99
 "bibliotecario/memory/retriever.py" = ["BLE001", "S110"]
 # Un PF que falla no debe tumbar el loop: captura amplia deliberada.
 "bibliotecario/harness/pfs.py" = ["BLE001"]
+# El cierre del loop degrada con gracia: si un tool de síntesis falla, el loop sigue.
+"bibliotecario/agent/loop.py" = ["BLE001"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

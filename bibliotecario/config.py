@@ -5,6 +5,12 @@ from pathlib import Path
 
 _DEFAULT_DATA_DIR = Path("data")
 _LLM_MODEL = "gemini-3.6-flash"
+_GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+# NVIDIA: nemotron-3-super-120b es el que mejor sostiene los prompts largos del loop
+# (calidad + 1.8s). El 30b "lightning" degrada a basura con contexto largo; por eso
+# el respaldo es gpt-oss-20b (otra familia) y no un modelo de la misma serie.
+_NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-super-120b-a12b")
+_NVIDIA_FALLBACK = os.environ.get("NVIDIA_FALLBACK_MODEL", "openai/gpt-oss-20b")
 _EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 _EMBED_DIM = 384
 
@@ -38,6 +44,14 @@ def gemini_api_keys() -> list[str]:
         if v and v not in keys:
             keys.append(v)
     return keys
+
+
+def groq_api_key() -> str | None:
+    return os.environ.get("GROQ_API_KEY") or None
+
+
+def nvidia_api_key() -> str | None:
+    return os.environ.get("NVIDIA_API_KEY") or None
 
 
 def github_token() -> str | None:
