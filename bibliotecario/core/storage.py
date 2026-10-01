@@ -116,8 +116,11 @@ CREATE INDEX IF NOT EXISTS idx_memory_level ON memory_items(level);
 def _connect(path: Path | None = None) -> sqlite3.Connection:
     p = path or db_path()
     p.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(p))
+    conn = sqlite3.connect(str(p), timeout=10.0)
     conn.execute("PRAGMA journal_mode=WAL")
+    # Con --workers 4 varias preguntas escriben a la vez (harness_runs, lessons).
+    # Sin esto, sqlite3.connect espera 5 s y luego lanza "database is locked".
+    conn.execute("PRAGMA busy_timeout=10000")
     conn.execute("PRAGMA foreign_keys=ON")
     conn.row_factory = sqlite3.Row
     return conn

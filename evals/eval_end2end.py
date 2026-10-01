@@ -94,7 +94,13 @@ def citation_metrics(q: dict, answer: str, evidence: list) -> dict:
 
 
 def run_one(q: dict, turns: int) -> dict:
-    """Ejecuta una pregunta y devuelve su fila. No lanza: todo error va a la fila."""
+    """Ejecuta una pregunta y devuelve su fila. No lanza: todo error va a la fila.
+
+    Trampa: el pineo de proveedor (LLM_PROVIDERS) lo pone main(), no este
+    módulo. Si se llama a run_one() desde un script suelto sin fijar la variable,
+    el round-robin usa Gemini y la fila se mezcla con los runs de la eval. Para
+    eso está --provider en la CLI; desde código, fija LLM_PROVIDERS antes.
+    """
     LLM.reset_usage()
     t0 = time.time()
     try:
