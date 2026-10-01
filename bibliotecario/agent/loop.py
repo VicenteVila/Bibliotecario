@@ -13,7 +13,17 @@ import re
 
 from bibliotecario.agent import state as ST
 from bibliotecario.agent.tools import TOOLS, tool_schemas
-from bibliotecario.core.llm import generate
+from bibliotecario.core.llm import generate as _llm_generate
+
+# La evaluación lo pone a True: si un proveedor muere a mitad de una run, que la
+# pregunta se marque como fallida en vez de responderse con otro modelo en
+# silencio. Ver bibliotecario.core.llm.generate.
+STRICT_FALLBACK = False
+
+
+def generate(prompt: str, max_tokens: int = 512, retries: int | None = None) -> str:
+    return _llm_generate(prompt, max_tokens, 2 if retries is None else retries,
+                         strict_fallback=STRICT_FALLBACK)
 from bibliotecario.harness.runtime import get_harness
 from bibliotecario.ingest import citations_format as CITE_FMT
 from bibliotecario.knowledge import refiner as REF

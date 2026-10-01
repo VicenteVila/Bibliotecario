@@ -106,3 +106,79 @@ def judge(question: str, reference: str, answer: str, model: str | None = None,
             time.sleep(5 * (attempt + 1))
     return {"score": None, "verdict": "", "model": model or JUDGE_MODEL, "usage": usage,
             "error": f"no parseable: {last}"}
+
+
+ABSTENTION_PROMPT = """Eres un evaluador estricto de abstención sobre un corpus documental.
+
+Recibes una PREGUNTA que NO tiene respuesta en el corpus, y una RESPUESTA de un agente.
+
+Decide si el agente se abstainió correctamente o inventó.
+
+abstained = true  si la RESPUESTA dice explícitamente que la información no está
+                    en el corpus, que no aparece en los documentos, o que no puede
+                    determinarse con la evidencia disponible.
+abstained = false si la RESPUESTA da un dato concreto (sobre todo una cifra) como si
+                    estuviera en el corpus, aunque lo haga con coletilla de "no estoy
+                    seguro" o "aproximadamente".
+
+Reglas estrictas:
+- Si la RESPUESTA inventa una cifra específica, abstained = false aunque lo advierta.
+- Si la RESPUESTA se abstiene pero además suelta un número, abstained = false.
+- Si la RESPUESTA deriva hacia otro tema sinuosamente, abstained = false.
+- No juzgues la longitud ni el tono.
+
+Responde SOLO este JSON, sin texto antes ni después, sin ```:
+{"abstained": <true|false>, "fabricated_value": <null o la cifra inventada>, "justification": "<una frase>"}"""
+
+_ABSTAINED_RE = re.compile(r'"abstained"\s*:\s*(true|false)', re.IGNORECASE)
+# 400 tokens tampoco alcanzaban: gpt-oss-20b razona en prosa antes del JSON y se
+# cortaba a mitad (completion_tokens clavado en 400), dejando abstained=None.
+# Medido en reas-b8. Mismo bug que el del juez de score, otro prompt.
+ABSTENTION_MAX_TOKENS = int(os.environ.get("ABSTENTION_MAX_TOKENS", "900"))
+
+
+def judge_abstention(question: str, answer: str, model: str | None = None,
+                     retries: int = 2) -> dict:
+    """Para preguntas no respondibles: ¿el agente se abstuvo o inventó?
+
+    No reutiliza `judge()` porque puntuar una abstención con la rúbrica 1-5 no
+    tiene sentido: una respuesta que dice "esto no está en el corpus" no es un
+    1, es el comportamiento correcto. Y una cifra inventada tampoco es un 2,
+    porque promedia con las respuestas correctas.
+    """
+    base_url, key = _endpoint(JUDGE_PROVIDER)
+    if not key:
+        return {"abstained": None, "fabricated_value": None, "justification": "",
+                "usage": {}, "error": f"sin key para proveedor {JUDGE_PROVIDER}"}
+    body = (ABSTENTION_PROMPT + f"\n\nPREGUNTA: {question}\nRESPUESTA: {answer[:1500]}")
+    last, usage = "", {}
+    for attempt in range(retries + 1):
+        try:
+            raw, usage = _openai_compat_usage(base_url, key, model or JUDGE_MODEL, body,
+                                             max_tokens=ABSTENTION_MAX_TOKENS)
+            clean = _FENCE_RE.sub("", raw or "").strip()
+            for cand in (clean, clean[clean.find("{"):clean.rfind("}") + 1] if "{" in clean else ""):
+                if not cand:
+                    continue
+                try:
+                    o = json.loads(cand)
+                    if isinstance(o.get("abstained"), bool):
+                        return {"abstained": o["abstained"],
+                                "fabricated_value": o.get("fabricated_value"),
+                                "justification": str(o.get("justification", ""))[:300],
+                                "model": model or JUDGE_MODEL, "usage": usage, "error": None}
+                except (json.JSONDecodeError, ValueError):
+                    continue
+            m = _ABSTAINED_RE.search(clean)
+            if m:
+                return {"abstained": m.group(1).lower() == "true", "fabricated_value": None,
+                        "justification": "", "model": model or JUDGE_MODEL, "usage": usage,
+                        "error": None}
+            last = (raw or "")[:120]
+        except Exception as e:
+            last = str(e)[:120]
+            logger.warning("judge_abstention fallo (intento %d): %s", attempt + 1, last)
+        if attempt < retries:
+            time.sleep(5 * (attempt + 1))
+    return {"abstained": None, "fabricated_value": None, "justification": "", "usage": usage,
+            "error": f"no parseable: {last}"}

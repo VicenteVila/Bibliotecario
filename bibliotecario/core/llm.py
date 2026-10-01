@@ -10,6 +10,8 @@ from __future__ import annotations
 
 import json
 import logging
+import os
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -117,7 +119,40 @@ def _openai_compat_usage(base_url: str, api_key: str, model: str, prompt: str,
         raise RuntimeError(f"HTTP {e.code}: {e.read()[:300].decode(errors='replace')}") from e
     msg = d["choices"][0]["message"]
     usage = d.get("usage") or {}
+    _usage_sink().append({**usage, "model": model})
     return (msg.get("content") or msg.get("reasoning_content") or "").strip(), usage
+
+
+_TLS = threading.local()
+
+
+def _usage_sink() -> list:
+    """Contador de tokens del agente, por hilo.
+
+    El harness de evaluación necesita el gasto real del agente para decidir si
+    el barrido profundo se paga. Es thread-local porque la eval puede correr en
+    paralelo y un sink compartido mezclaría el gasto de preguntas distintas.
+    """
+    sink = getattr(_TLS, "sink", None)
+    if sink is None:
+        sink = _TLS.sink = []
+    return sink
+
+
+def reset_usage() -> None:
+    _usage_sink().clear()
+
+
+def usage_totals() -> dict:
+    """Tokens y llamadas acumuladas desde el último reset_usage()."""
+    sink = _usage_sink()
+    tot = {"calls": len(sink),
+           "prompt_tokens": sum(int(u.get("prompt_tokens") or 0) for u in sink),
+           "completion_tokens": sum(int(u.get("completion_tokens") or 0) for u in sink),
+           "models": sorted({u.get("model", "?") for u in sink})}
+    tot["total_tokens"] = tot["prompt_tokens"] + tot["completion_tokens"]
+    tot["calls_tokens_unknown"] = sum(1 for u in sink if u.get("tokens_unknown"))
+    return tot
 
 
 def _new_client(key: str):
@@ -147,7 +182,15 @@ def _models(name: str) -> list[str]:
 
 
 def _providers() -> list[tuple[str, str]]:
-    """[(nombre, rol)] en orden de prioridad; rol: openai|gemini."""
+    """[(nombre, rol)] en orden de prioridad; rol: openai|gemini.
+
+    `LLM_PROVIDERS` fija la lista (ej. "nvidia"). La evaluación lo necesita: el
+    round-robin normal reparte las llamadas entre proveedores, así que una run
+    de 120 preguntas acaba midiendo un Agentson: una parte Nemotron y otra
+    Gemini. La media seguía pareciendo válida, pero mezcla dos sistemas y las
+    llamadas a Gemini además no reportan tokens, así que el coste salía
+    infravalado. Con la lista fijada, una caída se registra como fallo.
+    """
     prov: list[tuple[str, str]] = []
     if groq_api_key():
         prov.append(("groq", "openai"))
@@ -155,13 +198,28 @@ def _providers() -> list[tuple[str, str]]:
         prov.append(("nvidia", "openai"))
     for i, _k in enumerate(gemini_api_keys(), start=1):
         prov.append((f"gemini{i}", "gemini"))
+    pinned = [p.strip() for p in (os.environ.get("LLM_PROVIDERS") or "").split(",") if p.strip()]
+    if pinned:
+        prov = [p for p in prov if p[0] in pinned]
     return prov
 
 
-def generate(prompt: str, max_tokens: int = 512, retries: int = 2) -> str:
+def generate(prompt: str, max_tokens: int = 512, retries: int = 2,
+             strict_fallback: bool = False) -> str:
+    """strict_fallback=True: si TODOS los proveedores fallan, lanza en vez de
+    devolver "".
+
+    Importante para la evaluación. Con el comportamiento normal, un 504
+    transitorio marca un proveedor como muerto y el resto de la run contesta
+    con otro modelo sin que nadie se entere: la media resultante mezcla dos
+    sistemas y sigue pareciendo válida. Con strict_fallback la pregunta se
+    registra como fallida, que es lo honesto.
+    """
     global _RR_INDEX
     provs = _providers()
     if not provs:
+        if strict_fallback:
+            raise RuntimeError("sin proveedores LLM configurados")
         return ""
     live = [p for p in provs if not _is_dead(p[0])] or provs
     start = _RR_INDEX % len(live)
@@ -177,6 +235,11 @@ def generate(prompt: str, max_tokens: int = 512, retries: int = 2) -> str:
                     idx = int(name[len("gemini"):]) - 1
                     client = _new_client(gemini_api_keys()[idx])
                     out = _call_text(client, prompt, max_tokens)
+                    # Gemini no devuelve usage aquí: se registra la llamada con
+                    # tokens_desconocidos para que el coste nunca se infravalore
+                    # en silencio por cambiar de proveedor.
+                    _usage_sink().append({"model": _LLM_MODEL, "provider": "gemini",
+                                          "tokens_unknown": True})
                 else:
                     base, key = _endpoint(name)
                     models = _models(name)
@@ -202,7 +265,13 @@ def generate(prompt: str, max_tokens: int = 512, retries: int = 2) -> str:
                     _mark_dead(name)
                     break
                 logger.warning("LLM %s failed: %s", name, str(e)[:200])
+                if strict_fallback:
+                    raise
                 return ""
+    if strict_fallback:
+        raise RuntimeError("todos los proveedores LLM fallaron: "
+                           + ", ".join(f"{n}({'muerto' if _is_dead(n) else 'ok'})"
+                                       for n, _ in provs))
     return ""
 
 
