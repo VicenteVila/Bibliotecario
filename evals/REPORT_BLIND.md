@@ -344,3 +344,82 @@ estándar de un run es 0.161 y el MDE de una comparación pareada está entre 0.
 0.48 según cuánto mueva el cambio. Con el perfil realista observado (+1.5 en unas
 8 preguntas, 27 sin cambio) el MDE es ≈0.07: de sobra para ver el efecto del
 anclaje, que en las 3 deterministas fue +1.67 de media.
+
+## Fase 0b: run completo con anclaje (r4) — y lo que él reveló
+
+40/40, **0 caídas de infraestructura**, 0 fallbacks, 0 truncadas. Con el anclaje
+la infra no cayó ni una vez, que era de lo que había queDepends.
+
+| | media | n | judge=1-2 | | |
+|---|---|---|---|---|---|
+| sin anclaje (r1-r3, sin infra) | 4.324 | 103 | | | |
+| **con anclaje (r4)** | **4.543** | 35 | | | |
+
+Abstención: `abstain_rate` 0.867 → **1.0** (5/5), `inventadas` 0.
+`cite_precision` 0.900 → **0.957**. `cite_coverage` 0.971.
+
+### El anclaje: +0.219, y NO es significante
+
+Comparación pareada sobre las 35 respondibles (r4 vs media de r1-r3):
+
+| | |
+|---|---|
+| media sin anclaje | 4.324 |
+| media con anclaje | 4.543 |
+| **delta** | **+0.219** |
+| sd de las diferencias | 1.026 |
+| **t pareado** | **1.26** (p ≈ 0.22) |
+
+| mejoran | Empeoran | Iguales |
+|---|---|---|
+| 11 | 5 | 19 |
+
+**No se puede afirmar que el anclaje mejore el agente.** El MDE real es 0.485 y el
+efecto medido es 0.219: la mitad de lo que haría falta para distinguirlo del
+ruido. Mi MDE previo de ±0.07 estaba mal calculado (asumí que solo cambiaban 8
+preguntas; el sd real de las diferencias es 1.026, no 0.141).
+
+Donde sí se ve el efecto, es grande y localized: `wiki-b1` +3.00 (2,2,2 → 5),
+`wiki-b7` +3.00 (2,2,2 → 5), `tce-b4` +1.33 (1,5,5 → 5), `wiki-b2` +1.33.
+Donde empeora, también: `reas-b2` −2.33, `reas-b6` −1.67, `wiki-b4` −1.33.
+
+**El mecanismo de la regresión es el propio anclaje.** `NO_ENCONTRADO` convierte
+una respuesta audaz y equivocada en una abstención honesta:
+
+- `reas-b6`: "La evidencia disponible no proporciona una definición clara de
+  detecting co-dependent improvements". Judge 2.
+- `wiki-b4`: "The evidence retrieved does not contain any information about...".
+  Judge 1.
+
+En las no respondibles eso es exactamente lo que se quería (`abstain_rate` 1.0).
+En las respondibles es una abstención falsa. El anclaje no distingue "el corpus no
+lo contiene" de "mi retrieval no lo encontró", y esa es su debilidad de diseño.
+
+### Lo que el run reveló de verdad: la salida temprana del loop
+
+`reas-b2` y `reas-b6` gastaron **3.1k y 2.7k tokens** cuando las demás gastan ~37k.
+Causa en `loop.py:332`: si el modelo responde en prosa en cualquier turno,
+
+```python
+if name is None:
+    if _toolish(out): ...
+    answer = _fix_truncation(CITE_FMT.normalize_citations(out.strip()))
+    break        # <- _final_answer NO se llama
+```
+
+Se acepta la respuesta y se corta. **Sin barrido profundo, sin anclaje, sin
+forzar cita.** Y esas dos filas son exactamente 2 de las 5 regresiones.
+
+Agregado sobre las 4 runs (138 respondibles medidas):
+
+| ruta | n | judge medio |
+|---|---|---|
+| salida temprana (sin cierre forzado) | 11 | **2.273** |
+| cierre forzado a 4 turnos | 127 | **4.551** |
+| diferencia | | **+2.278, t = 8.95** |
+
+Ocurre en 5/35, 4/35, 2/35 y 2/35 de las runs: es un sesgo estructural, no una
+anomalía de r4. **Es la palanca más grande que hemos encontrado**, y no tiene nada
+que ver con el anclaje: el agente se salta la mitad buena de su propio pipeline
+cuando se impacienta.
+
