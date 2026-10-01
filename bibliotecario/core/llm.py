@@ -88,6 +88,19 @@ def _classify(exc: Exception) -> str:
 
 def _openai_compat(base_url: str, api_key: str, model: str, prompt: str,
                    max_tokens: int, temperature: float = 0.2, no_think: bool = True) -> str:
+    return _openai_compat_usage(base_url, api_key, model, prompt, max_tokens,
+                                temperature, no_think)[0]
+
+
+def _openai_compat_usage(base_url: str, api_key: str, model: str, prompt: str,
+                         max_tokens: int, temperature: float = 0.2,
+                         no_think: bool = True) -> tuple[str, dict]:
+    """Como _openai_compat, pero devuelve también el `usage` de la respuesta.
+
+    El conteo de tokens es lo único que permite saber si el barrido profundo
+    (que mete decenas de miles de caracteres en el cierre) sale rentable: sin
+    medirlo, cualquier decisión sobre el prompt es a ciegas.
+    """
     payload = {"model": model,
                "messages": [{"role": "user", "content": prompt}],
                "max_tokens": max_tokens, "temperature": temperature}
@@ -103,7 +116,8 @@ def _openai_compat(base_url: str, api_key: str, model: str, prompt: str,
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"HTTP {e.code}: {e.read()[:300].decode(errors='replace')}") from e
     msg = d["choices"][0]["message"]
-    return (msg.get("content") or msg.get("reasoning_content") or "").strip()
+    usage = d.get("usage") or {}
+    return (msg.get("content") or msg.get("reasoning_content") or "").strip(), usage
 
 
 def _new_client(key: str):
