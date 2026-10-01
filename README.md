@@ -57,17 +57,46 @@ ruff check bibliotecario tests
 ```bash
 python evals/eval_retrieval.py                    # métricas mecánicas de retrieval
 python evals/eval_end2end.py --turns 5            # loop completo + judge
+python evals/eval_end2end.py --golden golden_blind_qa.jsonl --turns 4 \
+       --provider nvidia --out result_blind_r1.json   # evaluación ciega
 ```
 
-El golden set (`evals/golden_qa.jsonl`) son 15 preguntas de dificultad creciente.
-Retrieval a nivel de documento: recall@1 `0.933`, recall@3/5 `1.0`, MRR `0.956`.
-End-to-end: `judge_mean 4.38`, `provenance 0.90`, 93 % de respuestas con cita,
-0 truncadas, 0 fallbacks de proveedor.
+### Set ciego (el que cuenta)
 
-El `judge_mean` es **estocástico** (mismo modelo, temperatura > 0): tres runs
-idénticos dieron 3.33–3.71 antes del barrido profundo, con σ ≈ 0.19. Para judging
-de cambios pequeños hay que comparar varios runs, no uno. Las métricas
-deterministas (`recall`, `provenance`, `truncadas`) sí son señal fiable.
+`evals/golden_qa.jsonl` son 15 preguntas **vistas**: se depuraron mirando los
+fallos del agente, así que sus métricas están sesgadas al alza.
+
+`evals/golden_blind_qa.jsonl` son 40 preguntas escritas leyendo los chunks,
+sin ejecutar el agente ni el juez. 8 por paper, 35 respondibles y 5 no
+respondibles (una por paper, para medir abstención real). Agente pineado con
+`--provider nvidia` y juez en `openai/gpt-oss-20b`, de familia distinta.
+
+**Resultado: `judge_mean 4.219`, IC 95 % ± 0.273** sobre 3 runs × 35
+respondibles (4.400 / 4.000 / 4.257). `cite_precision 0.881`,
+`abstain_rate 0.867`, ~681k tokens de agente por run.
+Detalle completo en `evals/REPORT_BLIND.md`; datos en `evals/result_blind_r*.json`.
+
+El ruido **dentro** de una misma pregunta es `σ = 0.445`, contra `σ = 1.234`
+**entre** preguntas. Comparar dos sistemas sobre las mismas 35 preguntas con
+3 runs cada uno detecta diferencias de **0.112** al 95 %; con una sola run
+serían 0.194. Por eso hay que repetir: 5 preguntas tienen `σ ≥ 1.7` y barcan
+la escala entera entre runs (`tce-b5` fue 5, 3 y 0).
+
+Dos cosas que la eval ciega desmintió:
+
+- **La etiqueta de dificultad no predice el rendimiento.** Las "difíciles"
+  puntúan 4.667 y las "fáciles" 4.083. Etiquetaba cuántos chunks había que
+  combinar, no cuánto le costaba al agente.
+- **La abstención no está calibrada.** Se abstiene bien en 13/15 no respondibles,
+  pero `tce-b3` y `tce-b4` son abstenciones *falsas* que se repiten en las 3
+  runs, con la respuesta presente en el corpus. No distingue "no está" de "no
+  lo he retrieved", así que un `abstain_rate` alto no prueba que sepa callarse.
+  Míralo junto a `false_abstention_rate`.
+
+### Set antiguo
+
+Retrieval a nivel de documento sobre el set de 15: recall@1 `0.933`,
+recall@3/5 `1.0`, MRR `0.956`. End-to-end: `judge_mean 4.38`, `provenance 0.90`.
 
 ## Notas operativas
 

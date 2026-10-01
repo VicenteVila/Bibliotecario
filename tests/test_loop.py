@@ -22,7 +22,7 @@ def test_loop_end_to_end_scripted(tmp_path, monkeypatch):
     monkeypatch.setattr(LOOP, "generate", lambda *a, **k: script.pop(0) if script else "Fin.")
 
     from bibliotecario.harness import runtime as RT
-    monkeypatch.setattr(RT, "_harness", None)
+    RT.reset_harness()
     import bibliotecario.harness.pfs as PFS
     monkeypatch.setattr(PFS, "_registry", None)
 
@@ -46,7 +46,7 @@ def test_loop_tool_invalida_recupera(tmp_path, monkeypatch):
     ]
     monkeypatch.setattr(LOOP, "generate", lambda *a, **k: script.pop(0) if script else "Fin.")
     from bibliotecario.harness import runtime as RT
-    monkeypatch.setattr(RT, "_harness", None)
+    RT.reset_harness()
     import bibliotecario.harness.pfs as PFS
     monkeypatch.setattr(PFS, "_registry", None)
     r = LOOP.run("q", max_turns=4)
@@ -81,7 +81,7 @@ def test_presupuesto_agotado_sintetiza(tmp_path, monkeypatch):
 
     monkeypatch.setattr(LOOP, "generate", fake_gen)
     from bibliotecario.harness import runtime as RT
-    monkeypatch.setattr(RT, "_harness", None)
+    RT.reset_harness()
     import bibliotecario.harness.pfs as PFS
     monkeypatch.setattr(PFS, "_registry", None)
     r = LOOP.run("q", max_turns=2)

@@ -98,7 +98,10 @@ def run_one(q: dict, turns: int) -> dict:
     LLM.reset_usage()
     t0 = time.time()
     try:
-        r = LOOP.run(q["question"], max_turns=turns)
+        # isolated=True: sin lecciones. Si no, el prompt lleva las 5 últimas,
+        # que incluyen el texto de otras preguntas del golden (key_insights
+        # = "Q: <pregunta>") y la eval deja de ser ciega.
+        r = LOOP.run(q["question"], max_turns=turns, isolated=True)
     except Exception as e:
         r = {"answer": "", "evidence": [], "turns": 0, "error": str(e)[:120]}
     usage = LLM.usage_totals()

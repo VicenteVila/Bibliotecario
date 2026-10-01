@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import logging
+import threading
 import uuid
 from typing import Any
 
@@ -72,11 +73,26 @@ class RuntimeHarness:
                 "action_pass_rate": self.actions.passed / max(1, self.actions.passed + self.actions.failed)}
 
 
-_harness: RuntimeHarness | None = None
+_local = threading.local()
 
 
 def get_harness() -> RuntimeHarness:
-    global _harness
-    if _harness is None:
-        _harness = RuntimeHarness()
-    return _harness
+    """Harness por hilo.
+
+    Antes era un singleton de módulo: con `--workers 4` las cuatro preguntas
+    paralelas compartían un harness, así que el calibrate() de una pisaba el
+    de otra y los contadores (interventions, actions.passed/failed) se
+    mezclaban entre preguntas distintas. El estado de una pregunta no puede
+    depender del orden de intercalado de los hilos, o la evaluación deja de
+    ser repetible. En producción el hilo es único, así que el comportamiento
+    no cambia.
+    """
+    harness = getattr(_local, "harness", None)
+    if harness is None:
+        harness = _local.harness = RuntimeHarness()
+    return harness
+
+
+def reset_harness() -> None:
+    """Olvida el harness del hilo actual. Solo para tests."""
+    _local.harness = None

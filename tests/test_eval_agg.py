@@ -79,7 +79,7 @@ def test_run_one_routes_unanswerable_to_abstention_judge(monkeypatch):
     monkeypatch.setattr(H.LLM, "usage_totals",
                         lambda: {"total_tokens": 1, "calls": 1, "calls_tokens_unknown": 0})
     monkeypatch.setattr(H.LOOP, "run",
-                        lambda q, max_turns=4: {"answer": "no consta en el corpus",
+                        lambda q, max_turns=4, isolated=False: {"answer": "no consta en el corpus",
                                                 "evidence": [], "turns": 1})
 
     def fake_abstain(question, answer, **kw):
@@ -181,3 +181,45 @@ def test_abstencion_falsa_se_mide_aparte():
     assert agg["answer_rate_on_answerable"] == 0.5
     # Y no debe alterar la media de calidad: sigue siendo 4.5.
     assert agg["judge_mean"] == 3.25
+
+
+def test_eval_arranca_aislado_de_lecciones():
+    """Guardián: si alguien quita isolated=True, el prompt se contaminaría."""
+    import inspect
+
+    from evals import eval_end2end as E
+    src = inspect.getsource(E.run_one)
+    assert "isolated=True" in src, "eval_end2end.run_one debe llamar a LOOP.run con isolated=True"
+
+
+def test_isolated_no_escribe_leccion_ni_las_lectura(monkeypatch):
+    """isolated=True: ni save_lesson ni lectura de la tabla lessons."""
+    import bibliotecario.agent.loop as L
+
+    called = []
+    monkeypatch.setattr(L.REF, "save_lesson", lambda *a, **k: called.append(a))
+    monkeypatch.setattr(L, "load_lessons", lambda *a, **k: called.append(("read", a)) or "LECCION")
+    monkeypatch.setattr(L, "generate", lambda *a, **k: '{"tool":"search_papers","args":{"query":"x"}}')
+    monkeypatch.setattr(L, "_toolish", lambda *a, **k: True)
+    monkeypatch.setattr(L, "parse_tool_call", lambda *a, **k: ("search_papers", {"query": "x"}))
+
+    L.run("pregunta de prueba", max_turns=1, isolated=True)
+    assert called == [], f"isolated no debe tocar lessons, pero: {called}"
+
+
+def test_harness_es_por_hilo():
+    """Con --workers 4 las preguntas paralelas no pueden compartir harness."""
+    import threading
+
+    from bibliotecario.harness.runtime import get_harness
+    seen = []
+
+    def grab():
+        seen.append(get_harness())
+
+    ts = [threading.Thread(target=grab) for _ in range(4)]
+    [t.start() for t in ts]
+    [t.join() for t in ts]
+    assert len({id(h) for h in seen}) == 4, "cada hilo debe tener su harness"
+    # El hilo principal conserva el suyo.
+    assert get_harness() is get_harness()

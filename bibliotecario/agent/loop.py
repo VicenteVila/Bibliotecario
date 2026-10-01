@@ -219,7 +219,16 @@ def _synthesize(question: str, retries: int = 1) -> str:
     return "" if out.startswith("(extractivo)") else out
 
 
-def run(question: str, max_turns: int = MAX_TURNS) -> dict:
+def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False) -> dict:
+    """Responde una pregunta.
+
+    `isolated=True` corta el aprendizaje: no lee lecciones guardadas ni escribe
+    una nueva. Es obligatorio en evaluación. Sin esto el prompt incluye las 5
+    lecciones más recientes, cuyo key_insights es `Q: <texto de la pregunta>`,
+    así que el agente ve preguntas anteriores del propio golden set: la eval deja
+    de ser ciega y cada run hereda las preguntas del run anterior, con lo que la
+    varianza medida mezcla ruido del modelo con deriva del estado.
+    """
     harness = get_harness()
     harness.calibrate(tool_schemas())
     run_id = harness.start_run({"question": question})
@@ -231,8 +240,9 @@ def run(question: str, max_turns: int = MAX_TURNS) -> dict:
     last_call = ""
 
     for turn in range(max_turns):
+        lessons = "" if isolated else load_lessons()
         prompt = (ST.STATIC_PROMPT + "\n\n" + ST.render_state(question, evidence, history,
-                                                              load_lessons(), flat, best))
+                                                              lessons, flat, best))
         out = generate(prompt, max_tokens=1024)
         transcript.append(f"T{turn}: {out[:500]}")
         if not out:
@@ -305,6 +315,7 @@ def run(question: str, max_turns: int = MAX_TURNS) -> dict:
         flat += 1
 
     harness.finish_run(run_id, None, {"turns": turn + 1, "tools": len(evidence)})
-    REF.save_lesson("qa", what_worked="\n".join(succeeded[-5:]), what_failed="\n".join(failed[-5:]),
-                    key_insights=f"Q: {question[:200]}")
+    if not isolated:
+        REF.save_lesson("qa", what_worked="\n".join(succeeded[-5:]), what_failed="\n".join(failed[-5:]),
+                        key_insights=f"Q: {question[:200]}")
     return {"answer": answer, "turns": turn + 1, "evidence": evidence, "run_id": run_id}
