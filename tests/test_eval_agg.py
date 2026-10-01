@@ -223,3 +223,20 @@ def test_harness_es_por_hilo():
     assert len({id(h) for h in seen}) == 4, "cada hilo debe tener su harness"
     # El hilo principal conserva el suyo.
     assert get_harness() is get_harness()
+
+
+def test_cifra_inventada_cero_cuenta_como_inventada():
+    """0 es falsy: si se cuenta por verdad, una fabricacion de 0 pasa por buena."""
+    un = [
+        {"id": "u1", "unanswerable": True, "abstained": True, "fabricated_value": "0"},
+        {"id": "u2", "unanswerable": True, "abstained": True, "fabricated_value": None},
+        {"id": "u3", "unanswerable": True, "abstained": False, "fabricated_value": None},
+    ]
+    for r in un:
+        r.update(judge=None, judge_error=None, difficulty="facil", cite_precision=0.0,
+                 cite_coverage=0.0, answer_has_cite=False, answer="x", answer_cites=0,
+                 turns=1, truncated=False, fallback=False, latency_s=1,
+                 agent_usage={"total_tokens": 1, "calls": 1})
+    agg = H.aggregate(un, turns=4, retries=1)
+    assert agg["n_unanswerable"] == 3
+    assert agg["n_fabricated"] == 1, agg["n_fabricated"]

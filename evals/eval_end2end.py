@@ -188,7 +188,10 @@ def aggregate(out: list, turns: int, retries: int) -> dict:
         agg.update({
             "abstain_rate": mean([1.0 if r["abstained"] else 0.0 for r in decided]),
             "n_abstain_decided": len(decided), "n_abstain_errors": nu - len(decided),
-            "n_fabricated": sum(1 for r in un_rows if r.get("fabricated_value")),
+            # is not None y no truthiness: una cifra inventada de 0 es tan
+            # inventada como un 2.7. Contando por verdad, pg-b8 daba "0" y
+            # pasaba por abstención limpia.
+            "n_fabricated": sum(1 for r in un_rows if r.get("fabricated_value") is not None),
         })
     if na:
         # Abstención sobre preguntas respondibles: no es una virtud, es retrieval
