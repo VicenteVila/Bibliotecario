@@ -32,6 +32,47 @@ demás, que es justo lo que importa.
 
 **judge = 4.229, IC 95 % ± 0.259** sobre 105 observaciones.
 
+## Fase 1: el ruido es del agente, no del juez
+
+La pregunta era cuánto del σ=0.709 intra-pregunta es del juez. Resuelta
+midiendo, no suponiendo: se re-juzgó la **misma** respuesta 3 veces
+(`evals/measure_judge_noise.py`, 19 respuestas × 3 repeticiones × 2 brazos =
+114 llamadas, 94.9k tokens, **cero llamadas al agente**). Todo lo que varía al
+repetir el juez sobre la misma respuesta es ruido del juez por construcción.
+
+| | T=0.2 | T=0.0 |
+|---|---|---|
+| sd del juez | **0.061** | 0.061 |
+| sd máxima en un item | 0.577 | 0.577 |
+| items coherentes en las 3 repeticiones | 17/19 | 17/19 |
+| errores de parseo | 0 | 0 |
+
+| | |
+|---|---|
+| sd del juez | 0.061 |
+| sd intra-pregunta observada en las runs | 0.709 |
+| **varianza explicada por el juez** | **0.7 %** |
+
+**El juez explica el 0.7 % de la varianza. El resto es el agente.** Las dos
+discrepancias están justo en una frontera de la rúbrica: `tce-b7` dio 5,4,4
+(original 4) y `wiki-b4` dio 2,1,2 (original 2). Error de ±1 punto, en el sitio
+donde la rúbrica dice "le falta un matiz" (4) frente a "correcta y completa" (5).
+
+Confirma por un camino independiente el análisis gratuito previo: 0 casos de
+respuesta idéntica con nota distinta en las 3 runs.
+
+### `temperature` no sirve: el endpoint la ignora
+
+Sorpresa que invalida una recomendación previa. Se repitieron 4 llamadas
+**idénticas** con `temperature=0.0` y devolvieron **3 salidas distintas**; con
+0.9, 4 distintas. NVIDIA NIM ignora el parámetro, así que **no se puede hacer
+el juez reproducible bajando la temperatura**. Por eso los dos brazos dan
+exactamente los mismos números.
+
+La alternativa correcta es **cachear el juez por hash de
+(pregunta, referencia, respuesta, modelo)**: entonces re-puntuar es
+determinista y gratis. Pendiente.
+
 ## Varianza
 
 | | contaminado | válido |
@@ -123,13 +164,13 @@ turno costaban **~108k tokens por run** (670k → 562k al aislar).
 
 - **Una sola familia de juez**, y además comparte endpoint (NVIDIA) con el
   agente. Solo difieren en familia de modelo.
-- **El juez es estocástico y se contradice.** 0 errores de parseo en 105
-  llamadas, pero `pg-b4` y `tce-b6` quedaron en 0 en la run 2: o el juez está
-  entre 1 y 5 según el día, o la respuesta estaba mal. Sin juez determinista no
-  se puede separar el ruido del modelo del ruido del juez, y buena parte del
-  σ = 0.709 puede ser suyo.
+- **El juez fluctúa poco (±1 punto en frontera de rúbrica) pero no es
+  determinista**, y el endpoint ignora `temperature`, así que no se puede
+  fijar sin cachear. Ver la sección de Fase 1.
 - **8 de 35 preguntas no dan un veredicto estable**, así que la media global
   resume mejor las 27 restantes.
+- **La deriva entre runs (6 preguntas `[3,5,5]`) sigue sin explicar.** Los logs
+  que lo habrían mostrado se borraron antes de commitearlos.
 - El barrido profundo se limita a los 2 papers con mejor score (`n_docs=2`): con
   5 papers serían ~80k caracteres. `tce-b4` y `tce-b5` fallaron bastante y son
   casos donde la respuesta está en un chunk que el top-8 no trae.

@@ -1,0 +1,181 @@
+{
+ "por_brazo": {
+  "0.2": {
+   "n_items": 19,
+   "n_calls": 57,
+   "n_parse_errors": 0,
+   "judge_sd": 0.061,
+   "judge_sd_max": 0.577,
+   "items_con_discrepancia": 2,
+   "frac_items_coherentes": 0.895,
+   "media_notas": 3.895,
+   "tokens": 47090,
+   "detalle_discrepancias": [
+    {
+     "key": "tce-b7@r3",
+     "notas": [
+      5,
+      4,
+      4
+     ]
+    },
+    {
+     "key": "wiki-b4@r3",
+     "notas": [
+      2,
+      1,
+      2
+     ]
+    }
+   ]
+  },
+  "0.0": {
+   "n_items": 19,
+   "n_calls": 57,
+   "n_parse_errors": 0,
+   "judge_sd": 0.061,
+   "judge_sd_max": 0.577,
+   "items_con_discrepancia": 2,
+   "frac_items_coherentes": 0.895,
+   "media_notas": 3.895,
+   "tokens": 47784
+  }
+ },
+ "tokens_total": 94874,
+ "muestra": [
+  {
+   "key": "pg-b4@r2",
+   "id": "pg-b4",
+   "run": 2,
+   "categoria": "caida",
+   "judge_original": 0
+  },
+  {
+   "key": "tce-b6@r2",
+   "id": "tce-b6",
+   "run": 2,
+   "categoria": "caida",
+   "judge_original": 0
+  },
+  {
+   "key": "tce-b7@r3",
+   "id": "tce-b7",
+   "run": 3,
+   "categoria": "determinista_mala",
+   "judge_original": 4
+  },
+  {
+   "key": "wiki-b1@r3",
+   "id": "wiki-b1",
+   "run": 3,
+   "categoria": "determinista_mala",
+   "judge_original": 2
+  },
+  {
+   "key": "wiki-b7@r3",
+   "id": "wiki-b7",
+   "run": 3,
+   "categoria": "determinista_mala",
+   "judge_original": 2
+  },
+  {
+   "key": "pearl-b1@r3",
+   "id": "pearl-b1",
+   "run": 3,
+   "categoria": "determinista_buena",
+   "judge_original": 5
+  },
+  {
+   "key": "pearl-b2@r3",
+   "id": "pearl-b2",
+   "run": 3,
+   "categoria": "determinista_buena",
+   "judge_original": 5
+  },
+  {
+   "key": "pg-b2@r3",
+   "id": "pg-b2",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 5
+  },
+  {
+   "key": "pg-b3@r3",
+   "id": "pg-b3",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 5
+  },
+  {
+   "key": "pg-b5@r3",
+   "id": "pg-b5",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 1
+  },
+  {
+   "key": "pg-b6@r3",
+   "id": "pg-b6",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 5
+  },
+  {
+   "key": "reas-b3@r3",
+   "id": "reas-b3",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 5
+  },
+  {
+   "key": "reas-b6@r3",
+   "id": "reas-b6",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 5
+  },
+  {
+   "key": "tce-b3@r3",
+   "id": "tce-b3",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 5
+  },
+  {
+   "key": "tce-b4@r3",
+   "id": "tce-b4",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 5
+  },
+  {
+   "key": "tce-b5@r3",
+   "id": "tce-b5",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 5
+  },
+  {
+   "key": "wiki-b2@r3",
+   "id": "wiki-b2",
+   "run": 3,
+   "categoria": "inestable",
+   "judge_original": 5
+  },
+  {
+   "key": "reas-b2@r3",
+   "id": "reas-b2",
+   "run": 3,
+   "categoria": "estable",
+   "judge_original": 4
+  },
+  {
+   "key": "wiki-b4@r3",
+   "id": "wiki-b4",
+   "run": 3,
+   "categoria": "estable",
+   "judge_original": 2
+  }
+ ],
+ "reps": 3
+}

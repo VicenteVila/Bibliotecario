@@ -76,25 +76,34 @@ def _parse(raw: str) -> dict | None:
     return None
 
 
+JUDGE_TEMPERATURE = float(os.environ.get("JUDGE_TEMPERATURE", "0.2"))
+
+
 def judge(question: str, reference: str, answer: str, model: str | None = None,
-          retries: int = 2) -> dict:
+          retries: int = 2, temperature: float | None = None) -> dict:
     """Puntúa una respuesta. Devuelve score, verdict, model, usage y error (nunca lanza).
 
     Un judge que no parsea devuelve score=None y error≠None. El harness debe
     contarlo como 0 en la media (no descartarlo), o el sesgo de supervivencia
     infla la media justo en las preguntas difíciles.
+
+    `temperature` permite medir cuánto de la varianza de las notas es del juez y
+    no del agente. Por defecto 0.2 (JUDGE_TEMPERATURE), que es lo que se ha
+    usado siempre; con 0 el juez es reproducible y las comparaciones entre
+    versiones dejan de arrastrar ese ruido. Ver evals/measure_judge_noise.py.
     """
     base_url, key = _endpoint(JUDGE_PROVIDER)
     if not key:
         return {"score": None, "verdict": "", "model": model or JUDGE_MODEL,
                 "usage": {}, "error": f"sin key para proveedor {JUDGE_PROVIDER}"}
+    temp = JUDGE_TEMPERATURE if temperature is None else temperature
     body = (JUDGE_PROMPT + f"\n\nPREGUNTA: {question}\nREFERENCIA: {reference}\n"
             f"RESPUESTA: {answer[:1500]}")
     last, usage = "", {}
     for attempt in range(retries + 1):
         try:
             raw, usage = _openai_compat_usage(base_url, key, model or JUDGE_MODEL, body,
-                                             max_tokens=JUDGE_MAX_TOKENS)
+                                             max_tokens=JUDGE_MAX_TOKENS, temperature=temp)
             got = _parse(raw)
             if got:
                 return {**got, "model": model or JUDGE_MODEL, "usage": usage, "error": None}
