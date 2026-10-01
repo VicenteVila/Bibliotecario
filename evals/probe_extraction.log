@@ -1,0 +1,16 @@
+proveedor pineado: ('nvidia', 'openai')
+loops pendientes: 3 (solo brazo estrecho; el ancho esta en las runs ciegas)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2847.79it/s]
+  1/3 wiki-b1   score=2 tokens=   5290 ['nvidia/nemotron-3-super-120b-a12b'] (74.4s)
+  2/3 wiki-b7   score=5 tokens=   5487 ['nvidia/nemotron-3-super-120b-a12b'] (76.6s)
+  3/3 tce-b7    score=2 tokens=   5426 ['nvidia/nemotron-3-super-120b-a12b'] (88.7s)
+
+=== estrecho (pajar minimo) vs ancho (runs ciegas reales) ===
+  wiki-b1   estrecho=2   ancho=[2, 2, 2]   evidencia ~1298 chars
+  wiki-b7   estrecho=5   ancho=[2, 2, 2]   evidencia ~1325 chars
+  tce-b7    estrecho=2   ancho=[4, 4, 4]   evidencia ~1312 chars
+
+--- lo que responde el agente con la aguja delante y nada mas:
+WikiSkill's knowledge layer consists of the persistent wiki, which stores skill-related files such as take-examine-move-loop.md, multi-operation-loop.md, and skill-impact.md, while the tracking layer includes the Skill Proposer and Wiki Maintainer components. The Wiki Maintainer updates the wiki by accumulating new evidence from rollouts, and the Skill Proposer proposes skill updates based on accumulated wiki patterns and stored trajectories. [5:37] [5:11]
+
+-> /mnt/c/Bibliotecario/evals/result_probe_extraction.json

@@ -174,3 +174,71 @@ turno costaban **~108k tokens por run** (670k → 562k al aislar).
 - El barrido profundo se limita a los 2 papers con mejor score (`n_docs=2`): con
   5 papers serían ~80k caracteres. `tce-b4` y `tce-b5` fallaron bastante y son
   casos donde la respuesta está en un chunk que el top-8 no trae.
+## Fase 2 (descartada): el problema no es el volumen del contexto
+
+Antes de tocar el agente se hicieron tres mediciones locales, sin inferencia
+(`evals/diagnose_visibility.py`):
+
+1. **La ventana de 220 chars del loop no oculta nada útil.** `result_s` es
+   `json.dumps(resultado)[:3000]` y de ahí se conservan 220. Con `search_papers`
+   el volcado gasta JSON, score, doc_id, chunk y **el título entero** (90 chars
+   solo para `WikiSkill`), así que quedan ~35 chars de texto de chunk de ~1300.
+   Medido en las 35 respondibles: `frac_visible = 0.000`. Ningún keyword de
+   ninguna pregunta llega a esa ventana.
+2. **La evidencia sí llega.** El doc gold está en el top-2 inyectado en 34/35
+   (nota 4.28 frente a 2.33 del único que se escapa, `wiki-b4`). Y el **chunk**
+   gold está inyectado en 29/35 (4.22) frente a 6/35 ausente (4.28): sin
+   diferencia. `wiki-b1` recibe el chunk 12, `wiki-b7` el 37 y `tce-b7` el 25.
+3. **El barrido entrega 5x más de lo que promete su docstring.** `per_doc=4` no
+   se respeta: `tools.py:125-128` añade los chunks léxicos y de cobertura con
+   `setdefault` sin comprobar el tope, y cada doc devuelve 19-22 chunks. Se
+   inyectan **50.494 chars de media** (máx 64k) donde el docstring dice 4-11k.
+
+Consecuencia: ampliar el truncado (la Fase 2 inicialmente propuesta) se
+construía sobre una premisa falsa, así que se sustituyó por el test correcto:
+**repetir el loop real dando solo el chunk gold** (pajar de 1.3k) frente a las
+runs válidas (46-56k). Todo idéntico salvo el volumen: trayectoria de 4 turnos,
+retries, filtro `_toolish`, parche de cita y juez.
+
+| pregunta | estrecho (1.3k) | ancho (46-56k, 3 runs) |
+|---|---|---|
+| `wiki-b1` | 2 | 2, 2, 2 |
+| `wiki-b7` | **5** | 2, 2, 2 |
+| `tce-b7` | **2** | 4, 4, 4 |
+
+Ni mejor ni peor: una sube 3 puntos, otra baja 2, otra igual. **El volumen no es
+el cuello de botella**, así que capar `per_doc` se descarta.
+
+Lo que sí muestra es el patrón de fallo real. El agente responde **con
+fluidez, citando bien y de forma reproducible**, y aun así se equivoca:
+
+- `wiki-b1` acierta `skill-impact.md` pero rellena con
+  `take-examine-move-loop.md` y `multi-operation-loop.md`, nombres plausibles
+  extraídos de otra parte del doc, en vez del `logs.md` de la referencia.
+- `tce-b7` con pajar corto responde sobre la reducción del 96% en coste con
+  Random-Resample: tema equivocado, bien citado.
+- `wiki-b7` con pajar corto acierta los tres elementos.
+
+Es desanclaje confiado, no truncamiento ni ruido. Encaja con Fase 1: si el juez
+solo explica el 0.7% de la varianza, es porque el fallo del agente es
+sistemático y reproducible, no aleatorio. `tce-b7` en concreto peorea al
+recortar, lo que es coherente con que `_doc_coverage_chunks` existe justamente
+para garantizar la cobertura del apéndice: ese pajar no es ruido, es lo que
+mantiene al agente en tema.
+
+### Dos trampas del arnés (fallaron y se corrigieron)
+
+1. `generate()` hace round-robin entre proveedores: sin `LLM_PROVIDERS=nvidia`
+   una 504 de NVIDIA lleva la respuesta a **Gemini en silencio**. La primera
+   versión de la sonda dio 5,1,1 mezclando dos modelos. Ahora el proveedor se
+   pinea antes de tocar la red y se graba el modelo de cada llamada.
+2. El prompt de cierre es `_final_answer` (filtra `_toolish`, parchea
+   truncado, fuerza `[doc:?]`). Una reconstrucción a mano puntuaba el volcado
+   JSON de una llamada a tool como respuesta, y por eso todo salía 1. El prompt
+   se delega al loop, no se copia.
+
+### Pendiente por tanto
+
+Ningún cambio de volumen. Las vías que quedan son de anclaje, no de recorte:
+extraer citas literales antes de redactar, o abstención calibrada cuando el dato
+concreto no aparece. Requieren medición propia y aprobación aparte.
