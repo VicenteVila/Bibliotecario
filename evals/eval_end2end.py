@@ -231,7 +231,12 @@ def main() -> None:
     def emit(row):
         results[row["id"]] = row
         # Se persiste en orden del golden para que los ficheros sean comparables.
-        merged = [results[i] for i in (r["id"] for r in rows) if i in results] or out
+        # Las filas ya guardadas se conservan y las nuevas pisan por id: sin este
+        # merge, reanudar una run interrumpida descarte las filas anteriores sin
+        # avisar. Pasó de verdad: se perdieron 4 preguntas de la primera run.
+        merged_map = {r["id"]: r for r in out}
+        merged_map.update(results)
+        merged = [merged_map[q["id"]] for q in rows if q["id"] in merged_map]
         save(merged, aggregate(merged, args.turns, args.retries), rp, meta)
         flag = ("abst=" + str(row["abstained"])) if row["unanswerable"] else f"judge={row['judge']}"
         print(f"{row['id']:8} prec={row['cite_precision']:.2f} {flag} "
@@ -247,7 +252,9 @@ def main() -> None:
         for q in todo:
             emit(run_one(q, args.turns))
 
-    merged = [results[i] for i in (r["id"] for r in rows) if i in results] or out
+    merged_map = {r["id"]: r for r in out}
+    merged_map.update(results)
+    merged = [merged_map[q["id"]] for q in rows if q["id"] in merged_map]
     agg = aggregate(merged, args.turns, args.retries)
     save(merged, agg, rp, meta)
     print(f"\nn={agg['n']} (respondibles={agg['n_answerable']}, "

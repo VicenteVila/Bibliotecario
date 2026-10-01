@@ -6,6 +6,7 @@ incomparables (provenance contra un doc_id en preguntas multi-paper). Aquí se
 ciñan las dos cosas.
 """
 import json
+import sys
 
 import pytest
 
@@ -129,3 +130,30 @@ def test_both_goldens_parse_and_declare_answerable_docs(golden):
         assert "answerable_docs" in r
         if not r.get("unanswerable"):
             assert r["answerable_docs"]
+
+def test_reanudar_no_pierde_filas(tmp_path, monkeypatch):
+    """Reanudar una run debe conservar lo ya calculado.
+
+    Regresión real: emit() solo escribía las filas de la sesión en curso, así que
+    al reanudar tras una interrupción desaparecían las anteriores. Se perdieron
+    4 preguntas de 40 sin que el agregado lo indicara.
+    """
+    prev = {"id": "pearl-b1", "judge": 5, "judge_error": None, "unanswerable": False,
+            "difficulty": "facil", "cite_precision": 1.0, "cite_coverage": 1.0,
+            "answer_has_cite": True, "truncated": False, "fallback": False,
+            "latency_s": 5, "judge_usage": {}, "agent_usage": {}, "abstained": None,
+            "fabricated_value": None}
+    rp = tmp_path / "r.json"
+    rp.write_text(json.dumps({"rows": [prev]}))
+
+    # pearl-b1 ya está hecho; solo pearl-b2 se calcula en esta sesión.
+    monkeypatch.setattr(sys, "argv", ["eval_end2end.py", "--golden", "golden_blind_qa.jsonl",
+                                      "--ids", "pearl-b1,pearl-b2", "--turns", "4",
+                                      "--out", str(rp)])
+    monkeypatch.setattr(H, "run_one", lambda q, turns: {**prev, "id": q["id"],
+                                                        "judge": 3, "difficulty": "media"})
+    H.main()
+    d = json.loads(rp.read_text())
+    assert [r["id"] for r in d["rows"]] == ["pearl-b1", "pearl-b2"]
+    assert d["aggregate"]["n"] == 2
+    assert d["aggregate"]["judge_mean"] == 4.0
