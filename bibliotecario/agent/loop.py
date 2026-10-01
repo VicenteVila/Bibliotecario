@@ -331,7 +331,13 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False) -> di
                 history.append(msg)
                 failed.append(msg)
                 continue
-            answer = _fix_truncation(CITE_FMT.normalize_citations(out.strip()))
+            # Una respuesta en prosa no se acepta cruda: pasa por el cierre forzado
+            # para que corra el barrido profundo y se exijan las citas. Aceptarla
+            # aqui saltaba media pipeline (medido: 2.273 vs 4.551 de media).
+            draft = CITE_FMT.normalize_citations(out.strip())
+            answer = (_final_answer(question, draft, evidence, flat, retries=1)
+                      or _fix_truncation(draft))
+            harness.record_action("loop", {"tool": "final_answer", "args": {"turn": turn}})
             succeeded.append(f"respuesta final en turno {turn}")
             break
         if name == "":
@@ -342,7 +348,7 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False) -> di
             history.append(msg)
             failed.append(msg)
             continue
-        call_sig = f"{name}:{sorted(args)}"
+        call_sig = f"{name}:{sorted(args.items())}"
         v = harness.validate_call(name, args, tool_schemas())
         if not v.valid:
             harness.record_error("loop")

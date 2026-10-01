@@ -1,0 +1,14 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2959.36it/s]
+pg-b2    prec=1.00 judge=5 tok= 20371 fb=False 48s
+tce-b4   prec=1.00 judge=5 tok= 20248 fb=False 74s
+reas-b2  prec=1.00 judge=4 tok= 19812 fb=False 90s
+reas-b6  prec=1.00 judge=5 tok= 18747 fb=False 118s
+wiki-b7  prec=1.00 judge=5 tok= 12207 fb=False 84s
+wiki-b4  prec=1.00 judge=2 tok= 20907 fb=False 125s
+
+n=6 (respondibles=6, no respondibles=0) modelo_juez=openai/gpt-oss-20b
+judge=4.333 (n=6/6, 0 errores)  por dificultad={'facil': 4.5, 'media': 3.5, 'dificil': 5.0}
+cite_precision=1.0 cite_coverage=1.0 con_cita=1.0
+abstencion_falsa=0.167 ['wiki-b4'] (respondidas=0.833)
+tokens_agente=112292 en 30 llamadas | tokens_juez=5939 | latencia_mediana=90s
+truncadas=0 fallbacks=0 -> result_earlyexit_fix.json

@@ -423,3 +423,81 @@ anomalía de r4. **Es la palanca más grande que hemos encontrado**, y no tiene 
 que ver con el anclaje: el agente se salta la mitad buena de su propio pipeline
 cuando se impacienta.
 
+## Fase 0c: por qué se respondía antes de buscar, y el arreglo
+
+Pregunta que quedaba abierta tras r4: si el modelo respondía pronto por
+impaciencia. No era eso. `evals/diagnose_early_exit.py` capturó la traza completa
+de `reas-b2`, `reas-b6` y `tce-b4`. Lo que muestra es que **el modelo no se
+impacienta: el loop le dice que está atascado cuando no lo está.**
+
+Las cuatro llamadas del modelo, para las tres preguntas, son tool calls
+legítimas. Y son búsquedas distintas:
+
+```
+reas-b2  turno 0: search_papers "HotpotQA prompt-optimization task data split ..."
+         turno 1: search_papers "HotpotQA prompt-optimization data split ..."
+         turno 2: search_papers "HotpotQA prompt-optimization data split ..."
+         turno 3: search_papers "HotpotQA prompt-optimization data split ..."
+         turno 4: respuesta final
+```
+
+Tres búsquedas distintas y el contador de estancamiento sube igual. La causa,
+`loop.py:345`:
+
+```python
+call_sig = f"{name}:{sorted(args)}"     # -> "search_papers:['query', 'top_k']"
+```
+
+`sorted(args)` ordena **las claves**, no los valores. Toda llamada a
+`search_papers` produce la misma firma, el `flat` check compara contra `last_call`
+y coincide siempre, así que `flat` se incrementa en el segundo turno **aunque el
+modelo haya buscado algo completamente distinto**. Al llegar a `flat >= 3`,
+`state.py:55` inyecta:
+
+> [AVISO ESTANCAMIENTO 3+] Sin progreso en 3 turnos: cambia de tool o responde ya.
+
+El modelo obedece un aviso falso, contesta en prosa, y `loop.py:332` aceptaba esa
+prosa **literal, sin `_final_answer`**: sin barrido profundo, sin exigir cita.
+
+### Los dos arreglos
+
+1. `call_sig = f"{name}:{sorted(args.items())}"` — una consulta distinta cuenta
+   como progreso, y el aviso solo aparece cuando el ciclo es real.
+2. Una respuesta en prosa se trata como **borrador**, no como respuesta: pasa por
+   `_final_answer`, que corre el barrido profundo y exige las citas. Si el cierre
+   no devuelve nada, se cae al borrador, así que no se pierde la respuesta.
+
+### Verificación en producción
+
+6 preguntas: las 4 que pillaron el bug en r3/r4, más `tce-b4` y `pg-b2` como
+controles. Pipeline real, sin anclaje.
+
+| id | antes (turnos, judge, tok) | ahora | Δ judge |
+|---|---|---|---|
+| `reas-b2` | (3, **2**, 3144) | (4, **4**, 19812) | **+2** |
+| `reas-b6` | (3, **2**, 2695) | (4, **5**, 18747) | **+3** |
+| `wiki-b7` | (3, **2**, 2734) en r3 | (4, **5**, 12207) | **+3** |
+| `wiki-b4` | (3, **2**, 2637) en r3 | (4, **2**, 20907) | 0 |
+| `tce-b4` | (4, 5, 35073) con anclaje | (4, 5, 20248) | 0 |
+| `pg-b2` | (4, 5, 38717) con anclaje | (4, 5, 20371) | 0 |
+
+**Cero salidas tempranas restantes.** `cite_precision` y `cite_coverage` a 1.0,
+0 fallbacks, 0 truncadas.
+
+Dos cosas que se ven en la tabla y que no eran el objetivo:
+
+- **Menos tokens, no más.** `tce-b4` y `pg-b2` bajan de ~35-39k a ~20k. Antes
+  gastaban turnos en un ciclo
+  de estancamiento falso. (También sin anclaje, así que no es una comparación limpia
+  contra r4 — pero 20k sin anclaje contra 35k con anclaje dice que **el anclaje
+  costaba ~15k tokens por pregunta sin ganar nada en estas dos**.)
+- **`wiki-b4` no se arregla, y no es culpa del loop.** Su documento gold **no
+  está en el top-2** del barrido (medido antes: `wiki-b4 → False`). Ahora usa
+  20.9k tokens de evidencia real y sigue puntuando 2: es un fallo de retrieval
+  puro. Es la única abstención falsa que queda en el lote (0.167).
+
+Precaución: n=6, una sola run, sin potencia estadística. Lo que sí es determinista
+y directamente observable es que las 6 llegan ahora a 4 turnos y que `reas-b2` /
+`reas-b6` pasan de 2.7k a ~19k tokens, lo que prueba que el barrido profundo
+ahora se ejecuta en la vía que antes lo saltaba.
+

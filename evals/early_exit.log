@@ -1,0 +1,28 @@
+proveedor pineado: ('nvidia', 'openai')
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 3241.93it/s]
+
+==========================================================================
+reas-b2: 4 turnos, 5 llamadas al modelo
+  turno 0: {"tool": "search_papers", "args": {"query": "HotpotQA prompt-optimization task data split student model performance measurement", "top_k": 5}}
+  turno 1: {"tool": "search_papers", "args": {"query": "HotpotQA prompt-optimization data split student model performance measurement", "top_k": 5}}
+  turno 2: {"tool": "search_papers", "args": {"query": "HotpotQA prompt-optimization data split student model performance measurement", "top_k": 5}}
+  turno 3: {"tool": "search_papers", "args": {"query": "HotpotQA prompt-optimization data split student model performance measurement", "top_k": 5}}
+  turno 4: For the HotpotQA prompt-optimization task, the data split uses the HotpotQA distractor setting with 500 examples for training, 500 for validation, and 1,000 for testing [4:71]. The student model is GPT-4.1 mini [4:71]. Performance
+
+==========================================================================
+reas-b6: 4 turnos, 5 llamadas al modelo
+  turno 0: {"tool": "search_papers", "args": {"query": "co-dependent improvements IMG-100", "top_k": 5}}
+  turno 1: {"tool": "search_papers", "args": {"query": "co-dependent improvements IMG-100", "top_k": 5}}
+  turno 2: {"tool": "search_papers", "args": {"query": "co-dependent improvements IMG-100", "top_k": 5}}
+  turno 3: {"tool": "search_papers", "args": {"query": "co-dependent improvements IMG-100", "top_k": 5}}
+  turno 4: The paper defines detecting co-dependent improvements as identifying when parameter changes only yield gains when applied together, which single-parameter sweeps miss. In IMG-100, the agent recognized AMP as a VRAM enabler: reduci
+
+==========================================================================
+tce-b4: 4 turnos, 5 llamadas al modelo
+  turno 0: {   "tool": "search_papers",   "args": {     "query": "evaluation budget rho = 20% mean test accuracies standard deviations naive fixed subset Random-Resample full estimation S-hat-max selection variance-weighted selection",     "
+  turno 1: {"tool": "search_papers", "args": {"query": "evaluation budget rho = 20% mean test accuracies standard deviations naive fixed subset Random-Resample full estimation S-hat-max selection variance-weighted selection", "top_k": 10}}
+  turno 2: {"tool": "search_papers", "args": {"query": "evaluation budget rho = 20% mean test accuracies standard deviations naive fixed subset Random-Resample full estimation S-hat-max selection variance-weighted selection", "top_k": 10}}
+  turno 3: {"tool": "search_papers", "args": {"query": "evaluation budget rho = 20% mean test accuracies standard deviations naive fixed subset Random-Resample full estimation S-hat-max selection variance-weighted selection", "top_k": 10}}
+  turno 4: Based on the ablation study in Table 4 of the Task-CoEvolve paper at ρ=20%, the mean test accuracies with standard deviations for the four configurations are: Naive fixed subset: 47.2±0.6, plus Random-Resample: 48.2±0.5, plus full
+
+-> /mnt/c/Bibliotecario/evals/result_early_exit.json
