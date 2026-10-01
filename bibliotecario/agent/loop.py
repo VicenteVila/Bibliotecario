@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 import re
 
 from bibliotecario.agent import state as ST
@@ -19,6 +20,21 @@ from bibliotecario.core.llm import generate as _llm_generate
 # pregunta se marque como fallida en vez de responderse con otro modelo en
 # silencio. Ver bibliotecario.core.llm.generate.
 STRICT_FALLBACK = False
+
+# Anclaje: localizar verbatim antes de redactar. Medido en evals/probe_extraction.py
+# (ver REPORT_BLIND.md, "Fase 2 descartada"): recortar el contexto NO arregla las
+# preguntas que fallan, porque el fallo no es de volumen sino de desanclaje
+# confiado. El agente cita bien y se equivoca igual en los tres runs: con el
+# pajar de 1.3k responde sobre el tema equivocado (tce-b7) o rellena con nombres
+# de archivo reales pero hermanos de los pedidos (wiki-b1). Esos nombres SI estan
+# en el documento, asi que no es fabricacion: es mala seleccion.
+#
+# Que ademas "CIERRE OBLIGADO: responde YA" prohibe decir que no se encontro nada,
+# mientras el juez (evals/judge.py:47) ya esta preparado para puntuar bien una
+# abstention honesta. Esta fase devuelve solo los spans verbatim que pueden
+# responder la pregunta, y el cierre solo puede usar esos.
+ANCHOR_GROUNDING = os.environ.get("ANCHOR_GROUNDING", "0") == "1"
+_NO_ENCONTRADO = "NO_ENCONTRADO"
 
 
 def generate(prompt: str, max_tokens: int = 512, retries: int | None = None) -> str:
@@ -166,6 +182,42 @@ def _deep_evidence(question: str, per_doc: int = 4, n_docs: int = 2) -> str:
     return "\n\n".join(lines)
 
 
+def _ground(question: str, deep: str, retries: int = 1) -> str:
+    """Localiza en el barrido los spans verbatim que pueden responder la pregunta.
+
+    Devuelve las lineas relevantes tal cual, o `_NO_ENCONTRADO` si el barrido no
+    contiene el dato pedido. No resume ni parafrasea: si devuelve algo, tiene que
+    ser texto que aparece literalmente en `deep`.
+
+    Existe para separar dos fallos que hasta ahora se confundian: no encontrar el
+    dato, y encontrarlo pero redactar sobre otro. Al obligar a emitir el span
+    literal antes de redactar, el agente tiene que mostrar donde ha mirado, y el
+    cierre puede decir "no aparece" en vez de inventar un hermano plausible.
+    """
+    if not deep:
+        return _NO_ENCONTRADO
+    prompt = (
+        "Localiza en la EVIDENCIA las lineas que pueden responder exactamente a esta "
+        "PREGUNTA.\n"
+        f"PREGUNTA: {question}\n\n"
+        f"EVIDENCIA:\n{deep}\n\n"
+        "REGLAS ESTRICTAS:\n"
+        "- Copia las lineas LITERALMENTE, sin parafrasear, sin resumir, sin corregir.\n"
+        f"- Si ningun dato de la EVIDENCIA responde a la PREGUNTA, responde solo {_NO_ENCONTRADO}.\n"
+        "- No deducias ni combines: solo copia lo que esta ahi escrito.\n"
+        "- Si aparecen varios candidatos, copia TODOS los relevantes, no elijas.\n"
+        "- No escribas commentary, solo las lineas copiadas.\n\n"
+        f"RESPUESTA ({_NO_ENCONTRADO} si no hay nada):")
+    out = generate(prompt, max_tokens=700, retries=retries).strip()
+    if _toolish(out):
+        return _NO_ENCONTRADO
+    if _NO_ENCONTRADO in out:
+        return _NO_ENCONTRADO
+    # Solo se admiten lineas que existen literalmente en el barrido. Si el modelo
+    # paraphrasea, lo que survive es exactamente el texto justificable.
+    return out
+
+
 def _final_answer(question: str, best: str, evidence: list[str], flat: int, retries: int = 1) -> str:
     """Cierre forzado: pide una respuesta en prosa a partir de la evidencia reunida.
 
@@ -176,8 +228,26 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
     """
     deep = _deep_evidence(question)
     ctx = ("\n".join(evidence[-8:]) or "(ninguna)") + ("\n\nEVIDENCIA PROFUNDA (barrido por documento):\n" + deep if deep else "")
+
+    # Anclaje (opt-in por ANCHOR_GROUNDING=1). Una pasada extra de localizacion
+    # verbatim: obliga a mostrar el span antes de redactar, y devuelve
+    # NO_ENCONTRADO cuando el barrido no tiene el dato. Ese caso antes era
+    # imposible: "CIERRE OBLIGADO" empujaba a rellenar con un hermano plausible.
+    anclaje = ""
+    if ANCHOR_GROUNDING:
+        spans = _ground(question, deep, retries=retries)
+        if spans == _NO_ENCONTRADO:
+            anclaje = ("\n\nANCLAJE: no se ha localizado en el barrido ningún dato que "
+                       "responda a esta pregunta. NO inventes ni deduzcas: explica en una "
+                       "frase qué se buscó y qué se encontró.\n")
+        else:
+            anclaje = ("\n\nANCLAJE (verbatim, solo estas lineas pueden sostener la "
+                       f"respuesta):\n{spans}\n"
+                       "- Redacta EXCLUSIVAMENTE con lo que hay en el anclaje.\n"
+                       "- No introduzcas nombres, cifras ni reglas que no aparezcan ahí.\n")
+
     prompt = (ST.STATIC_PROMPT + "\n\nPREGUNTA: " + question +
-              "\n\nEVIDENCIA REUNIDA:\n" + ctx +
+              "\n\nEVIDENCIA REUNIDA:\n" + ctx + anclaje +
               f"\n\nMejor resultado parcial:\n{best or '(ninguno)'}\n"
               f"\nTurnos sin progreso: {flat}.\n"
               "CIERRE OBLIGADO: responde YA en prosa (máx 150 palabras) usando solo esta evidencia.\n"
@@ -185,7 +255,7 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
               "- CITA obligatoriamente cada afirmación con el formato [doc_id:chunk] "
               "(ej. [5:7]).\n"
               "- La pregunta pide un dato concreto (una cifra, un tope, una regla). "
-              "BÚSCA ese dato explícito en toda la evidencia, también en el barrido: "
+              "BÚSCA ese dato explícitamente en toda la evidencia, también en el barrido: "
               "no te quedes con el primer chunk parecido.\n"
               "- Cifras exactas: copia el número literal de la evidencia. Si dos fuentes "
               "se contradicen, cita la que responde a la pregunta concreta.\n"

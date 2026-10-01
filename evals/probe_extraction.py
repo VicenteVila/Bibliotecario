@@ -30,6 +30,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import statistics as st
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -71,7 +72,7 @@ def narrow(q: dict) -> str:
     return "\n\n".join(parts)
 
 
-def one(q: dict, rep: int, turns: int, patch: bool) -> dict:
+def one(q: dict, rep: int, turns: int, patch: bool, brazo: str) -> dict:
     """Loop real completo. Solo cambia el barrido profundo si patch=True."""
     original = LOOP._deep_evidence
     if patch:
@@ -85,7 +86,7 @@ def one(q: dict, rep: int, turns: int, patch: bool) -> dict:
     finally:
         LOOP._deep_evidence = original  # type: ignore[assignment]
     j = judge(q["question"], q["reference"], res["answer"])
-    return {"id": q["id"], "brazo": "estrecho" if patch else "ancho", "rep": rep,
+    return {"id": q["id"], "brazo": brazo, "rep": rep,
             "chars_evidencia": len(narrow(q)) if patch else None,
             "score": j["score"], "verdict": j["verdict"], "error": j["error"],
             "answer": res["answer"], "latency_s": round(time.time() - t0, 1),
@@ -96,11 +97,17 @@ def one(q: dict, rep: int, turns: int, patch: bool) -> dict:
 def main() -> dict:
     ap = argparse.ArgumentParser()
     ap.add_argument("--mode", choices=["loop"], default="loop")
+    ap.add_argument("--anchor", action="store_true",
+                    help="activa ANCHOR_GROUNDING: una pasada de localizacion verbatim "
+                         "antes de redactar")
+    ap.add_argument("--arm", choices=["produccion", "estrecho"], default="produccion",
+                    help="produccion = barrido real n_docs=2 (compara con las runs ciegas); "
+                         "estrecho = solo el chunk gold")
+    ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--reps", type=int, default=1)
     ap.add_argument("--turns", type=int, default=4)
     ap.add_argument("--questions", default=",".join(DEFAULT_Q))
     ap.add_argument("--workers", type=int, default=3)
-    ap.add_argument("--out", default=str(OUT))
     args = ap.parse_args()
 
     out_path = Path(args.out)
@@ -108,6 +115,12 @@ def main() -> dict:
     if [p[0] for p in provs] != ["nvidia"]:
         raise SystemExit(f"aborta: proveedor esperado nvidia, obtuve {provs}")
     print(f"proveedor pineado: {provs[0]}")
+
+    LOOP.ANCHOR_GROUNDING = args.anchor
+    patch = args.arm == "estrecho"
+    brazo = "estrecho" if patch else ("anclaje" if args.anchor else "ancho_control")
+    print(f"brazo={brazo}  ANCHOR_GROUNDING={LOOP.ANCHOR_GROUNDING}  "
+          f"barrido={'solo chunk gold' if patch else 'produccion (n_docs=2)'}")
 
     golden = {json.loads(l)["id"]: json.loads(l)
               for l in (EVALS / "golden_blind_qa.jsonl").read_text().splitlines() if l.strip()}
@@ -118,15 +131,15 @@ def main() -> dict:
         obs = json.loads(out_path.read_text()).get("observaciones", [])
         print(f"reanudando con {len(obs)} observaciones previas")
     jobs = [(q, r) for q in qs for r in range(args.reps)
-            if not any(o["id"] == q["id"] and o["brazo"] == "estrecho" and o["rep"] == r for o in obs)]
-    print(f"loops pendientes: {len(jobs)} (solo brazo estrecho; el ancho esta en las runs ciegas)")
+            if not any(o["id"] == q["id"] and o["brazo"] == brazo and o["rep"] == r for o in obs)]
+    print(f"loops pendientes: {len(jobs)}")
 
     def guarded(job):
         q, rep = job
         try:
-            return one(q, rep, args.turns, patch=True)
+            return one(q, rep, args.turns, patch=patch, brazo=brazo)
         except Exception as e:
-            return {"id": q["id"], "brazo": "estrecho", "rep": rep, "score": None,
+            return {"id": q["id"], "brazo": brazo, "rep": rep, "score": None,
                     "error": f"{type(e).__name__}: {e}"}
 
     if jobs:
@@ -138,17 +151,28 @@ def main() -> dict:
                       f"tokens={o.get('tokens', 0):7} {o.get('modelos')} "
                       f"({o.get('latency_s', 0)}s)", flush=True)
 
-    print("\n=== estrecho (pajar minimo) vs ancho (runs ciegas reales) ===")
+    print(f"\n=== {brazo} (anchor={LOOP.ANCHOR_GROUNDING}) vs ancho real ===")
+    per_q: dict[str, list] = {}
     for o in obs:
-        if o["brazo"] != "estrecho":
+        if o["brazo"] != brazo or o["score"] is None:
             continue
-        w = WIDE.get(o["id"])
-        print(f"  {o['id']:9} estrecho={o['score']}   ancho={w}   "
-              f"evidencia ~{o.get('chars_evidencia')} chars")
+        per_q.setdefault(o["id"], []).append(o["score"])
+    for qid, sc in per_q.items():
+        w = WIDE.get(qid)
+        delta = f"  (ancho={st.mean(w):.2f}, delta={st.mean(sc) - st.mean(w):+.2f})" if w else ""
+        print(f"  {qid:9} {brazo}={sc} media={st.mean(sc):.2f}{delta}")
+    vals = [s for v in per_q.values() for s in v]
+    if vals and per_q:
+        base = st.mean([s for v in per_q for s in WIDE.get(v, [0])])
+        print(f"  TOTAL     media={st.mean(vals):.2f}  vs ancho {base:.2f}  "
+              f"delta={st.mean(vals) - base:+.2f}")
+    errores = [o for o in obs if o.get("error") and o["brazo"] == brazo]
+    if errores:
+        print(f"\n  ATENCION: {len(errores)} llamadas con error/infra_error")
 
-    print("\n--- lo que responde el agente con la aguja delante y nada mas:")
+    print(f"\n--- respuesta del agente en {brazo} (wiki-b1):")
     for o in obs:
-        if o["brazo"] == "estrecho" and o["id"] == "wiki-b1":
+        if o["brazo"] == brazo and o["id"] == "wiki-b1":
             print(o["answer"][:600])
             break
 

@@ -242,3 +242,56 @@ mantiene al agente en tema.
 Ningún cambio de volumen. Las vías que quedan son de anclaje, no de recorte:
 extraer citas literales antes de redactar, o abstención calibrada cuando el dato
 concreto no aparece. Requieren medición propia y aprobación aparte.
+
+## Fase 3: anclaje (extracción verbatim antes de redactar)
+
+Ruta que quedaba abierta tras descartar la Fase 2. Opt-in por
+`ANCHOR_GROUNDING=1`; el default sigue siendo el de siempre, asi que nada cambia
+sin la variable.
+
+Una pasada extra de localización pide al modelo que **copie literal** las líneas
+del barrido que pueden responder la pregunta, y devuelva `NO_ENCONTRADO` si no
+hay ninguna. El cierre solo puede usar esos spans. Motivo, medido: el juez ya
+tiene una regla para puntuar bien una abstención honesta (`judge.py:47`), pero
+`CIERRE OBLIGADO: responde YA` lo impedía. Con el pajar corto, `tce-b7`
+respondía sobre la reducción del 96% en coste con Random-Resample: tema
+equivocado y bien citado. En `wiki-b1` el agente citaba
+`take-examine-move-loop.md`, que **no existe en el barrido de esa pregunta** (sí
+es real, pero pertenece a `wiki-b7`). Fabricación y mala selección a la vez.
+
+Comparación contra las runs válidas, mismo loop, mismo barrido de producción:
+
+| pregunta | sin anclaje (3 runs) | con anclaje (2 runs) | delta |
+|---|---|---|---|
+| `wiki-b1` | 2, 2, 2 | 3, **5** | **+2.00** |
+| `wiki-b7` | 2, 2, 2 | **5, 5** | **+3.00** |
+| `tce-b7` | 4, 4, 4 | 4, 4 | 0.00 |
+
+Ninguna regresión: el `0.00` de `tce-b7` significa "sigue como estaba", no
+empeora. Y las tres son preguntas deterministas por definición, así que el delta
+no es ruido del juez (que explica solo el 0.7% de la varianza).
+
+Verificación mecánica del caso más grave: los dos nombres que el agente
+inventaba desaparecen y los dos correctos aparecen.
+
+| | antes | con anclaje |
+|---|---|---|
+| `logs.md` (correcto) | ausente | presente |
+| `skill-impact.md` (correcto) | presente | presente |
+| `take-examine-move-loop.md` (inventado) | presente | **ausente** |
+| `multi-operation-loop.md` (hermano equivocado) | presente | **ausente** |
+
+Sin regresiones de formato: 6/6 respuestas con cita `[doc:chunk]`, 0 vacías, 0
+errores de infraestructura.
+
+### Coste
+
+~37k tokens por pregunta con anclaje frente a ~18k sin él: **se duplica**, porque
+la pasada de localización vuelve a leer el barrido completo. A 35 preguntas son
+~650k tokens extra por run. Before de activarlo por defecto hay que medir si el
+set completo aguanta la mejora: en estas 3 preguntasGanó, pero son las que ya
+fallaban, y el mecanismo solo puede ayudar cuando la evidencia contiene el dato.
+
+`wiki-b1` rep0 se quedó en 3 porque mezcla quién actualiza cada archivo: el anclaje
+encuentra los nombres correctos pero no siempre la atribución completa. El juez lo
+penaliza por matiz, no por invención.

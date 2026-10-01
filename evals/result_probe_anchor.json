@@ -1,0 +1,106 @@
+{
+ "observaciones": [
+  {
+   "id": "wiki-b1",
+   "brazo": "anclaje",
+   "rep": 0,
+   "chars_evidencia": null,
+   "score": 3,
+   "verdict": "The answer mentions the correct files (logs.md and skill-impact.md) but mixes their update responsibilities and adds unrelated files, so it is partially correct but incomplete.",
+   "error": null,
+   "answer": "WikiSkill's knowledge and tracking layers consist of the Wiki Layer (wiki/) and the Skills Layer (skills/). The Wiki Layer contains pattern directory (patterns/), evolution log (logs.md), and skill impact tracker (skill-impact.md), updated by the Wiki Maintainer and outer-loop harness after validation gating [5:11][5:12]. The Skills Layer contains SKILL.md and PURPOSE.md files per skill, updated by the Skill Proposer [5:11].",
+   "latency_s": 91.1,
+   "modelos": [
+    "nvidia/nemotron-3-super-120b-a12b"
+   ],
+   "tokens": 36386,
+   "turns": 0,
+   "infra_error": null
+  },
+  {
+   "id": "wiki-b1",
+   "brazo": "anclaje",
+   "rep": 1,
+   "chars_evidencia": null,
+   "score": 5,
+   "verdict": "La respuesta menciona correctamente los archivos logs.md y skill-impact.md, indicando que logs.md es actualizado por el Wiki Maintainer y skill-impact.md por el harness externo, tal como exige la referencia.",
+   "error": null,
+   "answer": "WikiSkill's knowledge and tracking layers consist of the Wiki Layer (wiki/) and the Skills Layer (skills/). The Wiki Layer is updated by the Wiki Maintainer, which consolidates traces into the wiki, and the Skills Layer is updated by the Skill Proposer, which proposes skill updates from the wiki and traces [5:11]. The Wiki Layer contains a pattern directory (patterns/) with markdown files documenting failure modes or successful strategies, an evolution log (logs.md) updated by the Wiki Maintainer, and a skill impact tracker (skill-impact.md) updated programmatically by the outer-loop harness after validation gating [5:11]. The Skills Layer contains active evolved skills, each with SKILL.md (full skill content) and PURPOSE.md (mapping skill to motivating Wiki patterns) [5:11]. The Wiki Maintainer performs root-cause analysis on traces to update the wiki, while the Skill Proposer uses the wiki and traces to propose skill updates [5:11]. The Gating and Rollback mechanism evaluates skill candidates on the validation set and retains updates that improve validation performance [5:5]. The wiki persists across iterations so future updates can build on accumulated knowledge [5:5]. The Inference Agent executes rollouts using current skills and writes traces [5:11]. The system co-evolves agent skills with a persistent knowledge base (wiki) by continuously consolidating experience into the wiki, which subsequent skill updates can build on [5:0]. The Wiki Layer provides long-term historical awareness across optimization iterations through its evolution log and skill impact tracker [5:11]. The Skills Layer encodes procedural knowledge that the Inference Agent can read [5:11]. The WikiSkill loop consists of four components: Inference Agent, Wiki Maintainer, Skill Proposer, and Gating and Rollback [5:11]. Each iteration involves the Inference Agent executing rollouts, the Wiki Maintainer consolidating traces into the wiki, the Skill Proposer proposing skill updates, and the Gating and Rollback mechanism evaluating skill candidates [5:11]. The wiki is not reset between iterations but accumulates and compiles knowledge continuously throughout the evolution process [5:11]. The Skill Layer contains the active set of evolved skills that the Inference Agent can read [5:11]. The Wiki Layer maintains structured knowledge that compounds across iterations [5:10]. The Raw Layer stores immutable execution traces [5:10]. The WikiSkill framework structures the agent workspace into three layers: Raw Layer (immutable execution traces), Wiki Layer (persistent knowledge base), and Skills Layer (active procedural instructions) [5:10]. In each evolutionary loop, the Inference Agent runs rollouts, the Wiki Maintainer consolidates traces into the Wiki, and the Skill Proposer suggests updates while the Wiki is retained across all iterations [5:10]. The Wiki Skill framework co-evolves the joint state (skill set, wiki) across iterations, leveraging training rollouts, pattern consolidation, and validation gating [5:10]. The Wiki Layer provides long-term historical awareness across optimization iterations through an evolution log and a skill impact tracker [5:11]. The Skills Layer contains active procedural knowledge that the Inference Agent can read [5:11]. The Wiki Maintainer updates the wiki by consolidating traces [5:11]. The Skill Proposer updates skills by proposing skill updates from the wiki and traces [5:11]. The Gating and Rollback mechanism evaluates skill candidates on the validation set [5:5]. The wiki persists so that future updates can build on accumulated knowledge [5:5]. The Inference Agent executes rollouts using current skills and writes traces [5:11]. The WikiSkill framework co-evolves agent skills with a persistent knowledge base that continually organizes and refines knowledge from agent experience [5:0]. The Wiki Layer is maintained throughout skill evolution [5:11]. The Skills Layer contains the active set of evolved skills [5:11]. The Wiki Layer is updated by the Wiki Maintainer [5:11]. The Skills Layer is updated by the Skill Proposer [5:11]. The Wiki Layer contains a pattern directory, evolution log, and skill impact tracker [5:11]. The Skills Layer contains SKILL.md and PURPOSE […truncado]",
+   "latency_s": 102.7,
+   "modelos": [
+    "nvidia/nemotron-3-super-120b-a12b"
+   ],
+   "tokens": 37663,
+   "turns": 0,
+   "infra_error": null
+  },
+  {
+   "id": "wiki-b7",
+   "brazo": "anclaje",
+   "rep": 0,
+   "chars_evidencia": null,
+   "score": 5,
+   "verdict": "The answer correctly lists the maintainer’s identification, the proposer’s proposal, and the preservation file, matching the reference, and adds extra context.",
+   "error": null,
+   "answer": "At Iteration 0, the Wiki Maintainer identifies a basic looping behavior (take-examine-move-loop.md), while the Skill Proposer proposes goal-directed-action, which fails to improve performance on the validation set and is rejected. Crucially, skill-impact.md preserves the proposal diff and rejection outcome, allowing subsequent skill updates to account for this failed attempt. Informed by this audit trail, the Skill Proposer creates break-repetition-loop at Iteration 1 with a concrete action rule (Never Return an Item to Its Origin Location), which is accepted. As new loop variants emerge across rollouts (multi-operation-loop.md), the Wiki Maintainer accumulates new evidence in the persistent wiki. Guided by these accumulated wiki patterns and newly stored trajectories, the Skill Proposer further refines the skill at Iteration 4 with a new rule (Each Operation Type ONCE Per Item). This example illustrates how persistent knowledge from prior iterations informs subsequent skill refinement. [5:37]",
+   "latency_s": 105.3,
+   "modelos": [
+    "nvidia/nemotron-3-super-120b-a12b"
+   ],
+   "tokens": 20027,
+   "turns": 0,
+   "infra_error": null
+  },
+  {
+   "id": "wiki-b7",
+   "brazo": "anclaje",
+   "rep": 1,
+   "chars_evidencia": null,
+   "score": 5,
+   "verdict": "Respuesta incluye todos los elementos solicitados con los datos concretos y no añade información incorrecta.",
+   "error": null,
+   "answer": "At Iteration 0, the Wiki Maintainer identifies a basic looping behavior (take-examine-move-loop.md), while the Skill Proposer proposes goal-directed-action, which fails to improve performance on the validation set and is rejected. Crucially, skill-impact.md preserves the proposal diff and rejection outcome, allowing subsequent skill updates to account for this failed attempt. [5:37]",
+   "latency_s": 63.9,
+   "modelos": [
+    "nvidia/nemotron-3-super-120b-a12b"
+   ],
+   "tokens": 19948,
+   "turns": 0,
+   "infra_error": null
+  },
+  {
+   "id": "tce-b7",
+   "brazo": "anclaje",
+   "rep": 0,
+   "chars_evidencia": null,
+   "score": 4,
+   "verdict": "Correctly cites the main reason but omits the performance drop and search‑time reduction details.",
+   "error": null,
+   "answer": "The large cost reduction of Random-Resample (96%) should not necessarily be interpreted as higher efficiency; rather, uniform sampling also spends its budget on easier tasks that terminate quickly. [3:25]",
+   "latency_s": 79.5,
+   "modelos": [
+    "nvidia/nemotron-3-super-120b-a12b"
+   ],
+   "tokens": 37280,
+   "turns": 0,
+   "infra_error": null
+  },
+  {
+   "id": "tce-b7",
+   "brazo": "anclaje",
+   "rep": 1,
+   "chars_evidencia": null,
+   "score": 4,
+   "verdict": "Correctly states the main reason but omits the performance drop and search‑time reduction details.",
+   "error": null,
+   "answer": "The large cost reduction of Random-Resample (96%) should not necessarily be interpreted as higher efficiency; rather, uniform sampling also spends its budget on easier tasks that terminate quickly. [3:25]",
+   "latency_s": 73.2,
+   "modelos": [
+    "nvidia/nemotron-3-super-120b-a12b"
+   ],
+   "tokens": 37140,
+   "turns": 0,
+   "infra_error": null
+  }
+ ]
+}
