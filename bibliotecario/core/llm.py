@@ -185,11 +185,11 @@ def _new_client(key: str):
     return genai.Client(api_key=key)
 
 
-def _call_text(client, prompt: str, max_tokens: int) -> str:
+def _call_text(client, prompt: str, max_tokens: int, temperature: float = 0.2) -> str:
     resp = client.models.generate_content(
         model=_LLM_MODEL,
         contents=prompt,
-        config={"max_output_tokens": max_tokens, "temperature": 0.2},
+        config={"max_output_tokens": max_tokens, "temperature": temperature},
     )
     return (resp.text or "").strip()
 
@@ -230,9 +230,14 @@ def _providers() -> list[tuple[str, str]]:
 
 
 def generate(prompt: str, max_tokens: int = 512, retries: int = 2,
-             strict_fallback: bool = False) -> str:
+             strict_fallback: bool = False, temperature: float | None = None) -> str:
     """strict_fallback=True: si TODOS los proveedores fallan, lanza en vez de
     devolver "".
+
+    `temperature=None` deja el valor por defecto de cada backend (0.2). Se expone
+    solo para poder medir si un fallo del cierre es un modo estable del modelo o
+    una muestra desafortunada: si a 0.8 el modelo sigue omitiendo lo mismo, el
+    fallo no es de muestreo. Ver evals/probe_close_diversity.py.
 
     Importante para la evaluación. Con el comportamiento normal, un 504
     transitorio marca un proveedor como muerto y el resto de la run contesta
@@ -246,6 +251,7 @@ def generate(prompt: str, max_tokens: int = 512, retries: int = 2,
         if strict_fallback:
             raise RuntimeError("sin proveedores LLM configurados")
         return ""
+    temp = 0.2 if temperature is None else temperature
     live = [p for p in provs if not _is_dead(p[0])] or provs
     start = _RR_INDEX % len(live)
     _RR_INDEX += 1
@@ -259,7 +265,7 @@ def generate(prompt: str, max_tokens: int = 512, retries: int = 2,
                 if role == "gemini":
                     idx = int(name[len("gemini"):]) - 1
                     client = _new_client(gemini_api_keys()[idx])
-                    out = _call_text(client, prompt, max_tokens)
+                    out = _call_text(client, prompt, max_tokens, temperature=temp)
                     # Gemini no devuelve usage aquí: se registra la llamada con
                     # tokens_desconocidos para que el coste nunca se infravalore
                     # en silencio por cambiar de proveedor.
@@ -269,7 +275,7 @@ def generate(prompt: str, max_tokens: int = 512, retries: int = 2,
                     base, key = _endpoint(name)
                     models = _models(name)
                     out = _openai_compat(base, key or "", models[min(mi, len(models) - 1)],
-                                        prompt, max_tokens)
+                                        prompt, max_tokens, temperature=temp)
                 _mark_alive(name)
                 return out
             except Exception as e:

@@ -305,6 +305,44 @@ def _verify_citation(question: str, answer: str, deep: str, retries: int = 1) ->
     return CITE_FMT.normalize_citations(_fix_truncation(out))
 
 
+def _close_prompt(question: str, ctx: str, anclaje: str, best: str, flat: int,
+                  enumerate_slots: bool = False) -> str:
+    """Prompt de cierre, en una función aparte para que las sondas offline usen
+    exactamente el mismo texto que producción en vez de una copia que se desincroniza.
+
+    `enumerate_slots=True` antepone el paso de la dirección 2 del análisis:=listar
+    lo que la pregunta pide, con su span literal, antes de redactar. A diferencia
+    del anclaje (r4, p=0.206) NO restringe la redacción a esos spans: solo obliga
+    a haber mirado cada elemento pedido. Si al final hay mas elementos de los que
+    caben, la prosa los pierde igual.
+    """
+    enum = ""
+    if enumerate_slots:
+        enum = ("\n\nPASO 1, ANTES DE REDACTAR: desglosa qué pide exactamente la "
+                "pregunta. Una linea por elemento pedido (por ejemplo, una por cada "
+                "cifra, cada fichero o cada componente que la pregunta mencione), y al "
+                "final de cada linea el span LITERAL de la evidencia que lo sostiene.\n"
+                "- No filtres: si la pregunta admite varios elementos, van todos.\n"
+                "- Si un elemento pedido no aparece en la evidencia, marcalo como AUSENTE.\n"
+                "PASO 2: redacta la respuesta y cubrielos TODOS, en el mismo orden.\n")
+    return (ST.STATIC_PROMPT + "\n\nPREGUNTA: " + question +
+            "\n\nEVIDENCIA REUNIDA:\n" + ctx + anclaje + enum +
+            f"\n\nMejor resultado parcial:\n{best or '(ninguno)'}\n"
+            f"\nTurnos sin progreso: {flat}.\n"
+            "CIERRE OBLIGADO: responde YA en prosa (máx 150 palabras) usando solo esta evidencia.\n"
+            "REGLAS DE CIERRE:\n"
+            "- CITA obligatoriamente cada afirmación con el formato [doc_id:chunk] "
+            "(ej. [5:7]).\n"
+            "- La pregunta pide un dato concreto (una cifra, un tope, una regla). "
+            "BÚSCA ese dato explícitamente en toda la evidencia, también en el barrido: "
+            "no te quedes con el primer chunk parecido.\n"
+            "- Cifras exactas: copia el número literal de la evidencia. Si dos fuentes "
+            "se contradicen, cita la que responde a la pregunta concreta.\n"
+            "- No inventes cifras ni reglas que no aparezcan literalmente en la evidencia.\n"
+            "- No termines a media frase: completa la idea y cierra con punto.\n"
+            "- No emitas ningún bloque json ni vuelques resultados crudos.")
+
+
 def _final_answer(question: str, best: str, evidence: list[str], flat: int, retries: int = 1) -> str:
     """Cierre forzado: pide una respuesta en prosa a partir de la evidencia reunida.
 
@@ -333,22 +371,7 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
                        "- Redacta EXCLUSIVAMENTE con lo que hay en el anclaje.\n"
                        "- No introduzcas nombres, cifras ni reglas que no aparezcan ahí.\n")
 
-    prompt = (ST.STATIC_PROMPT + "\n\nPREGUNTA: " + question +
-              "\n\nEVIDENCIA REUNIDA:\n" + ctx + anclaje +
-              f"\n\nMejor resultado parcial:\n{best or '(ninguno)'}\n"
-              f"\nTurnos sin progreso: {flat}.\n"
-              "CIERRE OBLIGADO: responde YA en prosa (máx 150 palabras) usando solo esta evidencia.\n"
-              "REGLAS DE CIERRE:\n"
-              "- CITA obligatoriamente cada afirmación con el formato [doc_id:chunk] "
-              "(ej. [5:7]).\n"
-              "- La pregunta pide un dato concreto (una cifra, un tope, una regla). "
-              "BÚSCA ese dato explícitamente en toda la evidencia, también en el barrido: "
-              "no te quedes con el primer chunk parecido.\n"
-              "- Cifras exactas: copia el número literal de la evidencia. Si dos fuentes "
-              "se contradicen, cita la que responde a la pregunta concreta.\n"
-              "- No inventes cifras ni reglas que no aparezcan literalmente en la evidencia.\n"
-              "- No termines a media frase: completa la idea y cierra con punto.\n"
-              "- No emitas ningún bloque json ni vuelques resultados crudos.")
+    prompt = _close_prompt(question, ctx, anclaje, best, flat)
     out = generate(prompt, max_tokens=900, retries=retries).strip()
     if _toolish(out):
         return ""

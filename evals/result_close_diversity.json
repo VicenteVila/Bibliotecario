@@ -1,0 +1,247 @@
+{
+ "pg-b5": {
+  "keywords": [
+   "7,984.50",
+   "14,859.80",
+   "7,403.98",
+   "10,115.89",
+   "6,396.90"
+  ],
+  "grupo": "residuo",
+  "answers": {
+   "base": [
+    "The paper reports token counts for Mode 5 (10,115.89), Mode 4 (6,396.90), and the unguided baseline (4,003.24) on HotpotQA. The Mode 4-5 comparison reverses on HotpotQA: Mode 5 uses 10,115.89 tokens versus Mode 4’s 6,396.90. [2:82][2:85]"
+   ],
+   "hot": [
+    "Based on the paper, the total token counts reported are: for Mode 5, 10,115.89 tokens on HotpotQA and 7,984.50 tokens on MultiChallenge; for Mode 4, 6,396.90 tokens on HotpotQA and 14,859.80 tokens on MultiChallenge; and for the unguided baseline, 4,003.24 tokens on HotpotQA and 7,403.98 tokens on MultiChallenge. The Mode 4-5 comparison reverses on HotpotQA: Mode 5 uses 10,115.89 tokens versus Mode 4’s 6,396.90. [2:85]",
+    "Based on the evidence from Table 9 and Table 10, the paper reports the following total token counts:  \n- Mode 5: 10,115.89 tokens on HotpotQA and 7,984.50 tokens on MultiChallenge  \n- Mode 4: 6,396.90 tokens on HotpotQA and 14,859.80 tokens on MultiChallenge  \n- Unguided baseline: 4,003.24 tokens on HotpotQA and 7,403.98 tokens on MultiChallenge  \n\nThe Mode 4–5 comparison reverses on HotpotQA: Mode 5 uses 10,115.89 tokens versus Mode 4’s 6,396.90, while on MultiChallenge Mode 5 uses fewer tokens (7,984.50) than Mode 4 (14,859.80).  \n[2:82] [2:83] [2:85]",
+    "The paper reports token counts as follows: unguided baseline uses 7,403.98 tokens on MultiChallenge and 4,003.24 tokens on HotpotQA; Mode 4 uses 14,859.80 tokens on MultiChallenge and 6,396.90 tokens on HotpotQA; Mode 5 uses 7,984.50 tokens on MultiChallenge and 10,115.89 tokens on HotpotQA. On MultiChallenge, Mode 5 uses fewer tokens than Mode 4 (7,984.50 vs 14,859.80), but on HotpotQA the Mode 4–5 comparison reverses: Mode 5 uses more tokens than Mode 4 (10,115.89 vs 6,396.90). [2:84][2:85]",
+    "The paper reports token counts for Mode 5 and Mode 4 on HotpotQA and MultiChallenge: On HotpotQA, Mode 5 uses 10,115.89 tokens versus Mode 4's 6,396.90 tokens (Mode 4–5 comparison reverses on HotpotQA), while on MultiChallenge, Mode 5 uses 7,984.50 tokens compared with 14,859.80 for Mode 4 and 7,403.98 for the unguided baseline. [2:85]"
+   ],
+   "enum": [
+    "The paper reports token counts for Mode 5 as 10,115.89 on HotpotQA and 7,984.50 on MultiChallenge, for Mode 4 as 6,396.90 on HotpotQA and 14,859.80 on MultiChallenge, and for the unguided baseline as 4,003.24 on HotpotQA and 7,403.98 on MultiChallenge. The Mode 4-5 comparison reverses on HotpotQA: Mode 5 uses 10,115.89 tokens versus Mode 4’s 6,396.90. [2:82][2:83][2:84][2:85]",
+    "Mode 5 reports 10,115.89 tokens on HotpotQA, Mode 4 reports 6,396.90 tokens, and the unguided baseline reports 4,003.24 tokens. The Mode 4-5 comparison reverses on HotpotQA: Mode 5 uses 10,115.89 tokens versus Mode 4’s 6,396.90. [2:82][2:85]"
+   ]
+  }
+ },
+ "tce-b7": {
+  "keywords": [
+   "96%",
+   "3.3 points",
+   "1.9",
+   "5.0",
+   "easier tasks"
+  ],
+  "grupo": "residuo",
+  "answers": {
+   "base": [
+    "The paper argues that Random-Resample's 96% cost reduction should not be interpreted as higher efficiency because uniform sampling spends its budget on easier tasks that terminate quickly, while Task-CoEvolve focuses on long-running, multi-turn tasks where candidate harnesses show different success and failure outcomes, making the cost reduction misleading without considering task difficulty and informativeness. [3:25]"
+   ],
+   "hot": [
+    "Random-Resample reduces evaluation cost by 96% compared to full search, but this cost reduction should not be interpreted as higher efficiency because it uniformly samples tasks without focusing on informative ones, often selecting easy tasks that terminate quickly and thus waste the budget on low-signal evaluations, whereas Task-CoEvolve uses variance-weighted selection to concentrate the budget on long-running, multi-turn tasks where candidate harnesses disagree, leading to better performance under the same budget. [3:25]",
+    "The Random-Resample baseline reduces search cost by 96% (Table 3), but the paper argues this should not be interpreted as higher efficiency because uniform sampling spends the evaluation budget on easier tasks that terminate quickly, while variance-weighted selection in Task-CoEvolve concentrates the budget on long-running, multi-turn tasks where candidate harnesses show different success and failure outcomes [3:25]. Thus, the large cost reduction of Random-Resample does not reflect better optimization efficiency, as it evaluates less informative tasks and achieves lower performance (3.3 points worse than Task-CoEvolve under the same 20% budget) [3:25].",
+    "Random-Resample's 96% cost reduction should not be interpreted as higher efficiency because uniform sampling spends its budget on easier tasks that terminate quickly, while variance-weighted selection (as in Task-CoEvolve) concentrates the budget on long-running, multi-turn tasks where candidate harnesses show different success and failure outcomes, making Random-Resample's lower cost misleading without considering task difficulty and informativeness [3:25].",
+    "Random-Resample reduces cost by 96% but this should not be interpreted as higher efficiency because uniform sampling spends budget on easier tasks that terminate quickly, while Task-CoEvolve concentrates evaluation on long-running, multi-turn tasks where harnesses disagree, making Random-Resample’s cost reduction misleading [3:25]. Under the same 20% evaluation budget, Random-Resample achieves 3.3 points lower final performance than Task-CoEvolve [3:24]."
+   ],
+   "enum": [
+    "Random-Resample reduces cost by 96% but should not be interpreted as higher efficiency because it spends its budget on easier tasks that terminate quickly, while Task-CoEvolve focuses on long-running, multi-turn tasks where candidate harnesses show different outcomes, making the cost reduction misleading without considering task difficulty and informativeness [3:24] [3:25].",
+    "Random-Resample reduces evaluation cost by 96% but this should not be interpreted as higher efficiency because uniform sampling spends the budget on easier tasks that terminate quickly, while variance-weighted selection in Task-CoEvolve focuses on long-running, multi-turn tasks where candidate harnesses show different success and failure outcomes, making the cost reduction misleading without considering task difficulty and informativeness [3:24] [3:25]."
+   ]
+  }
+ },
+ "wiki-b1": {
+  "keywords": [
+   "logs.md",
+   "skill-impact.md",
+   "Wiki Maintainer",
+   "outer-loop harness",
+   "validation gating"
+  ],
+  "grupo": "residuo",
+  "answers": {
+   "base": [
+    "WikiSkill's knowledge and tracking layers consist of the Wiki Layer (wiki/) and the Skill Layer (skills/). The Wiki Layer is updated by the Wiki Maintainer, which consolidates execution traces into structured knowledge. The Skill Layer is updated by the Skill Proposer, which proposes skill updates based on the wiki and traces. [5:4][5:5][5:11][5:12]"
+   ],
+   "hot": [
+    "WikiSkill's knowledge layer is the Wiki Layer (wiki/) maintained by the Wiki Maintainer, and its tracking layer is the Raw Layer (raw/) storing immutable execution traces. The Wiki Maintainer updates the Wiki Layer by consolidating traces into structured knowledge, while the Raw Layer is populated by the Inference Agent during rollouts and remains immutable thereafter. [5:4][5:5][5:11]",
+    "WikiSkill consists of three layers: the Raw Layer (raw/) storing immutable execution traces, the Wiki Layer (wiki/) maintaining structured knowledge, and the Skills Layer (skills/) containing evolving procedural knowledge. The Wiki Maintainer updates the Wiki Layer by consolidating traces into the wiki, while the Skill Proposer updates the Skills Layer by proposing skill updates using the wiki and traces. [5:4] [5:5] [5:11] [5:12]",
+    "Based on the provided evidence, WikiSkill's knowledge and tracking layers consist of the Wiki Layer (wiki/) and the Skill Layer (skills/). The Wiki Layer maintains structured knowledge and is updated by the Wiki Maintainer component, while the Skill Layer contains evolving procedural knowledge and is updated by the Skill Proposer component. [5:11] [5:12]",
+    "WikiSkill's knowledge layer is the Wiki Layer (wiki/), which contains structured knowledge in patterns/ directory with markdown files documenting failure modes and successful strategies, plus evolution logs (logs.md) and skill impact tracker (skill-impact.md) [5:11][5:12]. The tracking layer is the Raw Layer (raw/), which stores immutable execution traces from training examples [5:11]. The Wiki Maintainer updates the Wiki Layer by consolidating traces into the wiki [5:4][5:5], while the outer-loop harness programmatically updates the skill impact tracker after validation gating [5:12]. The Raw Layer is immutable and only written to by the Inference Agent during rollouts [5:11]."
+   ],
+   "enum": [
+    "WikiSkill's knowledge and tracking layers consist of the Wiki Layer (wiki/) and the Skill Layer (skills/). The Wiki Layer is updated by the Wiki Maintainer, which consolidates execution traces into structured knowledge. The Skill Layer is updated by the Skill Proposer, which proposes skill updates based on the wiki and traces. [5:4][5:5][5:11][5:12]",
+    "WikiSkill's knowledge and tracking layers consist of the Wiki Layer (wiki/) and the Skill Layer (skills/). The Wiki Layer is updated by the Wiki Maintainer, which consolidates execution traces into structured knowledge. The Skill Layer is updated by the Skill Proposer, which proposes skill updates based on the wiki and traces. [5:4][5:5][5:11][5:12]"
+   ]
+  }
+ },
+ "wiki-b6": {
+  "keywords": [
+   "47.4%",
+   "39.4%",
+   "38.5%",
+   "Qwen-3.5-9B",
+   "complementary sources of performance"
+  ],
+  "grupo": "residuo",
+  "answers": {
+   "base": [
+    "Evolved skills can compensate for substantial differences in model scale: Qwen-3.5-9B with WikiSkill reaches 47.4% average accuracy, outperforming Qwen-3.6-27B without skills at 39.4% [5:24]."
+   ],
+   "hot": [
+    "The paper shows that evolved skills can substantially compensate for model scale differences: Qwen-3.5-9B with WikiSkill reaches 47.4% average accuracy, outperforming Qwen-3.6-27B without skills at 39.4%, and Qwen-3.5-4B with WikiSkill reaches 38.5%. [5:24]",
+    "Based on the evidence, evolved skills can compensate for substantial differences in model scale. Specifically, Qwen-3.5-9B with WikiSkill achieves 47.4% average accuracy, outperforming Qwen-3.6-27B without skills at 39.4%, and Qwen-3.5-4B with WikiSkill reaches 38.5% average accuracy. [5:24] [5:6] [5:23]",
+    "Evolved skills can substantially compensate for model scale differences: for example, Qwen-3.5-9B with WikiSkill achieves 47.4% average accuracy, outperforming the larger Qwen-3.6-27B without skills at 39.4%, and Qwen-3.5-4B with WikiSkill reaches 38.5% accuracy [5:24]. Across the Qwen family, WikiSkill improves performance by 12.3%, 17.5%, and 23.9% for 4B, 9B, and 27B models respectively, showing gains increase with model scale [5:6]. These results demonstrate that evolved procedural knowledge provides a complementary source of performance, allowing smaller models with skills to outperform substantially larger models without them [5:24].",
+    "Based on the WikiSkill paper, evolved skills can compensate for substantial differences in model scale: Qwen-3.5-9B with WikiSkill reaches 47.4% average accuracy, outperforming Qwen-3.6-27B without skills at 39.4%, while Qwen-3.5-4B with WikiSkill reaches 38.5% average accuracy. [5:24]"
+   ],
+   "enum": [
+    "Evolved skills can compensate for substantial differences in model scale: Qwen-3.5-9B with WikiSkill reaches 47.4% average accuracy, outperforming Qwen-3.6-27B without skills at 39.4%, while Qwen-3.5-4B with WikiSkill reaches 38.5%. [5:24]",
+    "The paper shows that evolved skills can compensate for substantial model scale differences: Qwen-3.5-9B with WikiSkill reaches 47.4% average accuracy, outperforming Qwen-3.6-27B without skills at 39.4%, and Qwen-3.5-4B with WikiSkill reaches 38.5% [5:24]. This demonstrates that effective skills allow smaller models to outperform substantially larger models that do not use skills. [5:24]"
+   ]
+  }
+ },
+ "wiki-b2": {
+  "keywords": [
+   "restricted from accessing the Wiki Layer",
+   "training rollouts",
+   "negatively affects skill development",
+   "ablation"
+  ],
+  "grupo": "residuo",
+  "answers": {
+   "base": [
+    "The Inference Agent is restricted from accessing the Wiki Layer during training rollouts, and ablation showed that allowing wiki access during training negatively affects skill development, reducing average benchmark performance from 63.7% to 60.9% [5:13][5:31]."
+   ],
+   "hot": [
+    "During training rollouts, the Inference Agent is restricted from accessing the Wiki Layer, as ablation studies show that allowing wiki access during training negatively affects skill development, reducing average benchmark performance from 63.7% to 60.9% and causing a substantial drop on LiveMath from 72.6% to 64.8% [5:13][5:30][5:31].",
+    "During training rollouts, the Inference Agent is restricted from accessing the Wiki Layer, as allowing wiki access during training negatively affects skill development [5:13]. The ablation study showed that providing the Inference Agent with wiki access during training rollouts reduces average benchmark performance from 63.7% to 60.9%, with a substantial drop on LiveMath from 72.6% to 64.8% [5:31].",
+    "The Inference Agent is restricted from accessing the Wiki Layer during training rollouts, as allowing wiki access during training negatively affects skill development [5:13]. The ablation study showed that providing the Inference Agent with wiki access during training rollouts reduces average benchmark performance from 63.7% to 60.9% [5:31].",
+    "The Inference Agent is restricted from accessing the Wiki Layer during training rollouts, and the ablation showed that allowing wiki access during training negatively affects skill development by reducing average benchmark performance from 63.7% to 60.9% on Gemini-3.5-Flash. [5:13][5:31]"
+   ],
+   "enum": [
+    "The Inference Agent is restricted from accessing the Wiki Layer during training rollouts, and ablation showed that allowing wiki access during training negatively affects skill development, reducing average benchmark performance from 63.7% to 60.9% [5:13][5:31].",
+    "The Inference Agent is restricted from accessing the Wiki Layer during training rollouts, as allowing wiki access during training negatively affects skill development. [5:13] [5:31]"
+   ]
+  }
+ },
+ "pearl-b2": {
+  "keywords": [
+   "hidden dimension",
+   "fixed to 32"
+  ],
+  "grupo": "control",
+  "answers": {
+   "base": [
+    "The hidden dimension d used for node, relation, and path embeddings in PEARL is fixed to 32. [1:29]"
+   ],
+   "hot": [
+    "The hidden dimension d used for node, relation, and path embeddings in PEARL is fixed to 32. [1:29]",
+    "PEARL uses a hidden dimension d = 32 for node, relation, and path embeddings. [1:29]",
+    "The hidden dimension d used for node, relation, and path embeddings in PEARL is fixed to 32 [1:29].",
+    "PEARL uses a hidden dimension d = 32 for node, relation, and path embeddings, as explicitly stated in the implementation details section. [1:29]"
+   ],
+   "enum": [
+    "The hidden dimension d used for node, relation, and path embeddings in PEARL is fixed to 32. [1:29]",
+    "The hidden dimension d used for node, relation, and path embeddings in PEARL is fixed to 32. [1:29]"
+   ]
+  }
+ },
+ "pg-b3": {
+  "keywords": [
+   "sequential strides",
+   "100 samples",
+   "20 on MultiChallenge",
+   "size is 1,000"
+  ],
+  "grupo": "control",
+  "answers": {
+   "base": [
+    "During self-evolution, the training split is processed in sequential strides of S=100 samples on HotpotQA and S=20 samples on MultiChallenge. The validation set Dval consumed by the acceptance gate has a size of 1,000 samples. [2:26] [2:56]"
+   ],
+   "hot": [
+    "The stride S used during self-evolution on the training split is S=100 for HotpotQA and S=20 for MultiChallenge, as stated in the text: \"During self-evolution, the training split is processed in sequential strides of 𝑆=100 samples on HotpotQA and 𝑆=20 on MultiChallenge.\" [2:26] The validation set Dval consumed by the acceptance gate has a size of 1,000 samples, as indicated in the same passage: \"The validation set Dval consumed by the acceptance gate is held out separately from both splits above and never overlaps the test set; its size is 1,000 for 1,000 validation samples, and 1,000 test samples.\" [2:26]",
+    "During self-evolution on HotpotQA, the training split is processed in sequential strides of S=100 samples. On MultiChallenge, the stride S is 20 samples. The validation set Dval consumed by the acceptance gate is of size 1,000 samples. [2:26] [2:86] [2:87]",
+    "During self-evolution on HotpotQA, the training split is processed in sequential strides of S=100 samples, and on MultiChallenge, the stride is S=20 samples. The validation set consumed by the acceptance gate has a size of 1,000 samples. [2:56]",
+    "During self-evolution on HotpotQA, the stride S is 100 samples, and on MultiChallenge, the stride S is 20 samples. The validation set consumed by the acceptance gate has a size of 1,000 samples. [2:26]"
+   ],
+   "enum": [
+    "During self-evolution, the training split is processed in sequential strides of S=100 samples on HotpotQA and S=20 on MultiChallenge. The validation set Dval consumed by the acceptance gate has a size of 1,000 samples. [2:26] [2:56]",
+    "During self-evolution, the training split is processed in sequential strides of S=100 samples on HotpotQA and S=20 on MultiChallenge. The validation set Dval consumed by the acceptance gate has a size of 1,000 samples. [2:56]"
+   ]
+  }
+ },
+ "tce-b5": {
+  "keywords": [
+   "deviation from an anchor",
+   "historical success rate",
+   "tiny",
+   "cancels in expectation"
+  ],
+  "grupo": "control",
+  "answers": {
+   "base": [
+    "The anchored deviation estimator used by Task-CoEvolve is defined as ˆS(h) = (1/N) Σ_{t∈T} ¯p_t + (1/N) Σ_{t∈S_k} (x_t(h) − ¯p_t)/π_t, where ¯p_t is the historical success rate of task t, x_t(h) is the observed outcome, and π_t is the sampling probability [3:15]. The raw outcome is not weighted directly because weighting the outcome itself would cause consistently solved or failed tasks with tiny inclusion probabilities to dominate the estimate due to division by small π_t, making comparisons unreliable; instead, weighting the deviation from the anchor ¯p_t ensures the anchor cancels in expectation and stabilizes estimation [3:15]."
+   ],
+   "hot": [
+    "The anchored deviation estimator used by Task-CoEvolve is defined in Equation (4): \\(\\hat{S}(h) = \\frac{1}{N} \\sum_{t \\in T} \\bar{p}_t + \\frac{1}{N} \\sum_{t \\in S_k} \\frac{x_t(h) - \\bar{p}_t}{\\pi_t}\\), where \\(\\bar{p}_t\\) is the historical success rate anchor and \\(\\pi_t\\) is the sampling probability. The raw outcome \\(x_t(h)\\) is not weighted directly because weighting the outcome alone would cause tasks with tiny inclusion probabilities \\(\\pi_t\\) to dominate the estimate when their outcomes deviate from the anchor, as explained in the text: \"Otherwise a consistently solved task with a tiny \\(\\pi_t\\) is occasionally sampled and its term \\(x_t(h)/\\pi_t\\) dominates Equation (3).\" [3:15] [3:14]",
+    "Task-CoEvolve uses the anchored difference estimator defined as \\(\\hat{S}(h) = \\frac{1}{N}\\sum_{t\\in T} \\bar{p}_t + \\frac{1}{N}\\sum_{t\\in S_k} \\frac{x_t(h) - \\bar{p}_t}{\\pi_t}\\), where \\(\\bar{p}_t\\) is the historical success rate of task \\(t\\) and \\(\\pi_t\\) is its sampling probability. The raw outcome \\(x_t(h)\\) is not weighted directly because weighting the outcome itself would cause the estimate to be dominated by tasks with tiny inclusion probabilities when the task is consistently solved or failed, making candidate comparison unreliable; instead, weighting the deviation from the anchor \\(\\bar{p}_t\\) avoids this issue [3:15].",
+    "Task-CoEvolve uses the anchored deviation estimator defined as ˆS(h) = (1/N) Σ_{t∈T} [¯p_t + (1/N) Σ_{t∈S_k} (x_t(h) − ¯p_t)/π_t], where the raw outcome x_t(h) is not weighted directly because weighting the raw outcome would cause tasks with tiny inclusion probabilities to dominate the estimate when the task is consistently solved or failed, making candidate comparisons unreliable. [3:15] [3:16]",
+    "Task-CoEvolve uses the anchored difference estimator defined as ˆS(h) = (1/N) Σ_{t∈T} ¯p_t + (1/N) Σ_{t∈S_k} (x_t(h) − ¯p_t)/π_t, where ¯p_t is the historical success rate of task t and π_t is its sampling probability, to estimate full-set performance from sampled tasks while accounting for selection bias. The raw outcome is not weighted directly because doing so would make scores from different iterations incomparable due to varying task difficulties in the sampled subset; weighting the raw outcome would cause estimates to depend on the subset's difficulty rather than reflecting true harness performance across the full task set, as explained in Section 3.3 where the raw subset mean depends on task difficulty and prevents cross-iteration comparison. [3:12][3:15]"
+   ],
+   "enum": [
+    "The anchored deviation estimator used by Task-CoEvolve is defined as ˆS(h) = (1/N) Σ_{t∈T} ¯p_t + (1/N) Σ_{t∈S_k} (x_t(h) − ¯p_t)/π_t, where the raw outcome is not weighted directly because weighting the outcome itself would cause tasks with tiny inclusion probabilities to dominate the estimate when the task is consistently solved or failed, whereas using the deviation from the historical anchor ¯p_t avoids this issue and ensures stability in estimation [3:15].",
+    "The anchored deviation estimator used by Task-CoEvolve is defined as ˆS(h) = (1/N) ∑_{t∈T} ¯p_t + (1/N) ∑_{t∈S_k} (x_t(h) − ¯p_t)/π_t, where ¯p_t is the historical success rate of task t and π_t is its sampling probability. The raw outcome is not weighted directly because weighting the outcome x_t(h) by 1/π_t would cause instability when a task with small π_t is consistently solved or failed, making its term dominate the estimate; instead, weighting the deviation from the anchor ¯p_t ensures the anchor cancels in expectation and provides stable estimation. [3:15] [3:16]"
+   ]
+  }
+ },
+ "reas-b6": {
+  "keywords": [
+   "co-dependent",
+   "only materialize when applied together",
+   "AMP",
+   "VRAM enabler"
+  ],
+  "grupo": "control",
+  "answers": {
+   "base": [
+    "The paper defines detecting co-dependent improvements as identifying parameter changes that only yield gains when applied together, which single-parameter sweeps miss. In IMG-100, the agent recognized AMP (mixed-precision training) as a VRAM enabler: reducing memory from 14.3 GB to 4.1 GB made deeper architectures feasible, which in turn made CutMix augmentation beneficial and EMA stable, forming a chain of co-dependent gains (82.38%→84.03%) that collapsed if any link was removed. [4:36]"
+   ],
+   "hot": [
+    "[4:36] The agent’s most distinctive capability is detecting when parameter changes are co-dependent, i.e., improvements that only materialize when applied together, which single-parameter sweeps systematically miss. In IMG-100, AMP (mixed-precision training) appeared to be a marginal speed optimization in isolation, but the agent recognized it as a VRAM enabler: reducing memory from 14.3 GB to 4.1 GB made deeper architectures feasible, which in turn made CutMix augmentation beneficial (enough epochs to help rather than hurt) and EMA stable (enough capacity to regularize). This chain of co-dependent gains (82.38%→84.03%) collapsed if any link was removed, as Claude Code demonstrated by never discovering AMP’s enabling role, capping at 78.59%.",
+    "The paper defines \"detecting co-dependent improvements\" as identifying parameter changes that only yield gains when applied together, which single-parameter sweeps miss. In IMG-100, the concrete case is: AMP (mixed-precision training) initially seemed a marginal speed optimization, but the agent recognized it as a VRAM enabler—reducing memory from 14.3 GB to 4.1 GB—making deeper architectures feasible, which then made CutMix augmentation beneficial and EMA stable, forming a chain of co-dependent gains (82.38%→84.03%) that collapsed if any link was removed [4:36].",
+    "Detecting co-dependent improvements means identifying when parameter changes only yield benefits when applied together, which single-parameter sweeps miss. In IMG-100, AMP (mixed-precision training) appeared marginal in isolation but was recognized as a VRAM enabler: reducing memory from 14.3 GB to 4.1 GB made deeper architectures feasible, which then made CutMix augmentation beneficial and EMA stable, forming a chain of gains (82.38%→84.03%) that collapsed if any link was removed [4:36].",
+    "The paper defines detecting co-dependent improvements as identifying parameter changes that only yield gains when applied together, which single-parameter sweeps miss. In IMG-100, the agent recognized AMP as a VRAM enabler: reducing memory from 14.3 GB to 4.1 GB made deeper architectures feasible, which in turn made CutMix augmentation beneficial and EMA stable, forming a chain of co-dependent gains (82.38%→84.03%) that collapsed if any link was removed. [4:36]"
+   ],
+   "enum": [
+    "The paper defines detecting co-dependent improvements as identifying when parameter changes only yield gains when applied together, which single-parameter sweeps miss. In IMG-100, the agent recognized AMP (mixed-precision training) as a VRAM enabler: reducing memory from 14.3 GB to 4.1 GB made deeper architectures feasible, which in turn made CutMix augmentation beneficial and EMA stable, forming a chain of co-dependent gains (82.38%→84.03%) that collapsed if any link was removed. [4:36]",
+    "The paper defines detecting co-dependent improvements as identifying when parameter changes only yield gains when applied together, which single-parameter sweeps miss. In IMG-100, AMP (mixed-precision training) appeared marginal in isolation but was recognized as a VRAM enabler: reducing memory from 14.3 GB to 4.1 GB made deeper architectures feasible, enabling CutMix augmentation and EMA stability, leading to a chain of gains from 82.38% to 84.03% that collapsed if any link was removed. [4:36]"
+   ]
+  }
+ },
+ "wiki-b5": {
+  "keywords": [
+   "11.6",
+   "14.1",
+   "24.8",
+   "28.0",
+   "40.9",
+   "OfficeQA",
+   "SpreadSheet"
+  ],
+  "grupo": "control",
+  "answers": {
+   "base": [
+    "Based on the evidence from the WikiSkill paper, for Qwen-3.6-27B, WikiSkill improves performance as follows: LiveMath by 28.0 points (33.9% → 61.9%), SealQA by 14.1 points (27.5% → 41.6%), SpreadSheet by 40.9 points (40.8% → 81.7%), OfficeQA by 11.6 points (42.1% → 53.7%), and ALFWorld by 24.8 points (52.8% → 77.6%). The dataset with the most benefit is SpreadSheet (40.9 points improvement), and the least benefit is OfficeQA (11.6 points improvement). [5:24] [5:25]"
+   ],
+   "hot": [
+    "Based on the WikiSkill paper, for Qwen-3.6-27B, WikiSkill improves performance on each of the five datasets as follows: LiveMathematicianBench (+28.0 points), SealQA (+14.1 points), SpreadSheetBench (+40.9 points), OfficeQA (+11.6 points), and ALFWorld (+24.8 points). The dataset with the most benefit is SpreadSheetBench (+40.9 points) and the least benefit is OfficeQA (+11.6 points). [5:24] [5:25]",
+    "For Qwen-3.6-27B, WikiSkill improves performance on the five datasets as follows: LiveMath by 28.0 points (33.9 → 61.9), SealQA by 14.1 points (27.5 → 41.6), SpreadSheet by 40.9 points (40.8 → 81.7), OfficeQA by 11.6 points (42.1 → 53.7), and ALFWorld by 24.8 points (52.8 → 77.6). The dataset with the most benefit is SpreadSheet (40.9-point gain), and the least benefit is OfficeQA (11.6-point gain). [5:20][5:24][5:25]",
+    "For Qwen-3.6-27B, WikiSkill improves performance by 28.0 points on LiveMath, 14.1 points on SealQA, 40.9 points on SpreadSheet, 11.6 points on OfficeQA, and 24.8 points on ALFWorld, with the greatest benefit on SpreadSheet and the least on OfficeQA [5:24][5:25].",
+    "Based on Table 1 in the paper, for Qwen-3.6-27B, WikiSkill improves performance by 28.0 points on LiveMath (33.9 → 61.9), 14.1 points on SealQA (27.5 → 41.6), 40.9 points on SpreadSheet (40.8 → 81.7), 11.6 points on OfficeQA (42.1 → 53.7), and 24.8 points on ALFWorld (52.8 → 77.6). The largest improvement is on SpreadSheet (+40.9 points), and the smallest improvement is on OfficeQA (+11.6 points). [5:22] [5:24]"
+   ],
+   "enum": [
+    "For Qwen-3.6-27B, WikiSkill improves performance by 28.0 points on LiveMath, 14.1 points on SealQA, 40.9 points on SpreadSheet, 11.6 points on OfficeQA, and 24.8 points on ALFWorld. The dataset with the most benefit is SpreadSheet (40.9 points), and the least benefit is OfficeQA (11.6 points). [5:24] [5:25]",
+    "For Qwen-3.6-27B, WikiSkill improves performance by 28.0 points on LiveMath, 14.1 points on SealQA, 40.9 points on SpreadSheet, 11.6 points on OfficeQA, and 24.8 points on ALFWorld. The dataset with the most benefit is SpreadSheet (40.9 points) and the least benefit is OfficeQA (11.6 points). [5:24] [5:25]"
+   ]
+  }
+ }
+}

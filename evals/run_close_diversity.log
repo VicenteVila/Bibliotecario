@@ -1,0 +1,67 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2874.40it/s]
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+LLM reintentable gemini1: esperando 44s (2)
+LLM reintentable gemini1: esperando 57s (1)
+LLM gemini1 agotada/sobrecargada, paso a siguiente
+LLM gemini1 aparcado 15 min tras 1 fallos
+LLM reintentable gemini2: esperando 55s (2)
+LLM reintentable gemini2: esperando 56s (1)
+LLM gemini2 agotada/sobrecargada, paso a siguiente
+LLM gemini2 aparcado 15 min tras 1 fallos
+
+=== pg-b5 (residuo) keywords=['7,984.50', '14,859.80', '7,403.98', '10,115.89', '6,396.90']
+  base  cobertura [2] de 5   faltan(base)=['7,984.50', '14,859.80', '7,403.98']
+  hot   cobertura [5, 5, 5, 5] de 5   faltan(base)=[]
+  enum  cobertura [5, 2] de 5   faltan(base)=[]
+
+=== tce-b7 (residuo) keywords=['96%', '3.3 points', '1.9', '5.0', 'easier tasks']
+  base  cobertura [2] de 5   faltan(base)=['3.3 points', '1.9', '5.0']
+  hot   cobertura [1, 3, 2, 3] de 5   faltan(base)=['3.3 points', '1.9', '5.0', 'easier tasks']
+  enum  cobertura [2, 2] de 5   faltan(base)=['3.3 points', '1.9', '5.0']
+
+=== wiki-b1 (residuo) keywords=['logs.md', 'skill-impact.md', 'Wiki Maintainer', 'outer-loop harness', 'validation gating']
+  base  cobertura [1] de 5   faltan(base)=['logs.md', 'skill-impact.md', 'outer-loop harness', 'validation gating']
+  hot   cobertura [1, 1, 1, 5] de 5   faltan(base)=['logs.md', 'skill-impact.md', 'outer-loop harness', 'validation gating']
+  enum  cobertura [1, 1] de 5   faltan(base)=['logs.md', 'skill-impact.md', 'outer-loop harness', 'validation gating']
+
+=== wiki-b6 (residuo) keywords=['47.4%', '39.4%', '38.5%', 'Qwen-3.5-9B', 'complementary sources of performance']
+  base  cobertura [3] de 5   faltan(base)=['38.5%', 'complementary sources of performance']
+  hot   cobertura [4, 4, 4, 4] de 5   faltan(base)=['complementary sources of performance']
+  enum  cobertura [4, 4] de 5   faltan(base)=['complementary sources of performance']
+
+=== wiki-b2 (residuo) keywords=['restricted from accessing the Wiki Layer', 'training rollouts', 'negatively affects skill development', 'ablation']
+  base  cobertura [4] de 4   faltan(base)=[]
+  hot   cobertura [4, 4, 4, 4] de 4   faltan(base)=[]
+  enum  cobertura [4, 3] de 4   faltan(base)=[]
+
+=== pearl-b2 (control) keywords=['hidden dimension', 'fixed to 32']
+  base  cobertura [2] de 2   faltan(base)=[]
+  hot   cobertura [2, 1, 2, 1] de 2   faltan(base)=[]
+  enum  cobertura [2, 2] de 2   faltan(base)=[]
+
+=== pg-b3 (control) keywords=['sequential strides', '100 samples', '20 on MultiChallenge', 'size is 1,000']
+  base  cobertura [2] de 4   faltan(base)=['20 on MultiChallenge', 'size is 1,000']
+  hot   cobertura [4, 2, 2, 1] de 4   faltan(base)=[]
+  enum  cobertura [3, 3] de 4   faltan(base)=['size is 1,000']
+
+=== tce-b5 (control) keywords=['deviation from an anchor', 'historical success rate', 'tiny', 'cancels in expectation']
+  base  cobertura [3] de 4   faltan(base)=['deviation from an anchor']
+  hot   cobertura [2, 2, 1, 1] de 4   faltan(base)=['deviation from an anchor', 'cancels in expectation']
+  enum  cobertura [1, 2] de 4   faltan(base)=['deviation from an anchor', 'historical success rate', 'cancels in expectation']
+
+=== reas-b6 (control) keywords=['co-dependent', 'only materialize when applied together', 'AMP', 'VRAM enabler']
+  base  cobertura [3] de 4   faltan(base)=['only materialize when applied together']
+  hot   cobertura [4, 3, 3, 3] de 4   faltan(base)=[]
+  enum  cobertura [3, 3] de 4   faltan(base)=['only materialize when applied together']
+
+=== wiki-b5 (control) keywords=['11.6', '14.1', '24.8', '28.0', '40.9', 'OfficeQA', 'SpreadSheet']
+  base  cobertura [7] de 7   faltan(base)=[]
+  hot   cobertura [7, 7, 7, 7] de 7   faltan(base)=[]
+  enum  cobertura [7, 7] de 7   faltan(base)=[]
+
+====================================================================
+condicion             residuo          controles
+base                   52.0%             80.0%
+hot                    73.0%             70.0%
+enum                   59.5%             77.5%
+guardado evals/result_close_diversity.json
