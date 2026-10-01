@@ -29,6 +29,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -55,6 +56,23 @@ def gold_docs(q: dict) -> list[int]:
     if q.get("answerable_docs"):
         return list(q["answerable_docs"])
     return [q["doc_id"]] if "doc_id" in q else []
+
+
+# Lenguaje de abstención. Distingue "no está en el corpus" de "lo respondí".
+# Hace falta en las DOS direcciones: si el agente se abstiene en una pregunta
+# respondible porque no recuperó el chunk, el fallo es de retrieval y no debe
+# mezclarse con la calidad de la respuesta. En la run 1 abstain_rate fue 1.0
+# sobre las no respondibles y aun así 2 de 7 abstenciones eran falsas.
+_ABSTAIN_WORDS = re.compile(
+    r"(no se encontr[oó]|not found|no .{0,25}evidencia espec|"
+    r"does not (explicitly )?(report|mention|state)|"
+    r"no (encuentra|aparece|consta|se menciona|indica)|"
+    r"La evidencia disponible no|insufficient evidence|could not find|"
+    r"no (hay|hay datos|dice|consta) (evidencia|datos|informaci[oó]n))", re.IGNORECASE)
+
+
+def looks_abstained(answer: str) -> bool:
+    return bool(_ABSTAIN_WORDS.search(answer or ""))
 
 
 def citation_metrics(q: dict, answer: str, evidence: list) -> dict:
@@ -110,6 +128,7 @@ def run_one(q: dict, turns: int) -> dict:
             "judge_model": j.get("model"), "judge_usage": j.get("usage"),
             "abstained": j.get("abstained"),
             "fabricated_value": j.get("fabricated_value"),
+            "looks_abstained": looks_abstained(ans),
             "fallback": fallback, "latency_s": round(time.time() - t0),
             "agent_usage": usage,
             "answer": ans}  # respuesta completa: los 400 chars impedían auditar
@@ -138,7 +157,9 @@ def aggregate(out: list, turns: int, retries: int) -> dict:
            "cite_precision_mean": None, "cite_coverage_mean": None,
            "answer_cite_rate": None, "by_difficulty": None,
            "abstain_rate": None, "n_abstain_decided": 0, "n_abstain_errors": 0,
-           "n_fabricated": 0, "latency_median_s": None}
+           "n_fabricated": 0, "latency_median_s": None,
+           "false_abstention_rate": None, "n_false_abstention": 0,
+           "answer_rate_on_answerable": None, "false_abstention_ids": []}
 
     if na:
         scores = [0 if r["judge"] is None else r["judge"] for r in ans_rows]
@@ -159,6 +180,16 @@ def aggregate(out: list, turns: int, retries: int) -> dict:
             "abstain_rate": mean([1.0 if r["abstained"] else 0.0 for r in decided]),
             "n_abstain_decided": len(decided), "n_abstain_errors": nu - len(decided),
             "n_fabricated": sum(1 for r in un_rows if r.get("fabricated_value")),
+        })
+    if na:
+        # Abstención sobre preguntas respondibles: no es una virtud, es retrieval
+        # fallido. Se mide aparte para no leer el abstain_rate como una skill.
+        fa = [r for r in ans_rows if r.get("looks_abstained")]
+        agg.update({
+            "false_abstention_rate": round(len(fa) / na, 3),
+            "n_false_abstention": len(fa),
+            "answer_rate_on_answerable": round(1 - len(fa) / na, 3),
+            "false_abstention_ids": [r["id"] for r in fa],
         })
     if out:
         # Si solo hay no respondibles, la mediana sale de esas filas y no de None.
@@ -264,6 +295,9 @@ def main() -> None:
               f"{agg['n_judge_errors']} errores)  por dificultad={agg['by_difficulty']}")
         print(f"cite_precision={agg['cite_precision_mean']} "
               f"cite_coverage={agg['cite_coverage_mean']} con_cita={agg['answer_cite_rate']}")
+    if agg["n_answerable"]:
+        print(f"abstencion_falsa={agg['false_abstention_rate']} "
+              f"{agg['false_abstention_ids']} (respondidas={agg['answer_rate_on_answerable']})")
     if agg["n_unanswerable"]:
         print(f"abstain_rate={agg['abstain_rate']} "
               f"(decididas={agg['n_abstain_decided']}/{agg['n_unanswerable']}, "

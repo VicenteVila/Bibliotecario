@@ -157,3 +157,27 @@ def test_reanudar_no_pierde_filas(tmp_path, monkeypatch):
     assert [r["id"] for r in d["rows"]] == ["pearl-b1", "pearl-b2"]
     assert d["aggregate"]["n"] == 2
     assert d["aggregate"]["judge_mean"] == 4.0
+
+
+def test_looks_abstained_detecta_y_no_inventa():
+    from evals.eval_end2end import looks_abstained as la
+    assert la("No se encontró evidencia específica en los papers ingeridos")
+    assert la("The corpus does not explicitly report the seed")
+    assert la("insufficient evidence in the retrieved chunks")
+    assert not la("PEARL achieves 8.67% on WN18RR [1:30]")
+    assert not la("")
+
+
+def test_abstencion_falsa_se_mide_aparte():
+    """Respondibles en las que el agente se abstiene: retrieval fallido, no skill."""
+    rows = [_row("a1", 5), _row("a2", 1), _row("a3", 4), _row("a4", 3)]
+    for r in (rows[1], rows[3]):
+        r["looks_abstained"] = True
+    rows[0]["looks_abstained"] = False
+    rows[2]["looks_abstained"] = False
+    agg = H.aggregate(rows, turns=4, retries=1)
+    assert agg["false_abstention_rate"] == 0.5
+    assert sorted(agg["false_abstention_ids"]) == ["a2", "a4"]
+    assert agg["answer_rate_on_answerable"] == 0.5
+    # Y no debe alterar la media de calidad: sigue siendo 4.5.
+    assert agg["judge_mean"] == 3.25
