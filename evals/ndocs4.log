@@ -1,0 +1,12 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 3121.96it/s]
+wiki-b1  prec=1.00 judge=2 tok= 34666 fb=False 62s
+wiki-b4  prec=1.00 judge=5 tok= 33832 fb=False 63s
+pg-b5    prec=1.00 judge=2 tok= 39872 fb=False 70s
+tce-b7   prec=1.00 judge=4 tok= 36308 fb=False 77s
+
+n=4 (respondibles=4, no respondibles=0) modelo_juez=openai/gpt-oss-20b
+judge=3.25 (n=4/4, 0 errores)  por dificultad={'facil': 2.0, 'media': 3.5, 'dificil': 4.0}
+cite_precision=1.0 cite_coverage=1.0 con_cita=1.0
+abstencion_falsa=0.0 [] (respondidas=1.0)
+tokens_agente=144678 en 20 llamadas | tokens_juez=4363 | latencia_mediana=70s
+truncadas=0 fallbacks=0 -> result_ndocs4.json

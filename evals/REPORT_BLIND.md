@@ -501,3 +501,90 @@ y directamente observable es que las 6 llegan ahora a 4 turnos y que `reas-b2` /
 `reas-b6` pasan de 2.7k a ~19k tokens, lo que prueba que el barrido profundo
 ahora se ejecuta en la vía que antes lo saltaba.
 
+## Fase 0d: por qué `wiki-b4` no se arreglaba con más evidencia
+
+Después del fix del loop, `wiki-b4` seguía con un 2 consumiendo 20.9k tokens de
+evidencia real. La pregunta es por qué, porque ya no cabe culpar al pipeline.
+
+### El doc gold no estaba en el top-2 del barrido
+
+La pregunta **nombra "WikiSkill"** y el doc gold (id 5) **es** WikiSkill. Su chunk
+`5:57` tiene el **mejor keyword score de todos (0.412)** y un dense alto (0.388).
+Pero `graph=0.0`, mientras los falsos traen `graph=0.5`:
+
+```
+total = 0.5·denso + 0.3·keyword + 0.2·grafo
+gold 5:57  = 0.5·0.388 + 0.3·0.412 + 0.2·0.000 = 0.318   -> rank 5
+falso 4:30 = 0.5·0.314 + 0.3·0.294 + 0.2·0.500 = 0.345   -> rank 1
+```
+
+### Tres hipótesis, dos descartadas con datos
+
+**1. "El grafo está descalibrado" — CIERTO pero irrelevante.** El grafo acierta el
+doc gold solo en **18/35 (51%)**, y en 10 de 35 devuelve lista vacía. Cuando
+acierta mal mete ruido. Pero barrer el peso no arregla nada medible:
+
+| `W_GRAPH` | recall@2 (doc) | chunks gold @8 | preguntas |
+|---|---|---|---|
+| 0.0 | **35/35** | 39/46 | 34/35 |
+| 0.1 | 35/35 | 39/46 | 34/35 |
+| 0.2 (actual) | 33/35 | 39/46 | 33/35 |
+
+Mover el peso de 0.2 a 0.0 cambia **1 chunk de 46**. Es ruido, y tocar la
+ponderación con 35 preguntas sería sobreajustar. Se deja como está.
+
+**2. "No puntúa el título del paper" — FALSA.** `retriever.py:44` solo tokeniza
+`r["text"]` y nunca el título, lo cual parece un bug obvious cuando la pregunta
+nombra el paper. Pero incluir el título en la bolsa léxica **no cambia una sola
+métrica**: recall@2 33/35 idéntico, chunks@8 39/46 idéntico. Descartado.
+
+**3. "El barrido encuentra el doc pero el cierre lo recorta" — CIERTA.** Esta es
+la buena. `deep_sweep` sí devuelve el doc 5 con los chunks 57 y 58, pero
+`_deep_evidence` hacía:
+
+```python
+for d in res.get("docs", [])[:n_docs]:     # n_docs=2
+```
+
+El doc gold caía en **4º lugar** del ranking y se quedaba fuera. El agente veía
+58k caracteres de evidencia y **ninguno de los 3 chunks que contestan la
+pregunta**. `5:57` (que dice literalmente *"benchmark validation splits are
+relatively small"*), `5:58` (`paired bootstrap ... 1,000 iterations`) y `5:59`
+(`top-tier statistical tie`) llegaban los tres a la base de datos y ninguno al
+cierre.
+
+### El arreglo y su coste real
+
+`n_docs` de 2 a 4. Determinista, sin coste de LLM, y **muy quirúrgico**:
+
+| `n_docs` | chars medio | recall chunks gold | preguntas con ≥1 |
+|---|---|---|---|
+| 2 (antes) | 50.494 | 38/46 | 33/35 |
+| 3 | 69.001 | 38/46 | 33/35 |
+| **4** | **83.390** | **40/46** | **34/35** |
+| 5 | 89.722 | 40/46 | 34/35 |
+
+`n_docs=3` no arregla nada porque el doc gold cae justo en la 4ª posición.
+Comparando chunk a chunk sobre las 35: **`wiki-b4` gana 2 chunks (0/3 → 2/3) y
+ninguna otra pregunta pierde ni uno.**
+
+En producción, sobre 4 preguntas con el pipeline real:
+
+```
+wiki-b4  2 -> 5   cite_precision 1.0, 0 abstenciones falsas
+```
+
+### El riesgo, dicho claro
+
+Subir `n_docs` da **más evidencia y más pajar**. En la misma tanda `wiki-b1` bajó
+a 2, y al mirar por qué se vio que **estaba todo en la evidencia y el agente lo
+pasó por alto**: 112.939 caracteres, y los cuatro términos que la referencia
+exige (`logs.md`, `skill-impact.md`, `outer-loop harness`, `validation gating`)
+ estaban presentes. Respondió con directorios (`wiki/`, `skills/`) en vez de los
+ficheros. Igual con `pg-b5`: los cinco números estaban, y dio solo los de
+HotpotQA inventándose el cuarto.
+
+O sea: `n_docs=4` arregla un fallo determinista de cobertura y **quizá** diluye
+la atención en el resto. Offline gana sin discusión; online hay un indicio en
+contra con n=1. **Lo decide la run completa de 40.**
+

@@ -162,12 +162,19 @@ def compact(transcript: list[str], snapshot: str) -> list[str]:
     return [f"[SNAPSHOT] {snapshot}", f"[RESUMEN] {summary}", f"[LESSONS]\n{load_lessons()}"]
 
 
-def _deep_evidence(question: str, per_doc: int = 4, n_docs: int = 2) -> str:
+def _deep_evidence(question: str, per_doc: int = 4, n_docs: int = 4) -> str:
     """Barrido profundo determinista: chunks del cierre que el top-8 no trajo.
 
     Sin coste LLM y sin varianza. Se limita a los `n_docs` papers con mejor score
-    porque el barrido completo de los 5 papers serían ~80k caracteres, más que el
+    porque el barrido completo de los 5 papers serían ~90k caracteres, más que el
     resumen y el resto de la evidencia juntos.
+
+    `n_docs` era 2 y recortaba en exclusiva: en `wiki-b4` el paper gold (doc 5,
+    que es el que la propia pregunta nombra) quedaba en 4º lugar del ranking y
+    sus chunks 57-59 nunca llegaban al cierre. Medido sobre las 35 respondibles,
+    subirlo a 4 sube el recall de chunks gold de 38/46 a 40/46 y arregla esa
+    pregunta sin perder ninguna otra. `n_docs=3` no arregla nada: 38/46 igual,
+    porque el doc gold cae justo en la 4ª posición.
     """
     try:
         res = TOOLS["deep_sweep"]["fn"](question=question, per_doc=per_doc)
