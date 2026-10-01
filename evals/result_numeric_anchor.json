@@ -1,0 +1,8 @@
+{
+ "violation_rate": 0.006802721088435374,
+ "config": "ventana 2 + enteros <=10",
+ "por_pregunta": {
+  "pg-b3": 3,
+  "pg-b5": 1
+ }
+}

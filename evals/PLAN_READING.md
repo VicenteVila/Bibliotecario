@@ -98,7 +98,7 @@ si/no. Sirve para `tce-b7`, que cita bien e invierte el sentido, y ese caso es
 el unico que **no** cubren A ni B.
 
 Es el paso mas caro y el que mas riesgo de sobrecorreccion (un juez que "corrige"
-respuestas correctas). Va el ultimo y detras de una puerta: si A y B ya先把 el
+respuestas correctas). Va el ultimo y detras de una puerta: si A y B ya han dejado el
 residuo a <1 fallo, C no hace falta.
 
 ---
@@ -178,3 +178,29 @@ dilucion de la que se hablaba, apareciendo en la pregunta que menos se esperaba.
 p-valor, es que el residuo son 5 preguntas con rango 1-5, y las cinco son
 exactamente el modo de fallo que el plan ataca (evidencia presente, respuesta
 incompleta o abandonada).
+
+---
+
+## 5. Resultado de los tres pasos (cerrado)
+
+Medidos los tres contra el mismo residuo de r5/r6. Detalle y tablas en
+`REPORT_BLIND.md`, "Fase 0f".
+
+| paso | que era | resultado |
+|---|---|---|
+| A | replay numerico sobre la evidencia citada | **descartado**: 0 cifras inventadas en 588 citas; el detector acierta 12/12 sobre numeros inyectados, no hay nada que cazar |
+| B | detector de pregunta multiparte | **descartado**: 16 falsos positivos sobre 30 respondibles ya correctas; mide "no contesto la 2ª parte", no "eligio la parte equivocada" |
+| C | verificar que la cita sostiene la afirmacion | **implementado y apagado**: 4.10 vs 4.00 (r5) y 3.60 (r6) en 13 preguntas; 0 controles danados; +0.029 sobre 35 contra r5, por debajo del +0.15 del gate y por debajo del ruido r5-r6 (0.114) |
+
+C queda en el codigo detras de `VERIFY_CITATION=1` (por defecto `0`), con la puerta
+anti-sobrecorreccion asimetrica: una reescritura solo se acepta si cita un chunk que
+ya estaba en la evidencia que se entrego al cierre. "OK", una salida sin cita o una
+cita nueva devuelven el borrador original intacto. Con el flag apagado no cambia
+nada: 178 tests pasan en ambos estados.
+
+**El plan queda agotado.** Las tres vias medibles estaban descartadas antes de
+empezar y la que quedaba no llego al gate. El diagnostico que si sobrevive es que
+el residuo es de *discriminacion* con la respuesta presente en el contexto, y que
+un parche mas del agente no lo ataca. Lo que toca probar despues es del lado de la
+pregunta (una sola sub-pregunta por caso) o de la recuperacion (ranquear el chunk
+dentro del documento, no el documento entero), no del cierre.

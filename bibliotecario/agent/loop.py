@@ -36,6 +36,17 @@ STRICT_FALLBACK = False
 ANCHOR_GROUNDING = os.environ.get("ANCHOR_GROUNDING", "0") == "1"
 _NO_ENCONTRADO = "NO_ENCONTRADO"
 
+# Verificacion de que la cita sostiene la afirmacion (opt-in por VERIFY_CITATION=1).
+# El residuo de r5/r6 no es de cobertura: en `tce-b7` el agente cita [3:25], ese chunk
+# contiene literalmente la respuesta ("uniform sampling also spends its budget on
+# easier tasks that terminate quickly") y aun asi se queda con la explicacion
+# anterior; en `wiki-b1` y `wiki-b6` cita bien y deja fuera justo lo que la pregunta
+# pedia. Ni el replay numerico (A) ni el detector de preguntas multiparte (B) tocan
+# ninguno de esos casos: A no encuentra ni una violacion real y B marca 16 de las 30
+# preguntas que ya eran correctas. Se queda como lo unico del plan que si mide el fallo.
+VERIFY_CITATION = os.environ.get("VERIFY_CITATION", "0") == "1"
+_CITE_RE = re.compile(r"\[(\d+):(\d+)\]")
+
 
 def generate(prompt: str, max_tokens: int = 512, retries: int | None = None) -> str:
     return _llm_generate(prompt, max_tokens, 2 if retries is None else retries,
@@ -225,6 +236,75 @@ def _ground(question: str, deep: str, retries: int = 1) -> str:
     return out
 
 
+def _chunk_index(deep: str) -> dict[str, str]:
+    """Indice 'doc:chunk' -> bloque integro del barrido profundo."""
+    idx: dict[str, str] = {}
+    key, buf = "", []
+    for line in (deep or "").splitlines():
+        m = re.match(r"^\[(\d+:\d+)\]\s", line)
+        if m:
+            if key:
+                idx[key] = "\n".join(buf)
+            key, buf = m.group(1), [line]
+        elif key:
+            buf.append(line)
+    if key:
+        idx[key] = "\n".join(buf)
+    return idx
+
+
+def _verify_citation(question: str, answer: str, deep: str, retries: int = 1) -> str:
+    """Comprueba que los chunks citados sostienen la respuesta y la reescribe si no.
+
+    Solo interviene si las citas del cierre resuelven dentro del barrido profundo:
+    una cita que no se puede localizar no se puede verificar, y no se toca.
+
+    La puerta anti-sobrecorreccion es asimetrica a proposito. Este paso es el que
+    puede tirar abajo respuestas que ya eran correctas, y el residuo medido son 5
+    preguntas de 35, asi que el umbral de aceptacion de una reescritura tiene que
+    ser alto: se exige que el verificador devuelva prosa Y que toda su cita exista
+    en los chunks que ya estaban en la evidencia. "OK", una salida sin cita, una
+    cita nueva o un volcado de tool devuelven el original intacto.
+    """
+    idx = _chunk_index(deep)
+    cited: list[tuple[str, str]] = []
+    for m in _CITE_RE.finditer(answer or ""):
+        cid = f"{m.group(1)}:{m.group(2)}"
+        if cid in idx and cid not in [c for c, _ in cited]:
+            cited.append((cid, idx[cid]))
+    if not cited:
+        return answer
+
+    allowed = {f"[{cid}]" for cid, _ in cited}
+    prompt = ("VERIFICACION DE UN CIERRE. Comprueba si la RESPUESTA se sostiene en los "
+              "chunks que cita.\n\n"
+              f"PREGUNTA: {question}\n\n"
+              f"RESPUESTA A VERIFICAR:\n{answer}\n\n"
+              "CHUNKS CITADOS (texto integro):\n" + "\n\n".join(t for _, t in cited) + "\n\n"
+              "COMPRUEBA en este orden:\n"
+              "1. ¿Cada afirmacion de la respuesta aparece LITERALMENTE en algun chunk citado?\n"
+              "2. ¿Se queda alguna parte de la pregunta sin responder? Repasa el chunk COMPLETO: "
+              "puede contener mas de un dato que responda a la pregunta, y quedarse con el "
+              "primero tambien es un fallo.\n"
+              "3. ¿Das el tipo de cosa que pide la pregunta? Si pide archivos, un directorio no "
+              "vale; si pide dos cifras, una sola no vale.\n\n"
+              "FORMATO DE SALIDA, obligatorio y excluyente:\n"
+              "- Si la respuesta es correcta y completa: escribe exactamente OK y nada mas.\n"
+              "- Si algo falla: escribe la respuesta CORREGIDA en prosa (max. 150 palabras), "
+              "citando cada afirmacion como [doc_id:chunk] y usando solo los chunks de arriba.\n\n"
+              "SALIDA:")
+    out = generate(prompt, max_tokens=900, retries=retries).strip()
+    if not out or _toolish(out):
+        return answer
+    if re.fullmatch(r"OK\.?", out, re.IGNORECASE):
+        return answer
+    if not CITE_FMT.has_citation(out):
+        return answer
+    if any(f"[{m.group(1)}:{m.group(2)}]" not in allowed for m in _CITE_RE.finditer(out)):
+        return answer
+    return CITE_FMT.normalize_citations(_fix_truncation(out))
+
+
 def _final_answer(question: str, best: str, evidence: list[str], flat: int, retries: int = 1) -> str:
     """Cierre forzado: pide una respuesta en prosa a partir de la evidencia reunida.
 
@@ -275,7 +355,10 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
     out = _fix_truncation(out)
     if evidence and not CITE_FMT.has_citation(out):
         out = out.rstrip() + "  [doc:?]"  # marca de hueco: el cierre debe citar
-    return CITE_FMT.normalize_citations(out)
+    out = CITE_FMT.normalize_citations(out)
+    if VERIFY_CITATION and deep:
+        out = _verify_citation(question, out, deep, retries=retries)
+    return out
 
 
 def _fix_truncation(text: str) -> str:

@@ -588,3 +588,92 @@ O sea: `n_docs=4` arregla un fallo determinista de cobertura y **quizá** diluye
 la atención en el resto. Offline gana sin discusión; online hay un indicio en
 contra con n=1. **Lo decide la run completa de 40.**
 
+
+## Fase 0e: r5 y r6 sin anclaje — el arreglo de cobertura aguanta
+
+Con `n_docs=4` y la salida temprana corregida, dos runs completas de las 40:
+
+| run | judge | delta pareado vs r1-r3 | p | tokens |
+|---|---|---|---|---|
+| r5 | **4.714** | +0.390 | 0.0042 | 1.130.796 |
+| r6 | **4.600** | +0.276 | 0.0927 | 1.127.060 |
+| pool | **4.657** | +0.333 | 0.0147 | — |
+
+r5 es la mejor run del proyecto y su delta es significante. r6 **no lo es por sí
+sola** (p=0.093); lo que confirma el efecto es el pool. La diferencia entre r5 y
+r6 (0.114) es el ancho de banda real del ruido de esta eval, y es el número con el
+que hay que comparar cualquier mejora posterior.
+
+Lo que mejora no es el volumen: es la cobertura. `false_abstention` pasa de 0.029
+a 0.0 en r5, `cite_precision` a 0.986 y `cite_coverage` a 1.0. 30 de las 35
+respondibles puntúan 5 en ambas runs, y 11 que estaban por debajo de 5 en la línea
+base llegan a 5 en las dos. **Toda** la varianza que queda está en cinco
+preguntas: `pg-b5`, `tce-b7`, `wiki-b1`, `wiki-b2`, `wiki-b6`.
+
+## Fase 0f: el residuo no es cobertura, y por eso el plan falló
+
+Las cinco que quedan fallan con la respuesta **en la evidencia**. Medido, no
+supuesto:
+
+- `tce-b7` cita `[3:25]`, ese chunk dice literalmente *"uniform sampling also
+  spends its budget on easier tasks that terminate quickly"*, y el agente se queda
+  con la explicación anterior del mismo párrafo.
+- `wiki-b1` cita bien y responde con directorios (`wiki/`, `skills/`) donde la
+  pregunta pide ficheros (`logs.md`, `skill-impact.md`).
+- `wiki-b6` cita bien y suelta dos de los tres números pedidos.
+- `pg-b5` cita la tabla de HotpotQA y omite la tabla principal, que es la otra
+  mitad de lo que la pregunta pide.
+- `wiki-b2` (r6) se abstiene con `[doc:?]` teniendo el chunk gold `[5:13]` dentro
+  del barrido.
+
+Los tres pasos del plan se midieron uno a uno contra ese residuo:
+
+- **A, replay numérico: descartado.** Corregido el regex que confundía comas de
+  listas con separadores de miles, sobre cita ±2 chunks y enteros ≤10 excluidos:
+  4/588 = 0,7% de las citas, y **cero** cifras que no existieran en la evidencia.
+  Las 4 son respuestas correctas con cita floja. La sensibilidad del detector es
+  12/12 sobre números inyectados, o sea que no es que no detectara: es que no hay
+  nada que detectar. Una puerta dura aquí solo recerraría respuestas buenas.
+- **B, detector de preguntas multiparte: descartado.** Marcó 16 de las 30
+  respondibles que ya eran correctas. Los fallos de granularidad de `wiki-b1` y de
+  tabla de `pg-b5` no son "no respondió a la segunda parte": son *seleccionó la
+  parte equivocada*. B no mide el fallo que existe.
+- **C, verificación de que la cita sostiene la afirmación: implementado, medido,
+  no llega al gate.** Detrás de `VERIFY_CITATION=1`, una llamada extra que recibe
+  el borrador y los chunks citados y solo puede devolver `OK` o una reescritura.
+  La puerta anti-sobrecorrección es asimétrica a propósito: se acepta una
+  reescritura solo si cita un chunk que ya estaba en la evidencia, y cualquier
+  otra salida devuelve el original intacto.
+
+## C en 13 preguntas: 4.10 contra 4.00 (r5) y 3.60 (r6)
+
+Residuo completo, 5 controles estables y 3 guardias de abstención:
+
+| | r5 | r6 | verify C |
+|---|---|---|---|
+| media de las 10 respondibles | 4.00 | 3.60 | **4.10** |
+| `pg-b5` | 2 | 1 | 2 |
+| `tce-b7` | 3 | 4 | 4 |
+| `wiki-b1` | 2 | 1 | 2 |
+| `wiki-b6` | 3 | 4 | 3 |
+| `wiki-b2` | 5 | 1 | 5 |
+| 5 controles estables | 5 | 5 | **5** (ninguno tocado) |
+| no respondibles sin abstener | 2/3 | 3/3 | 2/3 |
+
+Lo bueno: **cero controles dañados**, que era el riesgo real de este paso, y la
+guardia de abstención no empeora (2/3, igual que r5 y mejor que r6).
+
+Lo malo, y es lo que decide: contra r5 el cambio total es **+1 punto de juez
+sobre 35** (+0.029), y contra r6 **+5** (+0.14). Ninguno llega al +0.15 que el
+plan exigía, y ambos están por debajo del ruido ya medido entre r5 y r6 (0.114).
+Además cuesta **+19% de tokens** (33,7k por pregunta frente a 28,3k).
+
+`wiki-b2` volviendo de 1 a 5 es una sola pregunta inestable dándose la vuelta, que
+es exactamente lo que el plan advertía que no se debe contar como mejora.
+
+**Veredicto: C no supera el gate y no se activa.** Se queda implementado,
+testeado y apagado (`VERIFY_CITATION` por defecto `0`) porque no cuesta nada
+mientras esté apagado y porque el hallazgo de fondo es el que vale: con A y B
+descartados y C sin efecto medible, la disciminación no es un problema de
+contexto, de prompt ni de machinery, y el siguiente paso honesto es un rediseño
+de la pregunta, no otro parche del agente.

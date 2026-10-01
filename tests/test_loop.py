@@ -211,3 +211,70 @@ def test_respuesta_en_prosa_pasa_por_el_cierre_forzado(tmp_path, monkeypatch):
     r = LOOP.run("¿cuánto ahorra?", max_turns=4)
     assert cerrados["n"] == 1, "la prosa tiene que pasar por _final_answer"
     assert r["answer"] == "El ahorro es del 96% [1:0]."
+
+
+DEEP_FALSO = ("[3:25] Task-CoEvolve\nRandom-Resample cuts cost by 96% but that is not "
+              "efficiency, because uniform sampling also spends its budget on easier "
+              "tasks that terminate quickly.\n"
+              "[5:13] WikiSkill\nThe Inference Agent is restricted from accessing the "
+              "Wiki Layer during training rollouts.")
+
+
+def _prepara_verificacion(monkeypatch, respuestas):
+    monkeypatch.setattr(LOOP, "VERIFY_CITATION", True)
+    monkeypatch.setattr(LOOP, "_deep_evidence", lambda *a, **k: DEEP_FALSO)
+    cola = list(respuestas)
+    monkeypatch.setattr(LOOP, "generate", lambda *a, **k: cola.pop(0))
+
+
+def test_verificacion_reescribe_si_la_cita_no_alcanza(monkeypatch):
+    _prepara_verificacion(monkeypatch, [
+        "El ahorro es del 96% porque reparte mal [3:25].",
+        "Correcto: uniform sampling gasta el presupuesto en tareas faciles [3:25].",
+    ])
+    out = LOOP._final_answer("¿por que no es eficiencia?", "", ["ev"], 0)
+    assert out.startswith("Correcto: uniform sampling")
+    assert "96%" not in out
+
+
+def test_verificacion_conserva_original_si_el_verificador_dice_ok(monkeypatch):
+    _prepara_verificacion(monkeypatch, [
+        "El ahorro es del 96% [3:25].",
+        "OK",
+    ])
+    assert LOOP._final_answer("q", "", ["ev"], 0) == "El ahorro es del 96% [3:25]."
+
+
+def test_verificacion_rechaza_reescritura_con_cita_ajena(monkeypatch):
+    _prepara_verificacion(monkeypatch, [
+        "El ahorro es del 96% [3:25].",
+        "Otra cosa distinta [9:99].",
+    ])
+    assert LOOP._final_answer("q", "", ["ev"], 0) == "El ahorro es del 96% [3:25]."
+
+
+def test_verificacion_rechaza_reescritura_sin_cita(monkeypatch):
+    _prepara_verificacion(monkeypatch, [
+        "El ahorro es del 96% [3:25].",
+        "Uniform sampling gasta en tareas faciles.",
+    ])
+    assert LOOP._final_answer("q", "", ["ev"], 0) == "El ahorro es del 96% [3:25]."
+
+
+def test_verificacion_no_corre_si_la_cita_no_resuelve_en_el_barrido(monkeypatch):
+    _prepara_verificacion(monkeypatch, ["Cosa con cita no indexada [7:7]."])
+    assert LOOP._final_answer("q", "", ["ev"], 0) == "Cosa con cita no indexada [7:7]."
+
+
+def test_verificacion_apagada_por_defecto(monkeypatch):
+    monkeypatch.setattr(LOOP, "_deep_evidence", lambda *a, **k: DEEP_FALSO)
+    llamadas = []
+
+    def gen(*a, **k):
+        llamadas.append(a[0])
+        return "El ahorro es del 96% [3:25]."
+
+    monkeypatch.setattr(LOOP, "generate", gen)
+    assert LOOP.VERIFY_CITATION is False
+    LOOP._final_answer("q", "", ["ev"], 0)
+    assert len(llamadas) == 1

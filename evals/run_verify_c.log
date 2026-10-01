@@ -1,0 +1,41 @@
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 3175.40it/s]
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2769.71it/s]
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2389.49it/s]
+LLM reintentable gemini2: esperando 61s (1)
+LLM reintentable gemini1: esperando 50s (1)
+LLM reintentable gemini1: esperando 35s (1)
+LLM gemini1 agotada/sobrecargada, paso a siguiente
+LLM gemini1 aparcado 15 min tras 1 fallos
+LLM reintentable gemini2: esperando 57s (1)
+LLM gemini1 agotada/sobrecargada, paso a siguiente
+LLM gemini1 aparcado 30 min tras 2 fallos
+LLM gemini2 agotada/sobrecargada, paso a siguiente
+LLM gemini2 aparcado 15 min tras 1 fallos
+LLM reintentable gemini2: esperando 47s (1)
+pearl-b2 prec=1.00 judge=5 tok= 14809 fb=False 120s
+LLM gemini2 agotada/sobrecargada, paso a siguiente
+LLM gemini2 aparcado 30 min tras 2 fallos
+LLM gemini2 agotada/sobrecargada, paso a siguiente
+LLM gemini2 aparcado 60 min tras 3 fallos
+pg-b3    prec=1.00 judge=5 tok= 36527 fb=False 143s
+pearl-b8 prec=1.00 abst=True tok= 29919 fb=False 175s
+pg-b5    prec=1.00 judge=2 tok= 40740 fb=False 67s
+pg-b8    prec=1.00 abst=True tok= 38583 fb=False 65s
+tce-b5   prec=1.00 judge=5 tok= 35984 fb=False 72s
+tce-b7   prec=1.00 judge=4 tok= 37068 fb=False 69s
+reas-b6  prec=1.00 judge=5 tok= 34630 fb=False 67s
+reas-b8  prec=1.00 abst=False tok= 34699 fb=False 90s
+wiki-b1  prec=1.00 judge=2 tok= 35944 fb=False 83s
+wiki-b2  prec=1.00 judge=5 tok= 28027 fb=False 73s
+wiki-b5  prec=1.00 judge=5 tok= 32925 fb=False 57s
+wiki-b6  prec=1.00 judge=3 tok= 38936 fb=False 72s
+
+n=13 (respondibles=10, no respondibles=3) modelo_juez=openai/gpt-oss-20b
+judge=4.1 (n=10/10, 0 errores)  por dificultad={'facil': 4.0, 'media': 4.0, 'dificil': 4.5}
+cite_precision=1.0 cite_coverage=1.0 con_cita=1.0
+abstencion_falsa=0.0 [] (respondidas=1.0)
+abstain_rate=0.667 (decididas=3/3, 0 errores) inventadas=1
+tokens_agente=438791 en 78 llamadas | tokens_juez=12986 | latencia_mediana=72s
+truncadas=0 fallbacks=0 -> result_verify_c.json

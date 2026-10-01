@@ -1,0 +1,588 @@
+{
+ "meta": {
+  "golden": "golden_blind_qa.jsonl",
+  "run": "verify_c",
+  "judge_model": "openai/gpt-oss-20b",
+  "workers": 3,
+  "providers": [
+   [
+    "nvidia",
+    "openai"
+   ],
+   [
+    "gemini1",
+    "gemini"
+   ],
+   [
+    "gemini2",
+    "gemini"
+   ]
+  ],
+  "anchor_grounding": false
+ },
+ "aggregate": {
+  "n": 13,
+  "n_answerable": 10,
+  "n_unanswerable": 3,
+  "judge_model": "openai/gpt-oss-20b",
+  "turns": 4,
+  "retries": 1,
+  "judge_mean": 4.1,
+  "n_scored": 10,
+  "n_judge_errors": 0,
+  "n_infra": 0,
+  "infra_error_ids": [],
+  "cite_precision_mean": 1.0,
+  "cite_coverage_mean": 1.0,
+  "answer_cite_rate": 1.0,
+  "by_difficulty": {
+   "facil": 4.0,
+   "media": 4.0,
+   "dificil": 4.5
+  },
+  "abstain_rate": 0.667,
+  "n_abstain_decided": 3,
+  "n_abstain_errors": 0,
+  "n_fabricated": 1,
+  "latency_median_s": 72,
+  "false_abstention_rate": 0.0,
+  "n_false_abstention": 0,
+  "answer_rate_on_answerable": 1.0,
+  "false_abstention_ids": [],
+  "truncated": 0,
+  "fallbacks": 0,
+  "agent_tokens_total": 438791,
+  "agent_calls_total": 78,
+  "agent_calls_tokens_unknown": 4,
+  "agent_models": [
+   "gemini-3.6-flash",
+   "nvidia/nemotron-3-super-120b-a12b"
+  ],
+  "judge_tokens_total": 12986
+ },
+ "rows": [
+  {
+   "id": "pearl-b2",
+   "doc_id": 1,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 432,
+    "total_tokens": 569,
+    "completion_tokens": 137,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 120,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 14671,
+    "completion_tokens": 138,
+    "models": [
+     "gemini-3.6-flash",
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 14809,
+    "calls_tokens_unknown": 1
+   },
+   "answer": "The hidden dimension d used for node, relation, and path embeddings in PEARL is fixed to 32 [1:29]."
+  },
+  {
+   "id": "pearl-b8",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 518,
+    "total_tokens": 712,
+    "completion_tokens": 194,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 175,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 29542,
+    "completion_tokens": 377,
+    "models": [
+     "gemini-3.6-flash",
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 29919,
+    "calls_tokens_unknown": 2
+   },
+   "answer": "The LPRA path retriever issues one LLM query per candidate path during training, as it evaluates the semantic support of each candidate path for the query triple using an LLM-based scoring function [1:17]. However, the total number of LLM queries issued in one full training run of PEARL is not explicitly stated in the provided evidence. The evidence describes the mechanism of LPRA and its use of an LLM to score paths, but does not specify the total count of queries across the entire training process. Therefore, based on the available information, the exact total number of LLM queries issued by the LPRA path retriever in one full training run of PEARL cannot be determined. [1:17]"
+  },
+  {
+   "id": "pg-b3",
+   "doc_id": 2,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 3,
+   "n_evid": 3,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 546,
+    "total_tokens": 745,
+    "completion_tokens": 199,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 143,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 36302,
+    "completion_tokens": 225,
+    "models": [
+     "gemini-3.6-flash",
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 36527,
+    "calls_tokens_unknown": 1
+   },
+   "answer": "Based on the evidence from the paper \"Procedural Graphs: Self-Evolving Execution Structures for LLM Agents\", during self-evolution the training split is processed in sequential strides of S=100 samples on HotpotQA and S=20 samples on MultiChallenge. The validation set Dval consumed by the acceptance gate has a size of 1,000 samples. [2:56] [2:86] [2:87]"
+  },
+  {
+   "id": "pg-b5",
+   "doc_id": 2,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 553,
+    "total_tokens": 1065,
+    "completion_tokens": 512,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 67,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 40490,
+    "completion_tokens": 250,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 40740,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper reports token counts for Mode 5 (10,115.89), Mode 4 (6,396.90), and the unguided baseline (4,003.24) on HotpotQA, and the Mode 4-5 comparison reverses on HotpotQA: Mode 5 uses more tokens than Mode 4 [2:82]."
+  },
+  {
+   "id": "pg-b8",
+   "doc_id": 2,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 485,
+    "total_tokens": 766,
+    "completion_tokens": 281,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": true,
+   "fallback": false,
+   "latency_s": 65,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 38187,
+    "completion_tokens": 396,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 38583,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper does not specify the random seed used for splitting HotpotQA into train, validation, and test portions. The evidence provided discusses dataset splits and experimental setup but does not mention a random seed for the HotpotQA split. [2:88] confirms the HotpotQA environment uses a standard split of 1,000 training, 1,000 validation, and 1,000 test samples, but no seed is stated. No other chunks in the provided evidence contain information about a random seed for this split. Therefore, the requested detail is not present in the available evidence."
+  },
+  {
+   "id": "tce-b5",
+   "doc_id": 3,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 676,
+    "total_tokens": 1318,
+    "completion_tokens": 642,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 72,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 35661,
+    "completion_tokens": 323,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35984,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Task-CoEvolve uses the anchored difference estimator defined as \\(\\hat{S}(h) = \\frac{1}{N} \\sum_{t\\in T} \\bar{p}_t + \\frac{1}{N} \\sum_{t\\in S_k} \\frac{x_t(h) - \\bar{p}_t}{\\pi_t}\\) [3:15]. The raw outcome is not weighted directly because weighting the outcome \\(x_t(h)\\) by its inclusion probability \\(\\pi_t\\) would cause tasks with tiny \\(\\pi_t\\) (rarely sampled) to dominate the estimate when their outcome deviates from the historical mean, especially for consistently solved or failed tasks [3:15]. Instead, the deviation from the anchor \\(\\bar{p}_t\\) is weighted, which stabilizes estimation by canceling the anchor in expectation and preventing dominance by extreme outcomes [3:15]."
+  },
+  {
+   "id": "tce-b7",
+   "doc_id": 3,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 4,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 1194,
+    "completion_tokens": 625,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 69,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 36800,
+    "completion_tokens": 268,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 37068,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Random-Resample reduces cost by 96% but this should not be interpreted as higher efficiency because uniform sampling spends its budget on easier tasks that terminate quickly, whereas variance-weighted selection concentrates the evaluation budget on long-running, multi-turn tasks where candidate harnesses show different success and failure outcomes [3:25]. Under the same 20% evaluation budget, Random-Resample achieves a final performance 3.3 points lower than Task-CoEvolve, indicating that the large cost reduction does not reflect better optimization efficiency [3:25]."
+  },
+  {
+   "id": "reas-b6",
+   "doc_id": 4,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 559,
+    "total_tokens": 1168,
+    "completion_tokens": 609,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 67,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 34370,
+    "completion_tokens": 260,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 34630,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper defines detecting co-dependent improvements as identifying when parameter changes only yield gains when applied together, which single-parameter sweeps miss. In IMG-100, the agent recognized AMP (mixed-precision training) as a VRAM enabler: reducing memory from 14.3 GB to 4.1 GB made deeper architectures feasible, which in turn made CutMix augmentation beneficial and EMA stable, forming a chain of co-dependent gains (82.38%→84.03%) that collapsed if any link was removed [4:36]."
+  },
+  {
+   "id": "reas-b8",
+   "doc_id": 4,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 442,
+    "total_tokens": 1341,
+    "completion_tokens": 899,
+    "prompt_tokens_details": null
+   },
+   "abstained": false,
+   "fabricated_value": 0.23,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 90,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 34483,
+    "completion_tokens": 216,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 34699,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The exact code change that broke the ReASearch agent's EPLB plateau was temporarily allowing an expert to give up its last replica during the refinement phase, which had previously been restricted to experts with two or more replicas. This single operator change enabled exploration of beneficial intermediate states that were previously unreachable, lifting the score from ~0.21 to 0.23. [4:23]"
+  },
+  {
+   "id": "wiki-b1",
+   "doc_id": 5,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 767,
+    "total_tokens": 1438,
+    "completion_tokens": 671,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 83,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 35421,
+    "completion_tokens": 523,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35944,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "La respuesta es incorrecta porque no menciona la capa Raw Layer (raw/) como parte de las tres capas de conocimiento de WikiSkill, aunque la pregunta pide \"qué archivos hacen capas de conocimiento y seguimiento\". La respuesta solo menciona Wiki Layer (wiki/) y Skill Layer (skills/), omitiendo la Raw Layer, que es explícitamente descrita como una de las tres capas distintas en el chunk [5:11]: \"The WikiSkill workspace consists of three distinct layers, as shown in Figure 2 and described below. Raw Layer (raw/)... Wiki Layer (wiki/)... Skills Layer (skills/)\". Además, aunque la respuesta atribuye correctamente al Wiki Maintainer la actualización de la Wiki Layer y al Skill Proposer la actualización de la Skill Layer, omite que la capa Raw Layer es inmutable y no se actualiza por ningún agente, lo cual es relevante para completar la descripción de quién actualiza cada capa. Por tanto, la respuesta no responde completamente a la pregunta, ya que omite una de las tres capas solicitadas.\n\nRespuesta corregida:\nWikiSkill's knowledge and tracking layers consist of the Raw Layer (raw/), Wiki Layer (wiki/), and Skill Layer (skills/). The Wiki Maintainer updates the Wiki Layer by consolidating traces into structured knowledge, the Skill Proposer updates the Skill Layer by proposing skill updates from the wiki and traces, and the Raw Layer is immutable and not updated by any agent [5:11][5:12]."
+  },
+  {
+   "id": "wiki-b2",
+   "doc_id": 5,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 517,
+    "total_tokens": 876,
+    "completion_tokens": 359,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 73,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 27802,
+    "completion_tokens": 225,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 28027,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The Inference Agent is restricted from accessing the Wiki Layer during training rollouts, as allowing wiki access during training negatively affects skill development [5:13]. The ablation study showed that providing the Inference Agent with wiki access during training rollouts reduces average benchmark performance from 63.7% to 60.9%, with a substantial drop on LiveMath from 72.6% to 64.8% [5:31]."
+  },
+  {
+   "id": "wiki-b5",
+   "doc_id": 5,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 572,
+    "total_tokens": 791,
+    "completion_tokens": 219,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 57,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 32648,
+    "completion_tokens": 277,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 32925,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "For Qwen-3.6-27B, WikiSkill improves performance by 28.0 points on LiveMath, 14.1 points on SealQA, 40.9 points on SpreadSheet, 11.6 points on OfficeQA, and 24.8 points on ALFWorld. The dataset with the most benefit is SpreadSheet (40.9 points) and the least benefit is OfficeQA (11.6 points). [5:24] [5:25]"
+  },
+  {
+   "id": "wiki-b6",
+   "doc_id": 5,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 517,
+    "total_tokens": 1003,
+    "completion_tokens": 486,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 72,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 38736,
+    "completion_tokens": 200,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 38936,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Evolved skills can compensate for substantial differences in model scale: Qwen-3.5-9B with WikiSkill reaches 47.4% average accuracy, outperforming Qwen-3.6-27B without skills at 39.4% [5:24]."
+  }
+ ]
+}
