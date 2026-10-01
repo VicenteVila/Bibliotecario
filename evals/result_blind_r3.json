@@ -9,7 +9,8 @@
     "nvidia",
     "openai"
    ]
-  ]
+  ],
+  "anchor_grounding": false
  },
  "aggregate": {
   "n": 40,
@@ -21,6 +22,8 @@
   "judge_mean": 4.486,
   "n_scored": 35,
   "n_judge_errors": 0,
+  "n_infra": 0,
+  "infra_error_ids": [],
   "cite_precision_mean": 0.957,
   "cite_coverage_mean": 0.971,
   "answer_cite_rate": 0.971,

@@ -93,6 +93,31 @@ def citation_metrics(q: dict, answer: str, evidence: list) -> dict:
             "stray_docs": stray, "answer_cites": len(cites), "n_evid": len(evidence)}
 
 
+_INFRA_MARKERS = ("504", "502", "503", "500", "429", "408", "timeout", "timed out",
+                  "gateway", "bad gateway", "sobrecargad", "overloaded", "high demand",
+                  "rate limit", "todos los proveedores", "sin proveedores", "aparcado",
+                  "dead", "conexion", "connection")
+
+
+def _classify_run_error(e: Exception) -> str:
+    """Distingue caida de infraestructura de error de programacion.
+
+    Un 504 o un tier agotado son ruido de la red: la fila se marca `infra_error` y
+    aggregate la saca de la media. Un TypeError o un AttributeError son un bug
+    nuestro, y camuflado de "infraestructura" pasaria desapercibido mientras se
+    pierde una pregunta. Estos ultimos relanzan: una run con un bug dentro no es
+    un dato, es un error de quien la lanza.
+    """
+    msg = f"{type(e).__name__}: {str(e)[:160]}"
+    bajo = msg.lower()
+    if isinstance(e, (TypeError, AttributeError, NameError, ImportError,
+                      SyntaxError, KeyError, IndexError)):
+        raise e
+    if not any(m in bajo for m in _INFRA_MARKERS):
+        raise e
+    return msg
+
+
 def run_one(q: dict, turns: int) -> dict:
     """Ejecuta una pregunta y devuelve su fila. No lanza: todo error va a la fila.
 
@@ -103,13 +128,15 @@ def run_one(q: dict, turns: int) -> dict:
     """
     LLM.reset_usage()
     t0 = time.time()
+    infra_error = None
     try:
         # isolated=True: sin lecciones. Si no, el prompt lleva las 5 últimas,
         # que incluyen el texto de otras preguntas del golden (key_insights
         # = "Q: <pregunta>") y la eval deja de ser ciega.
         r = LOOP.run(q["question"], max_turns=turns, isolated=True)
     except Exception as e:
-        r = {"answer": "", "evidence": [], "turns": 0, "error": str(e)[:120]}
+        infra_error = _classify_run_error(e)
+        r = {"answer": "", "evidence": [], "turns": 0, "error": infra_error}
     usage = LLM.usage_totals()
     ans = r.get("answer", "")
     evidence = r.get("evidence", [])
@@ -117,12 +144,30 @@ def run_one(q: dict, turns: int) -> dict:
     fallback = ans.startswith(("(presupuesto agotado)", "(extractivo)"))
     unanswerable = bool(q.get("unanswerable"))
 
+    # Caída de infraestructura = el proveedor no llegó a responder, no que el
+    # agente respondiera mal. Se marca en la fila y aggregate la saca de la media:
+    # si no, un 504 se puntúa 0 y baja judge_mean como si fuera culpa del agente.
+    # Pasó de verdad en r2: pg-b4 y tce-b6 con answer="" y judge=0, y
+    # n_judge_errors=0 porque 0 no es None. La media 4.229 estaba sesgada abajo
+    # por ruido de red y no habia forma de verlo.
+    if infra_error is None and not ans and not (fallback or unanswerable):
+        infra_error = "respuesta vacia sin error reported (posible agotamiento de tier)"
+    # Un fallback por presupuesto es degradacion conocida del harness, tambien
+    # infraestructura: la respuesta no la escribio el agente.
+    if fallback:
+        infra_error = infra_error or f"fallback: {ans[:60]}"
+
     if unanswerable:
         # Puntuarla de 1 a 5 no tiene sentido: lo que se mide es si se abstuvo.
         j = ({"abstained": False, "fabricated_value": None, "justification": "sin respuesta",
               "usage": {}, "error": "fallback sin LLM"}
              if (fallback or not ans)
              else judge_abstention(q["question"], ans))
+    elif infra_error:
+        # No se llama al juez: no hay respuesta que juzgar. judge=None lo saca de
+        # la media y n_infra lo hace visible. Antes era judge=0, indistinguible.
+        j = {"score": None, "verdict": "omitido (fallo de infraestructura)", "error": infra_error,
+             "model": JUDGE_MODEL, "usage": {}}
     elif fallback or not ans:
         j = {"score": 0, "verdict": "omitido (fallback sin LLM)", "error": None,
              "model": JUDGE_MODEL, "usage": {}}
@@ -134,6 +179,7 @@ def run_one(q: dict, turns: int) -> dict:
             "answer_has_cite": CITE_FMT.has_citation(ans),
             "truncated": ans.rstrip().endswith("[…truncado]"),
             "judge": j.get("score"), "judge_error": j.get("error"),
+            "infra_error": infra_error,
             "judge_model": j.get("model"), "judge_usage": j.get("usage"),
             "abstained": j.get("abstained"),
             "fabricated_value": j.get("fabricated_value"),
@@ -152,6 +198,12 @@ def aggregate(out: list, turns: int, retries: int) -> dict:
     """
     ans_rows = [r for r in out if not r.get("unanswerable")]
     un_rows = [r for r in out if r.get("unanswerable")]
+    # Fallos de infraestructura fuera de las poblaciones que se promedian. Un 504
+    # no es una respuesta mala del agente: meterlo en la media lo baja como si lo fuera.
+    infra = [r for r in ans_rows if r.get("infra_error")]
+    ans_rows = [r for r in ans_rows if not r.get("infra_error")]
+    un_infra = [r for r in un_rows if r.get("infra_error")]
+    un_rows = [r for r in un_rows if not r.get("infra_error")]
     na, nu = len(ans_rows), len(un_rows)
 
     def mean(xs):
@@ -163,6 +215,7 @@ def aggregate(out: list, turns: int, retries: int) -> dict:
     agg = {"n": len(out), "n_answerable": na, "n_unanswerable": nu,
            "judge_model": JUDGE_MODEL, "turns": turns, "retries": retries,
            "judge_mean": None, "n_scored": 0, "n_judge_errors": 0,
+           "n_infra": len(infra) + len(un_infra), "infra_error_ids": [r["id"] for r in infra + un_infra],
            "cite_precision_mean": None, "cite_coverage_mean": None,
            "answer_cite_rate": None, "by_difficulty": None,
            "abstain_rate": None, "n_abstain_decided": 0, "n_abstain_errors": 0,
@@ -262,11 +315,21 @@ def main() -> None:
     if rp.exists():
         try:
             prev = json.loads(rp.read_text(encoding="utf-8"))
-            out, done = prev.get("rows", []), {r["id"] for r in prev.get("rows", [])}
+            out = prev.get("rows", [])
+            # Las filas de infraestructura NO cuentan como terminadas: son ruido de
+            # red, no mediciones. Si se dieran por buenas, reanudar las dejaria
+            # para siempre y la media saldria con huecos que solo se ven en el
+            # agregado. Reanudar es justamente el mecanismo para recuperar una run
+            # a la que se le acabo el tier.
+            out = [r for r in out if not r.get("infra_error")]
+            done = {r["id"] for r in out}
         except ValueError:
             pass
     meta = {"golden": args.golden, "run": args.run, "judge_model": JUDGE_MODEL,
-            "workers": args.workers, "providers": LLM._providers()}
+            "workers": args.workers, "providers": LLM._providers(),
+            # El anclaje se lee del entorno, pero se graba aqui: una run sin
+            # esta clave no se puede distinguir de una con anclaje al compararla.
+            "anchor_grounding": LOOP.ANCHOR_GROUNDING}
 
     todo = [q for q in rows if q["id"] not in done]
     results: dict[str, dict] = {}

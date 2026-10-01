@@ -22,15 +22,23 @@ demás, que es justo lo que importa.
 
 | | r1 | r2 | r3 | media |
 |---|---|---|---|---|
-| judge (35 respondibles) | 4.171 | 4.029 | 4.486 | **4.229** |
-| errores de juez | 0 | 0 | 0 | |
+| judge (respondibles sin fallo de infra) | 4.171 | 4.273 | 4.486 | **4.310** |
+| respondibles puntuadas | 35 | 33 | 35 | |
+| caída de infraestructura | 0 | **2** | 0 | |
 | cite_precision | 0.871 | 0.871 | 0.957 | 0.900 |
 | abstain_rate (5 no respondibles) | 1.0 | 0.6 | 1.0 | 0.867 |
 | abstención falsa | 0.114 | 0.057 | 0.029 | 0.067 |
 | truncadas / fallbacks | 0 / 0 | 0 / 0 | 0 / 0 | |
 | tokens de agente | 562k | 667k | 710k | 646k |
 
-**judge = 4.229, IC 95 % ± 0.259** sobre 105 observaciones.
+**judge = 4.310, IC 95 % ± 0.264** sobre 103 observaciones.
+
+> Las cifras de esta tabla se recalcularon al arreglar la métrica de
+> infraestructura (Fase 0, más abajo). Antes ponían `4.229` y contaban 105
+> observaciones: las dos caídas de red de r2 (`pg-b4`, `tce-b6`) se puntuaron
+> `judge=0` y, como `0` no es `None`, el agregado las contaba como respondibles
+> válidas con `n_judge_errors=0`. Bajaban la media **sin dejar rastro**. La cifra
+> real era 4.310.
 
 ## Fase 1: el ruido es del agente, no del juez
 
@@ -83,7 +91,7 @@ determinista y gratis. Pendiente.
 Quitar la contaminación **subió** el ruido dentro de la pregunta (0.445 →
 0.709). Las lecciones actuaban de pista y el agente rendía más parejo con ellas,
 pero era un apoyo externo, no capacidad propia. La media no se movió
-(4.219 → 4.229): lo que cambió es el mecanismo y la confianza en la cifra.
+(4.219 → 4.229 → 4.310): lo que cambió es el mecanismo y la confianza en la cifra.
 
 Con 3 runs y las mismas 35 preguntas (comparación emparejada) se detectan
 diferencias de **0.150** al 95 %; con una sola run serían 0.260.
@@ -295,3 +303,44 @@ fallaban, y el mecanismo solo puede ayudar cuando la evidencia contiene el dato.
 `wiki-b1` rep0 se quedó en 3 porque mezcla quién actualiza cada archivo: el anclaje
 encuentra los nombres correctos pero no siempre la atribución completa. El juez lo
 penaliza por matiz, no por invención.
+
+## Fase 0: la caída de red se camuflaba como nota mala
+
+El requisito para gastar 1.1M tokens en un run con anclaje era que los datos
+fueran fiables, y no lo eran. Dos caídas de proveedor en r2 quedaron con
+`answer=""`, `turns=0` y `judge=0`. Como `0` no es `None`, el agregado las
+contaba como respondibles puntuadas y `n_judge_errors` salía a **0**: el ruido de
+red bajaba la media y no había forma de verlo en ninguna métrica.
+
+Efecto sobre la cifra: **r2 pasa de 4.029 a 4.273**, y la media de las tres runs
+de **4.229 a 4.310**. El agente estaba mejor de lo que se sabía.
+
+Lo que se cambió:
+
+1. **`infra_error` en la fila.** `run_one` distingue caída de infraestructura de
+   respuesta mala, y el juez **no se llama** si no hay respuesta (`judge=None`).
+2. **`aggregate` la excluye de la media** y expone `n_infra` e
+   `infra_error_ids`. El hueco queda visible en vez de escondido en un 0.
+3. **Un bug de programación no se camufla de infraestructura.** Un `TypeError`
+   relanza. Si no, un error nuestro se descartaría en silencio y se perdería una
+   pregunta sin que nadie se entere.
+4. **Reanudar rehace la infraestructura.** Las filas de infra no cuentan como
+   terminadas: al reanudar se reintentan solas y las ya medidas no se vuelven a
+   pedir. Es lo que hace que una run a la que se le agota el tier se pueda
+   completar.
+5. **504/502/408/timeout ahora son transitorios.** `_classify` no los reconocía,
+   así que no reintentaban. Y un proveedor **no se aparca a la primera** con un
+   solo proveedor configurado (`LLM_DEAD_AFTER=3`): antes una ráfaga de 504
+   tumbaba el endpoint entero y las 35 preguntas salían vacías.
+6. **`meta.anchor_grounding`.** La run dice si fue con anclaje; sin eso no se
+   puede comparar una run con otra.
+
+Verificado sin red con una prueba de reanudación de dos pasadas: la infra se
+reintenta, las filas previas sobreviven, el orden del golden se mantiene y
+`judge_mean` sale limpio.
+
+**Impacto en el MDE.** El sd entre preguntas es 0.952, así que con n=35 el error
+estándar de un run es 0.161 y el MDE de una comparación pareada está entre 0.07 y
+0.48 según cuánto mueva el cambio. Con el perfil realista observado (+1.5 en unas
+8 preguntas, 27 sin cambio) el MDE es ≈0.07: de sobra para ver el efecto del
+anclaje, que en las 3 deterministas fue +1.67 de media.

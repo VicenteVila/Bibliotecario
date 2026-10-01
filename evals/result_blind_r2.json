@@ -9,34 +9,40 @@
     "nvidia",
     "openai"
    ]
-  ]
+  ],
+  "anchor_grounding": false
  },
  "aggregate": {
   "n": 40,
-  "n_answerable": 35,
+  "n_answerable": 33,
   "n_unanswerable": 5,
   "judge_model": "openai/gpt-oss-20b",
   "turns": 4,
   "retries": 1,
-  "judge_mean": 4.029,
-  "n_scored": 35,
+  "judge_mean": 4.273,
+  "n_scored": 33,
   "n_judge_errors": 0,
-  "cite_precision_mean": 0.871,
-  "cite_coverage_mean": 0.886,
-  "answer_cite_rate": 0.886,
+  "n_infra": 2,
+  "infra_error_ids": [
+   "pg-b4",
+   "tce-b6"
+  ],
+  "cite_precision_mean": 0.924,
+  "cite_coverage_mean": 0.939,
+  "answer_cite_rate": 0.939,
   "by_difficulty": {
    "facil": 4.417,
-   "media": 4.0,
-   "dificil": 3.556
+   "media": 4.308,
+   "dificil": 4.0
   },
   "abstain_rate": 0.6,
   "n_abstain_decided": 5,
   "n_abstain_errors": 0,
   "n_fabricated": 2,
-  "latency_median_s": 65,
-  "false_abstention_rate": 0.057,
+  "latency_median_s": 64,
+  "false_abstention_rate": 0.061,
   "n_false_abstention": 2,
-  "answer_rate_on_answerable": 0.943,
+  "answer_rate_on_answerable": 0.939,
   "false_abstention_ids": [
    "reas-b6",
    "wiki-b2"
@@ -513,7 +519,8 @@
     "total_tokens": 653,
     "calls_tokens_unknown": 0
    },
-   "answer": ""
+   "answer": "",
+   "infra_error": "RuntimeError: vacio por agotamiento de tier (retroactivo)"
   },
   {
    "id": "pg-b5",
@@ -898,7 +905,8 @@
     "total_tokens": 643,
     "calls_tokens_unknown": 0
    },
-   "answer": ""
+   "answer": "",
+   "infra_error": "RuntimeError: vacio por agotamiento de tier (retroactivo)"
   },
   {
    "id": "tce-b7",

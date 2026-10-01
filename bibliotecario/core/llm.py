@@ -42,6 +42,11 @@ _MIN_INTERVAL = 10.0
 _DEAD_UNTIL: dict[str, float] = {}
 _DEAD_BACKOFF = 900.0  # 15 min, se duplica hasta 1h por fallos consecutivos
 _MAX_BACKOFF = 3600.0
+# Fallos consecutivos antes de aparcar un proveedor. Con un solo proveedor
+# configurado no se aparca nunca antes de esto: en la eval cieda una rafaga de
+# 504 tumbaba el endpoint entero y las 35 preguntas salian con answer vacia.
+_DEAD_AFTER = int(os.environ.get("LLM_DEAD_AFTER", "3"))
+_STREAK: dict[str, int] = {}
 
 
 def _is_dead(name: str) -> bool:
@@ -49,16 +54,30 @@ def _is_dead(name: str) -> bool:
 
 
 def _mark_dead(name: str) -> None:
+    """Aparta un proveedor, pero no a la primera.
+
+    Con varios proveedores tiene sentido apartar al que falla: los demas siguen
+    contestando. Con uno solo (evaluacion pineada a un endpoint) apartarlo deja la
+    run entera sin modelo, y una rafaga de 504 tumba las 35 preguntas. Por eso se
+    cuentan fallos consecutivos y hace falta `_DEAD_AFTER` antes de aparcar.
+    """
+    n = _STREAK.get(name, 0) + 1
+    _STREAK[name] = n
+    if n < _DEAD_AFTER and len(_providers()) < 2:
+        logger.warning("LLM %s fallo %d/%d, se reintenta (no se aparca: es el unico "
+                       "proveedor)", name, n, _DEAD_AFTER)
+        return
     prev = _DEAD_UNTIL.get(name + "#b")
     back = _DEAD_BACKOFF if prev is None else min(_MAX_BACKOFF, prev * 2)
     _DEAD_UNTIL[name] = time.monotonic() + back
     _DEAD_UNTIL[name + "#b"] = back
-    logger.warning("LLM %s aparcado %.0f min", name, back / 60)
+    logger.warning("LLM %s aparcado %.0f min tras %d fallos", name, back / 60, n)
 
 
 def _mark_alive(name: str) -> None:
     _DEAD_UNTIL.pop(name, None)
     _DEAD_UNTIL.pop(name + "#b", None)
+    _STREAK[name] = 0
 
 
 def _pace(name: str) -> None:
@@ -82,8 +101,14 @@ def _classify(exc: Exception) -> str:
     code = getattr(exc, "code", None)
     if code == 401 or code == 403 or "401" in s or "403" in s or "API_KEY_INVALID" in s:
         return "invalid"
-    if (code in (429, 500, 503) or "429" in s or "500" in s or "503" in s
-            or "UNAVAILABLE" in s or "overloaded" in s.lower() or "high demand" in s.lower()):
+    # 504 y timeout son transitorios por definición en este endpoint: se vio a
+    # NVIDIA devolver 504 en una rafaga durante la eval ciega. Sin esto no
+    # entraban en "retryable", no reintentaban y tumba(ban) el proveedor entero.
+    if (code in (408, 429, 500, 502, 503, 504) or "408" in s or "429" in s
+            or "500" in s or "502" in s or "503" in s or "504" in s
+            or "UNAVAILABLE" in s or "overloaded" in s.lower() or "high demand" in s.lower()
+            or "timeout" in s.lower() or "timed out" in s.lower()
+            or "gateway time-out" in s.lower() or "bad gateway" in s.lower()):
         return "retryable"
     return "other"
 

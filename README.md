@@ -71,12 +71,17 @@ sin ejecutar el agente ni el juez. 8 por paper, 35 respondibles y 5 no
 respondibles (una por paper, para medir abstención real). Agente pineado con
 `--provider nvidia` y juez en `openai/gpt-oss-20b`, de familia distinta.
 
-**Resultado: `judge_mean 4.219`, IC 95 % ± 0.273** sobre 3 runs × 35
-respondibles (4.400 / 4.000 / 4.257). `cite_precision 0.881`,
-`abstain_rate 0.867`, ~681k tokens de agente por run.
+**Resultado: `judge_mean 4.310`, IC 95 % ± 0.264** sobre 3 runs × 33-35
+respondibles (4.171 / 4.273 / 4.486; r2 tiene 2 caídas de infraestructura que se
+excluyen de la media). `cite_precision 0.900`, `abstain_rate 0.867`, ~646k
+tokens de agente por run.
 Detalle completo en `evals/REPORT_BLIND.md`; datos en `evals/result_blind_r*.json`.
 
-El ruido **dentro** de una misma pregunta es `σ = 0.445`, contra `σ = 1.234`
+Un 504 del proveedor **no cuenta como nota del agente**: la fila lleva
+`infra_error` y queda fuera de `judge_mean`. Sin eso, dos caídas bajaban la media
+de r2 de 4.273 a 4.029 sin dejar rastro en ninguna métrica.
+
+El ruido **dentro** de una misma pregunta es `σ = 0.709`, contra `σ = 0.952`
 **entre** preguntas. Comparar dos sistemas sobre las mismas 35 preguntas con
 3 runs cada uno detecta diferencias de **0.112** al 95 %; con una sola run
 serían 0.194. Por eso hay que repetir: 5 preguntas tienen `σ ≥ 1.7` y barcan
