@@ -1,0 +1,49 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2667.14it/s]
+pearl-b2 prec=1.00 judge=5 tok= 14673 fb=False 47s
+pearl-b3 prec=0.50 judge=5 tok= 12905 fb=False 57s
+pearl-b1 prec=1.00 judge=5 tok= 13435 fb=False 76s
+pearl-b4 prec=1.00 judge=5 tok= 14826 fb=False 63s
+pearl-b5 prec=1.00 judge=5 tok= 37387 fb=False 58s
+pearl-b6 prec=1.00 judge=5 tok= 37065 fb=False 73s
+pearl-b7 prec=1.00 judge=5 tok= 21064 fb=False 53s
+pearl-b8 prec=1.00 abst=True tok= 30508 fb=False 59s
+pg-b1    prec=1.00 judge=5 tok= 34942 fb=False 56s
+pg-b2    prec=1.00 judge=5 tok= 20371 fb=False 51s
+pg-b3    prec=1.00 judge=5 tok= 36305 fb=False 63s
+pg-b4    prec=1.00 judge=5 tok= 20419 fb=False 51s
+pg-b5    prec=1.00 judge=2 tok= 39870 fb=False 70s
+pg-b6    prec=1.00 judge=5 tok= 23373 fb=False 50s
+pg-b7    prec=1.00 judge=5 tok= 20775 fb=False 60s
+pg-b8    prec=0.00 abst=True tok= 37798 fb=False 54s
+tce-b1   prec=1.00 judge=5 tok= 27215 fb=False 55s
+tce-b2   prec=1.00 judge=5 tok= 39163 fb=False 57s
+tce-b3   prec=1.00 judge=5 tok= 35327 fb=False 50s
+tce-b4   prec=1.00 judge=5 tok= 36587 fb=False 59s
+tce-b5   prec=1.00 judge=5 tok= 35149 fb=False 68s
+tce-b6   prec=1.00 judge=5 tok= 36554 fb=False 54s
+tce-b7   prec=1.00 judge=3 tok= 36347 fb=False 62s
+tce-b8   prec=0.00 abst=True tok= 28985 fb=False 51s
+reas-b1  prec=1.00 judge=5 tok= 25245 fb=False 72s
+reas-b2  prec=1.00 judge=5 tok= 33265 fb=False 55s
+reas-b3  prec=1.00 judge=5 tok= 26950 fb=False 57s
+reas-b5  prec=1.00 judge=5 tok= 37756 fb=False 57s
+reas-b4  prec=1.00 judge=5 tok= 12483 fb=False 62s
+reas-b6  prec=1.00 judge=5 tok= 33964 fb=False 65s
+reas-b7  prec=1.00 judge=5 tok= 34935 fb=False 54s
+reas-b8  prec=1.00 abst=False tok= 34216 fb=False 56s
+wiki-b2  prec=1.00 judge=5 tok= 25856 fb=False 42s
+wiki-b1  prec=1.00 judge=2 tok= 34788 fb=False 57s
+wiki-b3  prec=1.00 judge=5 tok= 11878 fb=False 56s
+wiki-b5  prec=1.00 judge=5 tok= 31911 fb=False 61s
+wiki-b4  prec=1.00 judge=5 tok= 33966 fb=False 63s
+wiki-b6  prec=1.00 judge=3 tok= 38345 fb=False 54s
+wiki-b7  prec=1.00 judge=5 tok= 12342 fb=False 49s
+wiki-b8  prec=1.00 abst=True tok= 11853 fb=False 57s
+
+n=40 (respondibles=35, no respondibles=5) modelo_juez=openai/gpt-oss-20b
+judge=4.714 (n=35/35, 0 errores)  por dificultad={'facil': 4.75, 'media': 4.643, 'dificil': 4.778}
+cite_precision=0.986 cite_coverage=1.0 con_cita=1.0
+abstencion_falsa=0.0 [] (respondidas=1.0)
+abstain_rate=0.8 (decididas=5/5, 0 errores) inventadas=1
+tokens_agente=1130796 en 199 llamadas | tokens_juez=33604 | latencia_mediana=57s
+truncadas=0 fallbacks=0 -> result_blind_r5.json
