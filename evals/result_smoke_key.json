@@ -1,0 +1,144 @@
+{
+ "meta": {
+  "golden": "golden_abstention.jsonl",
+  "run": "smoke_key",
+  "judge_model": "openai/gpt-oss-20b",
+  "workers": 2,
+  "providers": [
+   [
+    "nvidia",
+    "openai"
+   ]
+  ],
+  "anchor_grounding": false,
+  "temperature": null
+ },
+ "aggregate": {
+  "n": 2,
+  "n_answerable": 0,
+  "n_unanswerable": 2,
+  "judge_model": "openai/gpt-oss-20b",
+  "turns": 4,
+  "retries": 1,
+  "judge_mean": null,
+  "n_scored": 0,
+  "n_judge_errors": 0,
+  "n_infra": 0,
+  "infra_error_ids": [],
+  "cite_precision_mean": null,
+  "cite_coverage_mean": null,
+  "answer_cite_rate": null,
+  "by_difficulty": null,
+  "abstain_rate": 0.0,
+  "n_abstain_decided": 2,
+  "n_abstain_errors": 0,
+  "n_fabricated": 2,
+  "latency_median_s": 132,
+  "false_abstention_rate": null,
+  "n_false_abstention": 0,
+  "answer_rate_on_answerable": null,
+  "false_abstention_ids": [],
+  "truncated": 0,
+  "fallbacks": 0,
+  "agent_tokens_total": 72698,
+  "agent_calls_total": 11,
+  "agent_calls_tokens_unknown": 0,
+  "agent_models": [
+   "nvidia/nemotron-3-super-120b-a12b",
+   "openai/gpt-oss-20b"
+  ],
+  "judge_tokens_total": 2005
+ },
+ "rows": [
+  {
+   "id": "pearl-u1",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:28"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 425,
+    "total_tokens": 1033,
+    "completion_tokens": 608,
+    "prompt_tokens_details": null
+   },
+   "abstained": false,
+   "fabricated_value": 5,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 119,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 38357,
+    "completion_tokens": 509,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 38866,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The PEARL results on FB15k-237 V1 were averaged over five independent runs, as stated in the paper: \"All results are averaged over five independent runs.\" [1:28] The specific random seed used is not mentioned in the provided evidence."
+  },
+  {
+   "id": "reas-b8",
+   "doc_id": 4,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "4:23"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 437,
+    "total_tokens": 972,
+    "completion_tokens": 535,
+    "prompt_tokens_details": null
+   },
+   "abstained": false,
+   "fabricated_value": 0.23,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 132,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 33304,
+    "completion_tokens": 528,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 33832,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The exact code change that broke the ReASearch agent's EPLB plateau was allowing an expert to give up its last replica during the refinement phase, which previously only permitted experts with two or more replicas to donate. This single operator change enabled exploration of beneficial intermediate states, lifting the score from ~0.21 to 0.23. [4:23]"
+  }
+ ]
+}

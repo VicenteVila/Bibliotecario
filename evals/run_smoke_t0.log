@@ -1,0 +1,11 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 3754.65it/s]
+LLM reintentable nvidia: esperando 30s (1)
+evobench-d4 prec=1.00 judge=5 tok= 32443 fb=False 57s
+disclose-d1 prec=1.00 judge=5 tok= 36560 fb=False 86s
+
+n=2 (respondibles=2, no respondibles=0) modelo_juez=openai/gpt-oss-20b
+judge=5.0 (n=2/2, 0 errores)  por dificultad={'facil': 5.0, 'media': 5.0, 'dificil': None}
+cite_precision=1.0 cite_coverage=1.0 con_cita=1.0
+abstencion_falsa=0.0 [] (respondidas=1.0)
+tokens_agente=69003 en 10 llamadas | tokens_juez=1637 | latencia_mediana=86s
+truncadas=0 fallbacks=0 -> result_smoke_t0.json

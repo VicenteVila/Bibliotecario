@@ -293,10 +293,16 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=1,
                     help="preguntas en paralelo (el sink de tokens es thread-local)")
     ap.add_argument("--run", default="", help="etiqueta de la run, va en el JSON")
-    ap.add_argument("--temperature", type=float, default=None,
-                    help="fija la temperatura de sampling del agente. Sin esto cada "
-                         "backend usa 0.2, que es la mayor fuente de ruido entre runs "
-                         "(sd 0.946 por item). A 0 la trayectoria es reproducible.")
+    # Default 0.0, no None: medido. Con temperatura libre el agente fabrica en el
+    # 51.6% de las no respondibles; a 0 baja al 33.9%. Pareado sobre los mismos 62
+    # items, p exacto = 0.019, y no cuesta un token. El otro lado (24 respondibles)
+    # no mostraba dano: 0 abstenciones falsas, 0 respuestas degeneradas, 0 truncados,
+    # delta de judge -0.17 a 0.85 sigma.
+    ap.add_argument("--temperature", type=float, default=0.0,
+                    help="temperatura de sampling del agente. El default es 0 porque es "
+                         "la unica palanca medida que funciona y es gratis. Con sampling "
+                         "libre el ruido por item es sd 0.946 y la fabricacion de las no "
+                         "respondibles sube del 33.9% al 51.6% (p=0.019).")
     ap.add_argument("--provider", default="",
                     help="fija proveedores (p.ej. nvidia). Sin esto el round-robin "
                          "reparte la run entre Nemotron y Gemini y se mezclan dos agentes")

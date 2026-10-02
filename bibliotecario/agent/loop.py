@@ -47,6 +47,18 @@ _NO_ENCONTRADO = "NO_ENCONTRADO"
 VERIFY_CITATION = os.environ.get("VERIFY_CITATION", "0") == "1"
 _CITE_RE = re.compile(r"\[(\d+):(\d+)\]")
 
+# Verificacion de SOPORTE SEMANTICO con salida posible de abstencion
+# (opt-in por VERIFY_SUPPORT=1). MEDIDA Y RECHAZADA: se queda apagada.
+# Con temperatura libre parecia funcionar (51.6% -> 36.5% de fabricacion), pero al
+# repetir la comparacion pareada a temperatura 0 el efecto se dio la vuelta: 6
+# items corregidos frente a 13 rotos, p = 0.17. El -14.5pp anterior era ruido a su
+# favor. La quinta intervencion sin resultado, y la unica forma de distinguirla de
+# las cuatro anteriores fue este par de runs, no el run en si.
+# La implementacion se conserva porque el flag es opt-in y no cuesta nada apagado,
+# y porque repetir el experimento con otro verificador sigue siendo el camino si
+# se vuelve a intentarlo. No la pongas por defecto: el numero medido va al reves.
+VERIFY_SUPPORT = os.environ.get("VERIFY_SUPPORT", "0") == "1"
+
 
 def _temp_kw(t: float | None) -> dict:
     """Kwargs de temperatura, vacios si no se fijo ninguna.
@@ -397,7 +409,65 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
     out = CITE_FMT.normalize_citations(out)
     if VERIFY_CITATION and deep:
         out = _verify_citation(question, out, deep, retries=retries, **_temp_kw(temperature))
+    if VERIFY_SUPPORT and deep:
+        out = _verify_support(question, out, deep, retries=retries, **_temp_kw(temperature))
     return out
+
+
+def _verify_support(question: str, answer: str, deep: str, retries: int = 1,
+                    temperature: float | None = None) -> str:
+    """Comprueba si la evidencia SOSTIENE la respuesta y, si no, se abstiene.
+
+    Se distingue de `_verify_citation` en las dos cosas que hacian que aquella
+    no moviera la aguja: el criterio es de sustento semantico y no de coincidencia
+    literal, y la salida puede ser abstencion, no solo una reescritura.
+
+    La puerta es asimetrica a proposito. Este paso puede tirar abajo respuestas que
+    ya eran correctas, y las respondibles son 105 contra 64 no respondibles: una
+    Precision del 80% aqui destruye mas nota de la que gana en abstencion. Solo se
+    abstiene ante un veredicto negativo explicito y con motivo; una salida
+    ilegible, una excepcion, un "duda", un JSON mal formado o una lista de
+   rafts vacia devuelven el original intacto. Ante la duda, se responde.
+    """
+    if not (deep or "").strip():
+        return answer
+    prompt = ("VERIFICACION DE SUSTENTO. La RESPUESTA se va a publicar como si fuese "
+              "correcta. Decide si la EVIDENCIA la sostiene.\n\n"
+              f"PREGUNTA: {question}\n\n"
+              f"RESPUESTA A VERIFICAR:\n{answer}\n\n"
+              f"EVIDENCIA RECUPERADA:\n{deep[:12000]}\n\n"
+              "Un numero de repeticiones no es lo mismo que un valor medido: si la "
+              "evidencia dice 'three independent runs', eso NO da el coste en USD, ni "
+              "la desviacion tipica, ni la semilla. Un mecanismo plausible inventado "
+              "para explicar un fenomeno tambien es un fallo, aunque todas sus piezas "
+              "existan por separado en la evidencia.\n\n"
+              "Responde con un unico objeto JSON y nada mas:\n"
+              '{"sostenida": true|false, "motivo": "una frase"}\n\n'
+              "- sostenida=false SOLO si alguna afirmacion, cifra o relacion de la "
+              "RESPUESTA no se deduce de la EVIDENCIA.\n"
+              "- Si la respuesta es una admision de que el dato no esta, sostenida=true.\n"
+              "- Ante cualquier duda, sostenida=true.\n\n"
+              "JSON:")
+    try:
+        out = generate(prompt, max_tokens=200, retries=retries,
+                       **_temp_kw(temperature)).strip()
+    except Exception:
+        return answer
+    if not out or _toolish(out):
+        return answer
+    for obj in _bare_objects(out) or [{}]:
+        flag = obj.get("sostenida")
+        if flag is True:
+            return answer
+        if flag is False and str(obj.get("motivo") or "").strip():
+            return (_ABSTENCION_TEMPLATE.format(motivo=str(obj["motivo"]).strip()[:200]))
+    return answer
+
+
+_ABSTENCION_TEMPLATE = (
+    "No se puede responder esto con evidencia. {motivo}. "
+    "La busqueda en el corpus no devuelve un dato que lo sostenga, y deducirlo o "
+    "aproximarlo daria una respuesta con apariencia de dato y sin respaldo.")
 
 
 def _fix_truncation(text: str) -> str:

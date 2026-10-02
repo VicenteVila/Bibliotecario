@@ -1,0 +1,97 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 3803.44it/s]
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+disclose-d5 prec=1.00 judge=2 tok= 31010 fb=False 74s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+disclose-d3 prec=1.00 judge=5 tok= 25266 fb=False 106s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+disclose-d1 prec=1.00 judge=5 tok= 36343 fb=False 134s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+disclose-d2 prec=1.00 judge=5 tok= 32477 fb=False 163s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+disclose-d4 prec=1.00 judge=5 tok= 32928 fb=False 198s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+disclose-d6 prec=0.50 judge=5 tok= 32774 fb=False 165s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evobench-d1 prec=1.00 judge=5 tok= 32173 fb=False 122s
+LLM reintentable nvidia: esperando 30s (1)
+evobench-d2 prec=1.00 judge=5 tok= 34121 fb=False 109s
+disclose-d7 prec=0.00 judge=2 tok= 33016 fb=False 170s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evobench-d3 prec=1.00 judge=5 tok= 32601 fb=False 150s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evobench-d4 prec=1.00 judge=5 tok= 31961 fb=False 122s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+evobench-d7 prec=1.00 judge=2 tok= 35606 fb=False 150s
+LLM reintentable nvidia: esperando 30s (1)
+evobench-d5 prec=1.00 judge=2 tok= 35427 fb=False 173s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evobench-d6 prec=1.00 judge=3 tok= 35613 fb=False 179s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hal-d2   prec=1.00 judge=5 tok= 34758 fb=False 132s
+hal-d1   prec=1.00 judge=3 tok= 38457 fb=False 149s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evalsurvey-d1 prec=1.00 judge=5 tok= 29826 fb=False 72s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hal-d3   prec=1.00 judge=2 tok= 36342 fb=False 159s
+LLM reintentable nvidia: esperando 30s (1)
+hal-d4   prec=1.00 judge=2 tok= 31791 fb=False 164s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hal-d6   prec=1.00 judge=3 tok= 31681 fb=False 169s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hal-d7   prec=0.00 judge=1 tok= 33371 fb=False 199s
+LLM reintentable nvidia: esperando 30s (1)
+evalsurvey-d2 prec=1.00 judge=3 tok= 31768 fb=False 150s
+LLM reintentable nvidia: esperando 30s (1)
+evalsurvey-d7 prec=1.00 judge=3 tok= 33413 fb=False 157s
+evalsurvey-d6 prec=1.00 judge=5 tok= 29752 fb=False 186s
+
+n=24 (respondibles=24, no respondibles=0) modelo_juez=openai/gpt-oss-20b
+judge=3.667 (n=24/24, 0 errores)  por dificultad={'facil': 4.5, 'media': 3.5, 'dificil': 3.0}
+cite_precision=0.896 cite_coverage=0.917 con_cita=0.917
+abstencion_falsa=0.0 [] (respondidas=1.0)
+tokens_agente=792475 en 120 llamadas | tokens_juez=26177 | latencia_mediana=157s
+truncadas=0 fallbacks=0 -> result_regr_t0.json

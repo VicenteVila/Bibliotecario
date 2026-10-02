@@ -76,7 +76,7 @@ def validate(path, chunks):
                 errors.append(f"{qid}: unanswerable sin prefijo UNANSWERABLE en la referencia")
         elif not q["answerable_docs"]:
             errors.append(f"{qid}: respondible sin answerable_docs")
-        elif not set(q["answerable_docs"]) <= set([q["doc_id"]]):
+        elif not set(q["answerable_docs"]) <= {q["doc_id"]}:
             warnings.append(f"{qid}: answerable_docs {q['answerable_docs']} no incluye doc_id {q['doc_id']}")
 
         if not q["cite_chunks"]:
