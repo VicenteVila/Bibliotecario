@@ -90,7 +90,10 @@ def citation_metrics(q: dict, answer: str, evidence: list) -> dict:
     coverage = len(cited_docs & gold) / len(gold) if gold else 0.0
     stray = len(all_docs - gold)
     return {"cite_precision": round(precision, 3), "cite_coverage": round(coverage, 3),
-            "stray_docs": stray, "answer_cites": len(cites), "n_evid": len(evidence)}
+            "stray_docs": stray, "answer_cites": len(cites), "n_evid": len(evidence),
+            "cite_ids": [f"{d}:{i}" for d, i in cites],
+            "evidence_ids": [f"{e['doc_id']}:{e.get('chunk_idx')}" for e in evidence
+                             if isinstance(e, dict) and e.get("chunk_idx") is not None]}
 
 
 _INFRA_MARKERS = ("504", "502", "503", "500", "429", "408", "timeout", "timed out",
@@ -118,7 +121,7 @@ def _classify_run_error(e: Exception) -> str:
     return msg
 
 
-def run_one(q: dict, turns: int) -> dict:
+def run_one(q: dict, turns: int, temperature: float | None = None) -> dict:
     """Ejecuta una pregunta y devuelve su fila. No lanza: todo error va a la fila.
 
     Trampa: el pineo de proveedor (LLM_PROVIDERS) lo pone main(), no este
@@ -129,11 +132,14 @@ def run_one(q: dict, turns: int) -> dict:
     LLM.reset_usage()
     t0 = time.time()
     infra_error = None
+    # Solo se pasa `temperature` si se pidio: con None la llamada a LOOP.run es
+    # identica a la de siempre y los dobles que la sustituyen siguen valiendo.
+    temp_kw = {} if temperature is None else {"temperature": temperature}
     try:
         # isolated=True: sin lecciones. Si no, el prompt lleva las 5 últimas,
         # que incluyen el texto de otras preguntas del golden (key_insights
         # = "Q: <pregunta>") y la eval deja de ser ciega.
-        r = LOOP.run(q["question"], max_turns=turns, isolated=True)
+        r = LOOP.run(q["question"], max_turns=turns, isolated=True, **temp_kw)
     except Exception as e:
         infra_error = _classify_run_error(e)
         r = {"answer": "", "evidence": [], "turns": 0, "error": infra_error}
@@ -287,6 +293,10 @@ def main() -> None:
     ap.add_argument("--workers", type=int, default=1,
                     help="preguntas en paralelo (el sink de tokens es thread-local)")
     ap.add_argument("--run", default="", help="etiqueta de la run, va en el JSON")
+    ap.add_argument("--temperature", type=float, default=None,
+                    help="fija la temperatura de sampling del agente. Sin esto cada "
+                         "backend usa 0.2, que es la mayor fuente de ruido entre runs "
+                         "(sd 0.946 por item). A 0 la trayectoria es reproducible.")
     ap.add_argument("--provider", default="",
                     help="fija proveedores (p.ej. nvidia). Sin esto el round-robin "
                          "reparte la run entre Nemotron y Gemini y se mezclan dos agentes")
@@ -329,8 +339,11 @@ def main() -> None:
             "workers": args.workers, "providers": LLM._providers(),
             # El anclaje se lee del entorno, pero se graba aqui: una run sin
             # esta clave no se puede distinguir de una con anclaje al compararla.
-            "anchor_grounding": LOOP.ANCHOR_GROUNDING}
+            "anchor_grounding": LOOP.ANCHOR_GROUNDING,
+            "temperature": args.temperature}
 
+    # Ver run_one(): el kwarg solo viaja si se pidio una temperatura concreta.
+    temp_kw = {} if args.temperature is None else {"temperature": args.temperature}
     todo = [q for q in rows if q["id"] not in done]
     results: dict[str, dict] = {}
 
@@ -356,7 +369,7 @@ def main() -> None:
                 emit(f.result())
     else:
         for q in todo:
-            emit(run_one(q, args.turns))
+            emit(run_one(q, args.turns, **temp_kw))
 
     merged_map = {r["id"]: r for r in out}
     merged_map.update(results)

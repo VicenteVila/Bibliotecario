@@ -48,9 +48,23 @@ VERIFY_CITATION = os.environ.get("VERIFY_CITATION", "0") == "1"
 _CITE_RE = re.compile(r"\[(\d+):(\d+)\]")
 
 
-def generate(prompt: str, max_tokens: int = 512, retries: int | None = None) -> str:
+def _temp_kw(t: float | None) -> dict:
+    """Kwargs de temperatura, vacios si no se fijo ninguna.
+
+    Asi la ruta por defecto (`None`) llama exactamente igual que antes de existir
+    este parametro: los dobles de test y los llamantes externos no cambian.
+    """
+    return {} if t is None else {"temperature": t}
+
+
+def generate(prompt: str, max_tokens: int = 512, retries: int | None = None,
+             temperature: float | None = None) -> str:
+    """`temperature=None` deja el valor por defecto del backend (0.2). Fijarlo a 0
+    hace la trayectoria reproducible, que es lo que necesita el protocolo pareado:
+    el ruido entre runs del agente (sd 0.946 por item, medido en r7) viene en su
+    mayor parte de la sampling, no del juez."""
     return _llm_generate(prompt, max_tokens, 2 if retries is None else retries,
-                         strict_fallback=STRICT_FALLBACK)
+                         strict_fallback=STRICT_FALLBACK, temperature=temperature)
 from bibliotecario.harness.runtime import get_harness
 from bibliotecario.ingest import citations_format as CITE_FMT
 from bibliotecario.knowledge import refiner as REF
@@ -200,7 +214,7 @@ def _deep_evidence(question: str, per_doc: int = 4, n_docs: int = 4) -> str:
     return "\n\n".join(lines)
 
 
-def _ground(question: str, deep: str, retries: int = 1) -> str:
+def _ground(question: str, deep: str, retries: int = 1, temperature: float | None = None) -> str:
     """Localiza en el barrido los spans verbatim que pueden responder la pregunta.
 
     Devuelve las lineas relevantes tal cual, o `_NO_ENCONTRADO` si el barrido no
@@ -226,7 +240,7 @@ def _ground(question: str, deep: str, retries: int = 1) -> str:
         "- Si aparecen varios candidatos, copia TODOS los relevantes, no elijas.\n"
         "- No escribas commentary, solo las lineas copiadas.\n\n"
         f"RESPUESTA ({_NO_ENCONTRADO} si no hay nada):")
-    out = generate(prompt, max_tokens=700, retries=retries).strip()
+    out = generate(prompt, max_tokens=700, retries=retries, **_temp_kw(temperature)).strip()
     if _toolish(out):
         return _NO_ENCONTRADO
     if _NO_ENCONTRADO in out:
@@ -253,7 +267,8 @@ def _chunk_index(deep: str) -> dict[str, str]:
     return idx
 
 
-def _verify_citation(question: str, answer: str, deep: str, retries: int = 1) -> str:
+def _verify_citation(question: str, answer: str, deep: str, retries: int = 1,
+                     temperature: float | None = None) -> str:
     """Comprueba que los chunks citados sostienen la respuesta y la reescribe si no.
 
     Solo interviene si las citas del cierre resuelven dentro del barrido profundo:
@@ -293,7 +308,7 @@ def _verify_citation(question: str, answer: str, deep: str, retries: int = 1) ->
               "- Si algo falla: escribe la respuesta CORREGIDA en prosa (max. 150 palabras), "
               "citando cada afirmacion como [doc_id:chunk] y usando solo los chunks de arriba.\n\n"
               "SALIDA:")
-    out = generate(prompt, max_tokens=900, retries=retries).strip()
+    out = generate(prompt, max_tokens=900, retries=retries, **_temp_kw(temperature)).strip()
     if not out or _toolish(out):
         return answer
     if re.fullmatch(r"OK\.?", out, re.IGNORECASE):
@@ -343,7 +358,8 @@ def _close_prompt(question: str, ctx: str, anclaje: str, best: str, flat: int,
             "- No emitas ningún bloque json ni vuelques resultados crudos.")
 
 
-def _final_answer(question: str, best: str, evidence: list[str], flat: int, retries: int = 1) -> str:
+def _final_answer(question: str, best: str, evidence: list[str], flat: int, retries: int = 1,
+                   temperature: float | None = None) -> str:
     """Cierre forzado: pide una respuesta en prosa a partir de la evidencia reunida.
 
     Evita que el loop termine con el volcado JSON de un tool como 'respuesta'.
@@ -360,7 +376,7 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
     # imposible: "CIERRE OBLIGADO" empujaba a rellenar con un hermano plausible.
     anclaje = ""
     if ANCHOR_GROUNDING:
-        spans = _ground(question, deep, retries=retries)
+        spans = _ground(question, deep, retries=retries, **_temp_kw(temperature))
         if spans == _NO_ENCONTRADO:
             anclaje = ("\n\nANCLAJE: no se ha localizado en el barrido ningún dato que "
                        "responda a esta pregunta. NO inventes ni deduzcas: explica en una "
@@ -372,7 +388,7 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
                        "- No introduzcas nombres, cifras ni reglas que no aparezcan ahí.\n")
 
     prompt = _close_prompt(question, ctx, anclaje, best, flat)
-    out = generate(prompt, max_tokens=900, retries=retries).strip()
+    out = generate(prompt, max_tokens=900, retries=retries, **_temp_kw(temperature)).strip()
     if _toolish(out):
         return ""
     out = _fix_truncation(out)
@@ -380,7 +396,7 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
         out = out.rstrip() + "  [doc:?]"  # marca de hueco: el cierre debe citar
     out = CITE_FMT.normalize_citations(out)
     if VERIFY_CITATION and deep:
-        out = _verify_citation(question, out, deep, retries=retries)
+        out = _verify_citation(question, out, deep, retries=retries, **_temp_kw(temperature))
     return out
 
 
@@ -402,7 +418,8 @@ def _synthesize(question: str, retries: int = 1) -> str:
     return "" if out.startswith("(extractivo)") else out
 
 
-def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False) -> dict:
+def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
+        temperature: float | None = None) -> dict:
     """Responde una pregunta.
 
     `isolated=True` corta el aprendizaje: no lee lecciones guardadas ni escribe
@@ -426,7 +443,7 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False) -> di
         lessons = "" if isolated else load_lessons()
         prompt = (ST.STATIC_PROMPT + "\n\n" + ST.render_state(question, evidence, history,
                                                               lessons, flat, best))
-        out = generate(prompt, max_tokens=1024)
+        out = generate(prompt, max_tokens=1024, **_temp_kw(temperature))
         transcript.append(f"T{turn}: {out[:500]}")
         if not out:
             harness.record_error("loop")
@@ -448,7 +465,8 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False) -> di
             # para que corra el barrido profundo y se exijan las citas. Aceptarla
             # aqui saltaba media pipeline (medido: 2.273 vs 4.551 de media).
             draft = CITE_FMT.normalize_citations(out.strip())
-            answer = (_final_answer(question, draft, evidence, flat, retries=1)
+            answer = (_final_answer(question, draft, evidence, flat, retries=1,
+                                       **_temp_kw(temperature))
                       or _fix_truncation(draft))
             harness.record_action("loop", {"tool": "final_answer", "args": {"turn": turn}})
             succeeded.append(f"respuesta final en turno {turn}")
@@ -495,7 +513,8 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False) -> di
     else:
         # Presupuesto agotado: sintetizar respuesta en vez de volcar JSON crudo.
         if not answer:
-            answer = (_final_answer(question, best, evidence, flat, retries=1)
+            answer = (_final_answer(question, best, evidence, flat, retries=1,
+                                       **_temp_kw(temperature))
                       or _synthesize(question, retries=1)
                       or "(presupuesto agotado) " + (best or "sin evidencia"))
             if not answer.startswith("(presupuesto agotado)"):
