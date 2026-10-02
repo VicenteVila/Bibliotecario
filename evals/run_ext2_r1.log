@@ -1,0 +1,45 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2889.62it/s]
+evobench-d4 prec=1.00 judge=5 tok= 32242 fb=False 54s
+evobench-d3 prec=1.00 judge=5 tok= 34499 fb=False 64s
+evobench-d5 prec=1.00 judge=5 tok= 34607 fb=False 64s
+evobench-d6 prec=1.00 judge=2 tok= 35655 fb=False 68s
+evobench-d7 prec=0.00 judge=2 tok= 36446 fb=False 69s
+evobench-d8 prec=0.00 abst=False tok= 34715 fb=False 70s
+hal-d4   prec=1.00 judge=2 tok= 32153 fb=False 57s
+hal-d2   prec=1.00 judge=5 tok= 33478 fb=False 65s
+hal-d1   prec=1.00 judge=2 tok= 39024 fb=False 66s
+hal-d5   prec=1.00 judge=3 tok= 35482 fb=False 53s
+hal-d3   prec=1.00 judge=3 tok= 36469 fb=False 111s
+hal-d6   prec=1.00 judge=4 tok= 33667 fb=False 62s
+hal-d7   prec=1.00 judge=5 tok= 35526 fb=False 62s
+hal-d8   prec=1.00 abst=False tok= 38760 fb=False 65s
+evalsurvey-d1 prec=1.00 judge=5 tok= 31723 fb=False 51s
+evalsurvey-d2 prec=1.00 judge=5 tok= 33084 fb=False 51s
+evalsurvey-d5 prec=1.00 judge=5 tok= 28341 fb=False 37s
+evalsurvey-d4 prec=1.00 judge=5 tok= 33131 fb=False 52s
+evalsurvey-d3 prec=1.00 judge=3 tok= 35645 fb=False 84s
+evalsurvey-d8 prec=1.00 abst=False tok= 32305 fb=False 52s
+evalsurvey-d7 prec=1.00 judge=3 tok= 35181 fb=False 56s
+evalsurvey-d6 prec=1.00 judge=3 tok= 32300 fb=False 58s
+hsurvey-d1 prec=1.00 judge=3 tok= 35315 fb=False 66s
+hsurvey-d2 prec=1.00 judge=5 tok= 37571 fb=False 55s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hsurvey-d4 prec=1.00 judge=4 tok= 33211 fb=False 61s
+hsurvey-d3 prec=1.00 judge=5 tok= 32584 fb=False 65s
+hsurvey-d5 prec=1.00 judge=5 tok= 33336 fb=False 67s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hsurvey-d6 prec=0.50 judge=2 tok= 36414 fb=False 101s
+LLM reintentable nvidia: esperando 30s (1)
+hsurvey-d7 prec=1.00 judge=2 tok= 32724 fb=False 129s
+hsurvey-d8 prec=0.00 abst=True tok= 34382 fb=False 142s
+
+n=40 (respondibles=35, no respondibles=5) modelo_juez=openai/gpt-oss-20b
+judge=3.686 (n=35/35, 0 errores)  por dificultad={'facil': 4.0, 'media': 3.929, 'dificil': 3.091}
+cite_precision=0.914 cite_coverage=0.943 con_cita=0.971
+abstencion_falsa=0.029 ['evobench-d7'] (respondidas=0.971)
+abstain_rate=0.4 (decididas=5/5, 0 errores) inventadas=3
+tokens_agente=1358855 en 196 llamadas | tokens_juez=41582 | latencia_mediana=63s
+truncadas=0 fallbacks=0 -> result_blind_ext2_r1.json

@@ -1,0 +1,19 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1691.64it/s]
+tce-c6   prec=1.00 judge=5 tok= 35421 fb=False 58s
+pearl-c6 prec=1.00 judge=5 tok= 13843 fb=False 67s
+pg-c2    prec=1.00 judge=5 tok= 23535 fb=False 71s
+tce-c8   prec=1.00 judge=5 tok= 29713 fb=False 75s
+pearl-c3 prec=1.00 judge=5 tok= 41655 fb=False 83s
+pg-c5    prec=1.00 judge=5 tok= 24017 fb=False 55s
+wiki-c7  prec=1.00 judge=3 tok= 12982 fb=False 58s
+reas-c8  prec=1.00 abst=False tok= 26673 fb=False 72s
+wiki-c2  prec=1.00 judge=3 tok= 12018 fb=False 76s
+reas-c4  prec=1.00 judge=3 tok= 26741 fb=False 89s
+
+n=10 (respondibles=9, no respondibles=1) modelo_juez=openai/gpt-oss-20b
+judge=4.333 (n=9/9, 0 errores)  por dificultad={'facil': 5.0, 'media': 4.0, 'dificil': 4.5}
+cite_precision=1.0 cite_coverage=1.0 con_cita=1.0
+abstencion_falsa=0.0 [] (respondidas=1.0)
+abstain_rate=0.0 (decididas=1/1, 0 errores) inventadas=1
+tokens_agente=246598 en 51 llamadas | tokens_juez=10647 | latencia_mediana=71s
+truncadas=0 fallbacks=0 -> result_ext_smoke.json

@@ -1,47 +1,47 @@
 {
  "por_brazo": {
   "0.2": {
-   "n_items": 19,
-   "n_calls": 57,
+   "n_items": 18,
+   "n_calls": 54,
    "n_parse_errors": 0,
-   "judge_sd": 0.061,
+   "judge_sd": 0.064,
    "judge_sd_max": 0.577,
    "items_con_discrepancia": 2,
-   "frac_items_coherentes": 0.895,
-   "media_notas": 3.895,
-   "tokens": 47090,
+   "frac_items_coherentes": 0.889,
+   "media_notas": 3.963,
+   "tokens": 45485,
    "detalle_discrepancias": [
     {
-     "key": "tce-b7@r3",
+     "key": "tce-b7@r6",
      "notas": [
       5,
       4,
-      4
+      5
      ]
     },
     {
-     "key": "wiki-b4@r3",
+     "key": "reas-b2@r6",
      "notas": [
-      2,
-      1,
-      2
+      4,
+      5,
+      5
      ]
     }
    ]
   },
   "0.0": {
-   "n_items": 19,
-   "n_calls": 57,
+   "n_items": 18,
+   "n_calls": 54,
    "n_parse_errors": 0,
-   "judge_sd": 0.061,
+   "judge_sd": 0.096,
    "judge_sd_max": 0.577,
-   "items_con_discrepancia": 2,
-   "frac_items_coherentes": 0.895,
-   "media_notas": 3.895,
-   "tokens": 47784
+   "items_con_discrepancia": 3,
+   "frac_items_coherentes": 0.833,
+   "media_notas": 3.963,
+   "tokens": 46762
   }
  },
- "tokens_total": 94874,
+ "tokens_total": 92247,
  "muestra": [
   {
    "key": "pg-b4@r2",
@@ -58,124 +58,2171 @@
    "judge_original": 0
   },
   {
-   "key": "tce-b7@r3",
+   "key": "tce-b7@r6",
    "id": "tce-b7",
-   "run": 3,
+   "run": 6,
    "categoria": "determinista_mala",
    "judge_original": 4
   },
   {
-   "key": "wiki-b1@r3",
+   "key": "wiki-b1@r6",
    "id": "wiki-b1",
-   "run": 3,
+   "run": 6,
    "categoria": "determinista_mala",
-   "judge_original": 2
+   "judge_original": 1
   },
   {
-   "key": "wiki-b7@r3",
-   "id": "wiki-b7",
-   "run": 3,
-   "categoria": "determinista_mala",
-   "judge_original": 2
-  },
-  {
-   "key": "pearl-b1@r3",
+   "key": "pearl-b1@r6",
    "id": "pearl-b1",
-   "run": 3,
+   "run": 6,
    "categoria": "determinista_buena",
    "judge_original": 5
   },
   {
-   "key": "pearl-b2@r3",
+   "key": "pearl-b2@r6",
    "id": "pearl-b2",
-   "run": 3,
+   "run": 6,
    "categoria": "determinista_buena",
    "judge_original": 5
   },
   {
-   "key": "pg-b2@r3",
+   "key": "pg-b2@r6",
    "id": "pg-b2",
-   "run": 3,
+   "run": 6,
    "categoria": "inestable",
    "judge_original": 5
   },
   {
-   "key": "pg-b3@r3",
-   "id": "pg-b3",
-   "run": 3,
-   "categoria": "inestable",
-   "judge_original": 5
-  },
-  {
-   "key": "pg-b5@r3",
+   "key": "pg-b5@r6",
    "id": "pg-b5",
-   "run": 3,
+   "run": 6,
    "categoria": "inestable",
    "judge_original": 1
   },
   {
-   "key": "pg-b6@r3",
-   "id": "pg-b6",
-   "run": 3,
-   "categoria": "inestable",
-   "judge_original": 5
-  },
-  {
-   "key": "reas-b3@r3",
+   "key": "reas-b3@r6",
    "id": "reas-b3",
-   "run": 3,
+   "run": 6,
    "categoria": "inestable",
    "judge_original": 5
   },
   {
-   "key": "reas-b6@r3",
+   "key": "reas-b6@r6",
    "id": "reas-b6",
-   "run": 3,
+   "run": 6,
    "categoria": "inestable",
    "judge_original": 5
   },
   {
-   "key": "tce-b3@r3",
-   "id": "tce-b3",
-   "run": 3,
-   "categoria": "inestable",
-   "judge_original": 5
-  },
-  {
-   "key": "tce-b4@r3",
+   "key": "tce-b4@r6",
    "id": "tce-b4",
-   "run": 3,
+   "run": 6,
    "categoria": "inestable",
    "judge_original": 5
   },
   {
-   "key": "tce-b5@r3",
+   "key": "tce-b5@r6",
    "id": "tce-b5",
-   "run": 3,
+   "run": 6,
    "categoria": "inestable",
    "judge_original": 5
   },
   {
-   "key": "wiki-b2@r3",
+   "key": "wiki-b2@r6",
    "id": "wiki-b2",
-   "run": 3,
+   "run": 6,
+   "categoria": "inestable",
+   "judge_original": 1
+  },
+  {
+   "key": "wiki-b4@r6",
+   "id": "wiki-b4",
+   "run": 6,
    "categoria": "inestable",
    "judge_original": 5
   },
   {
-   "key": "reas-b2@r3",
-   "id": "reas-b2",
-   "run": 3,
-   "categoria": "estable",
-   "judge_original": 4
+   "key": "wiki-b7@r6",
+   "id": "wiki-b7",
+   "run": 6,
+   "categoria": "inestable",
+   "judge_original": 5
   },
   {
-   "key": "wiki-b4@r3",
-   "id": "wiki-b4",
-   "run": 3,
+   "key": "pg-b3@r6",
+   "id": "pg-b3",
+   "run": 6,
    "categoria": "estable",
-   "judge_original": 2
+   "judge_original": 5
+  },
+  {
+   "key": "pg-b6@r6",
+   "id": "pg-b6",
+   "run": 6,
+   "categoria": "estable",
+   "judge_original": 5
+  },
+  {
+   "key": "reas-b2@r6",
+   "id": "reas-b2",
+   "run": 6,
+   "categoria": "estable",
+   "judge_original": 5
   }
  ],
- "reps": 3
+ "reps": 3,
+ "observaciones": [
+  {
+   "key": "pearl-b1@r6",
+   "id": "pearl-b1",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "La respuesta menciona exactamente los tres benchmarks indicados en la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 463,
+    "total_tokens": 611,
+    "completion_tokens": 148,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.7
+  },
+  {
+   "key": "pearl-b1@r6",
+   "id": "pearl-b1",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The response lists all three benchmarks exactly as in the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 463,
+    "total_tokens": 611,
+    "completion_tokens": 148,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.6
+  },
+  {
+   "key": "pearl-b1@r6",
+   "id": "pearl-b1",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The answer lists all three benchmarks exactly as requested.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 463,
+    "total_tokens": 602,
+    "completion_tokens": 139,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.6
+  },
+  {
+   "key": "pearl-b1@r6",
+   "id": "pearl-b1",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer lists all three benchmarks exactly as requested.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 463,
+    "total_tokens": 607,
+    "completion_tokens": 144,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.7
+  },
+  {
+   "key": "pearl-b1@r6",
+   "id": "pearl-b1",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The answer lists all three benchmarks exactly as requested.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 463,
+    "total_tokens": 607,
+    "completion_tokens": 144,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.6
+  },
+  {
+   "key": "pearl-b1@r6",
+   "id": "pearl-b1",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta menciona exactamente los tres benchmarks requeridos con los nombres correctos.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 463,
+    "total_tokens": 610,
+    "completion_tokens": 147,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.6
+  },
+  {
+   "key": "pearl-b2@r6",
+   "id": "pearl-b2",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer correctly states that the hidden dimension d is 32 for all embeddings, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 432,
+    "total_tokens": 580,
+    "completion_tokens": 148,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.5
+  },
+  {
+   "key": "pearl-b2@r6",
+   "id": "pearl-b2",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The answer correctly states that the hidden dimension d is fixed to 32 for all embeddings, matching the reference exactly.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 432,
+    "total_tokens": 569,
+    "completion_tokens": 137,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.7
+  },
+  {
+   "key": "pearl-b2@r6",
+   "id": "pearl-b2",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The answer correctly states the hidden dimension as 32 for all embeddings, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 432,
+    "total_tokens": 570,
+    "completion_tokens": 138,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.8
+  },
+  {
+   "key": "pearl-b2@r6",
+   "id": "pearl-b2",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer correctly states that the hidden dimension d is 32 for all embeddings, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 432,
+    "total_tokens": 566,
+    "completion_tokens": 134,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.5
+  },
+  {
+   "key": "pearl-b2@r6",
+   "id": "pearl-b2",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The answer correctly states that the hidden dimension d is 32 for all embeddings, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 432,
+    "total_tokens": 566,
+    "completion_tokens": 134,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.2
+  },
+  {
+   "key": "pearl-b2@r6",
+   "id": "pearl-b2",
+   "run": 6,
+   "categoria": "determinista_buena",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The answer correctly states the hidden dimension as 32 for all embeddings, matching the reference exactly.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 432,
+    "total_tokens": 565,
+    "completion_tokens": 133,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.7
+  },
+  {
+   "key": "wiki-b2@r6",
+   "id": "wiki-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 1,
+   "verdict": "The answer incorrectly states no evidence, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 469,
+    "total_tokens": 750,
+    "completion_tokens": 281,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.3
+  },
+  {
+   "key": "wiki-b2@r6",
+   "id": "wiki-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 1,
+   "verdict": "The answer fails to mention the Wiki Layer restriction or the ablation result, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 469,
+    "total_tokens": 736,
+    "completion_tokens": 267,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.2
+  },
+  {
+   "key": "wiki-b2@r6",
+   "id": "wiki-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 1,
+   "verdict": "The answer incorrectly claims no evidence was found, contradicting the reference that specifies a Wiki restriction and its negative ablation effect.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 469,
+    "total_tokens": 750,
+    "completion_tokens": 281,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.3
+  },
+  {
+   "key": "wiki-b2@r6",
+   "id": "wiki-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 2,
+   "verdict": "The answer incorrectly states no evidence was found, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 469,
+    "total_tokens": 736,
+    "completion_tokens": 267,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.4
+  },
+  {
+   "key": "wiki-b2@r6",
+   "id": "wiki-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 1,
+   "verdict": "The answer incorrectly claims no evidence, contradicting the reference that specifies a Wiki restriction and its negative effect in ablation.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 469,
+    "total_tokens": 750,
+    "completion_tokens": 281,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.6
+  },
+  {
+   "key": "wiki-b2@r6",
+   "id": "wiki-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 2,
+   "verdict": "The answer incorrectly claims no evidence, contradicting the reference that specifies a Wiki Layer restriction and its negative effect in ablation.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 469,
+    "total_tokens": 747,
+    "completion_tokens": 278,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.4
+  },
+  {
+   "key": "pg-b5@r6",
+   "id": "pg-b5",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 2,
+   "verdict": "The response provides incorrect token counts for the unguided baseline and overall counts, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 558,
+    "total_tokens": 997,
+    "completion_tokens": 439,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.7
+  },
+  {
+   "key": "pg-b5@r6",
+   "id": "pg-b5",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 2,
+   "verdict": "The answer gives incorrect token counts and omits the overall totals, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 558,
+    "total_tokens": 1062,
+    "completion_tokens": 504,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.0
+  },
+  {
+   "key": "pg-b5@r6",
+   "id": "pg-b5",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 2,
+   "verdict": "The answer provides token counts that contradict the reference and are incorrect.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 558,
+    "total_tokens": 999,
+    "completion_tokens": 441,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 11.9
+  },
+  {
+   "key": "pg-b5@r6",
+   "id": "pg-b5",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 2,
+   "verdict": "The answer provides incorrect token counts that contradict the reference, though it correctly notes the HotpotQA reversal.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 558,
+    "total_tokens": 1094,
+    "completion_tokens": 536,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 24.6
+  },
+  {
+   "key": "pg-b5@r6",
+   "id": "pg-b5",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 2,
+   "verdict": "The response provides incorrect token counts, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 558,
+    "total_tokens": 1098,
+    "completion_tokens": 540,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 6.9
+  },
+  {
+   "key": "pg-b5@r6",
+   "id": "pg-b5",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 2,
+   "verdict": "The response provides incorrect token counts and misinterprets the question, contradicting the reference data.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 558,
+    "total_tokens": 935,
+    "completion_tokens": 377,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 17.1
+  },
+  {
+   "key": "tce-b7@r6",
+   "id": "tce-b7",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "La respuesta explica correctamente que el ahorro de costos no indica mayor eficiencia porque la uniform sampling dedica recursos a tareas fáciles, Random-Resample concentra la evaluación en tareas largas y su rendimiento final es 3.3 puntos inferior, tal como indica la referencia.",
+   "error": null,
+   "judge_original": 4,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 999,
+    "completion_tokens": 430,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.7
+  },
+  {
+   "key": "tce-b7@r6",
+   "id": "tce-b7",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 4,
+   "verdict": "La respuesta explica correctamente que la reducción de costo no implica mayor eficiencia porque uniform sampling se enfoca en tareas fáciles y Random-Resample tiene peor rendimiento, pero omite el detalle de la reducción de tiempo de búsqueda (1.9x) frente a tokens (5.0x).",
+   "error": null,
+   "judge_original": 4,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 1215,
+    "completion_tokens": 646,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 8.4
+  },
+  {
+   "key": "tce-b7@r6",
+   "id": "tce-b7",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta explica correctamente que la reducción de costos no indica mayor eficiencia porque el muestreo uniforme dedica recursos a tareas fáciles, mientras que Random-Resample obtiene peor rendimiento (3.3 puntos menos), tal como indica la referencia.",
+   "error": null,
+   "judge_original": 4,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 1051,
+    "completion_tokens": 482,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 6.1
+  },
+  {
+   "key": "tce-b7@r6",
+   "id": "tce-b7",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 4,
+   "verdict": "La respuesta explica correctamente que la reducción de costo no indica mayor eficiencia porque la muestra uniforme dedica recursos a tareas fáciles y Random‑Resample obtiene peor rendimiento, aunque omite el detalle del menor ahorro en tiempo de búsqueda frente al ahorro de tokens.",
+   "error": null,
+   "judge_original": 4,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 1267,
+    "completion_tokens": 698,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 31.0
+  },
+  {
+   "key": "tce-b7@r6",
+   "id": "tce-b7",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 4,
+   "verdict": "La respuesta explica correctamente que el ahorro de costo no indica mayor eficiencia porque el muestreo uniforme dedica recursos a tareas fáciles y Random‑Resample tiene peor rendimiento, pero omite el detalle del cociente de reducción de tiempo de búsqueda frente a tokens.",
+   "error": null,
+   "judge_original": 4,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 1240,
+    "completion_tokens": 671,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 10.1
+  },
+  {
+   "key": "tce-b7@r6",
+   "id": "tce-b7",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta explica correctamente que el ahorro de costo no indica mayor eficiencia porque la uniform sampling se queda en tareas fáciles, Random-Resample se centra en tareas más largas y su rendimiento final es 3.3 puntos inferior, tal como indica la referencia.",
+   "error": null,
+   "judge_original": 4,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 1008,
+    "completion_tokens": 439,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 19.8
+  },
+  {
+   "key": "wiki-b1@r6",
+   "id": "wiki-b1",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 2,
+   "verdict": "The answer incorrectly identifies the files and components, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 531,
+    "total_tokens": 916,
+    "completion_tokens": 385,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.8
+  },
+  {
+   "key": "wiki-b1@r6",
+   "id": "wiki-b1",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 2,
+   "verdict": "The answer misidentifies the files (logs.md and skill-impact.md) and the components that update them, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 531,
+    "total_tokens": 893,
+    "completion_tokens": 362,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.0
+  },
+  {
+   "key": "wiki-b1@r6",
+   "id": "wiki-b1",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 2,
+   "verdict": "The answer invents directories and components that are not mentioned in the reference and contradicts the specified files and update mechanisms.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 531,
+    "total_tokens": 847,
+    "completion_tokens": 316,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.1
+  },
+  {
+   "key": "wiki-b1@r6",
+   "id": "wiki-b1",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 2,
+   "verdict": "The answer misidentifies the files and the updating components, omitting logs.md and skill-impact.md and incorrectly attributing updates to the wrong components.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 531,
+    "total_tokens": 887,
+    "completion_tokens": 356,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 9.9
+  },
+  {
+   "key": "wiki-b1@r6",
+   "id": "wiki-b1",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 2,
+   "verdict": "The answer misidentifies the files and the updating components, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 531,
+    "total_tokens": 863,
+    "completion_tokens": 332,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 9.0
+  },
+  {
+   "key": "wiki-b1@r6",
+   "id": "wiki-b1",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 2,
+   "verdict": "The answer misidentifies the files and the updating components, contradicting the reference.",
+   "error": null,
+   "judge_original": 1,
+   "usage": {
+    "prompt_tokens": 531,
+    "total_tokens": 928,
+    "completion_tokens": 397,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 6.5
+  },
+  {
+   "key": "pg-b4@r2",
+   "id": "pg-b4",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 1,
+   "verdict": "The response is empty and does not answer the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 440,
+    "total_tokens": 539,
+    "completion_tokens": 99,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.8
+  },
+  {
+   "key": "pg-b4@r2",
+   "id": "pg-b4",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 1,
+   "verdict": "The response is empty and does not answer the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 440,
+    "total_tokens": 540,
+    "completion_tokens": 100,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.8
+  },
+  {
+   "key": "pg-b4@r2",
+   "id": "pg-b4",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 1,
+   "verdict": "The answer is empty and does not address the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 440,
+    "total_tokens": 536,
+    "completion_tokens": 96,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.9
+  },
+  {
+   "key": "pg-b4@r2",
+   "id": "pg-b4",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 1,
+   "verdict": "The response is empty and does not answer the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 440,
+    "total_tokens": 537,
+    "completion_tokens": 97,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.9
+  },
+  {
+   "key": "pg-b4@r2",
+   "id": "pg-b4",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 1,
+   "verdict": "The response is empty and does not answer the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 440,
+    "total_tokens": 525,
+    "completion_tokens": 85,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.5
+  },
+  {
+   "key": "pg-b4@r2",
+   "id": "pg-b4",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 1,
+   "verdict": "The response does not provide any answer to the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 440,
+    "total_tokens": 533,
+    "completion_tokens": 93,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.5
+  },
+  {
+   "key": "tce-b6@r2",
+   "id": "tce-b6",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 1,
+   "verdict": "The response is empty and does not answer the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 504,
+    "total_tokens": 558,
+    "completion_tokens": 54,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.7
+  },
+  {
+   "key": "tce-b6@r2",
+   "id": "tce-b6",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 1,
+   "verdict": "The response is empty and does not address the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 504,
+    "total_tokens": 556,
+    "completion_tokens": 52,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.4
+  },
+  {
+   "key": "tce-b6@r2",
+   "id": "tce-b6",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 1,
+   "verdict": "The response is empty and does not address the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 504,
+    "total_tokens": 569,
+    "completion_tokens": 65,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 0.8
+  },
+  {
+   "key": "tce-b6@r2",
+   "id": "tce-b6",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 1,
+   "verdict": "The response is empty and does not answer the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 504,
+    "total_tokens": 557,
+    "completion_tokens": 53,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.0
+  },
+  {
+   "key": "tce-b6@r2",
+   "id": "tce-b6",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 1,
+   "verdict": "The response is empty and does not address the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 504,
+    "total_tokens": 557,
+    "completion_tokens": 53,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.5
+  },
+  {
+   "key": "tce-b6@r2",
+   "id": "tce-b6",
+   "run": 2,
+   "categoria": "caida",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 1,
+   "verdict": "The response is empty and does not answer the question.",
+   "error": null,
+   "judge_original": 0,
+   "usage": {
+    "prompt_tokens": 504,
+    "total_tokens": 588,
+    "completion_tokens": 84,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.0
+  },
+  {
+   "key": "pg-b2@r6",
+   "id": "pg-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer gives the exact token limits for both the agent and the evolutionary refiner as stated in the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 452,
+    "total_tokens": 608,
+    "completion_tokens": 156,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.9
+  },
+  {
+   "key": "pg-b2@r6",
+   "id": "pg-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The answer correctly states the exact token limits for both the agent and the evolutionary refiner, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 452,
+    "total_tokens": 608,
+    "completion_tokens": 156,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.4
+  },
+  {
+   "key": "pg-b2@r6",
+   "id": "pg-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The answer gives the exact token limits for both the agent and the evolutionary refiner as specified in the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 452,
+    "total_tokens": 607,
+    "completion_tokens": 155,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.9
+  },
+  {
+   "key": "pg-b2@r6",
+   "id": "pg-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer correctly states the exact token limits for both the agent and the evolutionary refiner as specified in the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 452,
+    "total_tokens": 614,
+    "completion_tokens": 162,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 8.3
+  },
+  {
+   "key": "pg-b2@r6",
+   "id": "pg-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The answer correctly states the exact token limits for both the agent and the evolutionary refiner, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 452,
+    "total_tokens": 613,
+    "completion_tokens": 161,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.9
+  },
+  {
+   "key": "pg-b2@r6",
+   "id": "pg-b2",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The answer correctly states the exact token limits for both the agent and the evolutionary refiner as specified in the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 452,
+    "total_tokens": 614,
+    "completion_tokens": 162,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.3
+  },
+  {
+   "key": "reas-b3@r6",
+   "id": "reas-b3",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "La respuesta incluye la cifra exacta del plateau, la causa diagnosticada, la modificación realizada y el cambio de puntuación, cumpliendo todos los requisitos de la pregunta.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 615,
+    "total_tokens": 865,
+    "completion_tokens": 250,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 11.5
+  },
+  {
+   "key": "reas-b3@r6",
+   "id": "reas-b3",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "La respuesta incluye la cifra exacta de la plateau, la causa diagnosticada, la intervención que la rompió y el cambio de puntuación preciso, cumpliendo todos los requisitos de la pregunta.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 615,
+    "total_tokens": 965,
+    "completion_tokens": 350,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.3
+  },
+  {
+   "key": "reas-b3@r6",
+   "id": "reas-b3",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta incluye la cifra exacta del plateau (0.21), la explicación de la causa y la solución, y el cambio de puntuación (de 0.21 a 0.23), cumpliendo completamente la pregunta.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 615,
+    "total_tokens": 898,
+    "completion_tokens": 283,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.3
+  },
+  {
+   "key": "reas-b3@r6",
+   "id": "reas-b3",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "Correct and complete, includes plateau, diagnosis, and score change.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 615,
+    "total_tokens": 927,
+    "completion_tokens": 312,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.8
+  },
+  {
+   "key": "reas-b3@r6",
+   "id": "reas-b3",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "Correct and complete, includes plateau, diagnosis, operator change, and exact score change.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 615,
+    "total_tokens": 923,
+    "completion_tokens": 308,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.0
+  },
+  {
+   "key": "reas-b3@r6",
+   "id": "reas-b3",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta incluye la cifra exacta de la plateau, la causa diagnosticada, la intervención que la rompió y el cambio de puntuación preciso, cumpliendo todos los requisitos de la pregunta.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 615,
+    "total_tokens": 998,
+    "completion_tokens": 383,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.7
+  },
+  {
+   "key": "reas-b6@r6",
+   "id": "reas-b6",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer correctly defines co-dependent improvements and gives the IMG-100 case of AMP as a VRAM enabler, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 552,
+    "total_tokens": 1106,
+    "completion_tokens": 554,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 10.0
+  },
+  {
+   "key": "reas-b6@r6",
+   "id": "reas-b6",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "La respuesta explica correctamente el concepto de mejoras co-dependientes y proporciona el caso concreto de IMG-100, añadiendo datos adicionales que no contradicen la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 552,
+    "total_tokens": 1248,
+    "completion_tokens": 696,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 13.0
+  },
+  {
+   "key": "reas-b6@r6",
+   "id": "reas-b6",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta explica correctamente los co‑dependientes y describe el caso concreto de AMP en IMG‑100, añadiendo datos adicionales sin contradecir la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 552,
+    "total_tokens": 1054,
+    "completion_tokens": 502,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.0
+  },
+  {
+   "key": "reas-b6@r6",
+   "id": "reas-b6",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer correctly defines co-dependent improvements and gives the IMG-100 case of AMP as a VRAM enabler, adding consistent details that expand on the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 552,
+    "total_tokens": 1331,
+    "completion_tokens": 779,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 12.7
+  },
+  {
+   "key": "reas-b6@r6",
+   "id": "reas-b6",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The response correctly defines co-dependent improvements and accurately describes the IMG-100 case (AMP as a VRAM enabler), adding extra details that do not contradict the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 552,
+    "total_tokens": 1358,
+    "completion_tokens": 806,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 37.1
+  },
+  {
+   "key": "reas-b6@r6",
+   "id": "reas-b6",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The answer correctly defines co-dependent improvements and gives the concrete IMG-100 case (AMP as a VRAM enabler) with additional details, fully satisfying the question.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 552,
+    "total_tokens": 1153,
+    "completion_tokens": 601,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 30.5
+  },
+  {
+   "key": "tce-b4@r6",
+   "id": "tce-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "La respuesta proporciona exactamente los valores solicitados con sus desviaciones estándar, coincidiendo con la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 607,
+    "total_tokens": 738,
+    "completion_tokens": 131,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.6
+  },
+  {
+   "key": "tce-b4@r6",
+   "id": "tce-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "La respuesta incluye todas las cifras exactas solicitadas y coincide con la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 607,
+    "total_tokens": 705,
+    "completion_tokens": 98,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.1
+  },
+  {
+   "key": "tce-b4@r6",
+   "id": "tce-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta reproduce exactamente las cifras y desviaciones estándar indicadas en la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 607,
+    "total_tokens": 801,
+    "completion_tokens": 194,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.1
+  },
+  {
+   "key": "tce-b4@r6",
+   "id": "tce-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "La respuesta incluye todas las cifras exactas solicitadas, coincidiendo con la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 607,
+    "total_tokens": 675,
+    "completion_tokens": 68,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 1.4
+  },
+  {
+   "key": "tce-b4@r6",
+   "id": "tce-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The response lists all four accuracies with their exact standard deviations, matching the reference exactly.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 607,
+    "total_tokens": 736,
+    "completion_tokens": 129,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.5
+  },
+  {
+   "key": "tce-b4@r6",
+   "id": "tce-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The response correctly lists all four accuracies with their standard deviations exactly as in the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 607,
+    "total_tokens": 818,
+    "completion_tokens": 211,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.6
+  },
+  {
+   "key": "tce-b5@r6",
+   "id": "tce-b5",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer correctly states the anchored deviation estimator and explains the instability of weighting raw outcomes directly, matching the reference exactly.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 673,
+    "total_tokens": 1379,
+    "completion_tokens": 706,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 9.2
+  },
+  {
+   "key": "tce-b5@r6",
+   "id": "tce-b5",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "La respuesta incluye la fórmula exacta del estimador y explica correctamente que no se pondera el resultado bruto para evitar que tareas con probabilidad de inclusión muy pequeña dominen la estimación.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 673,
+    "total_tokens": 1208,
+    "completion_tokens": 535,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 10.2
+  },
+  {
+   "key": "tce-b5@r6",
+   "id": "tce-b5",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta incluye el estimador exacto y explica correctamente que el peso directo del resultado sería inestable por tareas con probabilidad de inclusión pequeña, tal como indica la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 673,
+    "total_tokens": 1250,
+    "completion_tokens": 577,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 6.0
+  },
+  {
+   "key": "tce-b5@r6",
+   "id": "tce-b5",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer correctly states the anchored deviation estimator and explains that weighting raw outcomes directly would cause instability due to small inclusion probabilities, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 673,
+    "total_tokens": 1322,
+    "completion_tokens": 649,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.9
+  },
+  {
+   "key": "tce-b5@r6",
+   "id": "tce-b5",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The answer correctly states the anchored deviation estimator and explains the instability issue with weighting raw outcomes directly, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 673,
+    "total_tokens": 1230,
+    "completion_tokens": 557,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.7
+  },
+  {
+   "key": "tce-b5@r6",
+   "id": "tce-b5",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The answer correctly states the anchored deviation estimator and explains that weighting the raw outcome directly would cause instability due to small inclusion probabilities, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 673,
+    "total_tokens": 1419,
+    "completion_tokens": 746,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 11.5
+  },
+  {
+   "key": "wiki-b4@r6",
+   "id": "wiki-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer correctly states the paired bootstrap test with 1,000 iterations and the handling of tied comparisons (p ≥ 0.05 grouped as a top‑tier statistical tie), matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 538,
+    "total_tokens": 973,
+    "completion_tokens": 435,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 6.6
+  },
+  {
+   "key": "wiki-b4@r6",
+   "id": "wiki-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The answer correctly states the paired bootstrap significance test with 1,000 iterations and the grouping of p ≥ 0.05 results into a top-tier statistical tie, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 538,
+    "total_tokens": 1118,
+    "completion_tokens": 580,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.5
+  },
+  {
+   "key": "wiki-b4@r6",
+   "id": "wiki-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta menciona correctamente el uso de pruebas de bootstrap emparejadas con 1,000 iteraciones y explica que las comparaciones con p ≥ 0.05 se agrupan como un empate estadístico, cubriendo ambos aspectos solicitados.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 538,
+    "total_tokens": 1077,
+    "completion_tokens": 539,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.1
+  },
+  {
+   "key": "wiki-b4@r6",
+   "id": "wiki-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The answer correctly states the paired bootstrap significance test with 1,000 iterations and the handling of tied comparisons (p ≥ 0.05 grouped into a top‑tier tie), matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 538,
+    "total_tokens": 1140,
+    "completion_tokens": 602,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 6.5
+  },
+  {
+   "key": "wiki-b4@r6",
+   "id": "wiki-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "La respuesta menciona correctamente el uso de pruebas de bootstrap emparejadas con 1,000 iteraciones y la agrupación de comparaciones con p ≥ 0.05 como ties, cubriendo todos los puntos solicitados.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 538,
+    "total_tokens": 953,
+    "completion_tokens": 415,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 21.9
+  },
+  {
+   "key": "wiki-b4@r6",
+   "id": "wiki-b4",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The answer correctly states the paired bootstrap test with 1,000 iterations and the handling of ties (p ≥ 0.05) as a top-tier statistical tie, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 538,
+    "total_tokens": 936,
+    "completion_tokens": 398,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 22.3
+  },
+  {
+   "key": "wiki-b7@r6",
+   "id": "wiki-b7",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "La respuesta incluye la identificación del Wiki Maintainer, la propuesta del Skill Proposer y el archivo que preservó el resultado, con los detalles exactos solicitados.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 605,
+    "total_tokens": 1043,
+    "completion_tokens": 438,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.4
+  },
+  {
+   "key": "wiki-b7@r6",
+   "id": "wiki-b7",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "Correctly answers all parts with exact details and adds extra context.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 605,
+    "total_tokens": 1022,
+    "completion_tokens": 417,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.6
+  },
+  {
+   "key": "wiki-b7@r6",
+   "id": "wiki-b7",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta incluye exactamente lo solicitado: identifica el comportamiento de bucle, la propuesta de skill y el archivo que preserva el resultado, sin contradecir la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 605,
+    "total_tokens": 1081,
+    "completion_tokens": 476,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.9
+  },
+  {
+   "key": "wiki-b7@r6",
+   "id": "wiki-b7",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The response accurately lists the Wiki Maintainer’s identification, the Skill Proposer’s proposal and the preservation of the outcome via skill-impact.md, matching the reference exactly.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 605,
+    "total_tokens": 1154,
+    "completion_tokens": 549,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 9.0
+  },
+  {
+   "key": "wiki-b7@r6",
+   "id": "wiki-b7",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "La respuesta incluye correctamente la identificación del comportamiento de bucle por el Wiki Maintainer, la propuesta de goal-directed-action por el Skill Proposer, y señala que skill-impact.md preservó la diferencia de propuesta y el rechazo, cumpliendo con la pregunta.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 605,
+    "total_tokens": 1171,
+    "completion_tokens": 566,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 10.5
+  },
+  {
+   "key": "wiki-b7@r6",
+   "id": "wiki-b7",
+   "run": 6,
+   "categoria": "inestable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The response correctly identifies the maintainer’s finding, the proposer’s proposal, and the file that preserved the outcome, matching the reference.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 605,
+    "total_tokens": 1159,
+    "completion_tokens": 554,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 9.8
+  },
+  {
+   "key": "pg-b3@r6",
+   "id": "pg-b3",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "La respuesta incluye exactamente los valores solicitados: S=100 para HotpotQA, S=20 para MultiChallenge y un conjunto de validación de 1,000 muestras.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 514,
+    "total_tokens": 720,
+    "completion_tokens": 206,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 12.5
+  },
+  {
+   "key": "pg-b3@r6",
+   "id": "pg-b3",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "La respuesta incluye exactamente los valores solicitados: S=100 en HotpotQA, S=20 en MultiChallenge y un conjunto de validación de 1,000 muestras.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 514,
+    "total_tokens": 725,
+    "completion_tokens": 211,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 2.3
+  },
+  {
+   "key": "pg-b3@r6",
+   "id": "pg-b3",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta incluye exactamente los valores solicitados: S=100 en HotpotQA, S=20 en MultiChallenge y un conjunto de validación de 1,000 muestras.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 514,
+    "total_tokens": 720,
+    "completion_tokens": 206,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.9
+  },
+  {
+   "key": "pg-b3@r6",
+   "id": "pg-b3",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "La respuesta incluye exactamente los valores solicitados: S=100 en HotpotQA, S=20 en MultiChallenge y un conjunto de validación de 1,000 muestras.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 514,
+    "total_tokens": 720,
+    "completion_tokens": 206,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.0
+  },
+  {
+   "key": "pg-b3@r6",
+   "id": "pg-b3",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "La respuesta incluye exactamente los valores solicitados: S=100 en HotpotQA, S=20 en MultiChallenge y un conjunto de validación de 1,000 muestras.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 514,
+    "total_tokens": 725,
+    "completion_tokens": 211,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.9
+  },
+  {
+   "key": "pg-b3@r6",
+   "id": "pg-b3",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta incluye exactamente los valores de stride S para HotpotQA y MultiChallenge, y la cifra correcta del tamaño del conjunto de validación.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 514,
+    "total_tokens": 718,
+    "completion_tokens": 204,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 5.5
+  },
+  {
+   "key": "pg-b6@r6",
+   "id": "pg-b6",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The response accurately restates the reference explanation, including the key point that total token use reflects the entire interaction and thus does not isolate graph compactness.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 477,
+    "total_tokens": 685,
+    "completion_tokens": 208,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 10.6
+  },
+  {
+   "key": "pg-b6@r6",
+   "id": "pg-b6",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The response fully matches the reference, providing the exact reason that token use reflects the entire interaction and does not isolate graph compactness.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 477,
+    "total_tokens": 675,
+    "completion_tokens": 198,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.7
+  },
+  {
+   "key": "pg-b6@r6",
+   "id": "pg-b6",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The response accurately restates the reference explanation, including the key point that total token use reflects the entire interaction and thus does not isolate graph compactness.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 477,
+    "total_tokens": 687,
+    "completion_tokens": 210,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 10.8
+  },
+  {
+   "key": "pg-b6@r6",
+   "id": "pg-b6",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "The response fully matches the reference, providing the exact reasoning and details requested.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 477,
+    "total_tokens": 667,
+    "completion_tokens": 190,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.3
+  },
+  {
+   "key": "pg-b6@r6",
+   "id": "pg-b6",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 5,
+   "verdict": "The response fully matches the reference, providing the exact reasoning that total token use reflects the entire interaction and thus does not isolate graph compactness.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 477,
+    "total_tokens": 678,
+    "completion_tokens": 201,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 4.7
+  },
+  {
+   "key": "pg-b6@r6",
+   "id": "pg-b6",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 5,
+   "verdict": "The response fully matches the reference, providing the exact reasoning that total token use reflects the entire interaction and does not isolate graph compactness.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 477,
+    "total_tokens": 677,
+    "completion_tokens": 200,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.4
+  },
+  {
+   "key": "reas-b2@r6",
+   "id": "reas-b2",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 0,
+   "score": 4,
+   "verdict": "Correct but omits the student model temperature of 1.0.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 949,
+    "completion_tokens": 380,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.4
+  },
+  {
+   "key": "reas-b2@r6",
+   "id": "reas-b2",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 1,
+   "score": 5,
+   "verdict": "La respuesta incluye la división de datos, el modelo estudiante y la métrica de rendimiento tal como se indica en la referencia.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 974,
+    "completion_tokens": 405,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 18.1
+  },
+  {
+   "key": "reas-b2@r6",
+   "id": "reas-b2",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.2,
+   "rep": 2,
+   "score": 5,
+   "verdict": "La respuesta incluye la división de datos exacta, el modelo estudiante y la métrica de rendimiento, cumpliendo todos los requisitos de la pregunta.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 940,
+    "completion_tokens": 371,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 6.9
+  },
+  {
+   "key": "reas-b2@r6",
+   "id": "reas-b2",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 0,
+   "score": 5,
+   "verdict": "Respuesta incluye la división de datos, el modelo estudiante y la métrica de rendimiento, con los valores exactos solicitados.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 1036,
+    "completion_tokens": 467,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 8.2
+  },
+  {
+   "key": "reas-b2@r6",
+   "id": "reas-b2",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 1,
+   "score": 4,
+   "verdict": "Correct but omits the student model’s temperature setting (1.0).",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 953,
+    "completion_tokens": 384,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 3.6
+  },
+  {
+   "key": "reas-b2@r6",
+   "id": "reas-b2",
+   "run": 6,
+   "categoria": "estable",
+   "temperature": 0.0,
+   "rep": 2,
+   "score": 4,
+   "verdict": "Correctly lists split, model, and metric but omits the temperature setting.",
+   "error": null,
+   "judge_original": 5,
+   "usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 973,
+    "completion_tokens": 404,
+    "prompt_tokens_details": null
+   },
+   "latency_s": 7.6
+  }
+ ]
 }

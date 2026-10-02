@@ -677,3 +677,110 @@ mientras esté apagado y porque el hallazgo de fondo es el que vale: con A y B
 descartados y C sin efecto medible, la disciminación no es un problema de
 contexto, de prompt ni de machinery, y el siguiente paso honesto es un rediseño
 de la pregunta, no otro parche del agente.
+
+---
+
+## 7. Fase de ampliación: de 5 a 10 papers (r7)
+
+El plan anterior se quedó sin preguntas: con 40 items el error teórico de la media
+es 0.15 y el MDE a 95% es **0.299**, asi que no hay forma honesta de validar un
++0.15. La decision fue ampliar corpus y preguntas antes que tocar el agente.
+
+**Corpus.** Se ingesta ron 5 papers nuevos (10 documentos, 842 chunks, calidad
+100): *From Question Answering to Task Completion* (160), *Harness as a Language*
+(78), *Evo-Bench* (68), *Evaluation and Benchmarking of LLM Agents* (68) y *Stop
+Comparing LLM Agents Without Disclosing the Harness* (55). Los `doc_id` 1-5 no se
+renumeraron.
+
+**Golden.** 40 preguntas nuevas, 8 por paper, 35 respondibles y 5 no respondibles
+(`evals/golden_blind_qa_ext2.jsonl`), validadas con `evals/validate_golden.py`,
+que normaliza saltos de linea y des-hifeniza antes de comprobar keywords.
+
+### 7.1 Primera run (ext2_r1): 3.686
+
+| metrica | ext2_r1 |
+|---|---|
+| juez | 3.686 (35/35, 0 errores) |
+| facil / media / dificil | 4.000 / 3.929 / 3.091 |
+| cite precision / coverage | 0.914 / 0.943 |
+| no respondibles | 2 de 5 se abstienen, **3 inventan** |
+| tokens | 1.359M en 196 llamadas |
+
+La distribucion se ve sana, pero la auditoria de los 20 items con juez<=2 encontro
+un defecto **sistematico, no puntual**: los docs 6 y 9 son ambos surveys de
+agentes, asi que las 16 preguntas que decian "the survey" eran ambiguas entre
+documentos. Dos de ellas lo demostraron de forma inequivoca: `evobench-d2` y
+`hsurvey-d6` respondieron citando **otro paper** (`Task-CoEvolve`, y el caso
+`Qwen3.6-27B` de Evo-Bench). Es el mismo fallo que ya se habia corregido en
+`pearl-c2` y `wiki-c4`, ahora repetido por no haber revisado el nuevo lote.
+
+### 7.2 Run corregida (ext2_r2): 3.800
+
+Se nombró el survey explicito en las 16 preguntas, se nombró Evo-Bench en cuatro
+mas, se elimino de `hal-d1` una tercera clausula que era inferencia propia y no
+afirmacion del paper, y se ensancho la referencia de `hsurvey-d7` para aceptar el
+marco de "migracion del cuello de botella" que el agente si usa.
+
+| metrica | ext2_r1 | ext2_r2 |
+|---|---|---|
+| juez | 3.686 | **3.800** |
+| facil / media / dificil | 4.000 / 3.929 / 3.091 | 4.400 / 3.571 / 3.545 |
+| cite precision | 0.914 | 0.914 |
+| abstension falsa | 0.029 (`evobench-d7`) | **0.000** |
+| truncadas | 0 | 1 |
+| latencia mediana | 63s | 152s |
+
+La desambiguacion se confirma en `evobench-d2`, que pasa de 2 a 5. Pero cuatro
+preguntas que habian subido con la correccion tambien bajaron, y eso es la senal
+importante.
+
+### 7.3 El ruido real: 62% de estabilidad entre runs
+
+Las dos runs son el **mismo sistema sobre las mismas preguntas** en 19 items que no
+se tocaron. Resultado:
+
+| | |
+|---|---|
+| items con judge identico | 10 de 16 (**62%**) |
+| cambio medio por item | 0.56 |
+| cambio maximo | 2 puntos |
+| sd de la diferencia pareada | 0.946 |
+
+El ruido entre runs del propio agente es **mayor** que el ruido del juez medido
+antes (1%): no es el juez el que fluctua, es el sistema. Traducido a la media:
+
+| n preguntas | error teorico | MDE 95% (dos colas) |
+|---|---|---|
+| 40 | 0.150 | 0.299 |
+| 80 | 0.106 | 0.212 |
+| 120 | 0.086 | **0.173** |
+| 200 | 0.067 | **0.134** |
+
+**Con 120 preguntas el MDE es 0.173: todavia no alcanza para validar un +0.15.** La
+cifra que hace falta son ~200 preguntas, o reducir el ruido por item. Esto corrige
+la suposicion con la que se abrio esta fase.
+
+### 7.4 Estado combinado (120 preguntas)
+
+| | |
+|---|---|
+| media juez | 4.057 (105 puntuadas de 106 respondibles) |
+| distribucion | 64×5, 3×4, 21×3, 14×2, 3×1 |
+| facil / media / dificil | 4.39 / 3.95 / 3.87 |
+| no respondibles | 9 de 14 se abstienen, 5 inventan |
+| tokens | 3.579M |
+
+Si el objetivo fuera solo "tener un numero", 4.057 seria un resumen comodo. No lo
+es: con este MDE no distingue un cambio real de ruido, y presentarlo como
+puntuacion de referencia seria exactamente el error que este informe lleva tres
+fases evitando.
+
+**Donde queda margen real:** 17 items con juez<=2, y 5 fabricaciones sobre
+no respondibles. Los docs con menos recorrido son el 5 (3.38), el 6 (3.29) y el 7
+(3.57); el doc 1 esta saturado (4.79) y deberia salir del conjunto o aceptarse
+como control.
+
+**Veredicto: la ampliacion del golden no produce una puntuacion comparable, sino
+una medicion de ruido.** El corpus y las preguntas ya estan; lo que falta no son
+mas preguntas del mismo tipo sino o bien 200 items, o bien un protocolo que
+reduzca la varianza entre runs.

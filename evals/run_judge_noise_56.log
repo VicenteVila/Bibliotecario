@@ -1,0 +1,18 @@
+muestra: 6 respuestas x 3 repeticiones x 2 brazos = 36 llamadas al juez
+  caida            0  
+  determinista_mala  0  
+  determinista_buena  2  pearl-b1, pearl-b2
+  inestable        1  wiki-b2
+  estable          3  pg-b5, tce-b7, wiki-b1
+reanudando: 0 observaciones ya existen
+llamadas pendientes: 36
+  10/36 llamadas | notas hasta ahora: media 5.00, min 5, max 5
+  20/36 llamadas | notas hasta ahora: media 3.60, min 1, max 5
+  30/36 llamadas | notas hasta ahora: media 3.57, min 1, max 5
+  36/36 llamadas | notas hasta ahora: media 3.31, min 1, max 5
+
+=== ruido del juez por brazo ===
+  T=0.2: sd=0.096 (max 0.577) coherentes=0.833 discrepancias=1/6 parse_errors=0 tokens=14758
+  T=0.0: sd=0.192 (max 0.577) coherentes=0.667 discrepancias=2/6 parse_errors=0 tokens=15074
+
+tokens totales: 29832  ->  /mnt/c/Bibliotecario/evals/result_judge_noise.json

@@ -1,0 +1,1662 @@
+{
+ "meta": {
+  "golden": "golden_blind_qa_ext2.jsonl",
+  "run": "ext2_r1",
+  "judge_model": "openai/gpt-oss-20b",
+  "workers": 5,
+  "providers": [
+   [
+    "nvidia",
+    "openai"
+   ]
+  ],
+  "anchor_grounding": false
+ },
+ "aggregate": {
+  "n": 40,
+  "n_answerable": 35,
+  "n_unanswerable": 5,
+  "judge_model": "openai/gpt-oss-20b",
+  "turns": 4,
+  "retries": 1,
+  "judge_mean": 3.686,
+  "n_scored": 35,
+  "n_judge_errors": 0,
+  "n_infra": 0,
+  "infra_error_ids": [],
+  "cite_precision_mean": 0.914,
+  "cite_coverage_mean": 0.943,
+  "answer_cite_rate": 0.971,
+  "by_difficulty": {
+   "facil": 4.0,
+   "media": 3.929,
+   "dificil": 3.091
+  },
+  "abstain_rate": 0.4,
+  "n_abstain_decided": 5,
+  "n_abstain_errors": 0,
+  "n_fabricated": 3,
+  "latency_median_s": 63,
+  "false_abstention_rate": 0.029,
+  "n_false_abstention": 1,
+  "answer_rate_on_answerable": 0.971,
+  "false_abstention_ids": [
+   "evobench-d7"
+  ],
+  "truncated": 0,
+  "fallbacks": 0,
+  "agent_tokens_total": 1358855,
+  "agent_calls_total": 196,
+  "agent_calls_tokens_unknown": 0,
+  "agent_models": [
+   "nvidia/nemotron-3-super-120b-a12b",
+   "openai/gpt-oss-20b"
+  ],
+  "judge_tokens_total": 41582
+ },
+ "rows": [
+  {
+   "id": "disclose-d1",
+   "doc_id": 10,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 594,
+    "total_tokens": 709,
+    "completion_tokens": 115,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 47,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 36363,
+    "completion_tokens": 233,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 36596,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The three quantities that govern long-horizon reliability in closed-loop agent systems are stability, context drift, and control lag. Stability is whether expected progress toward a goal is non-decreasing under the controller’s update rule. Context drift is how fast task-relevant information leaves the context window. Control lag is the number of steps between an anomaly being detected and a corrective signal reaching the policy. [10:7][10:8]"
+  },
+  {
+   "id": "disclose-d2",
+   "doc_id": 10,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 569,
+    "total_tokens": 959,
+    "completion_tokens": 390,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 74,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 32642,
+    "completion_tokens": 218,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 32860,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The subset100 task set was constructed by sampling SWE-bench Verified test tasks with seed 42 and stratification by difficulty label to preserve the approximate difficulty mix of the 500-task split (39 tasks < 15 min, 52 tasks 15 min–1 hour, 8 tasks 1–4 hours, 1 task > 4 hours). [10:43]"
+  },
+  {
+   "id": "disclose-d3",
+   "doc_id": 10,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 594,
+    "total_tokens": 1188,
+    "completion_tokens": 594,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 63,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 25409,
+    "completion_tokens": 195,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 25604,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The variance decomposition shows that harness-induced variance (HV) substantially exceeds model-induced variance (MV), with average HV of 18.48 pp² versus average MV of 2.37 pp², yielding a ratio of 7.80×, indicating harness variance dominates model variance under controlled conditions [10:22]."
+  },
+  {
+   "id": "disclose-d4",
+   "doc_id": 10,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 658,
+    "total_tokens": 1312,
+    "completion_tokens": 654,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 85,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35154,
+    "completion_tokens": 265,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35419,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "GLM-5.1 costs $12.54 under H1, $13.86 under H2, and $21.39 under H3. The H2 to H3 flip occurs because H3 adds per-step verification, anomaly checks, and recovery signals that convert ambiguous execution traces into corrective observations, closing the verification and recovery loop to flag ineffective test commands, failed edits, incomplete fixes, and regression risks before submission [10:54]."
+  },
+  {
+   "id": "disclose-d5",
+   "doc_id": 10,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 3,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 777,
+    "total_tokens": 1308,
+    "completion_tokens": 531,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 88,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 30913,
+    "completion_tokens": 372,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 31285,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper \"Stop Comparing LLM Agents Without Disclosing the Harness\" proposes three harness-aware reliability metrics: Stability, Context Drift, and Control Lag. Stability is defined as a Lyapunov-like measure V(st) = d(st, Ω*) being nonincreasing in expectation under the harness controller C, where Ω* is the set of goal-consistent states and d is a task-specific distance measure, formally E[V(st+1) | st] ≤ V(st) for all t. Context Drift is defined as δt = DKL(pt∥p0), the divergence of the current context-window embedding distribution pt from the initial task-relevant state p0, with high drift rate ˙δ = δt − δt−1 indicating failure to maintain task-relevant information. Control Lag τ is defined as the number of steps between harness anomaly detection (tool failure, malformed output, or empty result) and the arrival of corrective observation at the policy, formally τ = tc − td when anomaly is detected at step td and corrective observation otc reaches the policy at step tc. [10:13][10:14][10:15]"
+  },
+  {
+   "id": "disclose-d6",
+   "doc_id": 10,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 0.5,
+   "cite_coverage": 1.0,
+   "stray_docs": 1,
+   "answer_cites": 6,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 747,
+    "total_tokens": 1539,
+    "completion_tokens": 792,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 86,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 33149,
+    "completion_tokens": 400,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 33549,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper formalizes the relationship between harness and model by treating the harness as the controller of a closed-loop dynamical system and the LLM as the stochastic policy it governs, explaining why small harness changes can produce performance shifts exceeding those from substituting one model for another [10:0]. This formalization shows that harness configuration, not just model capability, governs performance variance in long-horizon tasks, and that harness-induced variance can substantially exceed model-induced variance, including cases of model ranking reversal [10:1]. The paper argues that agent performance is a property of the model–harness pairing, and that the harness mediates closed-loop interaction between the model and the external world through six runtime components [6:21]. It further explains that harness engineering shifts the optimization target from isolated prompts to the runtime that stabilizes agent execution, decomposing the harness into six coupled responsibilities: observation, context, control, action, state, and verification/governance [6:51]. This formalization explains why similar base models can behave so differently under different harness configurations, and why harness changes can yield up to a 6× difference in performance on the same benchmark [6:8]. The paper concludes that agent quality emerges from the interaction between model capability, runtime infrastructure, task structure, and evaluation design, rather than from model capability in isolation [6:119]."
+  },
+  {
+   "id": "disclose-d7",
+   "doc_id": 10,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 1,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 578,
+    "total_tokens": 1080,
+    "completion_tokens": 502,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 56,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34984,
+    "completion_tokens": 227,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35211,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper argues that scaling models does not dissolve the harness problem because long-horizon reliability is a controller property, and no model upgrade compensates for the absence of feedback structure in the harness, as evidenced by Claude Code redesigning rather than removing harness components as capability grew, the managed-agents architecture explicitly decoupling model and harness, and AHE producing double-digit pass-rate gains on top of frontier base models [10:28]."
+  },
+  {
+   "id": "disclose-d8",
+   "doc_id": 10,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 481,
+    "total_tokens": 728,
+    "completion_tokens": 247,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 55,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 36198,
+    "completion_tokens": 275,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 36473,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The controlled experiment reported Schema Compliance Rate and Action Efficiency values for H1, H2, and H3, but the specific measured values are not provided in the available evidence. [10:27] defines these metrics: \"Schema Compliance Rate measures the fraction of model outputs that parse without harness intervention (interface alignment), and Action Efficiency measures the ratio of productive, task-advancing actions to total actions (trajectory productivity).\" However, no numerical results for H1, H2, or H3 are given in the text. [10:27]"
+  },
+  {
+   "id": "evobench-d1",
+   "doc_id": 8,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 474,
+    "total_tokens": 949,
+    "completion_tokens": 475,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 56,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34609,
+    "completion_tokens": 186,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 34795,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The strongest evolvers gain 16.6 points over the seed harness and closely approach the human-engineered baseline of 47.5. [8:5]"
+  },
+  {
+   "id": "evobench-d2",
+   "doc_id": 8,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 1,
+   "answer_cites": 8,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 761,
+    "total_tokens": 1002,
+    "completion_tokens": 241,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 61,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 26069,
+    "completion_tokens": 1024,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 27093,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The auxiliary task set for harness evolution in Task-CoEvolve is composed using variance-weighted sampling based on past evaluation outcomes, where the sampling weight for each task is defined as the Bernoulli variance of its historical success rate plus a term inversely proportional to the square root of the number of observed outcomes, focusing the evaluation budget on tasks near the capability frontier [3:12]. This approach selects a new validation subset at each iteration to address the challenges of selecting informative tasks and making evaluations comparable across iterations despite using different subsets [3:12]. The task selection and full-set estimation procedures depend only on observed task outcomes, i.e., the history of successes and failures, and make no assumptions about either the task content or the harness code [3:11]. The sampling weight is calculated as \\( w_t = \\max \\left( \\bar{p}_t(1 - \\bar{p}_t), \\ell_t \\right) + \\lambda / \\sqrt{n_t} \\), where the first term represents the Bernoulli variance, which is largest when success and failure are balanced (\\( \\bar{p}_t = 0.5 \\)) and zero when the task is always solved or always failed, and the second term gives higher weight to tasks with fewer samples [3:13]. The floor \\( \\ell_t \\) equals a small positive constant for tasks that have never been solved and 0 otherwise, because a task nobody has solved may still become solvable as the harness improves [3:13]. This variance-weighted task selection focuses evaluation on tasks where candidate harnesses disagree, as tasks on which candidate harnesses disagree are more informative for distinguishing among them than tasks that are consistently solved or failed [3:4]. As the harness evolves, the sampling distribution also changes to focus on informative tasks for the current harness [3:4]. The selected tasks become more informative and more difficult over iterations, as shown in the progression from easy to medium to hard tasks [3:0]. The full-set score is then estimated from the sampled tasks by accounting for their sampling probabilities, enabling consistent comparisons across iterations despite evaluating different subsets [3:12]. This allows Task-CoEvolve to estimate full-set performance from partial evaluations while reducing evaluation cost [3:12]. The method builds on the observation that tasks where candidates have different outcomes are more informative, while tasks that are always solved or failed provide little information for ranking candidates [3:8]. The Bernoulli variance of each task’s historical success rate is used to measure how informative each task is, becoming large when success and failure are balanced [3:13]. Task-CoEvolve co-evolves the validation task set alongside the harness by addressing these two challenges: selecting tasks that best discriminate among candidate harnesses and making evaluations comparable across iterations despite using different subsets [3:8]. The approach reduces evaluation cost by evaluating each candidate on only a subset \\( S_k \\subset T \\) of size \\( m = \\lceil \\rho N \\rceil \\), which reduces the task executions from \\( K \\times N \\times r \\) to \\( K \\times m \\times r \\) [3:12]. The variance-weighted sampling distribution adapts as the harness evolves to focus on tasks near the capability frontier [3:4]. The method has been shown to nearly match full-set search performance at \\( \\rho = 7\\% \\) and surpass it at \\( \\rho = 20\\% \\) [3:17]. Task-CoEvolve reduces the search cost by 67–80% while maintaining performance close to Full Search [3:24]. For GPT-5.6 Luna, Full Search consumes 2,888M input tokens (22.2 hours), while Task-CoEvolve requires only 579M tokens (11.5 hours) [3:24]. For Qwen3.6, the input token usage decreases from 741M to 246M, and the search time decreases from 38.0 to 20.5 hours [3:24]. Despite these substantial reductions, the final performance is only 1.1 points lower than Full Search, showing that Task-CoEvolve achieves comparable search results at only one-third to one-fifth of the token cost [3:"
+  },
+  {
+   "id": "evobench-d3",
+   "doc_id": 8,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 597,
+    "total_tokens": 902,
+    "completion_tokens": 305,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 64,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34243,
+    "completion_tokens": 256,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 34499,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The Overall Score is defined as the final performance of the evolved harness on the unseen evaluation suite: Overall(E) := S(π, HT ; Deval). The Anytime Validation Score is defined as the average best-so-far validation performance over the evolution budget: AnytimeVal(E) := (1/biter) Σ(t=1 to biter) S*_t, where S*_t = max(i≤t) S(π, Hi; Dval). If a run terminates early, its final best-so-far validation score is carried forward for the remaining budget. [8:13]"
+  },
+  {
+   "id": "evobench-d4",
+   "doc_id": 8,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 655,
+    "total_tokens": 907,
+    "completion_tokens": 252,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 54,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 31983,
+    "completion_tokens": 259,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 32242,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The candidate tasks are divided into six score bands: frontier (s = 0), hard (0 < s ≤0.10), hardish (0.10 < s ≤0.25), mid (0.25 < s ≤0.50), solvable (0.50 < s ≤0.75), and easy (s > 0.75), with quota weights (0.58, 0.24, 0.11, 0.045, 0.02, 0.005) [8:51]."
+  },
+  {
+   "id": "evobench-d5",
+   "doc_id": 8,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 703,
+    "total_tokens": 915,
+    "completion_tokens": 212,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 64,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34257,
+    "completion_tokens": 350,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 34607,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Based on the evidence from the Evo-Bench paper, the four candidate pools have the following characteristics:\n\n- HLE: pool n = 768; selected n = 160; med. Sens = 0.29; med. Perf = 0.22 [8:49]\n- GDPval: pool n = 215; selected n = 96; med. Sens = 0.31; med. Perf = 0.61 [8:49]\n- APEX-Agents: pool n = 421; selected n = 96; med. Sens = 0.38; med. Perf = 0.11 [8:49]\n- Claw-Eval: pool n = 157; selected n = 96; med. Sens = 0.29; med. Perf = 0.83 [8:49]"
+  },
+  {
+   "id": "evobench-d6",
+   "doc_id": 8,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 566,
+    "total_tokens": 933,
+    "completion_tokens": 367,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 68,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35414,
+    "completion_tokens": 241,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35655,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Evo-Bench uses three integrity controls: strict sandbox separation preventing evolvers from writing to validation artifacts or held-out data, monitoring for retrieval of benchmark answers via web search, and detecting prompt injection attempts to manipulate scorers. Web access is not simply turned off because it is necessary for diagnosing failures and developing general harness improvements, as evolvers need this access to understand and fix issues during evolution [8:59]."
+  },
+  {
+   "id": "evobench-d7",
+   "doc_id": 8,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 0,
+   "answer_cites": 0,
+   "n_evid": 4,
+   "answer_has_cite": false,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 541,
+    "total_tokens": 912,
+    "completion_tokens": 371,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": true,
+   "fallback": false,
+   "latency_s": 69,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 36238,
+    "completion_tokens": 208,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 36446,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper does not contain any information about DeepSeek-V4-Flash misattributing a regression or naming the resulting behaviour. The provided evidence discusses agent harness design, evaluation dimensions, and related topics but does not mention DeepSeek-V4-Flash in the context of regression misattribution. Therefore, no citation can be provided for the requested details.  [doc:?]"
+  },
+  {
+   "id": "evobench-d8",
+   "doc_id": 8,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 1,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 411,
+    "total_tokens": 871,
+    "completion_tokens": 460,
+    "prompt_tokens_details": null
+   },
+   "abstained": false,
+   "fabricated_value": 3,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 70,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34523,
+    "completion_tokens": 192,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 34715,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The full evolution process was repeated across three independent runs for each method, and all reported scores represent the average test performance across the three resulting evolved skill sets. [5:20] [5:57]"
+  },
+  {
+   "id": "hal-d1",
+   "doc_id": 7,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 3,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 613,
+    "total_tokens": 1083,
+    "completion_tokens": 470,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 66,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 38760,
+    "completion_tokens": 264,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 39024,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Based on the provided evidence, JAZ invoke demonstrates three headline results against baselines: (1) On long-horizon workflows requiring recall beyond the context window, JAZ invoke outperforms Letta (MemGPT) by 8% at half its cost [7:1]; (2) On self-improvement workflows, JAZ invoke outperforms CodeAct+subagents and specialized harnesses at a similar or lower cost [7:7]; (3) JAZ invoke enables long-horizon and self-improvement capabilities without external systems, tools, or harness components [7:6]. [7:1][7:7][7:6]"
+  },
+  {
+   "id": "hal-d2",
+   "doc_id": 7,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 513,
+    "total_tokens": 974,
+    "completion_tokens": 461,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 65,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 33302,
+    "completion_tokens": 176,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 33478,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The invoke agent loop has two distinguishing properties: (1) the language model can write arbitrary executable code that includes recursive invoke calls, and (2) everything visible to the model—inputs to invoke and interaction history—are variables in the code environment that the model can reference and manipulate [7:10]."
+  },
+  {
+   "id": "hal-d3",
+   "doc_id": 7,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 706,
+    "total_tokens": 1409,
+    "completion_tokens": 703,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 111,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 36224,
+    "completion_tokens": 245,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 36469,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Based on the evidence from the paper \"Harness as a Language: A Minimalist Agent Framework With Maximal Expressivity\", JAZ invoke outperforms Letta by 8% at half its cost on long-horizon workflows requiring recall beyond the context window, while CodeAct+subagents and JAZ invoke implementations capped recursion depth to 2 (i.e., solver subagents do not have access to subsubagents) [7:1][7:25]."
+  },
+  {
+   "id": "hal-d4",
+   "doc_id": 7,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 777,
+    "total_tokens": 1442,
+    "completion_tokens": 665,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 57,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 31895,
+    "completion_tokens": 258,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 32153,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The self-improving methods on AppWorld show task-generalisation results with JAZ invoke achieving 72.6% TGC and 81.6% SGC at a cost of $18.3 per run, while ACE on CodeActJAZ achieves 70.7% TGC and 48.9% SGC at a higher cost of $29.2 per run, demonstrating JAZ invoke's superior performance and lower cost for self-improvement on AppWorld [7:60][7:61]."
+  },
+  {
+   "id": "hal-d5",
+   "doc_id": 7,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 581,
+    "total_tokens": 1181,
+    "completion_tokens": 600,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 53,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35269,
+    "completion_tokens": 213,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35482,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "For self-improving methods, we report the median and its 78% confidence interval formed by the 2nd and 5th order statistics. The substantially higher value of the median than the mean in JAZ invoke’s TGC and SGC is due to the outlier rep 5, which scored below the CodeAct baseline. [7:61]"
+  },
+  {
+   "id": "hal-d6",
+   "doc_id": 7,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 4,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 540,
+    "total_tokens": 1428,
+    "completion_tokens": 888,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 62,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 33478,
+    "completion_tokens": 189,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 33667,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper avoids overfitting per-task prompts by splitting the user prompt into two disjoint parts: method-agnostic instructions and task-agnostic guidance, ensuring the meta-agent learns self-improvement without hard-coding task-specific details [7:44]."
+  },
+  {
+   "id": "hal-d7",
+   "doc_id": 7,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 603,
+    "total_tokens": 957,
+    "completion_tokens": 354,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 62,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35256,
+    "completion_tokens": 270,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35526,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "JAZ invoke is cheaper than ACE on continual self-improvement because ACE's reflector and curator cost 10 times more per task than JAZ invoke, and even when ACE was restricted to training on only 42 tasks (10% of the test set) to balance cost and performance, it still ended up costing more than JAZ invoke learning across the entire test set [7:27][7:28]. The cost efficiency of JAZ invoke comes from its ability to batch multiple tasks together and selectively read parts of trajectories, avoiding the rigid workflow of ACE that fills context with full subagent trajectories [7:28]."
+  },
+  {
+   "id": "hal-d8",
+   "doc_id": 7,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 467,
+    "total_tokens": 930,
+    "completion_tokens": 463,
+    "prompt_tokens_details": null
+   },
+   "abstained": false,
+   "fabricated_value": 81.6,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 65,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 38509,
+    "completion_tokens": 251,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 38760,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Based on the evidence from Table 3 in the paper \"Harness as a Language: A Minimalist Agent Framework With Maximal Expressivity\", the exact per-task scores for JAZ invoke on the StuLife sequence are: Run 1: 81.6%, Run 2: 81.5%, Run 3: 81.7%. The run-to-run standard deviation of the aggregate score is 0.1. [7:60]"
+  },
+  {
+   "id": "evalsurvey-d1",
+   "doc_id": 9,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 2,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 1,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 605,
+    "total_tokens": 976,
+    "completion_tokens": 371,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 51,
+   "agent_usage": {
+    "calls": 3,
+    "prompt_tokens": 31422,
+    "completion_tokens": 301,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 31723,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "El survey argumenta que la evaluación de agentes LLM necesita nuevos enfoques porque, a diferencia del software tradicional donde se evalúa el rendimiento de un motor (componentes aislados y determinísticos), la evaluación de agentes evalúa el rendimiento de un coche completo en condiciones reales y dinámicas, lo que requiere considerar comportamiento emergente, interacción con entornos impredecibles y adaptación continua, algo que los métodos clásicos de prueba de software no pueden capturar adecuadamente [9:3]. Además, los agentes LLM son inherentemente probabilísticos y se comportan dinámicamente, a diferencia del comportamiento determinístico y estático que asume el testing tradicional de software, lo que exige nuevas formas de evaluar su rendimiento [9:3]."
+  },
+  {
+   "id": "evalsurvey-d2",
+   "doc_id": 9,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 4,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 563,
+    "total_tokens": 909,
+    "completion_tokens": 346,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 51,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 32823,
+    "completion_tokens": 261,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 33084,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey accounts for cost in agent evaluation by including it as a measure of an agent's monetary efficiency, typically estimated based on the number of input and output tokens, which directly correlate with usage-based pricing in most LLM deployments [9:11]. It is listed under the Agent Behavior dimension alongside latency as a key aspect to evaluate [9:10]. Cost is also referenced in evaluation contexts where more realistic settings often involve higher costs [9:34], and future research directions emphasize the need for time- and cost-bounded evaluation protocols to support iterative agent development [9:40]. These points collectively show that cost is treated as a critical practical factor in determining the scalability and deployment feasibility of LLM agents."
+  },
+  {
+   "id": "evalsurvey-d3",
+   "doc_id": 9,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 3,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 630,
+    "total_tokens": 1495,
+    "completion_tokens": 865,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 84,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35368,
+    "completion_tokens": 277,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35645,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey proposes metrics for tool use including Invocation Accuracy, Tool Selection Accuracy, Retrieval Accuracy (measured via rank accuracy k, Mean Reciprocal Rank, and Normalized Discounted Cumulative Gain), and Parameter-related evaluation such as parameter name F1 score and execution-based evaluation [9:12][9:13]. These metrics differ in focus: Invocation Accuracy assesses the decision to invoke a tool, Tool Selection Accuracy evaluates correct tool choice from candidates, Retrieval Accuracy measures tool retrieval from larger sets using ranking-based metrics, and Parameter-related evaluation checks correct identification and assignment of parameter names and values, with execution-based evaluation offering a more grounded assessment by running tool calls and assessing outcomes [9:12][9:13][9:14]."
+  },
+  {
+   "id": "evalsurvey-d4",
+   "doc_id": 9,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 581,
+    "total_tokens": 766,
+    "completion_tokens": 185,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 52,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 32898,
+    "completion_tokens": 233,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 33131,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey lists Success Rate (SR), F1-score, Pass@k, Progress Rate, Execution Accuracy, Transfer Learning Success, and Zero-Shot Generalization Accuracy as metrics for task completion under Agent Behavior. Benchmarks include AgentBoard, WebShop, AgentBench, Tool Use Evaluation, InformativeBench, SQuAD, ResearchArena, AppWorld, TheAgentCompany, MAGIC, Mobile-Env, Re-ReST, XMC-AGENT, and SWE-bench [9:25]."
+  },
+  {
+   "id": "evalsurvey-d5",
+   "doc_id": 9,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 2,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 1,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 513,
+    "total_tokens": 767,
+    "completion_tokens": 254,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 37,
+   "agent_usage": {
+    "calls": 3,
+    "prompt_tokens": 28198,
+    "completion_tokens": 143,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 28341,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Evaluating consistency is expensive because it requires executing the same task multiple times and observing the variation in outcomes, which introduces significant evaluation overhead: running multiple trials per input can be computationally expensive, especially when testing complex tasks involving tools, memory, or multi-agent coordination. [9:36]"
+  },
+  {
+   "id": "evalsurvey-d6",
+   "doc_id": 9,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 528,
+    "total_tokens": 1071,
+    "completion_tokens": 543,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 58,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 32089,
+    "completion_tokens": 211,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 32300,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey identifies that time- and cost-bounded evaluation protocols must balance depth and efficiency, as current methods requiring repeated trials or human-in-the-loop assessments can be both time- and resource-intensive, and future research should aim to develop protocols that strike this balance. [9:40]"
+  },
+  {
+   "id": "evalsurvey-d7",
+   "doc_id": 9,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 4,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 607,
+    "total_tokens": 1126,
+    "completion_tokens": 519,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 56,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34911,
+    "completion_tokens": 270,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35181,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey distinguishes reliability and robustness evaluation from task-performance evaluation by noting that task performance measures best-case capabilities, while reliability evaluation probes worst-case and average-case scenarios, focusing on consistency, robustness to variations, and trustworthiness of the agents’ outputs [9:18]. In enterprise settings, extra constraints include role-based access control, the need for reliability guarantees for audit and compliance, dynamic and long-horizon interactions, and compliance requirements, which are often overlooked in current research [9:0][9:5]. These challenges arise because enterprises demand high performance alongside predictable reliability, compliance with regulations, data security, and maintainability [9:34]."
+  },
+  {
+   "id": "evalsurvey-d8",
+   "doc_id": 9,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 3,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 458,
+    "total_tokens": 724,
+    "completion_tokens": 266,
+    "prompt_tokens_details": null
+   },
+   "abstained": false,
+   "fabricated_value": 0.378,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 52,
+   "agent_usage": {
+    "calls": 4,
+    "prompt_tokens": 32049,
+    "completion_tokens": 256,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 32305,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey reports that the measured agreement between LLM-as-a-judge scores and human judgement is low, with correlations typically around 0.3–0.4. Specifically, one cited study found a correlation of 0.378 between LLM-as-a-judge evaluations and human judgements [9:31]. This indicates only moderate alignment, suggesting that while LLMs can approximate human judgements, significant discrepancies remain in evaluation tasks."
+  },
+  {
+   "id": "hsurvey-d1",
+   "doc_id": 6,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 4,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 680,
+    "total_tokens": 1303,
+    "completion_tokens": 623,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 66,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35071,
+    "completion_tokens": 244,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35315,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey formalizes the execution harness as a runtime design object and decomposes it into six coupled responsibilities: observation, context, control, action, state, and verification/governance [6:16]. These components mediate closed-loop interaction between the foundation model and the external world [6:21]. The harness governs what the agent observes, what actions it may take, what state is carried forward, how control advances, and how failures are detected, constrained, or repaired [6:79]. This decomposition is used to map task properties and domain pressures to harness configurations [6:1]."
+  },
+  {
+   "id": "hsurvey-d2",
+   "doc_id": 6,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 504,
+    "total_tokens": 677,
+    "completion_tokens": 173,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 55,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 37379,
+    "completion_tokens": 192,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 37571,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "We separate three layers that are often conflated under “self-evolve”. Multi-model harnesses define who performs each runtime role. Learnable harnesses define how runtime policies are optimized. Co-evolution defines when and how the model, harness, and improvement loop are jointly updated from deployment experience. [6:50] [6:51]"
+  },
+  {
+   "id": "hsurvey-d3",
+   "doc_id": 6,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 696,
+    "total_tokens": 1220,
+    "completion_tokens": 524,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 65,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 32207,
+    "completion_tokens": 377,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 32584,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "In the harness-aware task taxonomy, task properties map to failure pressure, harness response, and critical components as follows: long horizon leads to state drift, addressed by checkpoints, summaries, and artifacts, with critical components being Context Manager, State Store, and Control Loop; partial observability causes indirect state, mitigated by structured observations, grounding, and abstraction, involving Observation Interface, Context Manager, and Action Interface; strong oracle yields checkable outcomes, handled via verifier loops and repair cycles, focusing on Verification & Governance and Control Loop; weak or delayed oracle results in uncertain success, managed through provenance tracking, review, and approval, engaging Verification & Governance, Context Manager, and State Store; irreversible actions produce persistent side effects, countered by sandbox, gates, and rollback, involving Verification & Governance and Action Interface; high autonomy or low latency limits human correction, requiring logging, budgets, and controllers, with critical components being Verification & Governance, State Store, and Observation Interface [6:71][6:72]."
+  },
+  {
+   "id": "hsurvey-d4",
+   "doc_id": 6,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 4,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 515,
+    "total_tokens": 891,
+    "completion_tokens": 376,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 61,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 33034,
+    "completion_tokens": 177,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 33211,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey characterizes task pressure using three dimensions: task horizon, environment type, and autonomy level [6:64]. It recommends that benchmark reports disclose the task pressures and harness configuration under which results are obtained [6:76]."
+  },
+  {
+   "id": "hsurvey-d5",
+   "doc_id": 6,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 537,
+    "total_tokens": 871,
+    "completion_tokens": 334,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 67,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 33118,
+    "completion_tokens": 218,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 33336,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey insists that a tool call proposed by the model is not the same as an executed action because a proposal is not an executed action: reliability depends on the harness to validate, dispatch, observe, and, when necessary, reject or repair the proposed action. [6:23]"
+  },
+  {
+   "id": "hsurvey-d6",
+   "doc_id": 6,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 0.5,
+   "cite_coverage": 1.0,
+   "stray_docs": 1,
+   "answer_cites": 2,
+   "n_evid": 3,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 630,
+    "total_tokens": 1247,
+    "completion_tokens": 617,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 101,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35992,
+    "completion_tokens": 422,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 36414,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The survey reframes failures attributed to missing memory or missing tools as misattributions to noise, where agents like Qwen3.6-27B blamed performance regressions on noise rather than recognizing issues like bundled edits, missing smoke checks, or weak best-snapshot management [8:60]. This reflects a broader pattern where failures are misdiagnosed as stochastic noise instead of being traced to specific harness deficiencies such as context management, verification, or recovery mechanisms [8:60]. The survey emphasizes that harness engineering addresses execution-level bottlenecks where agents lose track of progress, misuse tools, or fail to recover after errors—not merely missing information [6:43]. Thus, what appears as missing memory or tool failure is often a failure of the harness to properly detect, constrain, or repair execution issues [6:43][8:60]."
+  },
+  {
+   "id": "hsurvey-d7",
+   "doc_id": 6,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 3,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 620,
+    "total_tokens": 1221,
+    "completion_tokens": 601,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 129,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 32358,
+    "completion_tokens": 366,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 32724,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The primary bottleneck migrates across harness components as domain constraints change: it moves from Verification and Governance in software engineering, through Observation Interface and Action Interface in web/GUI interaction, to Context Manager and State and Artifact Store in scientific discovery, back to Verification and Governance in medical assistance, and finally to Control Loop in embodied settings [6:73]. This migration pattern shows that domain labels alone are insufficient descriptors; what matters for harness configuration is which component absorbs the failure budget under structural pressures [6:67]."
+  },
+  {
+   "id": "hsurvey-d8",
+   "doc_id": 6,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 1,
+   "answer_cites": 2,
+   "n_evid": 3,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 537,
+    "total_tokens": 700,
+    "completion_tokens": 163,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 142,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 33585,
+    "completion_tokens": 797,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 34382,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The measured effect size of each harness component on end-to-end agent performance is not explicitly provided in the given documents. While the documents discuss harness optimization, performance gains from evolved harnesses (e.g., +7.9 for Qwen3.6-35B-A3B and +10.1 for GPT-5.6 Luna in [3:44]), and the importance of harness design (noting up to a 6× performance difference from changing the harness alone in [3:2]), they do not break down or quantify the individual effect size of each harness component (e.g., specific code elements like waiting behavior, tokenization, or retrieval logic) on end-to-end performance. The analysis focuses on overall harness performance and optimization efficiency, not component-level effect sizes. Therefore, no specific effect size per component can be extracted from the provided text."
+  }
+ ]
+}

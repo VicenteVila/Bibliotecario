@@ -1,0 +1,456 @@
+{
+ "meta": {
+  "golden": "golden_blind_qa_ext.jsonl",
+  "run": "ext_smoke",
+  "judge_model": "openai/gpt-oss-20b",
+  "workers": 5,
+  "providers": [
+   [
+    "nvidia",
+    "openai"
+   ]
+  ],
+  "anchor_grounding": false
+ },
+ "aggregate": {
+  "n": 10,
+  "n_answerable": 9,
+  "n_unanswerable": 1,
+  "judge_model": "openai/gpt-oss-20b",
+  "turns": 4,
+  "retries": 1,
+  "judge_mean": 4.333,
+  "n_scored": 9,
+  "n_judge_errors": 0,
+  "n_infra": 0,
+  "infra_error_ids": [],
+  "cite_precision_mean": 1.0,
+  "cite_coverage_mean": 1.0,
+  "answer_cite_rate": 1.0,
+  "by_difficulty": {
+   "facil": 5.0,
+   "media": 4.0,
+   "dificil": 4.5
+  },
+  "abstain_rate": 0.0,
+  "n_abstain_decided": 1,
+  "n_abstain_errors": 0,
+  "n_fabricated": 1,
+  "latency_median_s": 71,
+  "false_abstention_rate": 0.0,
+  "n_false_abstention": 0,
+  "answer_rate_on_answerable": 1.0,
+  "false_abstention_ids": [],
+  "truncated": 0,
+  "fallbacks": 0,
+  "agent_tokens_total": 246598,
+  "agent_calls_total": 51,
+  "agent_calls_tokens_unknown": 0,
+  "agent_models": [
+   "nvidia/nemotron-3-super-120b-a12b"
+  ],
+  "judge_tokens_total": 10647
+ },
+ "rows": [
+  {
+   "id": "pearl-c3",
+   "doc_id": 1,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 561,
+    "total_tokens": 747,
+    "completion_tokens": 186,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 83,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 41170,
+    "completion_tokens": 485,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 41655,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Based on the evidence from the PEARL paper, for the query triple (Conan O'Brien, gender, Male), the five candidate relation paths with their importance scores in rank order are: Profession link → gender (0.95), Marriage link → gender (0.90), Friendship link → gender (0.85), Religion link → film → gender (0.80), and Influenced by → gender (0.75) [1:39]."
+  },
+  {
+   "id": "pearl-c6",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 604,
+    "total_tokens": 984,
+    "completion_tokens": 380,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 67,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 13551,
+    "completion_tokens": 292,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 13843,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL builds two augmented subgraph views by partitioning the entity node set Vcs into core nodes Venc (intersection of k-hop neighborhoods) and contextual nodes V∆ (complementary set), then independently sampling exactly ⌊|V∆|/2⌋ nodes from V∆ without replacement for each view to form V(a)∆, with each view’s entity node set defined as V(a)cs = Venc ∪ V(a)∆ [1:22][1:23]. Each view draws ⌊|V∆|/2⌋ nodes from the complementary set V∆ [1:22][1:23]."
+  },
+  {
+   "id": "tce-c6",
+   "doc_id": 3,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 572,
+    "total_tokens": 774,
+    "completion_tokens": 202,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 58,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35167,
+    "completion_tokens": 254,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 35421,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "At ρ = 7%, the estimated full-set score (ˆS) has a Spearman rank correlation of 0.13 with true scores, indicating poor ranking ability. The candidate selected by ˆS-max ranks 10th out of 60 candidates by true score, with a true score of 46.4% compared to the best candidate's 47.8%, resulting in a degradation of 1.4 points in true performance relative to the optimal choice. [3:29][3:30]"
+  },
+  {
+   "id": "tce-c8",
+   "doc_id": 3,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 651,
+    "total_tokens": 1132,
+    "completion_tokens": 481,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 75,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 29343,
+    "completion_tokens": 370,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 29713,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "On Terminal-Bench 2.1, replacing the difference estimator with the Hájek estimator leads to unstable estimation. In a Qwen3.6 run with ρ=10%, each candidate is evaluated on three tasks using Equation (3). At iteration 4, the candidate solved only one of the three tasks, with a raw score of 33.3%, but its estimated score was Ŝ = 85.9% [3:39]. This instability occurs because the Hájek estimator does not anchor to historical performance, causing extreme estimates when few tasks are sampled and outcomes are sparse. The difference estimator (Equation 4) avoids this by using the historical performance as an anchor, ensuring that tasks where the new candidate matches the starting harnesses contribute zero to the estimate, thus providing more stable comparisons [3:39]. Therefore, substituting the Hájek estimator for the difference estimator on Terminal-Bench 2.1 results in unstable and unreliable full-set score estimation, degrading the reliability of harness optimization despite reducing evaluation cost. [3:39]"
+  },
+  {
+   "id": "pg-c2",
+   "doc_id": 2,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 652,
+    "total_tokens": 994,
+    "completion_tokens": 342,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 71,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 23199,
+    "completion_tokens": 336,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 23535,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The Procedural Graph relation vocabulary contains four relation types: LEADS_TO, TRIGGERS, PROVIDES_INPUT_FOR, and CONVERGES_TO [2:61]. Across the seven benchmarks, the graphs have between 7 and 17 nodes and between 7 and 27 triplets [2:61]. Specifically: HotpotQA (9 nodes, 9 triplets), MultiChallenge (7 nodes, 7 triplets), GDPval (15 nodes, 22 triplets), ALFWorld (11 nodes, 27 triplets), 𝜏-bench (17 nodes, 18 triplets), BFCL v3 (131 nodes, 265 triplets), and EnterpriseArena (11 nodes, 13 triplets) [2:61]."
+  },
+  {
+   "id": "pg-c5",
+   "doc_id": 2,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 677,
+    "total_tokens": 1038,
+    "completion_tokens": 361,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 55,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 23649,
+    "completion_tokens": 368,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 24017,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "In the HotpotQA self-evolution study, a graph grown from a minimal skeleton (Mode 5) starts with an F1 score of 77.59%, below the expert-initialized graph (Mode 3), but subsequently surpasses it and reaches a peak validation F1 of 83.31% at Generation 10 [2:97]. This shows that evolution from scratch can yield more effective guidance than evolution from a hand-designed expert prior over generations. [2:97] also notes that Mode 5 uses fewer solver steps than expert-initialized modes, indicating improved efficiency. [2:96] confirms that Mode 5 evolves from a minimal skeleton graph (Start → End) with online incremental updates, while Mode 3 evolves from an expert-designed prior. Thus, the self-evolution loop enables the minimal skeleton graph to not only catch up to but exceed the performance of expert-initialized graphs across generations. [2:97]"
+  },
+  {
+   "id": "reas-c4",
+   "doc_id": 4,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 507,
+    "total_tokens": 1248,
+    "completion_tokens": 741,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 89,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 26544,
+    "completion_tokens": 197,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 26741,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The agent diagnosed that its 1752 lines of metaheuristics spent the 16-second budget on search machinery rather than solving the scheduling problem, and it used its reasoning-driven optimization framework to reallocate budget toward actual problem-solving by analyzing outcomes and refining its strategy over long horizons through persistent memory. [4:24]"
+  },
+  {
+   "id": "reas-c8",
+   "doc_id": 4,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 449,
+    "total_tokens": 876,
+    "completion_tokens": 427,
+    "prompt_tokens_details": null
+   },
+   "abstained": false,
+   "fabricated_value": 20,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 72,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 26430,
+    "completion_tokens": 243,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 26673,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The GLM-5 and Kimi-2.5 runs of ReASearch cost less than $20 in API usage per full run, as stated in the paper where it notes that \"In dollar terms, a full ReASearch run costs less than $20 in API usage with standard caching, comparable to the cost reported for GEPA in its public documentation.\" [4:19]"
+  },
+  {
+   "id": "wiki-c2",
+   "doc_id": 5,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 641,
+    "total_tokens": 1113,
+    "completion_tokens": 472,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 76,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 11786,
+    "completion_tokens": 232,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 12018,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The distribution of accepted skill updates across early, mid, and late iterations varies by model and benchmark. Across models, the initial stage (iterations 0–1) accounts for 39%–52% of accepted updates, with substantial fractions continuing into middle and late stages. On SealQA specifically, 33% of accepted updates occur in the middle stage and 28% in the late stage, indicating continued refinement is particularly pronounced there. [5:35]"
+  },
+  {
+   "id": "wiki-c7",
+   "doc_id": 5,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 885,
+    "total_tokens": 1741,
+    "completion_tokens": 856,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 58,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 12545,
+    "completion_tokens": 437,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 12982,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The number of proposed and accepted skill creations and edits, and wiki pattern counts, differ across models as shown in Table 4: Qwen-3.5-4B has 3.1 proposed / 1.6 accepted skill creations, 4.9 proposed / 1.3 accepted skill edits, and 8.8 wiki pattern creations / 18.4 edits; Qwen-3.5-9B has 4.6 / 1.4 skill creations, 3.4 / 0.7 skill edits, and 7.3 wiki pattern creations / 10.9 edits; Qwen-3.6-27B has 4.4 / 1.5 skill creations, 3.6 / 0.8 skill edits, and 6.5 wiki pattern creations / 17.9 edits; Gemma-4-31B has 4.8 / 1.3 skill creations, 3.2 / 0.8 skill edits, and 6.3 wiki pattern creations / 13.7 edits; Gemini-3.5-Flash has 2.3 / 1.2 skill creations, 5.7 / 1.1 skill edits, and 8.9 wiki pattern creations / 7.0 edits [5:36]."
+  }
+ ]
+}

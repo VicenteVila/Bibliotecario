@@ -204,3 +204,64 @@ el residuo es de *discriminacion* con la respuesta presente en el contexto, y qu
 un parche mas del agente no lo ataca. Lo que toca probar despues es del lado de la
 pregunta (una sola sub-pregunta por caso) o de la recuperacion (ranquear el chunk
 dentro del documento, no el documento entero), no del cierre.
+
+---
+
+## Fase r7: ampliacion a 10 papers y medicion de ruido
+
+### Que se hizo
+
+1. **Corpus**: 5 papers ingestaados (docs 6-10), 10 documentos y 842 chunks en total.
+   `doc_id` 1-5 intactos.
+2. **Golden**: 40 preguntas nuevas en `golden_blind_qa_ext2.jsonl`, 8 por paper,
+   35 respondibles y 5 no respondibles, con `evals/validate_golden.py` como puerta
+   (esquema, unicidad, keywords con des-hifenizado, coherencia de `unanswerable`).
+3. **Dos runs completas** del mismo sistema sobre las mismas 40 preguntas: `ext2_r1`
+   (3.686) y `ext2_r2` (3.800) tras corregir 21 preguntas.
+
+### Lo que se aprendio
+
+**1. La causa del residuo era ambiguedad de enunciado, y se repitio por omision.**
+Los docs 6 y 9 son ambos surveys; 16 preguntas decian "the survey". Dos respondieron
+sobre otro documento (`evobench-d2` -> `Task-CoEvolve`; `hsurvey-d6` -> el caso
+`Qwen3.6-27B` de Evo-Bench). Corregido nombrando el survey. `evobench-d2` paso de
+2 a 5. **Regla para todo item nuevo: ninguna pregunta puedeateligir documento; si
+dos papers del corpus podrian responderla, hay que nombrar el paper.**
+
+**2. El ruido entre runs del agente es 0.946 por item, no 1%.** Comparando las 19
+preguntas que no se tocaron entre `ext2_r1` y `ext2_r2`: solo el 62% mantiene la
+misma nota, cambio medio 0.56, maximo 2 puntos. La medicion previa de ruido del
+juez (1%) media otra cosa; lo que fluctua es el sistema completo.
+
+| n | MDE 95% |
+|---|---|
+| 40 | 0.299 |
+| 120 | 0.173 |
+| 200 | 0.134 |
+
+**3. 120 preguntas no bastan para un +0.15.** Hacen falta ~200 con este ruido, o
+un protocolo que lo reduzca. Presentar 4.057 como "puntuacion de referencia"
+seria un error deinterpretacion, no un dato.
+
+### Donde queda margen
+
+- 17 items con juez <= 2 sobre 105 puntuadas.
+- 5 de 14 no respondibles se responden con un valor inventado (`reas-b8`, `reas-c8`,
+  `evobench-d8`, `hal-d8`, `evalsurvey-d8`). La guardia de abstención es el punto
+  mas debil y el mas barato de atacar: no requiere saber la respuesta, solo saber
+  que no esta.
+- Docs con menos recorrido: 5 (3.38), 6 (3.29), 7 (3.57). El doc 1 esta saturado
+  (4.79) y sirve como control, no como medida.
+
+### Decisiones pendientes de ratificar
+
+1. **Ampliar a ~200 preguntas** (los 10 papers, ~20 por paper) para poder validar
+   un +0.15, o
+2. **Cambiar el protocolo a pareado**: misma pregunta, mismo seed de recuperacion,
+   dos sistemas comparados en la misma run, para que el ruido se cancele en la
+   diferencia en vez de sumar en la media. Es mas barato en tokens por pregunta de
+   margen y ataca el problema correcto.
+3. **Juez con 3 replicas en items numericos densos** (`pg-c3`, `reas-c5`,
+   `disclose-d3`, `disclose-d4` ya han mostrado varianza de 2 puntos).
+4. **Atacar la guardia de abstension** como candidato independiente, medido solo
+   sobre las 14 no respondibles.
