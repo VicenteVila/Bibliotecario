@@ -3,7 +3,14 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-_DEFAULT_DATA_DIR = Path("data")
+# Anclado a la raiz del repo, no al cwd. Con Path("data"), lanzar el harness
+# desde otro directorio (p.ej. evals/) creaba data/ vacio en silencio y se
+# evaluaba contra un corpus inexistente en lugar de fallar. Sigue siendo
+# sobreescribible por entorno para los tests y los usos con otra ruta.
+_DEFAULT_DATA_DIR = Path(
+    os.environ.get("BIBLIOTECARIO_DATA_DIR")
+    or Path(__file__).resolve().parent.parent / "data"
+)
 _LLM_MODEL = "gemini-3.6-flash"
 _GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
 # NVIDIA: nemotron-3-super-120b es el que mejor sostiene los prompts largos del loop
