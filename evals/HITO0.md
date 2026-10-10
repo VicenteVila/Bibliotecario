@@ -1,11 +1,11 @@
 # Hito 0 — que el agente no afirme lo que no tiene
 
-Estado a 2026-10-02; **actualizado el 2026-10-10** con la run T0, la primera
-con la temperatura aplicada de verdad. La seccion "Errata" anula la atribucion
-de temperatura de la linea base original. Todos los numeros de aqui son medidos
-sobre `evals/golden_abstention.jsonl` (64 no respondibles, 50 de ellas
-verificadas por sonda contra el corpus) y sobre los goldenes de respondibles
-existentes.
+Estado a 2026-10-02; **actualizado el 2026-10-10** con las runs T0 y T0', las
+primeras con la temperatura aplicada de verdad, y con T0' como replica exacta
+de T0. La seccion "Errata" anula la atribucion de temperatura de la linea base
+original. Todos los numeros de aqui son medidos sobre
+`evals/golden_abstention.jsonl` (64 no respondibles, 50 de ellas verificadas
+por sonda contra el corpus) y sobre los goldenes de respondibles existentes.
 
 ## Errata: la temperatura nunca se aplico
 
@@ -33,12 +33,15 @@ Queda **anulado** como efecto de temperatura:
 
 Lo que **sigue en pie**, porque no depende de la temperatura:
 
-- la fabricacion se mueve **entre 33.9% y 51.6% en runs con la misma
-  configuracion**. Leido bien, eso es evidencia de inestabilidad, no de una
-  palanca;
+- la fabricacion se mueve **dentro de la misma configuracion**: de 33.9% a
+  51.6% entre las dos runs a 0.2, y de 28.1% a 34.4% entre las dos replicadas
+  a 0.0. Leido bien, eso es evidencia de inestabilidad, no de una palanca — y
+  el abanico se estrecha al bajar la temperatura, que es justo lo que mide la
+  seccion de estabilidad;
 - el fallo de `_verify_support`: el flag viaja por variable de entorno, no por
   kwarg, asi que si se aplico. 6 items corregidos contra 13 rotos, p=0.17;
-- el suelo de ruido: ~200 items pareados para un efecto de 15pp;
+- el suelo de ruido: **~200 items pareados a 0.2 y ~122 a 0.0** para un efecto
+  de 15pp;
 - la regresion de respondibles: 0 abstenciones falsas, 0 degenerados, 0
   truncados, 0 fallbacks.
 
@@ -47,12 +50,14 @@ Los dos bugs estan arreglados y con guardian:
 `test_wrap_generate_reenvia_temperature`. **La temperatura ya si se mide**: el
 2026-10-10 se corrio la suite completa con `--temperature 0.0` aplicado de
 verdad (consta ahora en la metadata de `harness_runs`, no solo en el `meta` del
-JSON, que es como se colo el bug).
+JSON, que es como se colo el bug), y se repitio con un segundo `HEAD`
+identico (`T0'`) para poder medir flip.
 
 `--temperature` conserva el default 0.0 porque el protocolo pareado necesita
-reproducibilidad (ver el docstring de `loop.generate`): sin sampling fijo, cada
-run mide otra cosa. Que baje la fabricacion **si esta medido**: ver la linea
-base.
+reproducibilidad (ver el docstring de `loop.generate`). Que bajara la
+fabricacion **quedo medido y descartado**: 28.1% frente a 34.4%, z = 0.97. Lo
+que si toca es la estabilidad, de 30.6% a 17.7% de flip, con p = 0.093. Ver la
+linea base.
 
 ## La metrica
 
@@ -60,10 +65,16 @@ Abstencion binaria, no la nota de 1 a 5. Una respuesta que dice "esto no esta en
 corpus" no es un 2: es el comportamiento correcto, y promediarlo con las
 respuestas buenas lo penaliza. Por eso vive aparte.
 
-Es ademas la unica cifra del proyecto con ruido de juez cero: la decision es
-binaria y no pasa por el LLM-as-a-judge. Con n=64 el margen del IC95 es de
-+/-8.7pp a una tasa de abstencion del 85%, y de +/-11pp a la tasa real de la
-run T0 (71.9% de abstencion, 28.1% de fabricacion).
+Es la unica cifra del proyecto con ruido de juez practicamente nulo. Matiz que
+importa: la decision **si** pasa por un LLM (`judge_abstention`), con lo que la
+formulacion original de este apartado era falsa en el razonamiento. Lo que la
+sostiene es la medida, no la frase: replicado tres veces sobre las mismas 64
+respuestas el juez de abstencion **gira 0/64**, y en el rubrica el juez explica
+el **0.7% de la varianza** (`measure_judge_noise.py`, commit `3f339dc`). La
+cifra es fiable; el ruido es del agente.
+
+Margen del IC95: **+/-8.2pp** con las dos runs a 0.0 combinadas (n=124) y
++/-11pp con una run suelta (n=64).
 
 ## La linea base
 
@@ -72,11 +83,47 @@ run T0 (71.9% de abstencion, 28.1% de fabricacion).
 | run A (`result_abstention_base`) | 0.2 | 32/62 = 51.6% |
 | run B (`result_abst_t0_base`) | 0.2 | 21/62 = 33.9% |
 | **run T0 (`result_abst_t0_applied`)** | **0.0** | **18/64 = 28.1%** |
+| **run T0' (`result_abst_t0_rep2`)** | **0.0** | **22/64 = 34.4%** |
 
-A y B corrieron a 0.2 por el bug de la Errata. **T0, el 2026-10-10, es la primera
-que lleva la temperatura aplicada de verdad.** 64/64 decididas, 0 errores de
-juez, 0 fallbacks, 0 truncados; 2.083.943 tokens de agente, 44.798 de juez,
-latencia mediana 52s. IC95 de la T0: **+/-11.0pp**.
+A y B corrieron a 0.2 por el bug de la Errata. **T0 y T0' son las primeras que
+llevan la temperatura aplicada de verdad**, y T0' es una replica exacta de T0:
+mismo `HEAD` 17269d1 y **cero cambios de `.py`** entre las dos.
+
+T0: 64/64 decididas, 0 errores de juez, 0 fallbacks, 0 truncados; 2083943 tokens
+de agente, 44798 de juez, mediana 52s.
+T0': los mismos 64/64 y los mismos ceros; 2086539 tokens de agente (0.1% de
+diferencia), 46369 de juez, mediana 56s.
+
+**Estimacion combinada a 0.0: 39/124 = 31.5%, IC95 +/-8.2pp.** Esa es la cifra
+contra la que hay que comparar el objetivo, no una de las dos sueltas.
+
+### ¿y la estabilidad? (la medicion que faltaba)
+
+Mismo valor en las dos runs, misma temperatura, mismo codigo: ¿gira?
+
+| par | temperatura real | flip |
+|---|---|---|
+| **T0 vs T0'** | **0.0** | **11/62 = 17.7%** |
+| A vs B | 0.2 | 19/62 = 30.6% |
+
+Sobre los **62 items comunes a las cuatro runs**: el flip baja de 30.6% a 17.7%.
+Direccion correcta, **pero p = 0.093, no significativo**. Y la fabricacion entre
+las dos runs a 0.0 va de 27.4% a 35.5% (z = 0.97), tampoco significativo.
+
+Lo que deja claro:
+
+- **T=0 no alcanza determinismo**: casi una de cada cinco decisiones sigue
+  girando con la temperatura a cero.
+- **T=0 no reduce la fabricacion**: 28.1% y 34.4% son la misma cifra.
+- El efecto sobre la estabilidad apunta bien (17.7% frente a 30.6%) pero con
+  n=62 no se distingue del azar. **Se necesitan mas items, no mas runs.**
+- **Los items que giran son practicamente aleatorios**: de los 12 que giran
+  entre T0 y T0', solo 3 giran tambien entre A y B, cuando por azar se
+  esperarian 3.7. No hay un subconjunto de preguntas inestables al que culpar.
+
+Consecuencia practica: la tasa de discordancia mas baja baja el minimo para
+detectar un efecto de 15pp de ~200 a ~122 items pareados. **Sigue sin salirse
+del rango en el que una run por brazo no sirve.**
 
 Pareadas contra T0 sobre los items comunes y decididos por ambas:
 
@@ -84,14 +131,13 @@ Pareadas contra T0 sobre los items comunes y decididos por ambas:
   **p = 0.0059**;
 - **T0 vs B**: 7 contra 10 — **p = 0.6291**.
 
-Que deja y que no: T0 es significativamente mejor que la run A e
-indistinguible de la run B. Como A y B se diferencian entre si en 17.5pp, **no
-se puede separar el efecto de temperatura del ruido entre brazos**. La
-medicion existe por fin, el signo es favorable: T0 es la mas baja de las tres.
-Pero con n=64 no resuelve la pregunta.
+T0 es significativamente mejor que la run A e indistinguible de la run B. Como
+A y B se diferencian entre si en 17.5pp, **no se puede separar el efecto de
+temperatura del ruido entre brazos**. Con T0' repetido la conclusion se
+sostiene: la temperatura toca un poco la estabilidad y la fabricacion en nada.
 
-El piso sigue siendo grave: en el mejor caso, **una de cada cuatro** no
-respondibles se fabrica. A un objetivo de <=5% le faltan 23pp.
+El piso sigue siendo grave: **mas de una de cada cuatro** no respondibles se
+fabrica. A un objetivo de <=5% le faltan ~26pp.
 
 ## Lo que no funciona
 
@@ -143,28 +189,38 @@ numero.
 
 ## El ruido, que es donde nos hemos quedado 20 horas
 
-La decision de abstencion es **inestable en el 30%**: nueve de treinta
-abstenciones correctas se dan la vuelta entre dos runs. Ampliado a las tres runs
-sobre los 62 items comunes: las tres deciden lo mismo en **31/62 = 50.0%**, y
-las dos que corrieron a 0.2 discrepan entre si en **19/62 = 30.6%**, que es
-exactamente el 30% de siempre. La inestabilidad no es una peculiaridad de la
-primera pareja.
+La decision de abstencion era **inestable en el 30%** entre dos runs a 0.2
+(nueve de treinta abstenciones correctas se dan la vuelta). Ampliado a las
+cuatro runs sobre los 62 items comunes, la cifra queda medida:
 
-**Lo que ha cambiado:** ya no vale que "la comparacion que debia discriminar
-entre sampling y trajectory fue la anulada por la Errata" — se corrio, con la
-temperatura aplicada de verdad (run T0). **Lo que sigue sin aislarse** es la
-atribucion: T0 es un unico brazo a 0.0, y compararla con A o B mezcla el efecto
-de temperatura con el ruido entre brazos. Para separarlos hace falta **una
-segunda run a 0.0** y medir su flip contra T0. Esa es la medicion que falta, y
-cuesta una run.
+| par | temperatura | flip |
+|---|---|---|
+| A vs B | 0.2 | **19/62 = 30.6%** |
+| **T0 vs T0'** | **0.0** | **11/62 = 17.7%** |
 
-Lo que se observa en cualquier caso: en cuanto el primer turno diverge, todo lo
-demas diverge.
+La medicion que faltaba ya esta hecha: se corrio la misma pregunta dos veces a
+temperatura cero, con el mismo `HEAD` y sin cambios de codigo entre medias.
 
-Consecuencia practice: con este ruido, un efecto de 15pp necesita n cercano a 200
-items pareados para llegar a p<0.05 por McNemar. Cualquier palanca futura que
-se mida contra una sola run por arm esta por debajo del suelo de ruido. Ese es
-el motivo real de los cinco fracasos, mas que la calidad de las palancas.
+- **T=0 baja el flip de 30.6% a 17.7%, con p = 0.093.** Ni significativo ni
+  prescindible: hay efecto, no hay muestra para afirmarlo.
+- **T=0 no da determinismo.** Casi una de cada cinco decisiones sigue girando
+  con la temperatura a cero y el codigo identico. La sampling no era la fuente
+  unica, ni siquiera la principal.
+- **La fabricacion no se mueve**: 28.1% y 34.4% entre replicadas, z = 0.97.
+- **El juez descartado**: `measure_judge_noise.py` (commit `3f339dc`) asigna al
+  juez el **0.7% de la varianza**; el 99.3% es del agente. Y el juez de
+  abstencion, replicado 3 veces sobre las mismas 64 respuestas, **gira 0/64**.
+  El ruido es integramente del agente.
+- **Los items inestables no existen como grupo**: de los 12 que giran entre T0
+  y T0', solo 3 giran tambien entre A y B, cuando por azar serian 3.7. No hay
+  un subconjunto de preguntas dificiles al que culpar; la inestabilidad se
+  reparte por todo el conjunto.
+
+Consecuencia practice: con un flip del 17.7%, un efecto de 15pp necesita ~122
+items pareados en vez de ~200. Baja la factura, **pero no sale del rango en el
+que una run por brazo sigue sin servir**. Cualquier palanca futura medida con
+una sola run por brazo sigue por debajo del suelo de ruido — que es el motivo
+real de los cinco fracasos, mas que la calidad de las palancas.
 
 ## El harness ya se puede puntuar
 
@@ -192,11 +248,12 @@ bien. Ahora:
   como tarea (idempotente por `golden_id`) y cada run deja su outcome con
   `harness_run_id`. Antes las dos tablas estaban en 0 y `task_pool` no tenia ni
   un caller, asi que selector y estimator corriran sobre el prior 0.5 vacio.
-  Estado tras la run T0: **73 tareas, 74 outcomes, 74 runs con score**. La
-  diferencia entre 73 y 74 es `pearl-b8`: esta en el set ciego y en la suite de
-  abstencion, asi que se registra una sola tarea (idempotente por `golden_id`)
-  pero deja dos outcomes. No es un duplicado erroneo — el set ciego es mixto
-  por diseno y reutiliza los cinco `-b8`.
+  Estado tras T0 y T0': **73 tareas, 138 outcomes, 138 runs con score**. Las
+  tareas no suben porque los ids ya existian (el registro es idempotente); la
+  diferencia de una entre tareas y la primera ronda de outcomes es `pearl-b8`,
+  que esta en el set ciego y en la suite de abstencion, asi que se registra una
+  sola tarea pero deja dos outcomes. No es un duplicado erroneo — el set ciego
+  es mixto por diseno y reutiliza los cinco `-b8`.
 
 **Condicion, no verificacion:** `task_stats` calcula `p̄` *por tarea*. Con
 `n=1` por golden, `p̄` es 0 o 1 y la varianza es 0 con cualquier umbral. El
@@ -205,35 +262,46 @@ veces. El cableado no sirve de nada si no cambia el habito de lanzar evals.
 
 ## Donde queda
 
-Hito 0 **no cerrado**: con la temperatura aplicada de verdad, **28.1%** (18/64)
-de los no respondibles se fabrica. Sigue siendo inaceptable para un agente de
-investigacion, y a un objetivo de <=5% le faltan 23pp.
+Hito 0 **no cerrado**. Con la temperatura aplicada de verdad y dos runs
+replicadas, **31.5%** (39/124) de los no respondibles se fabrica, IC95
++/-8.2pp. Sigue siendo inaceptable para un agente de investigacion, y a un
+objetivo de <=5% le faltan **~26pp**.
 
 Lo que se sabe ahora que antes no:
 
-- **la temperatura ya esta medida**, y con ella desaparece la unica palanca que
-  se creia certificada y no lo era. El signo es favorable (28.1% < 33.9% <
-  51.6%) pero no separable del ruido entre brazos;
-- hay infraestructura para puntuar runs y para alimentar Task-CoEvolve, pero sin
-  repeticion de evals no genera dato;
-- el suelo de ruido (~200 pareados) explica los cinco fracasos tanto o mas que
-  la calidad de las palancas, y ahora esta confirmado en tres runs: 50% de
-  acuerdo total;
-- **`stray_docs` es el primer correlato de fabricacion que aparece con p<0.05**
-  en una run, y `cite_precision` queda descartado como filtro (11 de 18 en 1.0).
+- **la temperatura ya esta medida y replicada**: baja el flip de 30.6% a 17.7%
+  (p = 0.093) y no toca la fabricacion. Es una palanca **agotada**, no la que
+  iba a cerrar el hito;
+- **el juez esta descartado como fuente de ruido**: 0.7% de la varianza en el
+  rubrica, y 0/64 giros replicando el juez de abstencion sobre las mismas
+  respuestas. Todo el ruido restante es del agente;
+- **no hay items "inestables"**: los que giran entre T0 y T0' son al azar
+  (solape de 3 frente a 3.7 esperados). No se puede estabilizar el conjunto
+  descartando preguntas;
+- hay infraestructura para puntuar runs y para alimentar Task-CoEvolve, pero con
+  `n=1` por golden la varianza es 0 y el selector no tiene nada que elegir;
+- **`stray_docs` es el unico correlato de fabricacion con p<0.05** (64% contra
+  21%, RR 3.1x), y `cite_precision` queda descartado como filtro (11 de 18 en 1.0).
 
 La direccion que la evidencia apoya, en este orden:
 
-1. **Una segunda run a 0.0**, para medir su flip contra T0. Cuesta una run y es
-   lo que separa "la temperatura estabiliza" de "no estabiliza nada". Sin eso,
-   toda palanca futura se vuelve a medir contra un suelo de 30% y a n=200.
-2. **Atacar `stray_docs`**: filtrar o vetar la recuperacion y la cita de
-   documentos fuera del `doc_id` de la pregunta. Es mecanico, no pasa por juez,
-   y su techo asociado en la run T0 son 7 de las 18 fabricaciones — **sin que
-   este probada la causalidad**, porque puede ir al reves.
-3. **Trazabilidad de la run**, que es lo que describe domino 4 ("deliberate
+1. **Atacar `stray_docs`**: el barrido profundo (`_deep_evidence`) vierte
+   enteros los 4 papers con mejor score, y 3 de ellos no tienen nada que ver
+   con la pregunta — es donde el agente encuentra cifras ajenas. Es mecanico,
+   no pasa por juez, y su techo asociado son 7 de las 18 fabricaciones de T0
+   (**sin que este probada la causalidad**, porque puede ir al reves).
+2. **Verificacion determinista de las cifras**: 15 de las 18 fabricaciones
+   llevan un `fabricated_value` concreto. Exigir que toda cifra de la respuesta
+   aparezca en la evidencia entregada, sin LLM y con varianza 0, caza lo que
+   las cuatro puertas LLM ya probadas no cazaron. **Complementa al punto 1**:
+   si la cifra esta en la evidencia porque la metio un papel ajeno, solo
+   sirve la combinacion de los dos.
+3. **Ampliar la suite a n>=122**: con el flip medido, ese es el minimo para
+   que una palanca de 15pp sea detectable. Hoy, con n=64, cualquier comparacion
+   de un run por brazo sigue por debajo del suelo de ruido.
+4. **Trazabilidad de la run**, que es lo que describe domino 4 ("deliberate
    diagnosis, verification"): seedear el primer turno o grabar y reproducir cada
-   paso, para poder ver por que se decide abstenerse en un item y no en otro. Un
-   agente recursivo cuyo primer turno ya es aleatorio no puede pararse a si
+   paso. Un agente recursivo cuyo primer turno ya diverge no puede pararse a si
    mismo a partir de la evidencia. Sigue sin existir.
+
 
