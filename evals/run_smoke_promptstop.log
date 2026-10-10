@@ -1,0 +1,9 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2109.94it/s]
+pearl-u1 prec=0.00 abst=True tok= 69724 fb=False 54s
+pearl-b8 prec=0.00 abst=True tok= 56333 fb=False 63s
+pearl-c8 prec=0.00 abst=True tok= 66796 fb=False 64s
+
+n=3 (respondibles=0, no respondibles=3) modelo_juez=openai/gpt-oss-20b
+abstain_rate=1.0 (decididas=3/3, 0 errores) inventadas=0
+tokens_agente=192853 en 18 llamadas | tokens_juez=1810 | latencia_mediana=63s
+truncadas=0 fallbacks=0 -> result_smoke_promptstop.json

@@ -337,6 +337,14 @@ def _close_prompt(question: str, ctx: str, anclaje: str, best: str, flat: int,
     """Prompt de cierre, en una función aparte para que las sondas offline usen
     exactamente el mismo texto que producción en vez de una copia que se desincroniza.
 
+    Las REGLAS son deliberadamente de dos ramas. Antes el cierre decía "CIERRE
+    OBLIGADO: responde YA" y al mismo tiempo "no inventes cifras": cuando el dato
+    no estaba, la unica salida era inventar un hermano plausible (asi lo describe
+    tambien el comentario de `_ground`). La auditoria de las 40 fabricaciones de
+    T0/T0' lo confirma: en 16 de ellas la cifra existia en el paper correcto sin
+    responder a la pregunta, y en otras 17 el agente contestaba otro tema. El fallo
+    no es que busque mal, es que da por buena la primera coincidencia.
+
     `enumerate_slots=True` antepone el paso de la dirección 2 del análisis:=listar
     lo que la pregunta pide, con su span literal, antes de redactar. A diferencia
     del anclaje (r4, p=0.206) NO restringe la redacción a esos spans: solo obliga
@@ -356,10 +364,13 @@ def _close_prompt(question: str, ctx: str, anclaje: str, best: str, flat: int,
             "\n\nEVIDENCIA REUNIDA:\n" + ctx + anclaje + enum +
             f"\n\nMejor resultado parcial:\n{best or '(ninguno)'}\n"
             f"\nTurnos sin progreso: {flat}.\n"
-            "CIERRE OBLIGADO: responde YA en prosa (máx 150 palabras) usando solo esta evidencia.\n"
+            "CIERRE: redacta en prosa (máx 150 palabras) usando solo esta evidencia.\n"
             "REGLAS DE CIERRE:\n"
-            "- CITA obligatoriamente cada afirmación con el formato [doc_id:chunk] "
-            "(ej. [5:7]).\n"
+            "- Si la evidencia contiene literalmente el dato que pide la pregunta, "
+            "respóndelo y CITA cada afirmación con el formato [doc_id:chunk] (ej. [5:7]).\n"
+            "- Si NO lo contiene, no lo sustituyas por un número parecido ni por una "
+            "descripción general: explica en una frase qué se buscó y que no aparece, y "
+            "cierra sin dar ningún dato por cierto.\n"
             "- La pregunta pide un dato concreto (una cifra, un tope, una regla). "
             "BÚSCA ese dato explícitamente en toda la evidencia, también en el barrido: "
             "no te quedes con el primer chunk parecido.\n"

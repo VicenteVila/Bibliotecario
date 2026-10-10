@@ -1,0 +1,182 @@
+{
+ "meta": {
+  "golden": "golden_abstention.jsonl",
+  "run": "smoke_promptstop",
+  "judge_model": "openai/gpt-oss-20b",
+  "workers": 3,
+  "providers": [
+   [
+    "nvidia",
+    "openai"
+   ]
+  ],
+  "anchor_grounding": true,
+  "temperature": 0.0
+ },
+ "aggregate": {
+  "n": 3,
+  "n_answerable": 0,
+  "n_unanswerable": 3,
+  "judge_model": "openai/gpt-oss-20b",
+  "turns": 4,
+  "retries": 1,
+  "judge_mean": null,
+  "n_scored": 0,
+  "n_judge_errors": 0,
+  "n_infra": 0,
+  "infra_error_ids": [],
+  "cite_precision_mean": null,
+  "cite_coverage_mean": null,
+  "answer_cite_rate": null,
+  "by_difficulty": null,
+  "abstain_rate": 1.0,
+  "n_abstain_decided": 3,
+  "n_abstain_errors": 0,
+  "n_fabricated": 0,
+  "latency_median_s": 63,
+  "false_abstention_rate": null,
+  "n_false_abstention": 0,
+  "answer_rate_on_answerable": null,
+  "false_abstention_ids": [],
+  "truncated": 0,
+  "fallbacks": 0,
+  "agent_tokens_total": 192853,
+  "agent_calls_total": 18,
+  "agent_calls_tokens_unknown": 0,
+  "agent_models": [
+   "nvidia/nemotron-3-super-120b-a12b"
+  ],
+  "judge_tokens_total": 1810
+ },
+ "rows": [
+  {
+   "id": "pearl-b8",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 0,
+   "answer_cites": 0,
+   "n_evid": 4,
+   "cite_ids": [],
+   "evidence_ids": [],
+   "answer_has_cite": false,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 527,
+    "total_tokens": 637,
+    "completion_tokens": 110,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 63,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 56017,
+    "completion_tokens": 316,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 56333,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The question asks for the number of LLM queries issued by the LPRA path retriever during one full training run of PEARL. The provided evidence includes detailed descriptions of PEARL's LPRA module, its use of an LLM-guided path retriever (Qwen3-4B-Instruct), and discussions of training efficiency, ablation studies, and hyperparameters. However, no specific count of LLM queries per training run is stated anywhere in the text. The evidence covers path extraction, ranking, retention (top-M paths), and computational costs, but does not quantify the total LLM queries made by the LPRA retriever over the entire training process. Therefore, the requested numerical answer is not present in the gathered evidence.  [doc:?]",
+   "run_id": "d88567bc139c"
+  },
+  {
+   "id": "pearl-c8",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 0,
+   "answer_cites": 0,
+   "n_evid": 4,
+   "cite_ids": [],
+   "evidence_ids": [],
+   "answer_has_cite": false,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 418,
+    "total_tokens": 557,
+    "completion_tokens": 139,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": true,
+   "fallback": false,
+   "latency_s": 64,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 66553,
+    "completion_tokens": 243,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 66796,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "No se encontró en la evidencia el tiempo de entrenamiento en horas de reloj necesario para que PEARL converja en FB15k-237 V1 en una RTX 4090.  [doc:?]",
+   "run_id": "b86239f17d37"
+  },
+  {
+   "id": "pearl-u1",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 0,
+   "answer_cites": 0,
+   "n_evid": 4,
+   "cite_ids": [],
+   "evidence_ids": [],
+   "answer_has_cite": false,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 462,
+    "total_tokens": 616,
+    "completion_tokens": 154,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 54,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 69460,
+    "completion_tokens": 264,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 69724,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The question asks for the random seed and number of repeated runs used for PEARL results on FB15k-237 V1, but the provided evidence does not contain this information. The evidence includes performance metrics, hyperparameters, and experimental details, but no mention of random seed or repeated run count for PEARL on FB15k-237 V1. Therefore, the requested data cannot be confirmed from the given sources.  [doc:?]",
+   "run_id": "8ce9c60ad76e"
+  }
+ ]
+}
