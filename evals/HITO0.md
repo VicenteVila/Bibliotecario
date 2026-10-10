@@ -1,8 +1,9 @@
 # Hito 0 — que el agente no afirme lo que no tiene
 
 Estado a 2026-10-02; **actualizado el 2026-10-10** con las runs T0 y T0', las
-primeras con la temperatura aplicada de verdad, y con T0' como replica exacta
-de T0. La seccion "Errata" anula la atribucion de temperatura de la linea base
+primeras con la temperatura aplicada de verdad, con T0' como replica exacta de
+T0, y con la run `promptstop`, que baja la fabricacion de los no respondibles a
+**0%**. La seccion "Errata" anula la atribucion de temperatura de la linea base
 original. Todos los numeros de aqui son medidos sobre
 `evals/golden_abstention.jsonl` (64 no respondibles, 50 de ellas verificadas
 por sonda contra el corpus) y sobre los goldenes de respondibles existentes.
@@ -136,8 +137,10 @@ A y B se diferencian entre si en 17.5pp, **no se puede separar el efecto de
 temperatura del ruido entre brazos**. Con T0' repetido la conclusion se
 sostiene: la temperatura toca un poco la estabilidad y la fabricacion en nada.
 
-El piso sigue siendo grave: **mas de una de cada cuatro** no respondibles se
-fabrica. A un objetivo de <=5% le faltan ~26pp.
+El piso deja grave a ese punto del analisis: **mas de una de cada cuatro** no
+respondibles se fabrica, y a un objetivo de <=5% le faltan ~26pp. Es el estado
+que midieron la temperatura y las cinco puertas LLM — **no el final**: al final
+del documento esta lo que si lo cambio.
 
 ## Lo que no funciona
 
@@ -260,48 +263,108 @@ bien. Ahora:
 selector solo se vuelve informativo cuando un mismo golden se observa varias
 veces. El cableado no sirve de nada si no cambia el habito de lanzar evals.
 
+## Lo que si funciona: quitar la orden de contestar
+
+Las cinco intervenciones anteriores fueron puertas LLM encima de un prompt que
+ordenaba fabricar. La causa real estaba en dos lineas que nadie habia revisado:
+
+- `state.py`: *"Maximo 3 llamadas a tools por pregunta; despues responde con lo
+  que tengas"* y *"RESPONDE de inmediato"*;
+- `loop.py`, `_close_prompt`: *"CIERRE OBLIGADO: responde YA"*, junto a
+  *"no inventes cifras que no aparezcan literalmente"*.
+
+Orden contradictorio: responde si o si, pero no inventes. Cuando el dato no
+estaba, la unica salida legal era inventar un hermano plausible — el propio
+comentario de `_ground` ya lo decia.
+
+### La auditoria previa: no busca mal, da por buena la primera coincidencia
+
+Las 40 fabricaciones de T0 y T0' contra la corpus entera (10 papers, 842 chunks):
+
+| donde esta la cifra dada | T0 | T0' | total |
+|---|---|---|---|
+| en el paper objetivo, pero no responde la pregunta | 6 | 10 | **16** |
+| sin cifras: contesta otro tema | 8 | 9 | **17** |
+| solo en otro paper | 3 | 1 | 4 |
+| en ninguna parte | 1 | 1 | 2 |
+| gold + otro | 0 | 1 | 1 |
+
+Hipotesis descartada: solo 4-5 de 40 son respuestas verdaderas de otro paper.
+El caso dominante es que la cifra **si existe en el paper correcto** y no
+contesta lo preguntado, o que el agente contesta otro tema sin cifras.
+
+### El cambio
+
+Quitada la orden de contestar y anadida explicitamente la rama de parada: el
+objetivo de `STATIC_PROMPT` da la abstencion por valida como tercera respuesta,
+y `_close_prompt` pasa de obligado a condicional — si el dato esta literalmente,
+responde y cita; si no, declara que no aparece y cierra sin dar ningun dato.
+
+### El resultado
+
+| run | fabricacion |
+|---|---|
+| T0 | 18/64 = 28.1% |
+| T0' | 22/64 = 34.4% |
+| **`promptstop`** | **0/64 = 0.0%** |
+
+McNemar exacto: **p = 7.6e-06** contra T0 y **p = 4.8e-07** contra T0'. 18 y 22
+corregidas, **0 rotas**: ni una abstencion correcta se perdio ni hubo un giro en
+la direccion contraria. 0 errores de juez, 0 truncados, 0 fallbacks, 2101719
+tokens. El suelo de ruido (flip 17.7%) habria producido giros en ambas
+direcciones; estos son unilaterales.
+
+**Es la primera intervencion con resultado**, y la unica que no anade otra
+puerta: quita una orden en vez de meter un verificador.
+
+### Lo que falta por medir, y por que el hito sigue abierto
+
+La mitad **respondible** no se ha tocado. El mismo prompt que ofrece parar
+puede declarar ausente algo que si esta — exactamente el defecto documentado del
+anclaje en `REPORT_BLIND.md:386`: *"el anclaje no distingue 'el corpus no lo
+contiene' de 'mi retrieval no lo encontro'"*. Y el dato visible es que ahora
+solo 6 de 64 respuestas llevan cita. Es posible que se haya cambiado un
+problema por otro: fabricar en las no respondibles y negarse en las
+respondibles.
+
+Ademas se midio el coste de la otra via, `ANCHOR_GROUNDING`: funciona (smoke
+3/3 abstenciones) pero cuesta 64284 tokens/pregunta frente a 32561, casi el
+doble (~3.9M la suite). Queda apagado por defecto.
+
 ## Donde queda
 
-Hito 0 **no cerrado**. Con la temperatura aplicada de verdad y dos runs
-replicadas, **31.5%** (39/124) de los no respondibles se fabrica, IC95
-+/-8.2pp. Sigue siendo inaceptable para un agente de investigacion, y a un
-objetivo de <=5% le faltan **~26pp**.
+**La fabricacion esta resuelta en el terreno donde se mide**: **0%** (0/64)
+frente al 31.5% (39/124) de las dos replicadas, p <= 4.8e-07, sin perdidas. El
+objetivo de <=5% se cumple.
 
-Lo que se sabe ahora que antes no:
+**El hito sigue abierto por la otra mitad**, que no se ha medido con el nuevo
+prompt. Hasta que no corra `golden_blind_qa` con este mismo codigo no se puede
+afirmar que el agente responda lo que tiene y calle lo que no: de momento solo
+esta demostrado que calle lo que no tiene.
 
-- **la temperatura ya esta medida y replicada**: baja el flip de 30.6% a 17.7%
-  (p = 0.093) y no toca la fabricacion. Es una palanca **agotada**, no la que
-  iba a cerrar el hito;
-- **el juez esta descartado como fuente de ruido**: 0.7% de la varianza en el
-  rubrica, y 0/64 giros replicando el juez de abstencion sobre las mismas
-  respuestas. Todo el ruido restante es del agente;
-- **no hay items "inestables"**: los que giran entre T0 y T0' son al azar
-  (solape de 3 frente a 3.7 esperados). No se puede estabilizar el conjunto
-  descartando preguntas;
-- hay infraestructura para puntuar runs y para alimentar Task-CoEvolve, pero con
-  `n=1` por golden la varianza es 0 y el selector no tiene nada que elegir;
-- **`stray_docs` es el unico correlato de fabricacion con p<0.05** (64% contra
-  21%, RR 3.1x), y `cite_precision` queda descartado como filtro (11 de 18 en 1.0).
+Los puntos 1 y 2 que estaban escritos aqui (veto de `stray_docs` y
+verificacion determinista de cifras) **quedan refutados por preview offline,
+sin gastar tokens**. Tres variantes medidas sobre el cache de barridos:
 
-La direccion que la evidencia apoya, en este orden:
+- recortar `_deep_evidence` a 1 doc pierde el paper objetivo en el 47%
+  (77% -> 53%) y aun asi deja papers ajenos;
+- exigir que la cifra este en la evidencia entera caza 1-2 de 18-22;
+- exigir que este solo en el trozo citado caza 7 de 40 (17.5%) pero rompe el
+  12% de las respuestas correctas (6 runs, 6.5%-20%).
 
-1. **Atacar `stray_docs`**: el barrido profundo (`_deep_evidence`) vierte
-   enteros los 4 papers con mejor score, y 3 de ellos no tienen nada que ver
-   con la pregunta — es donde el agente encuentra cifras ajenas. Es mecanico,
-   no pasa por juez, y su techo asociado son 7 de las 18 fabricaciones de T0
-   (**sin que este probada la causalidad**, porque puede ir al reves).
-2. **Verificacion determinista de las cifras**: 15 de las 18 fabricaciones
-   llevan un `fabricated_value` concreto. Exigir que toda cifra de la respuesta
-   aparezca en la evidencia entregada, sin LLM y con varianza 0, caza lo que
-   las cuatro puertas LLM ya probadas no cazaron. **Complementa al punto 1**:
-   si la cifra esta en la evidencia porque la metio un papel ajeno, solo
-   sirve la combinacion de los dos.
-3. **Ampliar la suite a n>=122**: con el flip medido, ese es el minimo para
-   que una palanca de 15pp sea detectable. Hoy, con n=64, cualquier comparacion
-   de un run por brazo sigue por debajo del suelo de ruido.
-4. **Trazabilidad de la run**, que es lo que describe domino 4 ("deliberate
-   diagnosis, verification"): seedear el primer turno o grabar y reproducir cada
-   paso. Un agente recursivo cuyo primer turno ya diverge no puede pararse a si
-   mismo a partir de la evidencia. Sigue sin existir.
+Mismo motivo que la auditoria: la evidencia esta llena de numeros reales de
+papers equivocados, asi que cualquier cifra "se verifica" sola, y al recortar
+para arreglarlo se pierde el paper bueno.
+
+Pendiente, en orden:
+
+1. **Run sobre respondibles con el nuevo prompt** (~1.3M). Es lo unico que
+   puede refutar el cambio. Sin ella el hito no se cierra.
+2. **Trazabilidad de la run** (domino 4, "deliberate diagnosis,
+   verification"): seedear el primer turno o grabar y reproducir cada paso.
+   Un agente cuyo primer turno diverge no puede pararse a si mismo a partir de
+   la evidencia. Sigue sin existir.
+3. **Ampliar la suite a n>=122** solo si alguna palanca futura se espera
+   pequena. Para efectos grandes como el de ahora, n=64 ha bastado con creces.
 
 
