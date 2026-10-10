@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Cachear embeddings
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface
+          key: hf-all-MiniLM-L6-v2-${{ runner.os }}
+
+      - name: Instalar
+        run: python -m pip install -e ".[dev]"
+
+      - name: ruff
+        run: python -m ruff check .
+
+      # `python -m pytest` (no el binario `pytest`): evals/ no es un paquete
+      # instalado, así que necesita el cwd en sys.path.
+      - name: pytest
+        run: python -m pytest -q
+        env:
+          PYTHONPATH: .

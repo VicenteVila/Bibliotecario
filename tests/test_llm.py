@@ -107,6 +107,11 @@ def test_proveedor_agotado_se_aparca(tmp_path, monkeypatch):
 
 
 def test_cooldown_escalona_hasta_1h(monkeypatch):
+    # _mark_dead no aparcada con un solo proveedor (n<3 → reintenta), así que sin
+    # este arreglo el test solo pasaba con un .env de dos claves en el cwd: en un
+    # clon limpio o en CI, donde no hay .env, fallaba con KeyError.
+    monkeypatch.setattr(LLM, "_providers",
+                        lambda: [("nvidia", "openai"), ("gemini", "gemini")])
     LLM._mark_dead("nvidia")
     b1 = LLM._DEAD_UNTIL["nvidia#b"]
     LLM._mark_dead("nvidia")

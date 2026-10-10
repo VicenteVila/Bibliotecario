@@ -24,6 +24,10 @@ def rows():
 
 @pytest.fixture(scope="module")
 def corpus():
+    # data/ esta en .gitignore: en un clon limpio o en CI no existe la corpus, y
+    # estos dos test no pueden comprobar nada sin ella. Se saltan, no fallan.
+    if not (data_dir() / "bibliotecario.db").exists():
+        pytest.skip("sin data/bibliotecario.db: no se puede contrastar con la corpus")
     conn = sqlite3.connect(f"file:{data_dir() / 'bibliotecario.db'}?mode=ro", uri=True)
     try:
         return {
