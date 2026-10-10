@@ -1,0 +1,515 @@
+{
+ "meta": {
+  "golden": "golden_blind_qa.jsonl",
+  "run": "",
+  "judge_model": "openai/gpt-oss-20b",
+  "workers": 5,
+  "providers": [
+   [
+    "nvidia",
+    "openai"
+   ]
+  ],
+  "anchor_grounding": false,
+  "temperature": 0.0
+ },
+ "aggregate": {
+  "n": 10,
+  "n_answerable": 9,
+  "n_unanswerable": 1,
+  "judge_model": "openai/gpt-oss-20b",
+  "turns": 4,
+  "retries": 1,
+  "judge_mean": 5.0,
+  "n_scored": 9,
+  "n_judge_errors": 0,
+  "n_infra": 0,
+  "infra_error_ids": [],
+  "cite_precision_mean": 0.944,
+  "cite_coverage_mean": 1.0,
+  "answer_cite_rate": 1.0,
+  "by_difficulty": {
+   "facil": 5.0,
+   "media": 5.0,
+   "dificil": 5.0
+  },
+  "abstain_rate": 1.0,
+  "n_abstain_decided": 1,
+  "n_abstain_errors": 0,
+  "n_fabricated": 0,
+  "latency_median_s": 52,
+  "false_abstention_rate": 0.0,
+  "n_false_abstention": 0,
+  "answer_rate_on_answerable": 1.0,
+  "false_abstention_ids": [],
+  "truncated": 0,
+  "fallbacks": 0,
+  "agent_tokens_total": 238746,
+  "agent_calls_total": 50,
+  "agent_calls_tokens_unknown": 0,
+  "agent_models": [
+   "nvidia/nemotron-3-super-120b-a12b"
+  ],
+  "judge_tokens_total": 7658
+ },
+ "rows": [
+  {
+   "id": "pearl-b1",
+   "doc_id": 1,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 5,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:0",
+    "1:1",
+    "1:6",
+    "1:32",
+    "1:43"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 473,
+    "total_tokens": 620,
+    "completion_tokens": 147,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 51,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 13239,
+    "completion_tokens": 207,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 13446,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL evaluates on the inductive knowledge graph completion benchmarks WN18RR, FB15k-237, and NELL-995, as stated in the abstract and experimental sections of the paper. [1:0] [1:1] [1:6] [1:32] [1:43]",
+   "run_id": "70771ff9fd56"
+  },
+  {
+   "id": "pearl-b2",
+   "doc_id": 1,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:29"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 433,
+    "total_tokens": 569,
+    "completion_tokens": 136,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 53,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 14563,
+    "completion_tokens": 172,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 14735,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The hidden dimension d used for node, relation, and path embeddings in PEARL is fixed to 32. [1:29]",
+   "run_id": "899dbb38bcbf"
+  },
+  {
+   "id": "pearl-b3",
+   "doc_id": 1,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 0.5,
+   "cite_coverage": 1.0,
+   "stray_docs": 1,
+   "answer_cites": 3,
+   "n_evid": 4,
+   "cite_ids": [
+    "0:1",
+    "1:17",
+    "1:53"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 479,
+    "total_tokens": 992,
+    "completion_tokens": 513,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 46,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 12701,
+    "completion_tokens": 200,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 12901,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL uses Qwen3-4B-Instruct as its LLM-based path retriever and assigns importance scores in the range [0:1] to candidate paths [1:17][1:53].",
+   "run_id": "c231d3a4e98f"
+  },
+  {
+   "id": "pearl-b4",
+   "doc_id": 1,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:29"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 506,
+    "total_tokens": 758,
+    "completion_tokens": 252,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 52,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 14597,
+    "completion_tokens": 229,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 14826,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL uses L = 3 message-passing layers for CSNN and LB = 3 for BGNN, the maximum relational path length is set to Lm = 2, and the R-GAT employs H = 2 attention heads [1:29].",
+   "run_id": "f4f41766fdbc"
+  },
+  {
+   "id": "pearl-b5",
+   "doc_id": 1,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:15"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 518,
+    "total_tokens": 801,
+    "completion_tokens": 283,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 46,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 36649,
+    "completion_tokens": 260,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 36909,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "From V1 to V4, the average number of paths increases from 2.7 to 15.1, and the share of >10 paths increases from 4.05% to 29.19% [1:15].",
+   "run_id": "3b6a1633b5ea"
+  },
+  {
+   "id": "pearl-b6",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:31"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 508,
+    "total_tokens": 736,
+    "completion_tokens": 228,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 54,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 38879,
+    "completion_tokens": 286,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 39165,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL reports relative improvements of 8.67% on WN18RR, 6.01% on FB15k-237, and 3.20% on NELL-995 in average Hits@10 over the strongest competing methods [1:31].",
+   "run_id": "d712863a0db2"
+  },
+  {
+   "id": "pearl-b7",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:63",
+    "1:64"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 738,
+    "total_tokens": 998,
+    "completion_tokens": 260,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 56,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 20600,
+    "completion_tokens": 458,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 21058,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Based on the evidence from the PEARL paper, the hyperparameter values selected for WN18RR, FB15k-237, and NELL-995 are as follows:\n\n- **WN18RR**: batch size = 8, learning rate = 0.001, subgraph hop size k = 4, retained paths M = 3  \n- **FB15k-237**: batch size = 32, learning rate = 0.0005, subgraph hop size k = 3, retained paths M = 3  \n- **NELL-995**: batch size = 8, learning rate = 0.001, subgraph hop size k = 2, retained paths M = 5  \n\nThese values are explicitly stated in Table 7 of the paper, which summarizes the dataset-specific hyperparameter settings adopted for all datasets based on validation performance on the V1 subsets. [1:63] [1:64]",
+   "run_id": "41bddfad2af1"
+  },
+  {
+   "id": "pearl-b8",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:17",
+    "1:16"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 519,
+    "total_tokens": 828,
+    "completion_tokens": 309,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 56,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 30225,
+    "completion_tokens": 311,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 30536,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The LPRA path retriever issues one LLM query per candidate path during training, as it evaluates each path's semantic support for the query triple using the LLM-based retriever [1:17]. Since the number of candidate paths varies across inductive settings (e.g., average 2.7 paths in V1, up to 15.1 in V4) [1:16], the total number of LLM queries per training run depends on the sum of candidate paths across all training triples, which is not explicitly stated in the provided evidence. Therefore, the exact total number of LLM queries issued by the LPRA path retriever during one full training run of PEARL cannot be determined from the given information.",
+   "run_id": "170b1e97fce8"
+  },
+  {
+   "id": "pg-b1",
+   "doc_id": 2,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "cite_ids": [
+    "2:88"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 496,
+    "total_tokens": 757,
+    "completion_tokens": 261,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 55,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34594,
+    "completion_tokens": 206,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 34800,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The construction-strategy experiments are powered by the frozen Gemini 3.5 Flash model snapshot, and to make tool-calling reasoning deterministic, the sampling temperature is set to 0 and top-k sampling is configured with k=1, enforcing greedy decoding across all model calls [2:88].",
+   "run_id": "fe379d962a54"
+  },
+  {
+   "id": "pg-b2",
+   "doc_id": 2,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "cite_ids": [
+    "2:88"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 451,
+    "total_tokens": 599,
+    "completion_tokens": 148,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 46,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 20205,
+    "completion_tokens": 165,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 20370,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The maximum generation length is locked at 2,048 tokens for the agent and 8,192 tokens for the evolutionary refiner [2:88].",
+   "run_id": "1bb7d7176941"
+  }
+ ]
+}

@@ -264,7 +264,12 @@ def run_one(q: dict, turns: int, temperature: float | None = None,
     if run_id:
         get_harness().record_score(
             run_id, run_score(row),
-            {"eval_id": row["id"], "score_source": "abstention" if unanswerable else "judge"})
+            {"eval_id": row["id"], "score_source": "abstention" if unanswerable else "judge",
+             # Se graba lo que este proceso pidio, no lo que meta dice pedir: era
+             # exactamente la confusion que escondio el bug (--temperature aparecia
+             # en meta con 0.0 mientras los dos brazos corrian a 0.2). None =
+             # sin fijar, o sea el default del backend en llm.py.
+             "temperature": temperature})
     if task_id is not None:
         # None = sin dato (infra o juez no parseable): no se registra outcome y
         # la tarea sigue sin observar, que es como task_stats aplica el prior 0.5.

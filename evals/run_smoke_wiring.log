@@ -1,0 +1,20 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2672.26it/s]
+pearl-b5 prec=1.00 judge=5 tok= 36909 fb=False 46s
+pearl-b1 prec=1.00 judge=5 tok= 13446 fb=False 51s
+pearl-b4 prec=1.00 judge=5 tok= 14826 fb=False 52s
+pearl-b2 prec=1.00 judge=5 tok= 14735 fb=False 53s
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2257.34it/s]
+pearl-b3 prec=0.50 judge=5 tok= 12901 fb=False 46s
+pearl-b6 prec=1.00 judge=5 tok= 39165 fb=False 54s
+pg-b1    prec=1.00 judge=5 tok= 34800 fb=False 55s
+pearl-b8 prec=1.00 abst=True tok= 30536 fb=False 56s
+pearl-b7 prec=1.00 judge=5 tok= 21058 fb=False 56s
+pg-b2    prec=1.00 judge=5 tok= 20370 fb=False 46s
+
+n=10 (respondibles=9, no respondibles=1) modelo_juez=openai/gpt-oss-20b
+judge=5.0 (n=9/9, 0 errores)  por dificultad={'facil': 5.0, 'media': 5.0, 'dificil': 5.0}
+cite_precision=0.944 cite_coverage=1.0 con_cita=1.0
+abstencion_falsa=0.0 [] (respondidas=1.0)
+abstain_rate=1.0 (decididas=1/1, 0 errores) inventadas=0
+tokens_agente=238746 en 50 llamadas | tokens_juez=7658 | latencia_mediana=52s
+truncadas=0 fallbacks=0 -> result_smoke_wiring.json

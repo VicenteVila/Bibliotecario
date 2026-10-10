@@ -538,14 +538,22 @@ def test_run_one_puntua_la_run_en_harness_runs(monkeypatch):
     from bibliotecario.core import storage
     from bibliotecario.harness.runtime import get_harness
 
+    recibido = {}
+
     def fake_run(q, **kw):
+        recibido.update(kw)
         rid = get_harness().start_run({"question": q})
         return {"answer": "Respuesta [1:0]", "evidence": [], "turns": 1, "run_id": rid}
 
     _prepara_eval(monkeypatch, fake_run)
     row = H.run_one({"id": "a1", "question": "q", "reference": "r",
-                     "answerable_docs": [1]}, turns=4)
+                     "answerable_docs": [1]}, turns=4, temperature=0.0)
     assert row["run_id"], "la fila debe poder auditar contra harness_runs"
+
+    # Eslabon que no cubria ningun test: run_one -> LOOP.run. El bug de la
+    # temperatura estaba justo aqui, y sus dos guardianes solo cubrian main().
+    assert recibido.get("temperature") == 0.0, (
+        f"run_one no paso temperature a LOOP.run: {recibido!r}")
 
     with storage.get_conn() as conn:
         r = conn.execute("SELECT score, metadata FROM harness_runs WHERE id=?",
@@ -555,6 +563,9 @@ def test_run_one_puntua_la_run_en_harness_runs(monkeypatch):
     assert meta["eval_id"] == "a1"                 # qué golden produjo este score
     assert meta["question"] == "q"                 # finish_run fusiona, no pisa
     assert meta["score_source"] == "judge"
+    # Debe poderse consultar en la BD a que temperatura corrio la run, sin
+    # tener que confiar en el meta del JSON (que decia 0.0 mientras corría 0.2).
+    assert meta["temperature"] == 0.0
 
 
 def test_run_one_sin_run_id_no_toca_la_bd(monkeypatch):
