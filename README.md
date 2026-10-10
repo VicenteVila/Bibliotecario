@@ -20,8 +20,10 @@ Interfaz: **librería + CLI** (sin bot/API/dashboard).
 Base portada: **Asubarnipal** (commit `50a37b5`), con 10 bugs corregidos (detallados en el historial):
 tabla `embeddings` huérfana eliminada, ponderación híbrida unificada (0.5/0.3/0.2),
 upserts con `ON CONFLICT` que preservan FKs y metadata, sin FAISS duplicado,
-harness habilitado por defecto con runs persistidos, precondiciones PF tolerantes
-(clave plana y anidada), FallbackPF a Gemini, PFs cableados al loop.
+harness habilitado por defecto con runs persistidas y **puntuadas** (`record_score`
+escribe el score 0-1 desde la eval, `validation_tasks`/`task_outcomes` pobladas
+por golden), precondiciones PF tolerantes (clave plana y anidada), FallbackPF a
+Gemini, PFs cableados al loop.
 
 ## Quickstart
 

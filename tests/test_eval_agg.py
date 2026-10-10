@@ -7,6 +7,7 @@ ciñan las dos cosas.
 """
 import json
 import sys
+from pathlib import Path
 
 import pytest
 
@@ -467,3 +468,204 @@ def test_reanudar_rehace_las_filas_de_infra():
     done = {r["id"] for r in survived}
     assert done == {"a1", "a3"}                 # pg-b4 se rehace
     assert "pg-b4" not in done
+
+
+# --- score del harness -------------------------------------------------------
+
+def test_run_score_normaliza_las_dos_poblaciones():
+    """Una sola escala 0-1: sin ella, judge 1-5 y abstención bool no se comparan."""
+    assert H.run_score({"judge": 5, "unanswerable": False}) == 1.0
+    assert H.run_score({"judge": 4, "unanswerable": False}) == 0.75
+    assert H.run_score({"judge": 3, "unanswerable": False}) == 0.5
+    assert H.run_score({"judge": 1, "unanswerable": False}) == 0.0
+    # El juez da 0 en fallback: sin clamp, (0-1)/4 = -0.25, por debajo del mínimo.
+    assert H.run_score({"judge": 0, "unanswerable": False}) == 0.0
+    assert H.run_score({"unanswerable": True, "abstained": True}) == 1.0
+    assert H.run_score({"unanswerable": True, "abstained": False}) == 0.0
+    # Sin dato, no se inventa número.
+    assert H.run_score({"unanswerable": True, "abstained": None}) is None
+    assert H.run_score({"judge": None, "unanswerable": False}) is None
+    assert H.run_score({"judge": 5, "infra_error": "RuntimeError: 504"}) is None
+
+
+def test_run_success_umbral_4_y_exige_cita():
+    """El 3 de la rúbrica es 'falta O altera el dato principal': no es acierto."""
+    ok = {"judge": 5, "unanswerable": False, "answer_has_cite": True}
+    assert H.run_success(ok) is True
+    assert H.run_success({**ok, "judge": 4}) is True
+    assert H.run_success({**ok, "judge": 3}) is False
+    assert H.run_success({**ok, "judge": 2}) is False
+    # La rúbrica prohíbe al juez valorar citas: es lo único que no puede ver.
+    assert H.run_success({**ok, "answer_has_cite": False}) is False
+    assert H.run_success({"unanswerable": True, "abstained": True}) is True
+    assert H.run_success({"unanswerable": True, "abstained": False}) is False
+    assert H.run_success({"judge": None, "unanswerable": False}) is None
+    assert H.run_success({"judge": 5, "infra_error": "RuntimeError: 504"}) is None
+
+
+def test_umbral_de_exito_no_satura_el_bernoulli():
+    """p̄ necesita varianza: saturado, task_stats da 1.0 siempre y selector no elige."""
+    import glob
+
+    rows = []
+    for f in glob.glob(str(H.EVALS / "result_blind*.json")):
+        rows += [r for r in json.loads(Path(f).read_text(encoding="utf-8"))["rows"]
+                 if not r.get("unanswerable") and not r.get("infra_error")
+                 and r.get("judge") is not None]
+    if len(rows) < 100:          # sin histórico (corpus mínimo) no hay nada que mirar
+        pytest.skip("sin histórico de runs")
+    p = sum(1 for r in rows if H.run_success(r)) / len(rows)
+    assert 0.1 < p < 0.9, f"success={p:.3f} con {len(rows)} runs: p̄ saturado"
+
+
+def _prepara_eval(monkeypatch, fake_run, fake_judge_score=5):
+    from bibliotecario.harness.runtime import reset_harness
+
+    reset_harness()
+    monkeypatch.setattr(H.LLM, "reset_usage", lambda: None)
+    monkeypatch.setattr(H.LLM, "usage_totals",
+                        lambda: {"total_tokens": 1, "calls": 1, "calls_tokens_unknown": 0})
+    monkeypatch.setattr(H.LOOP, "run", fake_run)
+    if fake_judge_score is not None:
+        monkeypatch.setattr(H, "judge",
+                            lambda q, ref, a, **k: {"score": fake_judge_score,
+                                                    "verdict": "", "model": "m",
+                                                    "usage": {}, "error": None})
+
+
+def test_run_one_puntua_la_run_en_harness_runs(monkeypatch):
+    """El loop no tiene juez: sin este cable, harness_runs.score se queda en NULL."""
+    from bibliotecario.core import storage
+    from bibliotecario.harness.runtime import get_harness
+
+    def fake_run(q, **kw):
+        rid = get_harness().start_run({"question": q})
+        return {"answer": "Respuesta [1:0]", "evidence": [], "turns": 1, "run_id": rid}
+
+    _prepara_eval(monkeypatch, fake_run)
+    row = H.run_one({"id": "a1", "question": "q", "reference": "r",
+                     "answerable_docs": [1]}, turns=4)
+    assert row["run_id"], "la fila debe poder auditar contra harness_runs"
+
+    with storage.get_conn() as conn:
+        r = conn.execute("SELECT score, metadata FROM harness_runs WHERE id=?",
+                         (row["run_id"],)).fetchone()
+    assert r["score"] == 1.0                       # (5-1)/4
+    meta = json.loads(r["metadata"])
+    assert meta["eval_id"] == "a1"                 # qué golden produjo este score
+    assert meta["question"] == "q"                 # finish_run fusiona, no pisa
+    assert meta["score_source"] == "judge"
+
+
+def test_run_one_sin_run_id_no_toca_la_bd(monkeypatch):
+    """Lo que separa un test de una escritura: sin run_id no hay fila que puntuar."""
+    from bibliotecario.core import storage
+
+    def fake_run(q, **kw):
+        return {"answer": "x [1:0]", "evidence": [], "turns": 1}
+
+    _prepara_eval(monkeypatch, fake_run)
+    with storage.get_conn() as conn:
+        before = conn.execute("SELECT COUNT(*) c FROM harness_runs").fetchone()["c"]
+    row = H.run_one({"id": "a1", "question": "q", "reference": "r",
+                     "answerable_docs": [1]}, turns=4)
+    assert row["run_id"] is None
+    with storage.get_conn() as conn:
+        after = conn.execute("SELECT COUNT(*) c FROM harness_runs").fetchone()["c"]
+    assert before == after
+
+
+def test_run_one_registra_outcome_en_task_outcomes(monkeypatch):
+    """validation_tasks estaba en 0: Task-CoEvolve no tenía de qué calcular p̄."""
+    from bibliotecario.coevolve import task_pool
+    from bibliotecario.harness.runtime import get_harness
+
+    def fake_run(q, **kw):
+        return {"answer": "x [1:0]", "evidence": [], "turns": 1,
+                "run_id": get_harness().start_run({"question": q})}
+
+    _prepara_eval(monkeypatch, fake_run)
+    tid = task_pool.get_or_add_task("q", "qa", "r", "a1",
+                                    json.dumps({"golden_id": "a1"}))
+    H.run_one({"id": "a1", "question": "q", "reference": "r",
+               "answerable_docs": [1]}, turns=4, task_id=tid)
+
+    stats = task_pool.task_stats()
+    assert stats == [{"id": tid, "pbar": 1.0, "n": 1}]
+    # y no se duplica la tarea al repetir
+    assert task_pool.get_or_add_task("q", "qa", "r", "a1",
+                                     json.dumps({"golden_id": "a1"})) == tid
+    assert task_pool.count() == 1
+
+
+def test_run_one_infra_no_registra_outcome(monkeypatch):
+    """Sin dato no hay outcome: la tarea sigue sin observar y task_stats aplica 0.5."""
+    from bibliotecario.coevolve import task_pool
+    from bibliotecario.core import storage
+    from bibliotecario.harness.runtime import get_harness
+
+    def fake_run(q, **kw):
+        return {"answer": "", "evidence": [], "turns": 0,
+                "run_id": get_harness().start_run({"question": q})}
+
+    _prepara_eval(monkeypatch, fake_run, fake_judge_score=None)
+    tid = task_pool.get_or_add_task("q", "qa", "r", "a1",
+                                    json.dumps({"golden_id": "a1"}))
+    row = H.run_one({"id": "a1", "question": "q", "reference": "r",
+                     "answerable_docs": [1]}, turns=4, task_id=tid)
+
+    assert row["infra_error"], "respuesta vacía debe clasificarse como infra"
+    assert task_pool.task_stats() == [{"id": tid, "pbar": 0.5, "n": 0}]
+    with storage.get_conn() as conn:
+        r = conn.execute("SELECT score FROM harness_runs WHERE id=?", (row["run_id"],)).fetchone()
+    assert r["score"] is None, "infraestructura no es un 0, es 'no medido'"
+
+
+# --- guardias de los bugs de temperatura ------------------------------------
+
+def test_wrap_generate_reenvia_temperature():
+    """El wrapper original era (p, max_tokens, retries): reventaba con temperature."""
+    llamadas = []
+
+    def gen(p, max_tokens=512, retries=2, temperature=None):
+        llamadas.append((max_tokens, retries, temperature))
+        return "ok"
+
+    w = H._wrap_generate(7, gen)
+    assert w("p", max_tokens=900, temperature=0.0) == "ok"
+    assert llamadas == [(900, 7, 0.0)]
+    w("p", retries=1, temperature=1.0)
+    assert llamadas[-1] == (512, 1, 1.0)
+
+
+def test_temperature_llega_a_run_one_en_las_dos_ramas(tmp_path, monkeypatch):
+    """Guardián del bug que anuló el contraste de temperatura.
+
+    `ex.submit(run_one, q, args.turns)` no llevaba temp_kw. Como todas las runs
+    se lanzan con --workers > 1, --temperature se registraba en meta y no se
+    aplicaba: los dos brazos del pareado corrieron los dos a 0.2 y comparaban
+    0.2 con 0.2.
+    """
+    seen = []
+
+    def spy(q, turns, temperature=None, task_id=None, **kw):
+        seen.append(temperature)
+        return _row(q["id"], 5)
+
+    monkeypatch.setattr(H, "run_one", spy)
+    monkeypatch.setattr(H.LOOP, "STRICT_FALLBACK", True)
+    monkeypatch.setattr(H.LOOP, "generate", lambda *a, **k: "{}")
+    monkeypatch.setattr(H, "_wrap_generate", lambda r, g: g)
+
+    for workers in ("2", "1"):
+        seen.clear()
+        monkeypatch.setattr(sys, "argv",
+                            ["eval_end2end.py", "--golden", "golden_blind_qa.jsonl",
+                             "--ids", "pearl-b1,pearl-b2", "--turns", "4",
+                             "--workers", workers, "--temperature", "0.0",
+                             "--out", str(tmp_path / f"r{workers}.json")])
+        H.main()
+        assert len(seen) == 2, f"workers={workers}: {len(seen)} llamadas"
+        assert seen == [0.0, 0.0], (
+            f"workers={workers}: --temperature no viajó (llegó {seen!r}). "
+            "La rama paralela no pasaba temp_kw.")

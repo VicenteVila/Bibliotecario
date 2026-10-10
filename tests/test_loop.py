@@ -278,3 +278,86 @@ def test_verificacion_apagada_por_defecto(monkeypatch):
     assert LOOP.VERIFY_CITATION is False
     LOOP._final_answer("q", "", ["ev"], 0)
     assert len(llamadas) == 1
+
+
+def test_key_insights_no_lleva_la_pregunta(tmp_path, monkeypatch):
+    """275 de 275 lecciones tenían `Q: <pregunta>` en key_insights.
+
+    La columna no contenía insights, contenía la pregunta, y load_lessons la
+    inyectaba en el prompt: en producción cada run veía las 5 últimas preguntas
+    del corpus.
+    """
+    db = tmp_path / "li.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    with storage.get_conn(db) as conn:
+        conn.execute("INSERT INTO documents (path, title, paper_hash) VALUES (?,?,?)",
+                     ("f", "Doc", "h1"))
+
+    script = ['```json\n{"tool": "get_status", "args": {}}\n```',
+              "Ya está: hay 1 documento.",
+              "Hay 1 documento [1:0]."]
+    monkeypatch.setattr(LOOP, "generate", lambda *a, **k: script.pop(0) if script else "Fin.")
+    guardada = {}
+    monkeypatch.setattr(LOOP.REF, "save_lesson", lambda *a, **k: guardada.update(k))
+
+    from bibliotecario.harness import runtime as RT
+    RT.reset_harness()
+    import bibliotecario.harness.pfs as PFS
+    monkeypatch.setattr(PFS, "_registry", None)
+
+    LOOP.run("¿cuántos documentos hay?", max_turns=5)
+
+    assert guardada, "sin isolated=True debe escribir la lección"
+    ki = guardada["key_insights"]
+    assert "Q:" not in ki, f"el prefijo antiguo sigue ahí: {ki!r}"
+    assert "documentos" not in ki, f"la pregunta se filtra: {ki!r}"
+    assert "turnos" in ki, f"debe decir qué pasó, no qué se preguntó: {ki!r}"
+
+
+def test_run_cierra_la_run_si_el_bucle_lanza(tmp_path, monkeypatch):
+    """87 de 1121 runs se quedaron con finished_at NULL.
+
+    La excepción se escapaba sin pasar por finish_run. Ahora va en finally.
+    """
+    db = tmp_path / "fin.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+
+    def boom(*a, **k):
+        raise RuntimeError("revienta aquí dentro")
+
+    monkeypatch.setattr(LOOP, "generate", boom)
+
+    from bibliotecario.harness import runtime as RT
+    RT.reset_harness()
+    import bibliotecario.harness.pfs as PFS
+    monkeypatch.setattr(PFS, "_registry", None)
+
+    with pytest.raises(RuntimeError, match="revienta"):
+        LOOP.run("q", max_turns=3)
+
+    with storage.get_conn(db) as conn:
+        rows = conn.execute("SELECT finished_at FROM harness_runs").fetchall()
+    assert len(rows) == 1
+    assert rows[0]["finished_at"] is not None, "la run quedó huérfana"
+
+
+def test_run_sin_iteraciones_no_escribe_turnos_negativos(tmp_path, monkeypatch):
+    """turn=-1 antes del bucle: sin eso, max_turns=0 reventaría con NameError."""
+    db = tmp_path / "nt.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    monkeypatch.setattr(LOOP, "generate", lambda *a, **k: "Fin.")
+    monkeypatch.setattr(LOOP.REF, "save_lesson", lambda *a, **k: None)
+
+    from bibliotecario.harness import runtime as RT
+    RT.reset_harness()
+    import bibliotecario.harness.pfs as PFS
+    monkeypatch.setattr(PFS, "_registry", None)
+
+    r = LOOP.run("q", max_turns=0)
+    assert r["turns"] == 0
+    with storage.get_conn(db) as conn:
+        row = conn.execute("SELECT metadata FROM harness_runs").fetchone()
+    assert json.loads(row["metadata"])["turns"] == 0

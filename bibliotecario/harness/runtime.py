@@ -2,6 +2,10 @@
 
 Fixes vs origen: harness habilitado por defecto; runs persistidos en harness_runs
 (corrige 'cero persistencia'); estado PF consultable para validación Task-CoEvolve.
+
+harness_runs.score se rellena desde fuera con record_score(): el loop no tiene
+juez. Un score NULL significa "nadie lo midió", no "fue 0", y por eso las runs
+de infraestructura se quedan sin puntuar en lugar de bajar la media.
 """
 from __future__ import annotations
 
@@ -21,6 +25,18 @@ from bibliotecario.harness.layers import (
 from bibliotecario.harness.pfs import SkillProgramRegistry, get_pf_registry
 
 logger = logging.getLogger(__name__)
+
+
+def _read_metadata(conn, run_id: str) -> dict:
+    """Metadata ya escrita de una run. Nunca lanza: un JSON roto no debe tumbar un UPDATE."""
+    row = conn.execute("SELECT metadata FROM harness_runs WHERE id=?", (run_id,)).fetchone()
+    if row is None:
+        return {}
+    try:
+        data = json.loads(row["metadata"] or "{}")
+    except ValueError:
+        return {}
+    return data if isinstance(data, dict) else {}
 
 
 class RuntimeHarness:
@@ -64,9 +80,37 @@ class RuntimeHarness:
         return rid
 
     def finish_run(self, run_id: str, score: float | None, metadata: dict | None = None) -> None:
+        """Cierra la run. Fusiona la metadata en vez de sobrescribirla.
+
+        Antes el UPDATE pisaba la que start_run escribió, así que la `question`
+        desaparecía y una fila de harness_runs era anónima: un score sin saber
+        qué pregunta lo produjo no sirve para auditar nada.
+        """
         with storage.get_conn() as conn:
+            merged = _read_metadata(conn, run_id)
+            merged.update(metadata or {})
             conn.execute("UPDATE harness_runs SET finished_at=datetime('now'), score=?, metadata=? WHERE id=?",
-                         (score, json.dumps(metadata or {}, ensure_ascii=False), run_id))
+                         (score, json.dumps(merged, ensure_ascii=False), run_id))
+
+    def record_score(self, run_id: str, score: float | None,
+                     metadata: dict | None = None) -> bool:
+        """Escribe el score que una evaluación calculó fuera del loop.
+
+        El loop no tiene juez, así que el score siempre viene de fuera y solo
+        cuando alguien evalúa. Devuelve False si la run no existe: el caller
+        decide si eso es un problema, no el harness.
+
+        Solo toca la fila de `run_id`, así que con `--workers 5` (cada hilo con
+        su run) no hay carrera: una run nunca escribe la de otra.
+        """
+        with storage.get_conn() as conn:
+            if conn.execute("SELECT 1 FROM harness_runs WHERE id=?", (run_id,)).fetchone() is None:
+                return False
+            merged = _read_metadata(conn, run_id)
+            merged.update(metadata or {})
+            conn.execute("UPDATE harness_runs SET score=?, metadata=? WHERE id=?",
+                         (score, json.dumps(merged, ensure_ascii=False), run_id))
+        return True
 
     def stats(self) -> dict[str, Any]:
         return {"interventions": self._interventions, "pfs": self.pfs.stats(),

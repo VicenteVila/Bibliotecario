@@ -40,6 +40,8 @@ sys.path.insert(0, str(EVALS.parent))
 
 import bibliotecario.core.llm as LLM
 from bibliotecario.agent import loop as LOOP
+from bibliotecario.coevolve import task_pool
+from bibliotecario.harness.runtime import get_harness
 from bibliotecario.ingest import citations_format as CITE_FMT
 from evals.judge import JUDGE_MODEL, judge, judge_abstention
 
@@ -73,6 +75,60 @@ _ABSTAIN_WORDS = re.compile(
 
 def looks_abstained(answer: str) -> bool:
     return bool(_ABSTAIN_WORDS.search(answer or ""))
+
+
+# Umbral de éxito de una run: 0.75 = (4-1)/4, la frontera que la rúbrica del juez
+# marca entre "correcta" (4) y "parcialmente correcta" (3). Un 3 significa
+# literalmente "falta O altera el dato principal pedido", así que para un agente
+# de investigación no es un acierto: aceptarlo certificaría como buena una
+# respuesta que se equivoca en lo que se preguntó.
+# Medido sobre 313 runs (media 4.23): juez>=3 da p=0.847 (var 0.130) y juez>=2
+# da p=0.971 (var 0.028, saturado: task_stats daría p̄~1 siempre y el selector
+# de varianza de Task-CoEvolve no tendría nada que elegir). juez>=4 da
+# p=0.725, var 0.199. No se eligió juez>=5 aunque su varianza es mayor (0.216)
+# porque rechazaría como fallo una respuesta que la rúbrica define como correcta.
+SUCCESS_MIN_SCORE = 0.75
+
+
+def run_score(row: dict) -> float | None:
+    """Score 0-1 de la run, o None si no hay dato. Una sola escala para dos poblaciones.
+
+    Respondibles: (judge-1)/4 con clamp. El juez devuelve 0 en fallback, y sin
+    clamp eso daría -0.25: un fallo de infraestructura no puede puntuar por
+    debajo del mínimo de la escala.
+    No respondibles: 1.0 si se abstuvo, 0.0 si fabricó. Meter una abstención en
+    la rúbrica 1-5 la castigaría por comportarse bien, que es el error que este
+    harness ya cometió.
+    Infraestructura: None, igual que aggregate la saca de la media. NULL significa
+    "nadie lo midió", no "fue 0".
+    """
+    if row.get("infra_error"):
+        return None
+    if row.get("unanswerable"):
+        abst = row.get("abstained")
+        return None if abst is None else (1.0 if abst else 0.0)
+    judge = row.get("judge")
+    if judge is None:
+        return None
+    return min(1.0, max(0.0, (judge - 1) / 4))
+
+
+def run_success(row: dict) -> bool | None:
+    """Si la run hizo lo correcto. None si no hay dato (no se registra outcome).
+
+    En respondibles exige además cita. La rúbrica prohíbe al juez valorarlas
+    ("No premies la longitud, el estilo ni las citas"), así que es una dimensión
+    que el juez no puede ver por diseño, y una respuesta correcta sin atribución
+    no es auditable en un agente de investigación. Coste medido: 1 run de 313.
+    """
+    score = run_score(row)
+    if score is None:
+        return None
+    if score < SUCCESS_MIN_SCORE:
+        return False
+    if row.get("unanswerable"):
+        return True
+    return bool(row.get("answer_has_cite"))
 
 
 def citation_metrics(q: dict, answer: str, evidence: list) -> dict:
@@ -121,13 +177,18 @@ def _classify_run_error(e: Exception) -> str:
     return msg
 
 
-def run_one(q: dict, turns: int, temperature: float | None = None) -> dict:
+def run_one(q: dict, turns: int, temperature: float | None = None,
+            task_id: int | None = None) -> dict:
     """Ejecuta una pregunta y devuelve su fila. No lanza: todo error va a la fila.
 
     Trampa: el pineo de proveedor (LLM_PROVIDERS) lo pone main(), no este
     módulo. Si se llama a run_one() desde un script suelto sin fijar la variable,
     el round-robin usa Gemini y la fila se mezcla con los runs de la eval. Para
     eso está --provider en la CLI; desde código, fija LLM_PROVIDERS antes.
+
+    `task_id` es el validation_task que esta pregunta representa: con él, cada
+    run deja un outcome en task_outcomes y task_stats() deja de dar 0.5 por
+    defecto. Es opcional porque los dobles de test no lo tienen.
     """
     LLM.reset_usage()
     t0 = time.time()
@@ -136,9 +197,11 @@ def run_one(q: dict, turns: int, temperature: float | None = None) -> dict:
     # identica a la de siempre y los dobles que la sustituyen siguen valiendo.
     temp_kw = {} if temperature is None else {"temperature": temperature}
     try:
-        # isolated=True: sin lecciones. Si no, el prompt lleva las 5 últimas,
-        # que incluyen el texto de otras preguntas del golden (key_insights
-        # = "Q: <pregunta>") y la eval deja de ser ciega.
+        # isolated=True: sin lecciones. key_insights ya no lleva la pregunta
+        # (arreglado en _trajectory_fingerprint), pero sin aislamiento una fila
+        # del batch hereda las lecciones de la anterior y el resultado pasa a
+        # depender del orden en que los hilos dejan filas, que es otra forma de
+        # que la medida no sea repetible.
         r = LOOP.run(q["question"], max_turns=turns, isolated=True, **temp_kw)
     except Exception as e:
         infra_error = _classify_run_error(e)
@@ -180,19 +243,36 @@ def run_one(q: dict, turns: int, temperature: float | None = None) -> dict:
     else:
         j = judge(q["question"], q["reference"], ans)
 
-    return {"id": q["id"], "doc_id": q.get("doc_id"), "difficulty": q.get("difficulty"),
-            "unanswerable": unanswerable, "turns": r.get("turns"), **cm,
-            "answer_has_cite": CITE_FMT.has_citation(ans),
-            "truncated": ans.rstrip().endswith("[…truncado]"),
-            "judge": j.get("score"), "judge_error": j.get("error"),
-            "infra_error": infra_error,
-            "judge_model": j.get("model"), "judge_usage": j.get("usage"),
-            "abstained": j.get("abstained"),
-            "fabricated_value": j.get("fabricated_value"),
-            "looks_abstained": looks_abstained(ans),
-            "fallback": fallback, "latency_s": round(time.time() - t0),
-            "agent_usage": usage,
-            "answer": ans}  # respuesta completa: los 400 chars impedían auditar
+    row = {"id": q["id"], "doc_id": q.get("doc_id"), "difficulty": q.get("difficulty"),
+           "unanswerable": unanswerable, "turns": r.get("turns"), **cm,
+           "answer_has_cite": CITE_FMT.has_citation(ans),
+           "truncated": ans.rstrip().endswith("[…truncado]"),
+           "judge": j.get("score"), "judge_error": j.get("error"),
+           "infra_error": infra_error,
+           "judge_model": j.get("model"), "judge_usage": j.get("usage"),
+           "abstained": j.get("abstained"),
+           "fabricated_value": j.get("fabricated_value"),
+           "looks_abstained": looks_abstained(ans),
+           "fallback": fallback, "latency_s": round(time.time() - t0),
+           "agent_usage": usage,
+           "answer": ans}  # respuesta completa: los 400 chars impedían auditar
+
+    # El loop no tiene juez, así que el score de harness_runs solo puede
+    # escribirse aquí. Sin run_id no hay fila que puntuar y NO se toca la BD:
+    # es lo que separa un test de una escritura en producción.
+    run_id = r.get("run_id")
+    if run_id:
+        get_harness().record_score(
+            run_id, run_score(row),
+            {"eval_id": row["id"], "score_source": "abstention" if unanswerable else "judge"})
+    if task_id is not None:
+        # None = sin dato (infra o juez no parseable): no se registra outcome y
+        # la tarea sigue sin observar, que es como task_stats aplica el prior 0.5.
+        ok = run_success(row)
+        if ok is not None:
+            task_pool.record_outcome(task_id, ok, run_id or "")
+
+    return {**row, "run_id": run_id}
 
 
 def aggregate(out: list, turns: int, retries: int) -> dict:
@@ -282,6 +362,21 @@ def aggregate(out: list, turns: int, retries: int) -> dict:
     return agg
 
 
+def _wrap_generate(retries_default: int, gen):
+    """Fija --retries y conserva cualquier otro kwarg, temperature incluida.
+
+    El lambda original era `(p, max_tokens, retries)` y no aceptaba `temperature`:
+    aunque main() la hubiera pasado, `generate(..., temperature=0.0)` reventaba con
+    TypeError. Se tapaba con el otro bug (la rama paralela no pasaba temp_kw), que
+    impedía que este llegara a ejecutarse nunca. Juntos, la consecuencia silenciosa
+    fue que NINGUNA run del corpus llegó a fijar temperatura: todos los brazos
+    corrieron a 0.2, el default del backend.
+    """
+    def _wrap(p, max_tokens=512, retries=None, **kw):
+        return gen(p, max_tokens, retries_default if retries is None else retries, **kw)
+    return _wrap
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--limit", type=int, default=0)
@@ -315,9 +410,7 @@ def main() -> None:
     # conteste con Gemini: la media mezclaría dos modelos y seguiría pareciendo
     # válida. Con strict_fallback la pregunta queda como fallida y se ve.
     LOOP.STRICT_FALLBACK = True
-    _gen = LOOP.generate  # conserva strict_fallback del wrapper
-    LOOP.generate = lambda p, max_tokens=512, retries=None: _gen(
-        p, max_tokens, args.retries if retries is None else retries)
+    LOOP.generate = _wrap_generate(args.retries, LOOP.generate)
 
     rows = [json.loads(l) for l in (EVALS / args.golden).read_text().splitlines() if l.strip()]
     if args.ids:
@@ -325,6 +418,18 @@ def main() -> None:
         rows = [q for q in rows if q["id"] in want]
     if args.limit:
         rows = rows[:args.limit]
+
+    # Cada golden es una tarea de validación. Sin esto validation_tasks se
+    # quedaba en 0 y Task-CoEvolve era código que nadie invocaba: task_stats()
+    # no tenía nada de qué calcular p̄ y selector/estimator corrían sobre un
+    # prior 0.5 vacío. Idempotente por golden_id, así que reanudar o repetir la
+    # eval no duplica tareas ni reparte p̄ entre duplicados.
+    task_ids: dict[str, int] = {}
+    for q in rows:
+        task_ids[q["id"]] = task_pool.get_or_add_task(
+            q["question"], "qa", q.get("reference", ""), q["id"],
+            json.dumps({"golden_id": q["id"], "difficulty": q.get("difficulty"),
+                        "unanswerable": bool(q.get("unanswerable"))}, ensure_ascii=False))
 
     rp = EVALS / args.out
     out, done = [], set()
@@ -370,12 +475,19 @@ def main() -> None:
 
     if args.workers > 1:
         with ThreadPoolExecutor(max_workers=args.workers) as ex:
-            futs = {ex.submit(run_one, q, args.turns): q for q in todo}
+            # **temp_kw va AQUÍ y no solo en la rama serie: sin él, --temperature
+            # se registraba en meta pero no se aplicaba nunca, y como todo se
+            # ejecuta con --workers > 1, NINGUNA run del corpus llegó a fijar
+            # temperatura. Medido: los dos brazos del contraste pareado corrieron
+            # los dos a 0.2 (el default del backend), así que comparaban 0.2 con
+            # 0.2 y la diferencia no era de temperatura.
+            futs = {ex.submit(run_one, q, args.turns, task_id=task_ids[q["id"]],
+                              **temp_kw): q for q in todo}
             for f in as_completed(futs):
                 emit(f.result())
     else:
         for q in todo:
-            emit(run_one(q, args.turns, **temp_kw))
+            emit(run_one(q, args.turns, task_id=task_ids[q["id"]], **temp_kw))
 
     merged_map = {r["id"]: r for r in out}
     merged_map.update(results)

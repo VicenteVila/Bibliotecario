@@ -15,6 +15,25 @@ def add_task(task_text: str, kind: str, expected_answer: str = "", metadata: str
         return cur.lastrowid
 
 
+def get_or_add_task(task_text: str, kind: str, expected_answer: str = "",
+                    golden_id: str = "", metadata: str = "") -> int:
+    """Devuelve la tarea de un golden, creándola solo si no existe.
+
+    Sin esto, cada pasada de eval duplicaba los mismos goldens y p̄ se repartía
+    entre tareas distintas que medían lo mismo. Idempotente por `golden_id`,
+    que va dentro de metadata como JSON.
+    """
+    if golden_id:
+        with storage.get_conn() as conn:
+            row = conn.execute(
+                "SELECT id FROM validation_tasks WHERE kind=? AND metadata IS NOT NULL "
+                "AND json_extract(metadata, '$.golden_id')=?",
+                (kind, golden_id)).fetchone()
+            if row is not None:
+                return row["id"]
+    return add_task(task_text, kind, expected_answer, metadata)
+
+
 def record_outcome(task_id: int, success: bool, harness_run_id: str = "") -> None:
     with storage.get_conn() as conn:
         conn.execute("INSERT INTO task_outcomes (task_id, harness_run_id, success) VALUES (?,?,?)",

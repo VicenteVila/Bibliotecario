@@ -1,3 +1,4 @@
+import json
 
 from bibliotecario.agent.loop import parse_tool_call
 from bibliotecario.harness.pfs import get_pf_registry
@@ -66,3 +67,65 @@ def test_agent_tools_status(tmp_path, monkeypatch):
     storage.init_db(db)
     st = get_status()
     assert st["documents"] == 0 and "nodes" in st
+
+
+def test_finish_run_fusiona_metadata_en_las_de_sobre_escribirla(tmp_path, monkeypatch):
+    """start_run guarda la pregunta; finish_run no puede borrarla.
+
+    Antes el UPDATE pisaba toda la clave, así que la `question` desaparecía y una
+    fila de harness_runs era anónima: score sin saber qué pregunta lo produjo.
+    """
+    from bibliotecario.core import storage
+    from bibliotecario.harness.runtime import RuntimeHarness
+
+    db = tmp_path / "m.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    h = RuntimeHarness()
+    rid = h.start_run({"question": "¿cuántos documentos hay?"})
+    h.finish_run(rid, None, {"turns": 3, "tools": 2})
+    h.record_score(rid, 0.75, {"eval_id": "pearl-b1"})
+
+    with storage.get_conn(db) as conn:
+        row = conn.execute("SELECT score, metadata FROM harness_runs WHERE id=?",
+                           (rid,)).fetchone()
+    meta = json.loads(row["metadata"])
+    assert row["score"] == 0.75
+    # Las tres claves de tres fases distintas conviven.
+    assert meta["question"] == "¿cuántos documentos hay?"
+    assert meta["turns"] == 3 and meta["tools"] == 2
+    assert meta["eval_id"] == "pearl-b1"
+
+
+def test_record_score_desconocido_no_escribe(tmp_path, monkeypatch):
+    """Devuelve False en vez de inventar una fila."""
+    from bibliotecario.core import storage
+    from bibliotecario.harness.runtime import RuntimeHarness
+
+    db = tmp_path / "n.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    h = RuntimeHarness()
+    assert h.record_score("no-existe", 1.0) is False
+    with storage.get_conn(db) as conn:
+        assert conn.execute("SELECT COUNT(*) c FROM harness_runs").fetchone()["c"] == 0
+
+
+def test_record_score_soporta_metadata_rota(tmp_path, monkeypatch):
+    """Un JSON corrupto no debe tumbar el UPDATE del score."""
+    from bibliotecario.core import storage
+    from bibliotecario.harness.runtime import RuntimeHarness
+
+    db = tmp_path / "r.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    h = RuntimeHarness()
+    rid = h.start_run()
+    with storage.get_conn(db) as conn:
+        conn.execute("UPDATE harness_runs SET metadata='no-es-json' WHERE id=?", (rid,))
+    assert h.record_score(rid, 1.0, {"eval_id": "x"}) is True
+    with storage.get_conn(db) as conn:
+        row = conn.execute("SELECT score, metadata FROM harness_runs WHERE id=?",
+                           (rid,)).fetchone()
+    assert row["score"] == 1.0
+    assert json.loads(row["metadata"])["eval_id"] == "x"

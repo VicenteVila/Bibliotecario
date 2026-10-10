@@ -86,3 +86,32 @@ def test_background_cycle_sin_llm(tmp_path, monkeypatch):
     rep = BG.run_cycle()
     assert rep["consolidate"]["forgotten"] == 0
     assert "refine" in rep
+
+
+def test_get_or_add_task_idempotente(tmp_path, monkeypatch):
+    """Repetir la eval no debe duplicar tareas: p̄ se repartiría entre duplicados."""
+    import json
+
+    db = tmp_path / "ga.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    a = TP.get_or_add_task("pregunta", "qa", "ref", "wiki-1",
+                           json.dumps({"golden_id": "wiki-1"}))
+    b = TP.get_or_add_task("pregunta", "qa", "ref", "wiki-1",
+                           json.dumps({"golden_id": "wiki-1"}))
+    assert a == b
+    assert TP.count() == 1
+    c = TP.get_or_add_task("otra", "qa", "ref", "wiki-2",
+                           json.dumps({"golden_id": "wiki-2"}))
+    assert c != a
+    assert TP.count() == 2
+
+
+def test_get_or_add_task_sin_golden_id_duplica_a_proposito(tmp_path, monkeypatch):
+    """Sin golden_id no hay por qué deduplicar: dos tareas distintas sin identidad."""
+    db = tmp_path / "ga2.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    a = TP.get_or_add_task("p", "qa", "r")
+    b = TP.get_or_add_task("p", "qa", "r")
+    assert a != b

@@ -488,16 +488,34 @@ def _synthesize(question: str, retries: int = 1) -> str:
     return "" if out.startswith("(extractivo)") else out
 
 
+def _trajectory_fingerprint(turn: int, evidence: list, answer: str) -> str:
+    """Huella de la trayectoria, sin la pregunta.
+
+    Antes key_insights era `Q: <texto de la pregunta>`: las 5 lecciones que
+    load_lessons() inyecta en el prompt llevaban el texto de preguntas
+    anteriores, así que una run veía el golden de las demás. Ahora la columna
+    dice qué pasó (turnos, herramientas, si citó), que es lo que una run
+    siguiente puede reutilizar, y no qué se preguntó.
+    """
+    tools = sorted({e.split("(", 1)[0] for e in evidence if isinstance(e, str) and "(" in e})
+    cite = "con citas" if CITE_FMT.has_citation(answer) else "sin citas"
+    return f"{turn + 1} turnos · {', '.join(tools[:6]) or 'sin tools'} · {cite}"
+
+
 def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
         temperature: float | None = None) -> dict:
     """Responde una pregunta.
 
     `isolated=True` corta el aprendizaje: no lee lecciones guardadas ni escribe
-    una nueva. Es obligatorio en evaluación. Sin esto el prompt incluye las 5
-    lecciones más recientes, cuyo key_insights es `Q: <texto de la pregunta>`,
-    así que el agente ve preguntas anteriores del propio golden set: la eval deja
-    de ser ciega y cada run hereda las preguntas del run anterior, con lo que la
-    varianza medida mezcla ruido del modelo con deriva del estado.
+    una nueva. Es obligatorio en evaluación.
+
+    La razón original era que key_insights llevaba `Q: <pregunta>`, con lo que
+    el prompt de cada run incluía preguntas anteriores del propio golden set y
+    la eval dejaba de ser ciega. Eso ya está arreglado en _trajectory_fingerprint,
+    pero `isolated=True` sigue siendo obligatorio por una segunda razón: sin él,
+    una fila hereda las lecciones de la anterior dentro del mismo batch, así que
+    el resultado dependería del orden en que se ejecuten y la run no sería
+    repetible.
     """
     harness = get_harness()
     harness.calibrate(tool_schemas())
@@ -509,91 +527,99 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
     failed, succeeded = [], []
     last_call = ""
 
-    for turn in range(max_turns):
-        lessons = "" if isolated else load_lessons()
-        prompt = (ST.STATIC_PROMPT + "\n\n" + ST.render_state(question, evidence, history,
-                                                              lessons, flat, best))
-        out = generate(prompt, max_tokens=1024, **_temp_kw(temperature))
-        transcript.append(f"T{turn}: {out[:500]}")
-        if not out:
-            harness.record_error("loop")
-            flat += 1
-            history.append("turno vacío (fallo LLM)")
-            continue
-        name, args = parse_tool_call(out)
-        if name is None:
-            if _toolish(out):
-                # Parecía una llamada pero inválida (tool inexistente o JSON roto): feedback, no respuesta.
+    turn = -1  # si el bucle no llega a iterar, el finally sigue sabiendo los turnos
+
+    try:
+        for turn in range(max_turns):
+            lessons = "" if isolated else load_lessons()
+            prompt = (ST.STATIC_PROMPT + "\n\n" + ST.render_state(question, evidence, history,
+                                                                  lessons, flat, best))
+            out = generate(prompt, max_tokens=1024, **_temp_kw(temperature))
+            transcript.append(f"T{turn}: {out[:500]}")
+            if not out:
                 harness.record_error("loop")
                 flat += 1
-                msg = ("llamada inválida: emite EXACTAMENTE "
-                       '{"tool": nombre, "args": {...}} con un tool del catálogo (no sueltes args sin "tool")')
+                history.append("turno vacío (fallo LLM)")
+                continue
+            name, args = parse_tool_call(out)
+            if name is None:
+                if _toolish(out):
+                    # Parecía una llamada pero inválida (tool inexistente o JSON roto): feedback, no respuesta.
+                    harness.record_error("loop")
+                    flat += 1
+                    msg = ("llamada inválida: emite EXACTAMENTE "
+                           '{"tool": nombre, "args": {...}} con un tool del catálogo (no sueltes args sin "tool")')
+                    history.append(msg)
+                    failed.append(msg)
+                    continue
+                # Una respuesta en prosa no se acepta cruda: pasa por el cierre forzado
+                # para que corra el barrido profundo y se exijan las citas. Aceptarla
+                # aqui saltaba media pipeline (medido: 2.273 vs 4.551 de media).
+                draft = CITE_FMT.normalize_citations(out.strip())
+                answer = (_final_answer(question, draft, evidence, flat, retries=1,
+                                           **_temp_kw(temperature))
+                          or _fix_truncation(draft))
+                harness.record_action("loop", {"tool": "final_answer", "args": {"turn": turn}})
+                succeeded.append(f"respuesta final en turno {turn}")
+                break
+            if name == "":
+                harness.record_error("loop")
+                flat += 1
+                msg = ('llamada malformada: falta la clave "tool". Formato: '
+                       '{"tool": nombre, "args": {...}}')
                 history.append(msg)
                 failed.append(msg)
                 continue
-            # Una respuesta en prosa no se acepta cruda: pasa por el cierre forzado
-            # para que corra el barrido profundo y se exijan las citas. Aceptarla
-            # aqui saltaba media pipeline (medido: 2.273 vs 4.551 de media).
-            draft = CITE_FMT.normalize_citations(out.strip())
-            answer = (_final_answer(question, draft, evidence, flat, retries=1,
-                                       **_temp_kw(temperature))
-                      or _fix_truncation(draft))
-            harness.record_action("loop", {"tool": "final_answer", "args": {"turn": turn}})
-            succeeded.append(f"respuesta final en turno {turn}")
-            break
-        if name == "":
-            harness.record_error("loop")
-            flat += 1
-            msg = ('llamada malformada: falta la clave "tool". Formato: '
-                   '{"tool": nombre, "args": {...}}')
-            history.append(msg)
-            failed.append(msg)
-            continue
-        call_sig = f"{name}:{sorted(args.items())}"
-        v = harness.validate_call(name, args, tool_schemas())
-        if not v.valid:
-            harness.record_error("loop")
-            flat += 1
-            history.append(f"{name} inválida: {v.error}")
-            failed.append(f"{name} inválida: {v.error}")
-            continue
-        for pf in harness.apply_pfs({"last_action": {"status": "ok"}, "task": {"type": "research"},
-                                     "attempt_count": turn, "max_attempts": max_turns}):
-            history.append(f"[PF {pf['pf']}] {pf.get('message', '')}")
-        try:
-            result = TOOLS[name]["fn"](**v.canonicalized["arguments"])
-            result_s = json.dumps(result, ensure_ascii=False, default=str)[:3000]
-        except TypeError as e:
-            harness.record_error("loop")
-            history.append(f"{name} args incorrectos: {e}")
-            failed.append(f"{name} args: {e}")
-            flat += 1
-            continue
-        harness.record_action("loop", {"tool": name, "args": args})
-        history.extend(harness.regulate("loop"))
-        history.append(f"{name} → {result_s[:220]}")
-        evidence.append(f"{name}({','.join(f'{k}={v}' for k, v in args.items())}): {result_s[:220]}")
-        succeeded.append(f"{name} ok")
-        if call_sig == last_call:
-            flat += 1
+            call_sig = f"{name}:{sorted(args.items())}"
+            v = harness.validate_call(name, args, tool_schemas())
+            if not v.valid:
+                harness.record_error("loop")
+                flat += 1
+                history.append(f"{name} inválida: {v.error}")
+                failed.append(f"{name} inválida: {v.error}")
+                continue
+            for pf in harness.apply_pfs({"last_action": {"status": "ok"}, "task": {"type": "research"},
+                                         "attempt_count": turn, "max_attempts": max_turns}):
+                history.append(f"[PF {pf['pf']}] {pf.get('message', '')}")
+            try:
+                result = TOOLS[name]["fn"](**v.canonicalized["arguments"])
+                result_s = json.dumps(result, ensure_ascii=False, default=str)[:3000]
+            except TypeError as e:
+                harness.record_error("loop")
+                history.append(f"{name} args incorrectos: {e}")
+                failed.append(f"{name} args: {e}")
+                flat += 1
+                continue
+            harness.record_action("loop", {"tool": name, "args": args})
+            history.extend(harness.regulate("loop"))
+            history.append(f"{name} → {result_s[:220]}")
+            evidence.append(f"{name}({','.join(f'{k}={v}' for k, v in args.items())}): {result_s[:220]}")
+            succeeded.append(f"{name} ok")
+            if call_sig == last_call:
+                flat += 1
+            else:
+                flat = 0
+                best = result_s[:220]
+            last_call = call_sig
         else:
-            flat = 0
-            best = result_s[:220]
-        last_call = call_sig
-    else:
-        # Presupuesto agotado: sintetizar respuesta en vez de volcar JSON crudo.
-        if not answer:
-            answer = (_final_answer(question, best, evidence, flat, retries=1,
-                                       **_temp_kw(temperature))
-                      or _synthesize(question, retries=1)
-                      or "(presupuesto agotado) " + (best or "sin evidencia"))
-            if not answer.startswith("(presupuesto agotado)"):
-                harness.record_action("loop", {"tool": "synthesize", "args": {}})
-                succeeded.append("síntesis final tras agotar turnos")
-        flat += 1
+            # Presupuesto agotado: sintetizar respuesta en vez de volcar JSON crudo.
+            if not answer:
+                answer = (_final_answer(question, best, evidence, flat, retries=1,
+                                           **_temp_kw(temperature))
+                          or _synthesize(question, retries=1)
+                          or "(presupuesto agotado) " + (best or "sin evidencia"))
+                if not answer.startswith("(presupuesto agotado)"):
+                    harness.record_action("loop", {"tool": "synthesize", "args": {}})
+                    succeeded.append("síntesis final tras agotar turnos")
+            flat += 1
 
-    harness.finish_run(run_id, None, {"turns": turn + 1, "tools": len(evidence)})
+    finally:
+        # Siempre, aunque el bucle lance: 87 runs de 1121 se quedaron con
+        # finished_at NULL porque la excepcion se escapaba sin cerrarlas.
+        harness.finish_run(run_id, None, {"turns": turn + 1, "tools": len(evidence)})
+
     if not isolated:
-        REF.save_lesson("qa", what_worked="\n".join(succeeded[-5:]), what_failed="\n".join(failed[-5:]),
-                        key_insights=f"Q: {question[:200]}")
+        REF.save_lesson("qa", what_worked="\n".join(succeeded[-5:]),
+                        what_failed="\n".join(failed[-5:]),
+                        key_insights=_trajectory_fingerprint(turn, evidence, answer))
     return {"answer": answer, "turns": turn + 1, "evidence": evidence, "run_id": run_id}
