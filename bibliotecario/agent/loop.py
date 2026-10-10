@@ -360,10 +360,19 @@ def _close_prompt(question: str, ctx: str, anclaje: str, best: str, flat: int,
                 "- No filtres: si la pregunta admite varios elementos, van todos.\n"
                 "- Si un elemento pedido no aparece en la evidencia, marcalo como AUSENTE.\n"
                 "PASO 2: redacta la respuesta y cubrielos TODOS, en el mismo orden.\n")
-    return (ST.STATIC_PROMPT + "\n\nPREGUNTA: " + question +
-            "\n\nEVIDENCIA REUNIDA:\n" + ctx + anclaje + enum +
-            f"\n\nMejor resultado parcial:\n{best or '(ninguno)'}\n"
-            f"\nTurnos sin progreso: {flat}.\n"
+    # Dos variantes del cierre: ver PROMPT_LEGACY en state.py. La rama legacy es la
+    # previa a 15261a0, literal, y existe SOLO para poder comparar los dos prompts a
+    # la misma temperatura.
+    if ST.PROMPT_LEGACY:
+        cabecera = (
+            "CIERRE OBLIGADO: responde YA en prosa (máx 150 palabras) usando solo esta "
+            "evidencia.\n"
+            "REGLAS DE CIERRE:\n"
+            "- CITA obligatoriamente cada afirmación con el formato [doc_id:chunk] "
+            "(ej. [5:7]).\n"
+        )
+    else:
+        cabecera = (
             "CIERRE: redacta en prosa (máx 150 palabras) usando solo esta evidencia.\n"
             "REGLAS DE CIERRE:\n"
             "- Si la evidencia contiene literalmente el dato que pide la pregunta, "
@@ -371,6 +380,12 @@ def _close_prompt(question: str, ctx: str, anclaje: str, best: str, flat: int,
             "- Si NO lo contiene, no lo sustituyas por un número parecido ni por una "
             "descripción general: explica en una frase qué se buscó y que no aparece, y "
             "cierra sin dar ningún dato por cierto.\n"
+        )
+    return (ST.STATIC_PROMPT + "\n\nPREGUNTA: " + question +
+            "\n\nEVIDENCIA REUNIDA:\n" + ctx + anclaje + enum +
+            f"\n\nMejor resultado parcial:\n{best or '(ninguno)'}\n"
+            f"\nTurnos sin progreso: {flat}.\n"
+            + cabecera +
             "- La pregunta pide un dato concreto (una cifra, un tope, una regla). "
             "BÚSCA ese dato explícitamente en toda la evidencia, también en el barrido: "
             "no te quedes con el primer chunk parecido.\n"
