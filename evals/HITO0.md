@@ -2,13 +2,13 @@
 
 Estado a 2026-10-02; **actualizado el 2026-10-10** con las runs T0 y T0', las
 primeras con la temperatura aplicada de verdad, con T0' como replica exacta de
-T0, y con las dos runs `promptstop` (64 no respondibles y `golden_blind_qa`), que
-bajan la fabricacion de no respondibles a **0%** y cierran el hito. La seccion
-"Errata" anula la atribucion de temperatura de la linea base original. Todos los
-numeros de aqui son medidos sobre `evals/golden_abstention.jsonl` (64 no
-respondibles, 50 de ellas verificadas por sonda contra el corpus), sobre
-`evals/golden_blind_qa.jsonl` (35 respondibles + 5 no) y sobre los goldenes de
-respondibles existentes.
+T0, y con las tres runs `promptstop` (64 no respondibles, `golden_blind_qa` y la
+**replica** de esta ultima), que bajan la fabricacion de no respondibles a
+**0%** y cierran el hito. La seccion "Errata" anula la atribucion de temperatura
+de la linea base original. Todos los numeros de aqui son medidos sobre
+`evals/golden_abstention.jsonl` (64 no respondibles, 50 de ellas verificadas
+por sonda contra el corpus), sobre `evals/golden_blind_qa.jsonl` (35
+respondibles + 5 no) y sobre los goldenes de respondibles existentes.
 
 ## Errata: la temperatura nunca se aplico
 
@@ -324,21 +324,43 @@ puerta: quita una orden en vez de meter un verificador.
 Se corrio `golden_blind_qa` (35 respondibles + 5 no respondibles) con el mismo
 codigo. **El miedo no se cumple**: el prompt no niega en masa.
 
-| | promptstop | r5 | r6 | r1 |
-|---|---|---|---|---|
-| `judge_mean` | 4.314 | 4.714 | 4.600 | 4.171 |
-| abstenciones falsas | **1** (`reas-b2`) | 0 | 1 | 4 |
-| `run_score` | **0.825** | 0.912 | 0.887 | - |
-| exito (`run_success`) | 77.5% | 87.5% | 90.0% | - |
-| juez >=4 y con cita | 27/35 | 31/35 | 32/35 | - |
-| no respondibles abst. | 4/5 | 4/5 | 4/5 | 5/5 |
-| fabricadas (`fabricated_value`) | 0 | 1 | 0 | 0 |
-| tokens | 1.16M | 1.13M | 1.13M | 0.56M |
+| | promptstop | su replica | r5 | r6 | r1 |
+|---|---|---|---|---|---|
+| `judge_mean` | 4.314 | **4.143** | 4.714 | 4.600 | 4.171 |
+| `run_score` | 0.825 | **0.787** | 0.912 | 0.887 | 0.819 |
+| exito (`run_success`) | 77.5% | 72.5% | 87.5% | 90.0% | 75.0% |
+| juez >=4 y con cita | 27/35 | 25/35 | 31/35 | 32/35 | 25/35 |
+| abstenciones falsas | 1 (`reas-b2`) | **0** | 0 | 1 | 4 |
+| no respondibles abst. | 4/5 | 4/5 | 4/5 | 4/5 | 5/5 |
+| fabricadas (`fabricated_value`) | 0 | 1 | 1 | 0 | 0 |
+| truncadas | 0 | **2** | 0 | 0 | 0 |
+| tokens | 1.16M | 0.90M | 1.13M | 1.13M | 0.56M |
 
-El descenso de juez frente a r5 es **-0.400 con p = 0.070** y frente a r6
-**-0.286 con p = 0.244** (t pareado, df = 34): no significativo con n = 35. Ademas
-r5 y r6 corrieron a temperatura libre (0.2) y este a 0.0, ya medida con efecto
-pequeno sobre respondibles, asi que la diferencia no esta aislada.
+La replica **confirma la direccion y complica el juicio**: 4.143 contra 4.314 de
+la original, delta de +0.171 con p = 0.468 — ruido entre dos runs del mismo
+sistema, del mismo orden que el +0.114 de r5 contra r6. Los no respondibles se
+mantienen: 4/5 abstienen en las dos, y el que se contesta cambia de lado
+(`reas-b8` pasa a abstenerse, `wiki-b8` pasa a fabricar), asi que la fabricacion
+concreta es 0 y 1, no una tendencia.
+
+Con las dos runs promediadas por pregunta:
+
+| comparacion | delta de juez | p |
+|---|---|---|
+| **promptstop (2 runs) vs r5** | **-0.486** | **0.014** |
+| ... sin las 2 truncadas | -0.424 | 0.036 |
+| ... sin `pearl-b5/b6/b7` | -0.359 | 0.069 |
+| promptstop (2 runs) vs r6 | -0.371 | 0.106 |
+| promptstop (2 runs) vs r1 (la base) | +0.057 | 0.840 |
+
+La regresion contra r5 **es significativa en la especificacion principal y
+sobrevive a sacar las 2 respuestas truncadas**, pero no a sacar el cluster
+entero de pearl, y **nunca es significativa contra r6**. Contra la base r1 es
+indistinguible.
+
+Los tres items que arrastran todo son `pearl-b5`, `pearl-b6` y `pearl-b7`: en la
+original sacaron 5, 5 y 5, y en la replica 1, 2 y 1. `pearl-b7` salio ademas
+truncado, igual que `pg-b7` (un 3). El resto del descenso es difuso.
 
 Ademas se midio el coste de la otra via, `ANCHOR_GROUNDING`: funciona (smoke
 3/3 abstenciones) pero cuesta 64284 tokens/pregunta frente a 32561, casi el
@@ -352,17 +374,24 @@ hizo falta, que es la conclusion util.
 | criterio | umbral | medido |
 |---|---|---|
 | fabricacion en no respondibles | <=5% | **0%** (0/64) frente a 28.1% y 34.4%, McNemar p <= 4.8e-07 |
-| `run_score` | >=0.75 | **1.000** (suite abstencion) y **0.825** (blind) |
-| juez >=4 con cita en respondibles | - | 27/35 |
-| abstenciones falsas | - | 1/35 (`reas-b2`); r5: 0, r6: 1, r1: 4 |
+| `run_score` | >=0.75 | **1.000** (suite abstencion) y **0.806** (blind, 2 runs; la replica sola, 0.787) |
+| juez >=4 con cita en respondibles | - | 52/70 = 74.3% |
+| abstenciones falsas | - | 1/70 (solo la original); r5: 0, r6: 1, r1: 4 |
+| no respondibles que se abstienen | - | 8/10 (4/5 en cada run) |
 
-Coste de las dos runs: 2.10M + 1.16M = **3.26M**.
+Coste de las tres runs: 2.10M + 1.16M + 0.90M = **4.16M**.
 
-La deuda que queda es deuda, no bloqueo: la mitad respondible puntua 0.825
-contra 0.912 de la mejor run previa (r5), 27/35 contra 31/35. No es significativo
-(p = 0.070) y esta mezclado con el cambio de temperatura (0.2 -> 0.0), pero es la
-primera vez que una mejora grande en no respondibles viene con una bajada, por
-pequena, en respondibles. Merece una replica antes de darlo por definitivo.
+**La deuda de respondibles ya esta medida, no pendiente.** El descenso contra r5
+es significativo en la especificacion principal (p = 0.014) y sobrevive a sacar
+las 2 truncadas (p = 0.036), pero se sostiene sobre tres preguntas de pearl y
+**no llega a significancia contra r6** (p = 0.106). Y hay un confundo que
+separa: r5 y r6 corrieron a temperatura libre (0.2) y estas a 0.0, ya medida con
+efecto pequeno sobre respondibles.
+
+Lectura honesta: **Hito 0 pasa sus umbrales** — fabricacion 0% y run_score 0.806
+>= 0.75 — pero el cambio que arreglo la fabricacion **cuesta puntos en la mitad
+respondible**, y el precio no esta aislado del efecto temperatura. No es una
+mejora gratis.
 
 Los puntos 1 y 2 que estaban escritos aqui (veto de `stray_docs` y
 verificacion determinista de cifras) **quedan refutados por preview offline,
@@ -380,15 +409,20 @@ para arreglarlo se pierde el paper bueno.
 
 Pendiente, en orden:
 
-1. **Replica de la run blind** (~1.2M): el 0.825 contra 0.912 de r5 no es
-   significativo, pero es la primera regresion en respondibles que aparece con
-   una mejora grande en no respondibles. Sin replica no se distingue el efecto
-   del prompt del efecto de la temperatura.
-2. **Trazabilidad de la run** (domino 4, "deliberate diagnosis,
+1. **Trazabilidad de la run** (domino 4, "deliberate diagnosis,
    verification"): seedear el primer turno o grabar y reproducir cada paso.
    Un agente cuyo primer turno diverge no puede pararse a si mismo a partir de
    la evidencia. Sigue sin existir.
-3. **Ampliar la suite a n>=122** solo si alguna palanca futura se espera
+2. **Ampliar la suite a n>=122** solo si alguna palanca futura se espera
    pequena. Para efectos grandes como el de ahora, n=64 ha bastado con creces.
+
+Hecho y fuera de esta lista:
+
+- **Replica de la run blind** (896816 tokens): medida arriba. Confirma la
+  direccion del descenso, lo acota a3 preguntas de pearl y no alcanza
+  significancia contra r6.
+- **Co-evolucion (#4)**: descartada el ciclo en vivo con datos, sin gastar un
+  token. Detalle en `evals/REPORT_COEVOLVE.md`.
+- **CI (#5)**: en verde en cada push desde `b11fd3b`.
 
 
