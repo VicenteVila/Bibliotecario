@@ -37,7 +37,9 @@ bibliotecario repl
 Comandos: `status` · `ingest <pdf|url|youtube|img|txt|docx> [--ocr]` ·
 `ingest-dir <carpeta> [--ocr]` (lote: omite no-soportados y duplicados por hash) ·
 `ask "<pregunta>" [--turns N]` · `blueprint <técnica> <objetivo>` ·
-`implement <técnica> <objetivo>` · `evolve` (co-evolución en background).
+`implement <técnica> <objetivo>` · `evolve` (consolida memoria y refina lecciones).
+Atención: `evolve` **no** hace co-evolución; `coevolve/selector.py` y
+`coevolve/estimator.py` están implementados pero sin llamantes en producción.
 
 ```python
 import bibliotecario.api as API
@@ -50,8 +52,8 @@ API.implement("Task-CoEvolve", "validar mi agente")
 ## Tests
 
 ```bash
-python -m pytest tests/ -q   # 72 tests
-ruff check bibliotecario tests
+python -m pytest tests/ -q   # 195 tests
+ruff check bibliotecario evals tests scripts
 ```
 
 ## Evaluación

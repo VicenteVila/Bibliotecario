@@ -1,0 +1,71 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2236.36it/s]
+pearl-c8 prec=1.00 abst=True tok= 35752 fb=False 55s
+pearl-u3 prec=0.00 abst=True tok= 34799 fb=False 63s
+pearl-b8 prec=1.00 abst=False tok= 30429 fb=False 63s
+pearl-u2 prec=1.00 abst=True tok= 35508 fb=False 69s
+pearl-u1 prec=1.00 abst=True tok= 37309 fb=False 70s
+pearl-u4 prec=0.50 abst=False tok= 36939 fb=False 51s
+pearl-u6 prec=0.00 abst=False tok= 36885 fb=False 62s
+pearl-u8 prec=1.00 abst=True tok= 37939 fb=False 55s
+pearl-u5 prec=1.00 abst=False tok= 36478 fb=False 66s
+pearl-u7 prec=1.00 abst=True tok= 37423 fb=False 68s
+pg-b8    prec=1.00 abst=False tok= 37992 fb=False 58s
+pg-u2    prec=1.00 abst=True tok= 35577 fb=False 46s
+pg-c8    prec=1.00 abst=True tok= 20978 fb=False 53s
+pg-u1    prec=1.00 abst=False tok= 21180 fb=False 55s
+pg-u3    prec=0.00 abst=True tok= 34781 fb=False 52s
+pg-u4    prec=1.00 abst=False tok= 21419 fb=False 48s
+tce-b8   prec=1.00 abst=True tok= 37173 fb=False 48s
+pg-u5    prec=1.00 abst=True tok= 20646 fb=False 52s
+tce-u1   prec=1.00 abst=True tok= 36235 fb=False 55s
+tce-u2   prec=1.00 abst=False tok= 33915 fb=False 52s
+tce-u5   prec=0.00 abst=False tok= 36411 fb=False 54s
+tce-u4   prec=1.00 abst=True tok= 35460 fb=False 58s
+reas-c8  prec=1.00 abst=False tok= 33285 fb=False 51s
+tce-u3   prec=0.00 abst=False tok= 34348 fb=False 90s
+reas-b8  prec=1.00 abst=False tok= 33918 fb=False 70s
+reas-u1  prec=0.00 abst=True tok= 34049 fb=False 49s
+reas-u2  prec=0.00 abst=False tok= 35535 fb=False 58s
+reas-u3  prec=1.00 abst=True tok= 35536 fb=False 51s
+wiki-c8  prec=1.00 abst=True tok= 26913 fb=False 52s
+wiki-b8  prec=1.00 abst=True tok= 11649 fb=False 55s
+wiki-u1  prec=1.00 abst=True tok= 13296 fb=False 54s
+wiki-u2  prec=1.00 abst=False tok= 28989 fb=False 51s
+wiki-u4  prec=1.00 abst=True tok= 34814 fb=False 49s
+wiki-u5  prec=1.00 abst=False tok= 12186 fb=False 49s
+wiki-u3  prec=1.00 abst=False tok= 12997 fb=False 68s
+wiki-u6  prec=0.00 abst=True tok= 36747 fb=False 51s
+hsurvey-d8 prec=1.00 abst=True tok= 34182 fb=False 49s
+hsurvey-u1 prec=0.00 abst=True tok= 33901 fb=False 53s
+hsurvey-u3 prec=0.00 abst=True tok= 36125 fb=False 49s
+hsurvey-u2 prec=0.25 abst=True tok= 36847 fb=False 70s
+hsurvey-u4 prec=0.00 abst=True tok= 34995 fb=False 52s
+hal-d8   prec=1.00 abst=True tok= 38865 fb=False 47s
+hal-u2   prec=0.00 abst=True tok= 32775 fb=False 37s
+hal-u1   prec=0.00 abst=False tok= 36670 fb=False 50s
+hal-u3   prec=0.00 abst=True tok= 34776 fb=False 44s
+hal-u4   prec=0.00 abst=True tok= 33851 fb=False 49s
+evobench-d8 prec=0.00 abst=True tok= 35023 fb=False 49s
+evobench-u1 prec=0.00 abst=True tok= 32557 fb=False 46s
+evobench-u3 prec=0.00 abst=True tok= 30556 fb=False 33s
+evobench-u2 prec=1.00 abst=True tok= 35439 fb=False 55s
+evalsurvey-d8 prec=1.00 abst=True tok= 34982 fb=False 40s
+evalsurvey-u1 prec=0.00 abst=True tok= 31339 fb=False 30s
+evobench-u4 prec=0.00 abst=True tok= 36237 fb=False 49s
+evobench-u5 prec=0.00 abst=True tok= 35114 fb=False 52s
+evalsurvey-u2 prec=0.00 abst=True tok= 35388 fb=False 36s
+evalsurvey-u3 prec=0.00 abst=True tok= 31540 fb=False 34s
+evalsurvey-u5 prec=0.00 abst=True tok= 36222 fb=False 35s
+evalsurvey-u4 prec=0.00 abst=True tok= 31854 fb=False 43s
+disclose-u1 prec=1.00 abst=True tok= 33789 fb=False 46s
+disclose-d8 prec=1.00 abst=True tok= 37224 fb=False 61s
+LLM reintentable nvidia: esperando 30s (1)
+disclose-u2 prec=1.00 abst=True tok= 32480 fb=False 47s
+disclose-u4 prec=1.00 abst=True tok= 38347 fb=False 48s
+disclose-u5 prec=0.00 abst=True tok= 34914 fb=False 42s
+disclose-u3 prec=0.00 abst=False tok= 32461 fb=False 75s
+
+n=64 (respondibles=0, no respondibles=64) modelo_juez=openai/gpt-oss-20b
+abstain_rate=0.719 (decididas=64/64, 0 errores) inventadas=15
+tokens_agente=2083943 en 305 llamadas | tokens_juez=44798 | latencia_mediana=52s
+truncadas=0 fallbacks=0 -> result_abst_t0_applied.json
