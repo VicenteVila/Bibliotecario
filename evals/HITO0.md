@@ -2,11 +2,13 @@
 
 Estado a 2026-10-02; **actualizado el 2026-10-10** con las runs T0 y T0', las
 primeras con la temperatura aplicada de verdad, con T0' como replica exacta de
-T0, y con la run `promptstop`, que baja la fabricacion de los no respondibles a
-**0%**. La seccion "Errata" anula la atribucion de temperatura de la linea base
-original. Todos los numeros de aqui son medidos sobre
-`evals/golden_abstention.jsonl` (64 no respondibles, 50 de ellas verificadas
-por sonda contra el corpus) y sobre los goldenes de respondibles existentes.
+T0, y con las dos runs `promptstop` (64 no respondibles y `golden_blind_qa`), que
+bajan la fabricacion de no respondibles a **0%** y cierran el hito. La seccion
+"Errata" anula la atribucion de temperatura de la linea base original. Todos los
+numeros de aqui son medidos sobre `evals/golden_abstention.jsonl` (64 no
+respondibles, 50 de ellas verificadas por sonda contra el corpus), sobre
+`evals/golden_blind_qa.jsonl` (35 respondibles + 5 no) y sobre los goldenes de
+respondibles existentes.
 
 ## Errata: la temperatura nunca se aplico
 
@@ -317,30 +319,50 @@ direcciones; estos son unilaterales.
 **Es la primera intervencion con resultado**, y la unica que no anade otra
 puerta: quita una orden en vez de meter un verificador.
 
-### Lo que falta por medir, y por que el hito sigue abierto
+### La mitad respondible: medida
 
-La mitad **respondible** no se ha tocado. El mismo prompt que ofrece parar
-puede declarar ausente algo que si esta — exactamente el defecto documentado del
-anclaje en `REPORT_BLIND.md:386`: *"el anclaje no distingue 'el corpus no lo
-contiene' de 'mi retrieval no lo encontro'"*. Y el dato visible es que ahora
-solo 6 de 64 respuestas llevan cita. Es posible que se haya cambiado un
-problema por otro: fabricar en las no respondibles y negarse en las
-respondibles.
+Se corrio `golden_blind_qa` (35 respondibles + 5 no respondibles) con el mismo
+codigo. **El miedo no se cumple**: el prompt no niega en masa.
+
+| | promptstop | r5 | r6 | r1 |
+|---|---|---|---|---|
+| `judge_mean` | 4.314 | 4.714 | 4.600 | 4.171 |
+| abstenciones falsas | **1** (`reas-b2`) | 0 | 1 | 4 |
+| `run_score` | **0.825** | 0.912 | 0.887 | - |
+| exito (`run_success`) | 77.5% | 87.5% | 90.0% | - |
+| juez >=4 y con cita | 27/35 | 31/35 | 32/35 | - |
+| no respondibles abst. | 4/5 | 4/5 | 4/5 | 5/5 |
+| fabricadas (`fabricated_value`) | 0 | 1 | 0 | 0 |
+| tokens | 1.16M | 1.13M | 1.13M | 0.56M |
+
+El descenso de juez frente a r5 es **-0.400 con p = 0.070** y frente a r6
+**-0.286 con p = 0.244** (t pareado, df = 34): no significativo con n = 35. Ademas
+r5 y r6 corrieron a temperatura libre (0.2) y este a 0.0, ya medida con efecto
+pequeno sobre respondibles, asi que la diferencia no esta aislada.
 
 Ademas se midio el coste de la otra via, `ANCHOR_GROUNDING`: funciona (smoke
 3/3 abstenciones) pero cuesta 64284 tokens/pregunta frente a 32561, casi el
-doble (~3.9M la suite). Queda apagado por defecto.
+doble (~3.9M la suite). Queda apagado por defecto — con el cambio de prompt no
+hizo falta, que es la conclusion util.
 
 ## Donde queda
 
-**La fabricacion esta resuelta en el terreno donde se mide**: **0%** (0/64)
-frente al 31.5% (39/124) de las dos replicadas, p <= 4.8e-07, sin perdidas. El
-objetivo de <=5% se cumple.
+**Hito 0 cerrado: las dos mitades medidas.**
 
-**El hito sigue abierto por la otra mitad**, que no se ha medido con el nuevo
-prompt. Hasta que no corra `golden_blind_qa` con este mismo codigo no se puede
-afirmar que el agente responda lo que tiene y calle lo que no: de momento solo
-esta demostrado que calle lo que no tiene.
+| criterio | umbral | medido |
+|---|---|---|
+| fabricacion en no respondibles | <=5% | **0%** (0/64) frente a 28.1% y 34.4%, McNemar p <= 4.8e-07 |
+| `run_score` | >=0.75 | **1.000** (suite abstencion) y **0.825** (blind) |
+| juez >=4 con cita en respondibles | - | 27/35 |
+| abstenciones falsas | - | 1/35 (`reas-b2`); r5: 0, r6: 1, r1: 4 |
+
+Coste de las dos runs: 2.10M + 1.16M = **3.26M**.
+
+La deuda que queda es deuda, no bloqueo: la mitad respondible puntua 0.825
+contra 0.912 de la mejor run previa (r5), 27/35 contra 31/35. No es significativo
+(p = 0.070) y esta mezclado con el cambio de temperatura (0.2 -> 0.0), pero es la
+primera vez que una mejora grande en no respondibles viene con una bajada, por
+pequena, en respondibles. Merece una replica antes de darlo por definitivo.
 
 Los puntos 1 y 2 que estaban escritos aqui (veto de `stray_docs` y
 verificacion determinista de cifras) **quedan refutados por preview offline,
@@ -358,8 +380,10 @@ para arreglarlo se pierde el paper bueno.
 
 Pendiente, en orden:
 
-1. **Run sobre respondibles con el nuevo prompt** (~1.3M). Es lo unico que
-   puede refutar el cambio. Sin ella el hito no se cierra.
+1. **Replica de la run blind** (~1.2M): el 0.825 contra 0.912 de r5 no es
+   significativo, pero es la primera regresion en respondibles que aparece con
+   una mejora grande en no respondibles. Sin replica no se distingue el efecto
+   del prompt del efecto de la temperatura.
 2. **Trazabilidad de la run** (domino 4, "deliberate diagnosis,
    verification"): seedear el primer turno o grabar y reproducir cada paso.
    Un agente cuyo primer turno diverge no puede pararse a si mismo a partir de
