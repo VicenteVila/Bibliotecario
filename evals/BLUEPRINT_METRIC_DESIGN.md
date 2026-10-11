@@ -113,6 +113,19 @@ separadamente verificables:
 - Los cinco apartados que el propio prompt exige: **modulos, dependencias,
   orden, validacion, riesgos**.
 
+### D. Funcionamiento — ¿hace algo? *(nadie lo ha medido nunca)*
+- El agente generado se **ejecuta sobre una tarea real y devuelve algo** que no
+  sea todos los pasos en `"todo"`.
+- **Hoy esto no es medible y lo sabemos**: `instantiate_agent_template` genera
+  `run()` que marca cada paso como `"todo"` por diseño (§1.2). **Nadie ha
+  ejecutado nunca** `data/agents/task-coevolve/agent_template.py` sobre nada.
+
+**A, B y C miden plausibilidad. D mide producto.** El README promete «arneses
+que funcionan»; A+B+C se pueden cumplir al 100% con un agente que no hace nada.
+Declarar el Hito 2 cerrado con solo A+B+C seria **el mismo error de forma** que
+tener el umbral de calidad calibrado contra un tramposo: un gate verde que no
+dice lo que la palabra «cumplido» sugiere.
+
 ---
 
 ## 3. La metrica propuesta
@@ -129,12 +142,26 @@ sin tocar un LLM y que **no se pueden negociar**.
 | # | comprobacion | falla si |
 |---|---|---|
 | **B1** | Los **5 apartados** estan en `BLUEPRINT.md` | falta alguno de modulos/dependencias/orden/validacion/riesgos |
-| **B2** | `agent_template.py` **compila y `run()` ejecuta** sin excepcion | `py_compile` falla o `run()` levanta |
+| **B2** | `agent_template.py` **compila y `run()` ejecuta** sin excepcion | `py_compile` falla o `run()` levanta — **PERO VER LA ADVERTENCIA ABAJO: hoy no puede fallar** |
 | **B3** | Todos los `procedures` **existen para esa tecnica** | algun procedimiento viene del fallback a "todas las tecnicas" |
 | **B4** | El resultado **no es el placeholder** `"(sin LLM: usa los procedimientos listados)"` | los proveedores fallaron y nadie se entero |
 | **B5** | *(decision)* **cada modulo/dependencia principal lleva `[doc:chunk]`** | se reclama una cita que el prompt nunca pidio |
 | **B6** | `BLUEPRINT.md` **termina en una estructura markdown completa** | acaba en una tabla `| :---` sin filas, o en un ` ``` ` sin cerrar — es decir, `max_tokens=1500` no alcanzo y **nadie lo sabe** (medido: H1) |
 | **B7** | *(propuesta §5.5-P3)* **`BLUEPRINT.md` lleva `[doc:chunk]`** — umbral `>= 3` distintas (§6 dec. 1) | da **0**, que es exactamente lo que midio **H3** |
+| **B8** | *(propuesta)* **todas las citas resuelven**: cada `[doc:x:c]` apunta a un chunk existente y no vacio | una cita bien formada que **no existe** en la BD — B7 pasa, el anclaje es mentira |
+
+**B2 hoy no puede fallar.** El `agent_template.py` que genera
+`instantiate_agent_template` tiene un `run()` que recorre `STEPS` y anota
+`"todo"` en cada uno (§1.2): `py_compile` pasa, `run()` no levanta, **B2 = 100%
+con un agente que no hace nada**. Es un gate de la misma forma que el umbral de
+4,50 calibrado contra `r5`: **verde sin decir nada**. Solo pasa a distinguir
+algo cuando exista la dimension **D** de §2 — es decir, cuando el agente haga
+algo medible.
+
+**B7 y B8 son presencia y validez.** QA tenia `cite_precision` (medido: 0,943
+en candF); el diseno de blueprints solo habia conservado el `grep`, o sea la
+mitad. **B8 es gratis** (un lookup en la BD) y es la unica que impide que tres
+citas a trozos irrelevantes saquen el eje de anclaje por completo en verde.
 
 **B5 es la decision importante.** Hoy el prompt no pide citas, asi que B5
 fallaria al 100%: o se anade la exigencia de cita al prompt (y se mide de
@@ -144,11 +171,12 @@ incumplimiento de una regla que nadie puso.**
 
 `procedures` sale del grafo sembrado asi que B3 es literalmente gratis
 (un `set` de nombres), y B1/B2/B4/B6 son gratis igual (B6 es leer las
-dos ultimas lineas del fichero). B5 solo si se cambia el prompt.
+dos ultimas lineas del fichero). B7/B8 son un `grep` y un `lookup`. **B5 solo si
+se cambia el prompt.**
 
 ### 3.2 Piso de calidad (juez, si)
 
-Rubricas 1-5 con el mismo juez de siempre (`openai/gpt-oss-20b`, familia
+Rubricas **Q1-Q4** con el mismo juez de siempre (`openai/gpt-oss-20b`, familia
 distinta al agente), **declaradas antes de medir**:
 
 | # | rubrica | lo que pregunta |
@@ -159,10 +187,18 @@ distinta al agente), **declaradas antes de medir**:
 | Q4 | **coherencia interna** *(propuesta, §6 dec. 6)* | ¿afirma algo que un `REPORT_*.md` del propio proyecto contradiga? H2 es el caso de prueba |
 
 Umbrales propuestos (a confirmar — **borrador de §6 dec. 3**): suelo en
-**B1-B7 = 100%**, juez `mean >= 4.0` en Q1-Q3 **y ninguna rubrica `< 3.0`**, y
+**B1-B8 = 100%**, juez `mean >= 4.0` en Q1-Q3 **y ninguna rubrica `< 3.0`**, y
 **Q4 = 0 contradicciones** (binario). El 4.0 es mas bajo que el 4.50 del Hito 1
 porque hay **3 rubricas en vez de una pregunta de 35 items**, o sea menos
 muestra y mas ruido por item: bajar el umbral compensa el MDE peor.
+
+**Falta controlar el ruido del juez, y hoy no esta previsto.** En QA medimos
+`judge_sd` (0,064-0,096) y `frac_items_coherentes` antes de creer cualquier
+diferencia; aqui solo se dice «mismo juez de siempre». Con **n = 15** y 3
+rubricas, el ruido del propio juez **decide** si `>= 4.0` significa algo o no.
+Propuesta: **re-juzgar los mismos 15 resultados una vez** (~30 k) y exigir
+`judge_sd <= 0.15` antes de interpretar la media. Sin ese numero, la nota del
+juez es un dato, no una medicion.
 
 ### 3.3 Referencia escrita a mano (el trabajo que nadie ha hecho)
 
@@ -180,6 +216,27 @@ de referencia que el sistema **cubre**, los que **omite** y los que **inventa**.
 Ese triple — *cubierto / omitido / inventado* — es la medicion, y es el
 equivalente exacto de la fabricacion del Hito 0.
 
+### 3.4 Suite negativa (no existe, y es el criterio que mas pesa)
+
+**El criterio vinculante del Hito 1 es negativo**: `0/64` en
+`golden_abstention`. QA tiene ademas `golden_blind_unanswerable`. De blueprints:
+**cero ficheros de trampas.**
+
+Sin eso se declara el Hito 2 cerrado **midiendo solo el lado positivo** — o sea,
+con el mismo hueco que tuvo que tapar el Hito 0 creando `golden_abstention`.
+
+| caso | que debe devolver | estado hoy |
+|---|---|---|
+| **N1** — tecnica que no existe en el grafo | que **no existe**, sin escribir blueprint | H5: **lo salvo el modelo, no el codigo** (`list_procedures(technique) or list_procedures()` tiro las 18 tecnicas ajenas) |
+| **N2** — tecnica en el grafo pero **no ingerida** en el corpus | **abstencion**: no hay evidencia, no se disena | sin medir nunca |
+| **N3** — objetivo **contradicterio** con el corpus | senalar la contradiccion en vez de resolverla a su aire | sin medir nunca |
+| **N4** — objetivo que pide algo que el paper **descarta explicitamente** | **no** prometerlo (el caso H2, al reves) | sin medir nunca |
+
+N1/N2/N3/N4 se escriben **a mano, 0 tokens**, igual que los golden de QA. Son
+la contrapartida exacta de `golden_abstention`, y **N1 ademas es un fix de
+codigo** (decisión 4 de §6), no solo un test: hoy la unica razon por la que no
+salta es que el modelo se nego por su cuenta.
+
 ---
 
 ## 4. Coste (es la noticia buena)
@@ -189,12 +246,21 @@ Porque `build_blueprint` es **una llamada**, no un loop:
 | que | estimacion |
 |---|---|
 | 5 tecnicas x 3 runs = 15 blueprints | **~60-75k** |
-| juez sobre los 15 | **~30k** |
-| referencias a mano | **0 tokens** (tiempo de diseño) |
-| **total** | **~100k** |
+| juez Q1-Q3 sobre los 15 | **~30k** |
+| **+ Q4** con contexto del informe interno (§6 dec. 6) | **~45k** |
+| **+ juez repetido** para `judge_sd` (§3.2) | **~75k** |
+| referencias a mano · suite negativa N1-N4 · **B8** | **0 tokens** (tiempo de diseño) |
+| **total (sin P1)** | **~225k** |
+| **+ A/B de P1** si se adopta (§5.7, 30 blueprints) | **~515k** |
+| **total con P1** | **~740k** |
 
-Frente a los ~9-10M del Hito 1. **Hito 2 es dos ordenes de magnitud mas barato
-que Hito 1**, y es el frente que el README promete como "la mitad del valor".
+Frente a los ~11 M gastados en el Hito 1: **sin P1 es un orden y medio menos;
+con P1 sigue siendo ~15 veces mas barato**. No hace falta redondear a "dos
+ordenes" para que salga bien — el numero aguanta tal cual.
+
+*(Errata interna: la version anterior de esta tabla ponia **~100k** y no
+contemplaba Q4, el control de ruido del juez ni el A/B de P1. Los tres se
+anadieron al revisar que se escapaban medir.)*
 
 Ojo: eso mide la **capacidad** (`api.blueprint()` directo). Lo que cuesta de
 verdad — y es una pregunta distinta — es si el agente **llama a la herramienta
@@ -321,20 +387,28 @@ gastar*. P1 cambia la estructura de la llamada, asi que **toca medirlo igual
 que se midio la temperatura en el Hito 0**.
 
 **Diseno del A/B** — dos brazos nuevos sobre las mismas 5 tecnicas, mas el
-baseline que ya existe (H3 = 0 citas, coste 0):
+baseline que ya existe (H3 = 0 citas, coste 0). **3 runs por tecnica en cada
+brazo, es decir 15 blueprints por brazo** — no 10: con 2 runs por tecnica no
+hay con que medir, y aqui el numero de muestras ya de por si es critico (R2).
 
-| brazo | que es | coste |
-|---|---|---|
-| **A** (ya hecho) | `generate()` actual, sin exigir cita → H3 = **0** | 0 |
-| **B** | `generate()` + **P2** (exigir cita), sigue sin loop | ~10 blueprints ≈ **100-150 k** |
-| **C** | **P1** (loop) + **P2** | ~10 blueprints ≈ **100-150 k** |
+| brazo | que es | blueprints | coste |
+|---|---|---|---|
+| **A** (ya hecho) | `generate()` actual, sin exigir cita → H3 = **0** | 15 (ya existen) | **0** |
+| **B** | `generate()` + **P2** (exigir cita), sigue sin loop | 5 tecnicas x 3 | ~15 x 5 k ≈ **80 k** |
+| **C** | **P1'** (loop orquesta, tool escribe) + **P2** | 5 tecnicas x 3 | ~15 x 25 k ≈ **375 k** |
+| juez sobre los 30 del A/B | Q1-Q4 | — | ~60 k |
+| **total** | | 30 | **≈ 515 k** |
 
 - **B vs A** aísla el efecto del **prompt**.
 - **C vs B** aísla el efecto del **loop** — que es la pregunta que hace la propuesta.
 
-**~200-300 k tokens en total**, comparable al coste de toda la medicion
-propuesta en §4. Si **C no gana a B** en B7/Q1, **P1 se descarta** y nos
-quedamos con el prompt en una sola llamada: mas barato y sin el riesgo R2.
+*(Corregido el 2026-10-11: la version anterior decia «~10 blueprints» por brazo
+y «200-300 k en total», lo que contradecia los 15 de §4 y §5.5 y daba un
+brazo de 2 runs por tecnica. Error mio, arreglado aqui antes de medir y no
+despues — que es justo la regla de §6 dec. 2.)*
+
+Si **C no gana a B** en B7/Q1, **P1 se descarta** y nos quedamos con el prompt
+en una sola llamada: mas barato y sin el riesgo R2.
 
 Sin este A/B, P1 seria exactamente el error que documenta la Errata 1 del Hito
 1: **un cambio que se adopta porque suena mejor, sin haberlo medido.**
@@ -351,7 +425,8 @@ regla aprendida en el Hito 1 se respeta: **todo se fija ANTES de la primera run.
 
 **Propuesta: SÍ, condicionada al A/B de §5.7.** A-B aísla el prompt, C-B aísla
 el loop; si C no gana a B en B7/Q1, **P1 se descarta** y nos quedamos con solo
-P2 (más barato, sin riesgo R2). Coste del A/B: **~200-300 k**.
+P2 (más barato, sin riesgo R2). Coste del A/B: **~515 k** (15+15 blueprints y
+juez), ver §5.7.
 
 *Si se dice no:* B5/B7 quedan en comprobar un resultado que el sistema no está
 diseñado para producir, y Hito 2 se mide con una métrica que ya sabemos que va
@@ -390,14 +465,21 @@ después de ver los números.*
 
 | eje | umbral |
 |---|---|
-| **B1-B7** (suelo mecánico) | **100%** — son deterministas, o pasan o se arregla el sistema |
+| **B1-B8** (suelo mecánico) | **100%** — son deterministas, o pasan o se arregla el sistema |
 | **Q1-Q3** (juez) | **`mean >= 4.0` Y ninguna rubrica `< 3.0`** |
 | **Q4** (nueva, ver decisión 6) | **0 contradicciones** — binario |
+| **`judge_sd`** (ruido del juez, §3.2) | **`<= 0.15`** — sin esto la media no es interpretable |
+| **N1-N4** (suite negativa, §3.4) | **0 fallos** — mismo peso que el `0/64` del Hito 1 |
 
 **La condición `ninguna < 3.0` es nueva** y es la lección directa de H2: un
 blueprint que contradice `REPORT_COEVOLVE.md` perfectamente pudo haber sacado
 buena nota de media. **La media esconde exactamente el fallo que más importa**,
 igual que la media de calidad del Hito 1 escondía que `r5` fabricaba.
+
+**B8 y N1-N4 no son añadidos cosméticos**: B8 es el `cite_precision` que sí
+tenía QA y aquí se había tirado, y N1-N4 son el `golden_abstention` que sí tenía
+QA y aquí **no existía en absoluto**. **Eran los dos criterios que más pesaban
+en el Hito 1 y el diseño de Hito 2 no los traía.**
 
 ### Decisión 4 — el fallback silencioso (§1.1)
 
@@ -439,7 +521,46 @@ pasa), aplicada al eje que H2 demostró estar **completamente sin medir**. Y es
 lo único de §6 que **no se arregla con un umbral**: no hay nota que compense un
 blueprint que contradice nuestros propios datos.
 
----
+### Decisión 7 — B8, la cita que resuelve
+
+**Propuesta: SÍ, y es gratis.** Cada `[doc:x:c]` del blueprint se comprueba
+**contra la BD**: existe el documento, existe el chunk, y no está vacío.
+
+Coste: un lookup. **0 tokens.**
+
+Es el hueco de forma: QA tenía `cite_precision` medido (0,943 en candF) y el
+diseño de blueprints se quedó con el `grep` — **la mitad de la comprobación**.
+Sin B8, tres citas a trozos irrelevantes sacan el eje de anclaje en verde.
+
+### Decisión 8 — suite negativa N1-N4
+
+**Propuesta: SÍ, escrita a mano, 0 tokens.** Ver §3.4: técnica inexistente (N1),
+técnica no ingerida (N2), objetivo contradictorio (N3), objetivo que pide algo
+que el paper descarta (N4).
+
+**Es el criterio que más pesa y el que menos se ha medido.** El Hito 1 se cerró
+con el `0/64` como criterio **vinculante**; aquí no existía ningún equivalente.
+Cerrar Hito 2 solo con el lado positivo repetiría el hueco que tuvo que tapar el
+Hito 0 creando `golden_abstention`.
+
+*N1 además obliga al fix de la decisión 4*, no solo a un test.
+
+### Decisión 9 — la dimensión D: ¿el agente generado funciona?
+
+**Propuesta: declararla BIERTA y no gatearla en este hito.** Ver §2.D.
+
+**Motivo para no gatearla:** `instantiate_agent_template` genera un `run()` que
+pone todo en `"todo"` por diseño, así que *hoy* no hay nada que ejecutar —
+gatear D ahora sería fallar siempre, que es exactamente el defecto que se le
+encontró a B2.
+
+**Motivo para no saltársela:** el README promete «arneses que funcionan». Con
+A+B+C se puede estar en 100% y que el agente no haga nada. Declarar el Hito 2
+cerrado sin tocar D es **decir cumplido con un número que no mide eso**.
+
+*Si se aprueba esto, el cierre de §7 debe decir explícitamente que «Hito 2»
+cubre plausibilidad y anclaje, **no funcionamiento** — con la misma honestidad
+con que el Hito 1 declaró que su MDE real era 0,458 y no 0,15.*
 
 ---
 
@@ -449,3 +570,14 @@ La misma estructura: tabla *criterio / umbral / medido* con el valor real de la
 run final, coste real en tokens, y la seccion de erratas si algo resulta estar
 mal medido. Y **el suelo mecanico se declara ANTES de la primera run**, no
 despues de ver los numeros.
+
+La tabla de cierre tendrá **una fila por eje de §2**, incluida **D**, y la de D
+llevará la casilla vacia si no se trabajo en ella — **no la fila ausente**. Que
+falte una fila es como tachar el umbral sin dejar el original: se pierde de
+vista lo que no se comprobo.
+
+**Alcance declarado de antemano** (§6 dec. 9): con A+B+C cerrados y D abierta,
+lo que este documento puede declarar es que el blueprint **es fiel, es accionable
+y esta anclado**. **No** que el agente generado **funcione**. El README promete
+lo segundo; decir «Hito 2 cerrado» sin esa fila seria exactamente la clase de
+engano que el Hito 1 paso a corregir en sus propias erratas.
