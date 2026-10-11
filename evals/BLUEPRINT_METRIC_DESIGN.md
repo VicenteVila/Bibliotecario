@@ -50,14 +50,45 @@ def run(context: dict) -> dict:
 diseno. Esto descarta de raiz un criterio obvio — "¿el agente instanciado
 funciona?" — porque se cumpliria siempre y no distinguiria nada.
 
-Ademas `data/agents/` esta **vacia**: `implement` no se ha invocado nunca en
-produccion. No hay un solo blueprint que evaluar.
+~~Ademas `data/agents/` esta **vacia**: `implement` no se ha invocado nunca en
+produccion. No hay un solo blueprint que evaluar.~~
+**Actualizado 2026-10-11:** `data/agents/` ya no esta vacia. Ver §1.4.
 
 ### 1.3 Hay 5 tecnicas sembradas
 
 `knowledge/seed.py` define el grafo procedural de: **Task-CoEvolve, PEARL,
 WikiSkill, Procedural Graphs, ReASearch**. Son el universo conocido y el
 material con el que se puede construir una referencia.
+
+### 1.4 Primera ejecucion real (2026-10-11)
+
+`implement "Task-CoEvolve" "validar mi agente antes de cada release"`.
+Coste: **una sola llamada, ~1.5k tokens**. Salio en
+`data/agents/task-coevolve/{BLUEPRINT.md,agent_template.py}`.
+
+Todo lo que sigue esta **medido sobre esa salida**, no deduido del codigo.
+
+| # | hallazgo | evidencia | ya se preveia? |
+|---|---|---|---|
+| **H1** | **El blueprint sale truncado a mitad de tabla** | `BLUEPRINT.md` (1.025 bytes) termina literalmente en `\| :---`. `generate(..., max_tokens=1500)` no alcanza y **el fichero se guarda igual, sin aviso** | No: `max_tokens=1500` se dio por suficiente |
+| **H2** | **Promete lo que nuestra propia medicion contradice** | El blueprint dice *"manteniendo garantías estadísticas de precisión"* y encadena `[S-max Final Selection Gate] ──► [CI/CD Release Decision]`. `REPORT_COEVOLVE.md` dice: *"contra el baseline que importa… solo gana en el mejor de los casos… **Decisión: no se gasta**"* | Parcialmente — §1.1 ya avisaba de que "la fabricación aqui es invisible"; no de que **contradiria un veredicto interno del propio proyecto** |
+| **H3** | **Cero citas, módulos generados de la nada** | `grep -c "doc:\["` → **0**. `Adaptive Harness Execution Engine`, `History Profiler` y demas no vienen de ninguna parte | **Sí, literalmente.** §1.1: *"el blueprint puede inventar módulos y dependencias sin que nada se note"* |
+| **H4** | **El stub hace exactamente nada** | `run()` devuelve los 4 pasos en `"todo"` y termina | **Sí**, §1.2 |
+| **H5** | **El fallback silencioso existe, pero el modelo lo salvo** | Pedida una tecnica inexistente, `list_procedures(technique) or list_procedures()` **tiro al grafo completo: 18 procedimientos ajenos** entraron en el prompt. El LLM **se nego** a escribir el blueprint y explico que la tecnica no existe | El bug **si**; la salvacion **no** — §1.1 lo daba por perdido |
+
+**H5 es una correccion a mi propio documento y hay que dejarla escrita.**
+El bug de codigo esta ahi exactamente como se predijo, pero el modelo no lo
+explotó: se nego, y de paso dejo constancia de que estaba usando su
+**conocimiento parametrico** (*"hasta la fecha de corte de mi conocimiento:
+junio 2024"*), no el corpus. En esa ruta el sistema no esta leyendo los papers
+que ingirio — y lo dice.
+
+**H2 es el que importa para la metrica.** No es un error de forma: es un
+blueprint que **recomienda conectar una tecnica a un release gate** cuando
+nuestro propio informe la descarto con datos. Y al no haber citas (H3),
+**no existe ninguna comprobacion mecanica que lo detecte**. Eso es exactamente
+lo que §2.A llama *"ningun modulo inventado sin respaldo en el corpus"*,
+y hoy es indetectable sin referencias escritas a mano (§3.3).
 
 ---
 
@@ -102,6 +133,7 @@ sin tocar un LLM y que **no se pueden negociar**.
 | **B3** | Todos los `procedures` **existen para esa tecnica** | algun procedimiento viene del fallback a "todas las tecnicas" |
 | **B4** | El resultado **no es el placeholder** `"(sin LLM: usa los procedimientos listados)"` | los proveedores fallaron y nadie se entero |
 | **B5** | *(decision)* **cada modulo/dependencia principal lleva `[doc:chunk]`** | se reclama una cita que el prompt nunca pidio |
+| **B6** | `BLUEPRINT.md` **termina en una estructura markdown completa** | acaba en una tabla `| :---` sin filas, o en un ` ``` ` sin cerrar — es decir, `max_tokens=1500` no alcanzo y **nadie lo sabe** (medido: H1) |
 
 **B5 es la decision importante.** Hoy el prompt no pide citas, asi que B5
 fallaria al 100%: o se anade la exigencia de cita al prompt (y se mide de
@@ -110,7 +142,8 @@ orientacion y la fidelidad la juzga un modelo. **No se puede medir el
 incumplimiento de una regla que nadie puso.**
 
 `procedures` sale del grafo sembrado asi que B3 es literalmente gratis
-(un `set` de nombres), y B1/B2/B4 son gratis igual. B5 solo si se cambia el prompt.
+(un `set` de nombres), y B1/B2/B4/B6 son gratis igual (B6 es leer las
+dos ultimas lineas del fichero). B5 solo si se cambia el prompt.
 
 ### 3.2 Piso de calidad (juez, si)
 
@@ -171,13 +204,23 @@ acerca al del blind. Se plantea como segunda fase, no primero.
 
 1. **B5 — ¿citas `[doc:chunk]` en los blueprints?** Es lo que separa un
    blueprint verificable de uno que suena bien. Anadirlo cambia el prompt, asi
-   que obliga a re-medir, como el Hito 0.
-2. **Umbrales**: suelo 100% en B1-B4 y juez 4.0 en Q1-Q3. ¿o se sube?
-3. **El fallback silencioso del 1.1** (tecnica inexistente -> todas las
-   tecnicas): ¿se arregla como bug antes de medir? B3 lo detecta pero no lo
-   arregla.
-4. **Referencias escritas por quien**: sin eso, Q1 es el unico juez de
+   que obliga a re-medir, como el Hito 0. **H3 lo vuelve urgente**: sin citas,
+   H2 es indetectable por diseño.
+2. **`max_tokens=1500` no alcanza** (H1). Subirlo cambia la salida, asi que hay
+   que elegir el valor **antes** de la primera run de medicion, no despues —
+   igual que se hizo con la temperatura en el Hito 1. B6 detecta el corte pero
+   no lo evita.
+3. **Umbrales**: suelo 100% en B1-B6 y juez 4.0 en Q1-Q3. ¿o se sube?
+4. **El fallback silencioso del 1.1** (tecnica inexistente -> todas las
+   tecnicas): B3 lo detecta. **H5 anade que hoy lo salva el modelo, no el
+   codigo** — se puede arreglar como bug, o declarar que se confia en esa
+   negativa y medirla. Lo que no se puede es no decidirlo.
+5. **Referencias escritas por quien**: sin eso, Q1 es el unico juez de
    fidelidad y es exactamente lo debil.
+6. **H2, el problema de fondo**: un blueprint que contradice `REPORT_COEVOLVE.md`
+   sin que nada lo señale. No hay umbral que lo arregle — es el motivo por el
+   que §3.3 (referencias a mano) deja de ser opcional y pasa a ser **el
+   trabajo del Hito 2**.
 
 ---
 
