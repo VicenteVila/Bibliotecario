@@ -1,0 +1,1907 @@
+{
+ "meta": {
+  "golden": "golden_blind_qa.jsonl",
+  "run": "candA_estado_viejo_cierre_nuevo",
+  "judge_model": "openai/gpt-oss-20b",
+  "workers": 4,
+  "providers": [
+   [
+    "nvidia",
+    "openai"
+   ],
+   [
+    "gemini1",
+    "gemini"
+   ],
+   [
+    "gemini2",
+    "gemini"
+   ]
+  ],
+  "anchor_grounding": false,
+  "temperature": 0.0
+ },
+ "aggregate": {
+  "n": 40,
+  "n_answerable": 35,
+  "n_unanswerable": 5,
+  "judge_model": "openai/gpt-oss-20b",
+  "turns": 4,
+  "retries": 1,
+  "judge_mean": 4.629,
+  "n_scored": 35,
+  "n_judge_errors": 0,
+  "n_infra": 0,
+  "infra_error_ids": [],
+  "cite_precision_mean": 0.914,
+  "cite_coverage_mean": 0.943,
+  "answer_cite_rate": 0.943,
+  "by_difficulty": {
+   "facil": 4.333,
+   "media": 4.643,
+   "dificil": 5.0
+  },
+  "abstain_rate": 0.8,
+  "n_abstain_decided": 5,
+  "n_abstain_errors": 0,
+  "n_fabricated": 1,
+  "latency_median_s": 140,
+  "false_abstention_rate": 0.0,
+  "n_false_abstention": 0,
+  "answer_rate_on_answerable": 1.0,
+  "false_abstention_ids": [],
+  "truncated": 1,
+  "fallbacks": 0,
+  "agent_tokens_total": 1127543,
+  "agent_calls_total": 200,
+  "agent_calls_tokens_unknown": 0,
+  "agent_models": [
+   "nvidia/nemotron-3-super-120b-a12b",
+   "openai/gpt-oss-20b"
+  ],
+  "judge_tokens_total": 36340
+ },
+ "rows": [
+  {
+   "id": "pearl-b1",
+   "doc_id": 1,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:1",
+    "1:6"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 458,
+    "total_tokens": 606,
+    "completion_tokens": 148,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 76,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 13291,
+    "completion_tokens": 190,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b"
+    ],
+    "total_tokens": 13481,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL evaluates on the inductive knowledge graph completion benchmarks WN18RR, FB15k-237, and NELL-995, as stated in the abstract and experimental sections of the paper. [1:1] [1:6]",
+   "run_id": "02a471365544"
+  },
+  {
+   "id": "pearl-b2",
+   "doc_id": 1,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "1:29"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 433,
+    "total_tokens": 581,
+    "completion_tokens": 148,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 177,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 14268,
+    "completion_tokens": 386,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 14654,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The hidden dimension d used for node, relation, and path embeddings in PEARL is fixed to 32. [1:29]",
+   "run_id": "4721d7210c3e"
+  },
+  {
+   "id": "pearl-b3",
+   "doc_id": 1,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 0.5,
+   "cite_coverage": 1.0,
+   "stray_docs": 1,
+   "answer_cites": 4,
+   "n_evid": 2,
+   "cite_ids": [
+    "0:1",
+    "1:17",
+    "1:53",
+    "1:54"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 485,
+    "total_tokens": 1017,
+    "completion_tokens": 532,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 169,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 12310,
+    "completion_tokens": 391,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 12701,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL uses Qwen3-4B-Instruct as its LLM-based semantic path retriever, and assigns importance scores to candidate paths in the range [0:1] [1:17][1:53][1:54].",
+   "run_id": "52e6e3cadd3e"
+  },
+  {
+   "id": "pearl-b4",
+   "doc_id": 1,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "1:29"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 546,
+    "total_tokens": 791,
+    "completion_tokens": 245,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 259,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 13302,
+    "completion_tokens": 820,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 14122,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL employs three message‑passing layers in its Contextual Subgraph Neural Network (CSNN) and three layers in its Bipartite Graph Neural Network (BGNN) [1:29]. The maximum relational path length considered is two hops (Lm = 2) [1:29], and the Relational Graph Attention Network (R‑GAT) used within BGNN has two attention heads (H = 2) [1:29].",
+   "run_id": "c5c727a3828c"
+  },
+  {
+   "id": "pearl-b5",
+   "doc_id": 1,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "1:15"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 518,
+    "total_tokens": 854,
+    "completion_tokens": 336,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 159,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 36223,
+    "completion_tokens": 540,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 36763,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "From V1 to V4, the average number of paths increases from 2.7 to 15.1, and the share of >10 paths increases from 4.05% to 29.19% [1:15].",
+   "run_id": "097e28f4a3b4"
+  },
+  {
+   "id": "pearl-b6",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "1:31"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 512,
+    "total_tokens": 732,
+    "completion_tokens": 220,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 154,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35055,
+    "completion_tokens": 644,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 35699,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL reports relative improvements in average Hits@10 of **8.67 % on WN18RR, 6.01 % on FB15k‑237, and 3.20 % on NELL‑995** over the strongest competing methods [1:31].",
+   "run_id": "d6053a7b501f"
+  },
+  {
+   "id": "pearl-b7",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 4,
+   "cite_ids": [
+    "1:60"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 719,
+    "total_tokens": 1059,
+    "completion_tokens": 340,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 99,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 19229,
+    "completion_tokens": 903,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 20132,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "PEARL’s hyper‑parameter choices are listed in Table 7 of the paper.  \nFor **WN18RR** the authors set a batch size of **8**, a learning rate of **0.001**, a subgraph hop size **k = 4**, and retained **M = 3** paths [1:60].  \nFor **FB15k‑237** the configuration is a batch size of **32**, a learning rate of **0.0005**, a hop size **k = 3**, and retained **M = 3** paths [1:60].  \nFor **NELL‑995** the chosen values are a batch size of **8**, a learning rate of **0.001**, a hop size **k = 2**, and retained **M = 5** paths [1:60].",
+   "run_id": "88405e9e70de"
+  },
+  {
+   "id": "pearl-b8",
+   "doc_id": 1,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 0,
+   "answer_cites": 0,
+   "n_evid": 1,
+   "cite_ids": [],
+   "evidence_ids": [],
+   "answer_has_cite": false,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 406,
+    "total_tokens": 576,
+    "completion_tokens": 170,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 172,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 29175,
+    "completion_tokens": 488,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 29663,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The evidence does not specify the total number of LLM queries issued by the LPRA path retriever during one full training run of PEARL.  [doc:?]",
+   "run_id": "adec5c63784d"
+  },
+  {
+   "id": "pg-b1",
+   "doc_id": 2,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "2:88"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 497,
+    "total_tokens": 731,
+    "completion_tokens": 234,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 96,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34110,
+    "completion_tokens": 373,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 34483,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The construction-strategy experiments are powered by the frozen Gemini 3.5 Flash model snapshot, and to ensure deterministic tool-calling reasoning, the sampling temperature is set to 0 and top-k sampling is configured with k=1, enforcing greedy decoding across all model calls. [2:88]",
+   "run_id": "9124fff25ca5"
+  },
+  {
+   "id": "pg-b2",
+   "doc_id": 2,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "2:88"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 458,
+    "total_tokens": 668,
+    "completion_tokens": 210,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 134,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 18560,
+    "completion_tokens": 351,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 18911,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "El límite de longitud de generación fijado es de 2 048 tokens para el agente y de 8 192 tokens para el refiner evolutivo. [2:88]",
+   "run_id": "1a67fafaab61"
+  },
+  {
+   "id": "pg-b3",
+   "doc_id": 2,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "2:24"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 514,
+    "total_tokens": 709,
+    "completion_tokens": 195,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 156,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34773,
+    "completion_tokens": 521,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 35294,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "During self-evolution, the training split is processed in sequential strides of S=100 samples on HotpotQA and S=20 samples on MultiChallenge. The validation set Dval consumed by the acceptance gate has a size of 1,000 samples. [2:24]",
+   "run_id": "8b9e39a4531f"
+  },
+  {
+   "id": "pg-b4",
+   "doc_id": 2,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "2:15"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 535,
+    "total_tokens": 806,
+    "completion_tokens": 271,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 187,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 18438,
+    "completion_tokens": 644,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 19082,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "When the concatenated training trajectories exceed the configured maximum token length \\(L_{\\max}\\), the refiner trims the context by discarding tokens from the **beginning** of the concatenated sequence while preserving the **final \\(L_{\\max}\\) tokens in their original order**. This approach keeps the trajectory ending rather than an initial prefix, ensuring that the most recent, potentially most relevant part of the trajectory is retained for the refiner’s analysis. [2:15]",
+   "run_id": "4951b2947786"
+  },
+  {
+   "id": "pg-b5",
+   "doc_id": 2,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "2:9"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 2,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 558,
+    "total_tokens": 1276,
+    "completion_tokens": 718,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 224,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34380,
+    "completion_tokens": 927,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 35307,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Unguided baseline: 4,003.24 tokens; Mode 4: 6,396.90 tokens; Mode 5: 10,115.89 tokens. On HotpotQA the comparison reverses: Mode 5 uses more tokens than Mode 4, i.e., 10,115.89 versus 6,396.90 tokens [2:9].",
+   "run_id": "33e3631db16b"
+  },
+  {
+   "id": "pg-b6",
+   "doc_id": 2,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "2:85"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 475,
+    "total_tokens": 768,
+    "completion_tokens": 293,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 140,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35794,
+    "completion_tokens": 364,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 36158,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper cautions that total token use cannot by itself establish that a graph representation is more compact because it reflects the complete interaction, including the number of steps and generated outputs, and cannot alone establish that a graph representation is more compact. [2:85]",
+   "run_id": "4b1b83bd2334"
+  },
+  {
+   "id": "pg-b7",
+   "doc_id": 2,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "2:85"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 527,
+    "total_tokens": 804,
+    "completion_tokens": 277,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 95,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 19871,
+    "completion_tokens": 327,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 20198,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Mode 1: Hand-crafted Expert PG is initialized with a human-engineered directed graph containing expert-designed tool nodes, valid transitions, and manually annotated natural language guidance. It uses a zero-shot execution training strategy with no evolutionary mutation or validation/safeguard steps, as the graph structure and guidance remain static. [2:85]",
+   "run_id": "eea41fa58c0b"
+  },
+  {
+   "id": "pg-b8",
+   "doc_id": 2,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 0,
+   "answer_cites": 0,
+   "n_evid": 2,
+   "cite_ids": [],
+   "evidence_ids": [],
+   "answer_has_cite": false,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 413,
+    "total_tokens": 597,
+    "completion_tokens": 184,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 112,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 37039,
+    "completion_tokens": 383,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 37422,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The evidence does not contain the random seed used for splitting HotpotQA into train, validation, and test portions. The provided text discusses dataset splits and experimental setups but does not specify the random seed value.  [doc:?]",
+   "run_id": "8b52f1a80ed5"
+  },
+  {
+   "id": "tce-b1",
+   "doc_id": 3,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 2,
+   "cite_ids": [
+    "3:22",
+    "3:23"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 507,
+    "total_tokens": 830,
+    "completion_tokens": 323,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 149,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 33324,
+    "completion_tokens": 384,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 33708,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Terminal-Bench 2.1 contains 89 tasks, and the two models used for search and final evaluation are GPT-5.6 Luna and Qwen3.6-35B-A3B. [3:22][3:23]",
+   "run_id": "932f80a78c05"
+  },
+  {
+   "id": "tce-b2",
+   "doc_id": 3,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "3:16"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 459,
+    "total_tokens": 624,
+    "completion_tokens": 165,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 140,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34591,
+    "completion_tokens": 548,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 35139,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "El clasificador LLM empleado en la configuración de clasificación de texto en línea es **GPT‑OSS‑120B** y se utiliza con una temperatura de **0**. [3:16]",
+   "run_id": "6cd7e3302995"
+  },
+  {
+   "id": "tce-b3",
+   "doc_id": 3,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 0,
+   "answer_cites": 0,
+   "n_evid": 2,
+   "cite_ids": [],
+   "evidence_ids": [],
+   "answer_has_cite": false,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 429,
+    "total_tokens": 546,
+    "completion_tokens": 117,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 130,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 30881,
+    "completion_tokens": 453,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 31334,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The LawBench task in the online text classification setup predicts **215 classes**【3:16】.  [doc:?]",
+   "run_id": "b12df7b9b0d8"
+  },
+  {
+   "id": "tce-b4",
+   "doc_id": 3,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "3:26"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 598,
+    "total_tokens": 903,
+    "completion_tokens": 305,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 82,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 34892,
+    "completion_tokens": 476,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 35368,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The mean test accuracies (with standard deviations) for the four ablation configurations at ρ=20% are: Naive (fixed subset) 47.2±0.6, + Random-Resample 48.2±0.5, + Full estimation with S-hat-max selection 48.8±1.4, and + Variance-weighted selection (Task-CoEvolve) 49.3±0.8 [3:26].",
+   "run_id": "6d3d21db4966"
+  },
+  {
+   "id": "tce-b5",
+   "doc_id": 3,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 3,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "3:15"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 819,
+    "total_tokens": 1719,
+    "completion_tokens": 900,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 107,
+   "agent_usage": {
+    "calls": 4,
+    "prompt_tokens": 31198,
+    "completion_tokens": 839,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 32037,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "We need to answer: \"State the anchored deviation estimator used by Task-CoEvolve, and explain why the raw outcome is not weighted directly.\"\n\nWe need evidence citations. We saw chunk [3:15] includes equation (4) anchored difference estimator: ˆS(h) = 1/N sum_t in T \\bar{p}_t + 1/N sum_{t in Sk} (x_t(h)-\\bar{p}_t)/π_t. That is anchored difference estimator. Also earlier chunk [3:15] mentions variance-weighted sampling and anchored difference estimator. Also chunk [3:15] says \"The anchor is fixed before sampling, so it cancels in expectation.\" Also chunk [3:15] says \"The raw subset mean then depends on the difficulty of the sampled tasks, so scores from different iterations are no longer comparable.\" And chunk [3:15] says \"We therefore weight not the outcome but its deviation from an anchor \\bar{p}_t, the historical success rate of task t.\" So answer: anchored deviation estimator is the anchored difference estimator (Equation 4). Raw outcome not weighted directly because tasks with success rates near 0 or 1 have low variance and are less informative; weighting raw outcome would bias estimates toward tasks that are easy or hard, making scores from different subsets incomparable. Also anchored difference estimator accounts for sampling probabilities and anchors to cancel expectation.\n\nWe need citations: [3:15] chunk. Also maybe [3:15] earlier part. Let's search for \"anchored difference estimator\" to confirm.\nsearch_papers(query=\"anchored difference estimator Task-CoEvolve\", top_k=5)",
+   "run_id": "e5a622be8a80"
+  },
+  {
+   "id": "tce-b6",
+   "doc_id": 3,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 3,
+   "cite_ids": [
+    "3:24",
+    "3:25"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 624,
+    "total_tokens": 989,
+    "completion_tokens": 365,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 93,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 35588,
+    "completion_tokens": 325,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 35913,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Task-CoEvolve reduces total search time by about half for both models: from 22.2 to 11.5 hours for GPT-5.6 Luna and from 38.0 to 20.5 hours for Qwen3.6-35B-A3B. The two fixed costs limiting further time reduction are candidate proposal by the meta-agent (2.4–3.3 hours per iteration) and the use of 10-way parallelism, which makes search time depend on the longest-running tasks rather than the number of evaluations. [3:24][3:25]",
+   "run_id": "9c523ac1a3b2"
+  },
+  {
+   "id": "tce-b7",
+   "doc_id": 3,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "3:25"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 568,
+    "total_tokens": 1015,
+    "completion_tokens": 447,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 198,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 32316,
+    "completion_tokens": 837,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 33153,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Random‑Resample reduces cost by 96 % because it simply resamples a subset of the validation set at every iteration. The paper notes that this uniform sampling tends to pick easier tasks that finish quickly, so the cost savings come from evaluating cheaper tasks rather than from a more efficient harness. In other words, the 96 % reduction should not be taken as evidence of higher efficiency, because the budget is spent on tasks that terminate quickly rather than on more informative or harder tasks that would truly reflect harness performance [3:25].",
+   "run_id": "c40e46d2d913"
+  },
+  {
+   "id": "tce-b8",
+   "doc_id": 3,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 3,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 0,
+   "answer_cites": 0,
+   "n_evid": 2,
+   "cite_ids": [],
+   "evidence_ids": [],
+   "answer_has_cite": false,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 607,
+    "total_tokens": 780,
+    "completion_tokens": 173,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": true,
+   "fallback": false,
+   "latency_s": 95,
+   "agent_usage": {
+    "calls": 4,
+    "prompt_tokens": 32954,
+    "completion_tokens": 551,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 33505,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "He revisado los resultados de las búsquedas realizadas y, aunque el documento mencionado (Task-CoEvolve) trata sobre configuración en clasificación de texto en línea, no contiene información específica sobre el costo total en USD de la fase de búsqueda para los experimentos en los conjuntos de datos Law, Symptom2Disease y el tercer conjunto de datos.\n\nTras dos intentos de búsqueda con consultas relevantes, no se ha encontrado evidencia que respalde una cifra de costo total en USD para la fase de búsqueda en los experimentos mencionados. Dado que no se dispone de información suficiente tras el límite permitido de herramientas, y siguiendo las reglas de regulación, debo responder con lo disponible o indicar la falta de evidencia.\n\nNo se encontró evidencia de los costos de búsqueda en USD para los experimentos de clasificación de texto en línea en los conjuntos de datos Law, Symptom2Disease y el tercer conjunto de datos en los resultados obtenidos.\n\nRespuesta final: No se encontró evidencia del costo total en USD de la fase de búsqueda para los experimentos de clasificación de texto en línea en los conjuntos de datos Law, Symptom2Disease y el tercer conjunto de datos en los documentos disponibles.",
+   "run_id": "ad6784a66ed1"
+  },
+  {
+   "id": "reas-b1",
+   "doc_id": 4,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 3,
+   "cite_ids": [
+    "4:10",
+    "4:68"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 580,
+    "total_tokens": 895,
+    "completion_tokens": 315,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 119,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 32035,
+    "completion_tokens": 684,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 32719,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "El agente ReASearch mantiene un archivo llamado **`lessons.md`** como memoria persistente. Cada vez que el contexto se comprime—ya sea porque el uso de tokens supera un umbral o el agente decide recortar su historial—el contenido de `lessons.md` se inserta automáticamente en el contexto comprimido para que el modelo lo tenga disponible en la siguiente ronda de razonamiento. Además, al iniciar una nueva ejecución, se puede cargar el archivo de lecciones de una corrida anterior mediante la bandera `--lessons`, permitiendo transferir conocimientos entre sesiones. [4:10] [4:68]",
+   "run_id": "a781b6b66b99"
+  },
+  {
+   "id": "reas-b2",
+   "doc_id": 4,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 0.0,
+   "cite_coverage": 0.0,
+   "stray_docs": 0,
+   "answer_cites": 0,
+   "n_evid": 2,
+   "cite_ids": [],
+   "evidence_ids": [],
+   "answer_has_cite": false,
+   "truncated": false,
+   "judge": 1,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 589,
+    "total_tokens": 995,
+    "completion_tokens": 406,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 164,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 33618,
+    "completion_tokens": 523,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 34141,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "La información disponible en los papers ingeridos no proporciona detalles específicos sobre la división de datos, el modelo estudiante o la métrica de rendimiento para la tarea de optimización de prompts en HotpotQA. El fragmento recuperado menciona promediar sobre 5 ejecuciones y el uso de GPT, pero no especifica el rol del modelo (estudiante vs. profesor), la división de datos ni la métrica exacta de rendimiento. Por lo tanto, no se puede responder con evidencia citada a la pregunta formulada.  [doc:?]",
+   "run_id": "eef57ffc57a1"
+  },
+  {
+   "id": "reas-b3",
+   "doc_id": 4,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "4:23"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 628,
+    "total_tokens": 866,
+    "completion_tokens": 238,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 123,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 31466,
+    "completion_tokens": 788,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 32254,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "On the Expert‑Parallelism Load Balancer (EPLB) task the agent plateaued at a score of about 0.21 for more than 120 turns. The diagnosis revealed that the refinement phase was stuck because the code only allowed experts with two or more replicas to donate, a rule that was too restrictive to resolve many imbalances. By temporarily permitting an expert to give up its last replica, the agent could explore beneficial intermediate states it could never reach before. This single operator change broke the plateau, raising the score from 0.21 to 0.23 [4:23].",
+   "run_id": "db0d218f0e60"
+  },
+  {
+   "id": "reas-b4",
+   "doc_id": 4,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 3,
+   "cite_ids": [
+    "4:33",
+    "4:36"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 655,
+    "total_tokens": 1278,
+    "completion_tokens": 623,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 131,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 11891,
+    "completion_tokens": 502,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 12393,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The agent follows a three-phase optimization pattern: (i) broad architectural exploration, (ii) focused hyperparameter refinement, and (iii) diminishing-returns finetuning. [4:33] For IMG-100, BN recomputation yielded a +0.47% gain (83.47%→83.94%). [4:36] Learning-rate and warmdown changes required co-tuning: reducing batch size from 218 to 217 necessitated simultaneously adjusting the learning rate (0.04→0.027) and warmdown schedule (0.6715→0.702). [4:36]",
+   "run_id": "1dfe0af7f9ce"
+  },
+  {
+   "id": "reas-b5",
+   "doc_id": 4,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "4:69"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 454,
+    "total_tokens": 689,
+    "completion_tokens": 235,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 99,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 36028,
+    "completion_tokens": 297,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 36325,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The validate_candidate tool returns only the aggregate accuracy metric without per-example trajectories to reduce overfitting to validation feedback, and the agent is withheld access to detailed validation trajectories. [4:69]",
+   "run_id": "5708791c9ac7"
+  },
+  {
+   "id": "reas-b6",
+   "doc_id": 4,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "4:36"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 560,
+    "total_tokens": 1139,
+    "completion_tokens": 579,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 151,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 31639,
+    "completion_tokens": 415,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 32054,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The paper defines detecting co-dependent improvements as identifying when parameter changes only yield gains when applied together, which single-parameter sweeps miss. In IMG-100, the agent recognized AMP (mixed-precision training) as a VRAM enabler: reducing memory from 14.3 GB to 4.1 GB made deeper architectures feasible, which in turn made CutMix augmentation beneficial and EMA stable, forming a chain of co-dependent gains (82.38%→84.03%) that collapsed if any link was removed. [4:36]",
+   "run_id": "ac283fd2b4f7"
+  },
+  {
+   "id": "reas-b7",
+   "doc_id": 4,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "4:70"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 542,
+    "total_tokens": 801,
+    "completion_tokens": 259,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 223,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 31594,
+    "completion_tokens": 734,
+    "models": [
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 32328,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "In the program‑evolution and ML‑workflow toolsets, the only git operations that are blocked are **push and remote operations**; the agent may still run `git commit`, `git log`, `git diff`, `git status`, `git reset`, and `git checkout` locally.  \nThe `run_experiment` tool **executes a time‑bounded training job and returns the resulting metrics**.  \n\n[4:70]",
+   "run_id": "023d960308eb"
+  },
+  {
+   "id": "reas-b8",
+   "doc_id": 4,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "4:23"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 453,
+    "total_tokens": 980,
+    "completion_tokens": 527,
+    "prompt_tokens_details": null
+   },
+   "abstained": false,
+   "fabricated_value": 0.23,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 260,
+   "agent_usage": {
+    "calls": 7,
+    "prompt_tokens": 34470,
+    "completion_tokens": 1227,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 35697,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The exact code diff that broke the ReASearch agent's EPLB plateau was changing the refinement phase to allow an expert to give up its last replica, which had previously been restricted to only experts with two or more replicas. This single operator change enabled the agent to explore beneficial intermediate states it could not reach before, breaking the plateau and improving the score from ∼0.21 to 0.23. [doc:4:23]",
+   "run_id": "c97dacb015c8"
+  },
+  {
+   "id": "wiki-b1",
+   "doc_id": 5,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 3,
+   "cite_ids": [
+    "5:11",
+    "5:12"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 686,
+    "total_tokens": 1542,
+    "completion_tokens": 856,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 130,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 32684,
+    "completion_tokens": 1014,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 33698,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "WikiSkill’s knowledge layer is the **Wiki directory** (`wiki/`).  \nInside it contains:  \n\n* a **patterns/** sub‑folder with individual Markdown files that document failure modes or successful strategies;  \n* a **logs.md** file that records the evolution log;  \n* a **skill‑impact.md** file that tracks the impact of each skill proposal.  \n\nThese files are updated by the **Wiki Maintainer** component, which consolidates raw traces into the wiki and writes the logs.  \n\nThe **tracking layer** consists of the two log files, **logs.md** and **skill‑impact.md**.  \n* **logs.md** is updated by the Wiki Maintainer as traces are processed.  \n* **skill‑impact.md** is updated programmatically by the outer‑loop harness after a skill proposal is validated (or rejected) during gating.  \n\nThus, the Wiki Layer (knowledge) is maintained by the Wiki Maintainer, while the tracking logs are updated by the Wiki Maintainer and the outer‑loop harness respectively. [5:11] [5:12]",
+   "run_id": "d8da0009f6fc"
+  },
+  {
+   "id": "wiki-b2",
+   "doc_id": 5,
+   "difficulty": "facil",
+   "unanswerable": false,
+   "turns": 3,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 2,
+   "n_evid": 2,
+   "cite_ids": [
+    "5:13",
+    "5:31"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 526,
+    "total_tokens": 776,
+    "completion_tokens": 250,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 81,
+   "agent_usage": {
+    "calls": 4,
+    "prompt_tokens": 24016,
+    "completion_tokens": 604,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 24620,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The Inference Agent is **restricted from accessing the Wiki Layer during training rollouts**.  \nAn ablation study shows that allowing the agent to read the Wiki during these rollouts **negatively impacts skill development**, reducing overall performance (e.g., from 63.7 % to 60.9 % average accuracy, with a notable drop on LiveMath from 72.6 % to 64.8 %). [5:13] [5:31]",
+   "run_id": "21c911bc8da8"
+  },
+  {
+   "id": "wiki-b3",
+   "doc_id": 5,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "5:56"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 548,
+    "total_tokens": 844,
+    "completion_tokens": 296,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 77,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 11527,
+    "completion_tokens": 355,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 11882,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "WikiSkill applies a stratified sampling strategy per iteration that samples up to 8 traces, stratified into a maximum of 5 failing traces for root-cause analysis and up to 3 passing traces to identify effective strategies, with each individual execution log capped at 15,000 characters before injection into the prompt for the Wiki Maintainer's diagnostic feedback [5:56].",
+   "run_id": "f301c2a3a2fd"
+  },
+  {
+   "id": "wiki-b4",
+   "doc_id": 5,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 0.5,
+   "cite_coverage": 1.0,
+   "stray_docs": 1,
+   "answer_cites": 2,
+   "n_evid": 2,
+   "cite_ids": [
+    "5:57",
+    "3:40"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 3,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 756,
+    "total_tokens": 1357,
+    "completion_tokens": 601,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 192,
+   "agent_usage": {
+    "calls": 6,
+    "prompt_tokens": 32702,
+    "completion_tokens": 1472,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 34174,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "We need to answer: \"What statistical procedure does WikiSkill use to report scores given that benchmark validation splits are small, and how are statistically tied comparisons handled?\" Use only documents. We have document [5:57] WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution. It says: \"benchmark validation splits are relatively small, which can introduce evaluation noise into gating decision. To account for this variability, all reported scores represent the average test performance across three independent runs of the entire evolutionary pipeline, with paired bootstrap significance testing (detailed in Appendix C).\" So statistical procedure: average test performance across three independent runs, with paired bootstrap significance testing. Also mention tied comparisons: We need to find how tied comparisons are handled. Search in documents for \"tied\" or \"tie\". In [3:40] Task-CoEvolve: Efficient Harness Optimization via Adaptive Validation Task Selection, there's mention of tie-breaking rule: \"When the subset is small, many candidates can have the same score. The choice of tie-breaking rule does not change the ordering of the methods. In fact, selecting the latest candidate makes the baselines worse... We therefore use the earliest candidate, which is more favorable to the baselines and also follows the implementation of Lee et al. (2026), where the first candidate reaching the best score is returned.\" That is about tie-breaking rule. But question: \"how are statistically tied comparisons handled?\" Might refer to statistical significance testing: if tied, maybe they use bootstrap to determine significance. But we need evidence. Let's search for \"statistically tied\" or \"statistically tied comparisons\" in documents. In [5:57], no mention of tie-breaking. In [3:40], tie-breaking rule. But question: \"statistically tied comparisons\" maybe refers to when two methods have statistically tied scores, how handled. Could be that they use paired bootstrap significance testing to determine if difference is significant; if not, they consider them tied. But we need citation. Let's read [5:57] again: \"We perform paired bootstrap significance testing (detailed in Appendix C).\" That indicates they test significance. But not explicit about tie handling. Maybe they treat ties as not significant. But we need to answer: \"What statistical procedure does WikiSkill use to report scores given that benchmark validation splits are small, and how are statistically tied comparisons handled?\" So answer: They average across three runs and use paired bootstrap significance testing. For tied comparisons, they use the earliest candidate tie-breaking rule? Wait, that is for Task-CoEvolve. But question specifically about WikiSkill. So maybe tied comparisons are handled by bootstrap significance testing: if the difference is not statistically significant, they consider them tied. But we need citation. Let's search for \"bootstrap\" in [5:57]. It says: \"paired bootstrap significance testing (detailed in Appendix C).\" So we can cite that. For tied comparisons, maybe they use \"paired bootstrap significance testing\" to determine significance; if tied, they treat as statistically tied. But we need evidence. Let's search for \"statistically tied\" in the documents.\nSearch manually: In [5:57] text: \"We perform paired bootstrap significance testing (detailed in Appendix C).\" No mention of ties. In [3:40] text: \"When the subset is small, many candidates can have the same score. The choice of tie-breaking rule does not change the ordering of the methods. In fact, selecting the latest candidate makes the baselines worse... We therefore use the earliest candidate, which is more favorable to the baselines and also follows the implementation of Lee et al. (2026), where the first candidate reaching the best score is returned.\" That is tie-breaking rule. But question: \"statistically tied comparisons\" maybe refers to statistical significance ties. But we can answer: They use paired bootstrap significance testing to determine if differences are significant; if not, comparisons are considered tied. But we need citation. We can cite [5:57] for the procedure. For tie handling, we can cite [3:40] for tie-breaking rule. But is that relevant to WikiSkill? The question: \"What statistical procedure does WikiSkill use to report scores given that benchmark validation splits are small, and how are statistically tied comparisons handled?\" The first part is definitely from [5:57]. The second part might be from [3:40] but that is about tie-breaking rule for Task-CoEvolve. But maybe WikiSkill also uses a tie-breaking rule? Let's search for \"tie\" in [5:57] again.\nSearch: \"tie\" not present. So tie handling might be general: they use paired bootstrap significance testing; if tied, they treat as tied. But we need to cite. We can cite [5:57] for significance testing. For tie handling, we can cite [3:40] for tie-breaking rule. But the question: \"statistically tied comparisons\" might refer to when",
+   "run_id": "a4e86a43c079"
+  },
+  {
+   "id": "wiki-b5",
+   "doc_id": 5,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "5:23"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 572,
+    "total_tokens": 890,
+    "completion_tokens": 318,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 155,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 36156,
+    "completion_tokens": 869,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 37025,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "For Qwen‑3.6‑27B, WikiSkill raises accuracy by +11.6 points on OfficeQA, +14.1 points on SealQA, +24.8 points on ALFWorld, +28.0 points on LiveMath, and +40.9 points on SpreadSheet [5:23]. The greatest benefit comes from SpreadSheet (+40.9 points), while the smallest improvement is on OfficeQA (+11.6 points).",
+   "run_id": "ce89561a752a"
+  },
+  {
+   "id": "wiki-b6",
+   "doc_id": 5,
+   "difficulty": "media",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 3,
+   "cite_ids": [
+    "5:6"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 621,
+    "total_tokens": 1504,
+    "completion_tokens": 883,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 168,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 29937,
+    "completion_tokens": 1153,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 31090,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "Evolved skills can close a sizable gap between models of very different sizes.  In the WikiSkill study, a 9‑B Qwen model equipped with evolved skills achieved an average accuracy of **47.4 %**, while a 27‑B Qwen model *without* skills scored only **39.4 %**—an **8‑point** compensation for the scale difference [5:6].  Moreover, WikiSkill’s gains grow with model size, adding **12.3 %** to a 4‑B model, **17.5 %** to a 9‑B model, and **23.9 %** to a 27‑B model, illustrating how skill evolution can substantially offset the advantage of larger models [5:6].",
+   "run_id": "8d7f28412ed8"
+  },
+  {
+   "id": "wiki-b7",
+   "doc_id": 5,
+   "difficulty": "dificil",
+   "unanswerable": false,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 3,
+   "n_evid": 2,
+   "cite_ids": [
+    "5:37",
+    "5:38",
+    "5:34"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": true,
+   "judge": 5,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 805,
+    "total_tokens": 1163,
+    "completion_tokens": 358,
+    "prompt_tokens_details": null
+   },
+   "abstained": null,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 150,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 10620,
+    "completion_tokens": 1206,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 11826,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "We need to answer: \"Trace the ALFWorld case study of wiki-guided skill evolution: what did the Wiki Maintainer identify, what did the Skill Proposer propose, and what preserved the outcome?\"\n\nWe have evidence chunks. Let's locate relevant parts.\n\nFrom chunk [5:37] and [5:38] etc. Let's read [5:37] again: It says:\n\n\"Case Study: Anatomy of Wiki-Guided Skill Evolution\n\nTo illustrate how the Wiki and Skill Layers interact during evolution, we trace a concrete example from Qwen-3.6-27B on ALFWorld, as shown in Figure 3 (simplified for presentation). At Iteration 0, the Wiki Maintainer identifies a basic looping behavior (take-examine-move-loop.md), while the Skill Proposer proposes goal-directed-action, which fails to improve performance on the validation set and is rejected. Crucially, skill-impact.md preserves the proposal diff and rejection outcome, allowing subsequent skill updates to account for this failed attempt. Informed by this audit trail, the Skill Proposer creates break-repetition-loop at Iteration 1 with a concrete action rule (Never Return an Item to Its Origin Location), which is accepted. As new loop variants emerge across rollouts (multi-operation-loop.md), the Wiki Maintainer accumulates new evidence in the persistent wiki. Guided by these accumulated wiki patterns and newly stored trajectories (not shown in the figure), the Skill Proposer further refines the skill at Iteration 4 with a new rule (Each Operation Type ONCE Per Item). This example illustrates how persistent knowledge from prior iterations informs subsequent skill refinement.\"\n\nSo the Wiki Maintainer identified a basic looping behavior (take-examine-move-loop.md). The Skill Proposer proposed goal-directed-action at iteration 0, which was rejected. Then later proposed break-repetition-loop at iteration 1, accepted. The outcome preserved was the audit trail in skill-impact.md that preserved the proposal diff and rejection outcome, allowing subsequent updates to account for failed attempt. Also the persistent wiki knowledge preserved the outcome? The question: \"what preserved the outcome?\" Likely refers to the audit trail in skill-impact.md preserving the outcome of the proposal and rejection, enabling subsequent proposals. Let's confirm.\n\nFrom [5:37] we see: \"skill-impact.md preserves the proposal diff and rejection outcome\". That is the preservation mechanism. Also the persistent wiki knowledge is preserved across iterations. But the question: \"what preserved the outcome?\" Might refer to the audit trail that preserved the outcome of the rejected proposal. Let's read [5:34] maybe: It says \"skill-impact.md preserves the proposal diff and rejection outcome\". Yes.\n\nThus answer: Wiki Maintainer identified basic looping behavior (take-examine-move-loop.md). Skill Proposer proposed goal-directed-action (which was rejected). The outcome was preserved by skill-impact.md audit trail (preserving proposal diff and rejection outcome). Also persistent wiki knowledge preserved across iterations. But we need to answer exactly: \"what did the Wiki Maintainer identify, what did the Skill Proposer propose, and what preserved the outcome?\" So:\n\n- Wiki Maintainer identified a basic looping behavior (take-examine-move-loop.md).\n- Skill Proposer proposed goal-directed-action (initially).\n- The outcome was preserved by skill-impact.md audit trail (preserving proposal diff and rejection outcome). Also the persistent wiki knowledge base preserved across iterations.\n\nLet's cite [5:37] for the identification and proposal. And [5:37] also for the audit trail. Also maybe [5:34] for skill-impact.md. Let's check [5:34] again: It says \"skill-impact.md preserves the proposal diff and rejection outcome\". Yes.\n\nThus answer with citations: [5:37] for identification and proposal, [5:34] for preservation. Also maybe [5:37] includes mention of skill-impact.md. So we can cite [5:37] for all. But to be safe, cite [5:34] for preservation.\n\nLet's craft answer: \"In the ALFWorld case study, the Wiki Maintainer first identified a basic looping pattern (take‑examine‑move‑loop.md). The Skill Proposer initially suggested a goal‑directed‑action skill, which was rejected. The rejection and the proposal diff were preserved in the audit log skill‑impact.md, allowing subsequent iterations to build on that history […truncado]",
+   "run_id": "b64f51f5d115"
+  },
+  {
+   "id": "wiki-b8",
+   "doc_id": 5,
+   "difficulty": "dificil",
+   "unanswerable": true,
+   "turns": 4,
+   "cite_precision": 1.0,
+   "cite_coverage": 1.0,
+   "stray_docs": 0,
+   "answer_cites": 1,
+   "n_evid": 2,
+   "cite_ids": [
+    "5:15"
+   ],
+   "evidence_ids": [],
+   "answer_has_cite": true,
+   "truncated": false,
+   "judge": null,
+   "judge_error": null,
+   "infra_error": null,
+   "judge_model": "openai/gpt-oss-20b",
+   "judge_usage": {
+    "prompt_tokens": 428,
+    "total_tokens": 640,
+    "completion_tokens": 212,
+    "prompt_tokens_details": null
+   },
+   "abstained": true,
+   "fabricated_value": null,
+   "looks_abstained": false,
+   "fallback": false,
+   "latency_s": 99,
+   "agent_usage": {
+    "calls": 5,
+    "prompt_tokens": 10779,
+    "completion_tokens": 311,
+    "models": [
+     "nvidia/nemotron-3-super-120b-a12b",
+     "openai/gpt-oss-20b"
+    ],
+    "total_tokens": 11090,
+    "calls_tokens_unknown": 0
+   },
+   "answer": "The Wiki Maintainer can create new pattern pages and update existing pattern pages with new evidence or refined solutions in each iteration, but there is no hard limit on the number of patterns created or updated per iteration; the Wiki Maintainer decides what updates are warranted based on the traces and the current wiki state. [5:15]",
+   "run_id": "324bbe528887"
+  }
+ ]
+}

@@ -363,7 +363,7 @@ def _close_prompt(question: str, ctx: str, anclaje: str, best: str, flat: int,
     # Dos variantes del cierre: ver PROMPT_LEGACY en state.py. La rama legacy es la
     # previa a 15261a0, literal, y existe SOLO para poder comparar los dos prompts a
     # la misma temperatura.
-    if ST.PROMPT_LEGACY:
+    if ST.CLOSE_LEGACY:
         cabecera = (
             "CIERRE OBLIGADO: responde YA en prosa (máx 150 palabras) usando solo esta "
             "evidencia.\n"

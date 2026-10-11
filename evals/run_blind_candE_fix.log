@@ -1,0 +1,25 @@
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+LLM reintentable gemini1: esperando 30s (1)
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2650.79it/s]
+LLM reintentable gemini2: esperando 30s (1)
+LLM gemini1 agotada/sobrecargada, paso a siguiente
+LLM gemini1 aparcado 15 min tras 1 fallos
+LLM reintentable gemini2: esperando 30s (1)
+LLM gemini2 agotada/sobrecargada, paso a siguiente
+LLM gemini2 aparcado 15 min tras 1 fallos
+LLM reintentable nvidia: esperando 30s (1)
+LLM gemini2 agotada/sobrecargada, paso a siguiente
+LLM gemini2 aparcado 30 min tras 2 fallos
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+reas-b3  prec=1.00 judge=5 tok= 34900 fb=False 125s
+reas-b1  prec=1.00 judge=5 tok= 34505 fb=False 190s
+
+n=40 (respondibles=35, no respondibles=5) modelo_juez=openai/gpt-oss-20b
+judge=4.4 (n=35/35, 0 errores)  por dificultad={'facil': 4.75, 'media': 4.071, 'dificil': 4.444}
+cite_precision=0.929 cite_coverage=0.943 con_cita=0.943
+abstencion_falsa=0.0 [] (respondidas=1.0)
+abstain_rate=0.8 (decididas=5/5, 0 errores) inventadas=1
+tokens_agente=1158139 en 202 llamadas | tokens_juez=34727 | latencia_mediana=143s
+truncadas=1 fallbacks=0 -> result_blind_candE.json

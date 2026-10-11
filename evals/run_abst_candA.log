@@ -1,0 +1,258 @@
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2082.27it/s]
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+pearl-u1 prec=1.00 abst=False tok= 37239 fb=False 102s
+pearl-b8 prec=0.00 abst=True tok= 30192 fb=False 104s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pearl-u3 prec=0.00 abst=False tok= 31143 fb=False 155s
+LLM reintentable nvidia: esperando 30s (1)
+pearl-u4 prec=1.00 abst=True tok= 36755 fb=False 96s
+pearl-u2 prec=1.00 abst=False tok= 37239 fb=False 198s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pearl-u6 prec=0.00 abst=False tok= 35582 fb=False 65s
+pearl-c8 prec=1.00 abst=True tok= 35918 fb=False 237s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+pearl-u8 prec=1.00 abst=True tok= 37203 fb=False 115s
+LLM reintentable nvidia: esperando 30s (1)
+pearl-u5 prec=1.00 abst=False tok= 35290 fb=False 227s
+LLM reintentable nvidia: esperando 30s (1)
+pg-c8    prec=1.00 abst=True tok= 21186 fb=False 103s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pg-b8    prec=0.00 abst=True tok= 38372 fb=False 151s
+pearl-u7 prec=1.00 abst=False tok= 37497 fb=False 194s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+pg-u5    prec=1.00 abst=True tok= 20352 fb=False 90s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+pg-u3    prec=0.00 abst=True tok= 34695 fb=False 160s
+pg-u1    prec=1.00 abst=True tok= 24180 fb=False 209s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pg-u2    prec=0.00 abst=True tok= 35232 fb=False 208s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+tce-b8   prec=0.00 abst=True tok= 36798 fb=False 155s
+pg-u4    prec=1.00 abst=True tok= 25194 fb=False 268s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+tce-u1   prec=1.00 abst=True tok= 36113 fb=False 185s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+tce-u3   prec=0.00 abst=True tok= 32450 fb=False 200s
+tce-u2   prec=0.00 abst=True tok= 34512 fb=False 225s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+reas-b8  prec=1.00 abst=False tok= 32158 fb=False 110s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+tce-u4   prec=1.00 abst=False tok= 35422 fb=False 174s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+tce-u5   prec=0.00 abst=True tok= 36175 fb=False 202s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+reas-u1  prec=0.00 abst=True tok= 34490 fb=False 170s
+reas-u2  prec=0.00 abst=True tok= 35412 fb=False 123s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+reas-c8  prec=1.00 abst=False tok= 32969 fb=False 184s
+LLM reintentable nvidia: esperando 30s (1)
+wiki-b8  prec=1.00 abst=True tok= 11103 fb=False 119s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+reas-u3  prec=1.00 abst=True tok= 35595 fb=False 159s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-u2  prec=0.00 abst=True tok= 27466 fb=False 99s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-u4  prec=0.00 abst=True tok= 31227 fb=False 88s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-c8  prec=0.00 abst=True tok= 27560 fb=False 187s
+LLM reintentable nvidia: esperando 30s (1)
+wiki-u3  prec=1.00 abst=False tok= 12447 fb=False 142s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-u1  prec=0.00 abst=True tok= 15096 fb=False 210s
+wiki-u5  prec=0.00 abst=True tok= 11967 fb=False 105s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-u6  prec=0.00 abst=False tok= 36511 fb=False 117s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hsurvey-d8 prec=0.50 abst=True tok= 34119 fb=False 140s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hsurvey-u1 prec=0.00 abst=True tok= 33677 fb=False 159s
+hsurvey-u2 prec=0.00 abst=True tok= 36541 fb=False 144s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+hsurvey-u4 prec=0.00 abst=True tok= 35070 fb=False 120s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hsurvey-u3 prec=0.00 abst=False tok= 34402 fb=False 217s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hal-u2   prec=0.00 abst=True tok= 30915 fb=False 98s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hal-u1   prec=0.00 abst=False tok= 34290 fb=False 145s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hal-u3   prec=0.00 abst=True tok= 35630 fb=False 140s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+hal-d8   prec=0.00 abst=None tok= 36635 fb=False 235s
+evobench-u1 prec=0.50 abst=True tok= 32293 fb=False 79s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+hal-u4   prec=0.00 abst=True tok= 35092 fb=False 161s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evobench-d8 prec=0.00 abst=True tok= 34721 fb=False 176s
+evobench-u3 prec=0.00 abst=False tok= 29116 fb=False 75s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evobench-u5 prec=0.00 abst=True tok= 31674 fb=False 76s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evalsurvey-u2 prec=0.00 abst=True tok= 34991 fb=False 57s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+evobench-u2 prec=0.00 abst=None tok= 33363 fb=False 241s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+evalsurvey-u1 prec=0.00 abst=False tok= 33181 fb=False 142s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evalsurvey-d8 prec=0.25 abst=True tok= 36172 fb=False 185s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evalsurvey-u5 prec=0.00 abst=True tok= 36922 fb=False 71s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evalsurvey-u4 prec=0.00 abst=False tok= 31309 fb=False 150s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+evalsurvey-u3 prec=0.00 abst=False tok= 32335 fb=False 217s
+disclose-u1 prec=0.00 abst=True tok= 33797 fb=False 97s
+evobench-u4 prec=0.00 abst=False tok= 36400 fb=False 395s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+disclose-u2 prec=0.50 abst=True tok= 32547 fb=False 112s
+disclose-d8 prec=0.00 abst=True tok= 36380 fb=False 219s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+disclose-u3 prec=0.00 abst=False tok= 33930 fb=False 115s
+LLM reintentable nvidia: esperando 30s (2)
+disclose-u5 prec=0.00 abst=True tok= 36250 fb=False 128s
+disclose-u4 prec=0.00 abst=False tok= 38284 fb=False 158s
+
+n=64 (respondibles=0, no respondibles=64) modelo_juez=openai/gpt-oss-20b
+abstain_rate=0.677 (decididas=62/64, 2 errores) inventadas=14
+tokens_agente=2068776 en 340 llamadas | tokens_juez=50162 | latencia_mediana=151s
+truncadas=0 fallbacks=0 -> result_abst_candA.json

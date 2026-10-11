@@ -96,7 +96,20 @@ def _retry_delay(exc: Exception, default: float = 30.0) -> float:
         return default
 
 
+class TransientResponse(RuntimeError):
+    """HTTP 200 con un cuerpo que no es una completacion valida.
+
+    NVIDIA a veces devuelve 200 OK con un payload de error en lugar de
+    `choices`. Clasificado como "other" caia en la rama de `strict_fallback` y
+    reventaba la RUN ENTERA: murio `abst_candC` a las 22/64 y se perdio la mitad
+    del coste de la run. Un 200 malformado es transitorio por definicion: se
+    reintenta como cualquier 5xx.
+    """
+
+
 def _classify(exc: Exception) -> str:
+    if isinstance(exc, TransientResponse):
+        return "retryable"
     s = str(exc)
     code = getattr(exc, "code", None)
     if code == 401 or code == 403 or "401" in s or "403" in s or "API_KEY_INVALID" in s:
@@ -142,7 +155,11 @@ def _openai_compat_usage(base_url: str, api_key: str, model: str, prompt: str,
             d = json.loads(r.read().decode())
     except urllib.error.HTTPError as e:
         raise RuntimeError(f"HTTP {e.code}: {e.read()[:300].decode(errors='replace')}") from e
-    msg = d["choices"][0]["message"]
+    choices = d.get("choices") if isinstance(d, dict) else None
+    msg = choices[0].get("message") if choices and isinstance(choices[0], dict) else None
+    if not msg:
+        raise TransientResponse(
+            f"HTTP 200 sin choices: {json.dumps(d, ensure_ascii=False)[:300]}")
     usage = d.get("usage") or {}
     _usage_sink().append({**usage, "model": model})
     return (msg.get("content") or msg.get("reasoning_content") or "").strip(), usage

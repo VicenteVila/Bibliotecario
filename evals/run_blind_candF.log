@@ -1,0 +1,170 @@
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+Direct use of automatic function calling (AFC) in Models.generate_content is not recommended. Instead, we recommend to use AFC in Chat.send_message. Similarly, direct use of AFC in Models.generate_content_stream is not recommended. Instead, we recommend to use AFC in Chat.send_message_stream.
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1279.73it/s]
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 2430.00it/s]
+Loading weights:   0%|          | 0/103 [00:00<?, ?it/s]Loading weights: 100%|██████████| 103/103 [00:00<00:00, 1547.85it/s]
+LLM reintentable gemini2: esperando 30s (1)
+LLM reintentable gemini1: esperando 30s (1)
+LLM reintentable gemini1: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM gemini1 agotada/sobrecargada, paso a siguiente
+LLM gemini2 agotada/sobrecargada, paso a siguiente
+LLM gemini1 aparcado 15 min tras 1 fallos
+LLM gemini2 aparcado 15 min tras 1 fallos
+LLM reintentable gemini2: esperando 30s (1)
+LLM gemini1 agotada/sobrecargada, paso a siguiente
+LLM gemini1 aparcado 30 min tras 2 fallos
+LLM reintentable gemini2: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM gemini2 agotada/sobrecargada, paso a siguiente
+LLM gemini2 aparcado 30 min tras 2 fallos
+LLM gemini2 agotada/sobrecargada, paso a siguiente
+LLM gemini2 aparcado 60 min tras 3 fallos
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pearl-b3 prec=1.00 judge=5 tok= 11311 fb=False 109s
+pearl-b4 prec=1.00 judge=5 tok= 15683 fb=False 110s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pearl-b1 prec=1.00 judge=5 tok= 12972 fb=False 134s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pearl-b2 prec=1.00 judge=5 tok= 15417 fb=False 174s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pearl-b6 prec=1.00 judge=5 tok= 40116 fb=False 99s
+pearl-b5 prec=1.00 judge=5 tok= 34990 fb=False 110s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pg-b1    prec=1.00 judge=5 tok= 35356 fb=False 77s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+pearl-b7 prec=1.00 judge=5 tok= 20192 fb=False 178s
+LLM reintentable nvidia: esperando 30s (1)
+pg-b2    prec=1.00 judge=5 tok= 20959 fb=False 103s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pearl-b8 prec=1.00 abst=True tok= 31793 fb=False 193s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pg-b4    prec=1.00 judge=5 tok= 19783 fb=False 108s
+LLM reintentable nvidia: esperando 30s (1)
+pg-b5    prec=1.00 judge=2 tok= 38324 fb=False 113s
+LLM reintentable nvidia: esperando 30s (1)
+pg-b3    prec=1.00 judge=5 tok= 35759 fb=False 161s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pg-b6    prec=1.00 judge=5 tok= 35197 fb=False 125s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pg-b7    prec=1.00 judge=5 tok= 21430 fb=False 108s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+tce-b2   prec=1.00 judge=5 tok= 39246 fb=False 81s
+LLM reintentable nvidia: esperando 30s (1)
+tce-b1   prec=0.00 judge=1 tok= 33660 fb=False 130s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+pg-b8    prec=0.50 abst=True tok= 39079 fb=False 205s
+tce-b3   prec=1.00 judge=5 tok= 33933 fb=False 121s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+tce-b6   prec=1.00 judge=5 tok= 36939 fb=False 75s
+tce-b4   prec=1.00 judge=5 tok= 33335 fb=False 155s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+tce-b5   prec=1.00 judge=5 tok= 35215 fb=False 168s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+tce-b7   prec=1.00 judge=4 tok= 36020 fb=False 182s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+reas-b2  prec=1.00 judge=5 tok= 33374 fb=False 132s
+LLM reintentable nvidia: esperando 30s (1)
+reas-b1  prec=1.00 judge=5 tok= 32637 fb=False 168s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+tce-b8   prec=0.00 abst=None tok= 38597 fb=False 200s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+reas-b3  prec=1.00 judge=5 tok= 33077 fb=False 144s
+LLM reintentable nvidia: esperando 30s (1)
+reas-b4  prec=1.00 judge=5 tok= 12824 fb=False 105s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+reas-b5  prec=1.00 judge=5 tok= 35481 fb=False 141s
+LLM reintentable nvidia: esperando 30s (1)
+reas-b6  prec=1.00 judge=5 tok= 33387 fb=False 145s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+reas-b7  prec=1.00 judge=5 tok= 33707 fb=False 104s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-b1  prec=0.00 judge=2 tok= 36270 fb=False 112s
+LLM reintentable nvidia: esperando 30s (1)
+reas-b8  prec=0.00 abst=True tok= 34583 fb=False 176s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-b2  prec=1.00 judge=5 tok= 27219 fb=False 107s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-b3  prec=1.00 judge=5 tok= 12149 fb=False 154s
+wiki-b6  prec=1.00 judge=5 tok= 33020 fb=False 84s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-b4  prec=1.00 judge=5 tok= 34299 fb=False 137s
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (1)
+wiki-b5  prec=1.00 judge=5 tok= 40209 fb=False 153s
+LLM reintentable nvidia: esperando 30s (1)
+wiki-b7  prec=1.00 judge=5 tok= 12874 fb=False 131s
+wiki-b8  prec=1.00 abst=False tok= 12433 fb=False 159s
+
+n=40 (respondibles=35, no respondibles=5) modelo_juez=openai/gpt-oss-20b
+judge=4.686 (n=35/35, 0 errores)  por dificultad={'facil': 4.417, 'media': 4.786, 'dificil': 4.889}
+cite_precision=0.943 cite_coverage=0.943 con_cita=0.943
+abstencion_falsa=0.0 [] (respondidas=1.0)
+abstain_rate=0.75 (decididas=4/5, 1 errores) inventadas=0
+tokens_agente=1172849 en 205 llamadas | tokens_juez=35211 | latencia_mediana=125s
+truncadas=1 fallbacks=0 -> result_blind_candF.json

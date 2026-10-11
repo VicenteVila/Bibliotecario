@@ -1,4 +1,6 @@
 """Failover de keys: 429 agota reintentos y salta; 401 salta directo sin esperar."""
+import json
+
 import pytest
 
 import bibliotecario.core.llm as LLM
@@ -242,3 +244,64 @@ def test_con_varios_proveedores_aparca_seguido(monkeypatch):
     monkeypatch.setattr(LLM, "_providers", lambda: [("nvidia", "openai"), ("gemini1", "gemini")])
     LLM._mark_dead("nvidia")
     assert LLM._is_dead("nvidia")
+
+
+class _Resp200:
+    """Respuesta 200 OK con un cuerpo que no es una completacion."""
+
+    def __init__(self, payload):
+        self._p = payload
+
+    def read(self):
+        return json.dumps(self._p).encode()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *a):
+        return False
+
+
+def test_payload_200_sin_choices_es_reintentable(monkeypatch):
+    """NVIDIA devuelve 200 OK con un payload de error: tiene que reintentar.
+
+    Antes era KeyError -> _classify -> "other" -> strict_fallback -> se tumbaba
+    la run ENTERA. Mato `abst_candC` a las 22/64 y llevo por delante la mitad
+    del coste de la run. Un 200 malformado es transitorio por definicion.
+    """
+    monkeypatch.setattr("urllib.request.urlopen",
+                        lambda req, timeout=0: _Resp200({"error": "overloaded"}))
+    with pytest.raises(LLM.TransientResponse):
+        LLM._openai_compat_usage("https://x/v1", "k", "m", "p", 10)
+    assert LLM._classify(LLM.TransientResponse("HTTP 200 sin choices: {}")) == "retryable"
+
+
+def test_payload_200_sin_message_tambien(monkeypatch):
+    """choices existe pero vacio o sin message: mismo tratamiento."""
+    monkeypatch.setattr("urllib.request.urlopen",
+                        lambda req, timeout=0: _Resp200({"choices": []}))
+    with pytest.raises(LLM.TransientResponse):
+        LLM._openai_compat_usage("https://x/v1", "k", "m", "p", 10)
+    monkeypatch.setattr("urllib.request.urlopen",
+                        lambda req, timeout=0: _Resp200({"choices": [{}]}))
+    with pytest.raises(LLM.TransientResponse):
+        LLM._openai_compat_usage("https://x/v1", "k", "m", "p", 10)
+
+
+def test_un_200_malformado_no_tumba_la_run(monkeypatch):
+    """Se reintenta y acaba devolviendo, en vez de propagar y matar el proceso."""
+    monkeypatch.setattr(LLM, "_providers", lambda: [("nvidia", "openai")])
+    monkeypatch.setattr(LLM, "_retry_delay", lambda exc, default=30.0: 0.0)
+    llamadas = []
+
+    def fake(base, key, model, p, mt, **kw):
+        llamadas.append(model)
+        if len(llamadas) < 2:
+            raise LLM.TransientResponse("HTTP 200 sin choices: {}")
+        return "ok"
+
+    monkeypatch.setattr(LLM, "_openai_compat", fake)
+    assert LLM.generate("x", retries=2, strict_fallback=True) == "ok"
+    assert len(llamadas) == 2
+    # y no ha apartado al proveedor por un fallo transitorio
+    assert not LLM._is_dead("nvidia")
