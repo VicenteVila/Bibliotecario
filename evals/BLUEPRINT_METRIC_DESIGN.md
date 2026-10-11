@@ -88,14 +88,15 @@ blueprint que **recomienda conectar una tecnica a un release gate** cuando
 nuestro propio informe la descarto con datos. Y al no haber citas (H3),
 **no existe ninguna comprobacion mecanica que lo detecte**. Eso es exactamente
 lo que §2.A llama *"ningun modulo inventado sin respaldo en el corpus"*,
-y hoy es indetectable sin referencias escritas a mano (§3.3).
+y hoy es indetectable: hace falta que el juez reciba el informe que se
+contradice (Q4) y el paper delante (Q1), que es lo que propone §3.3.
 
 ---
 
 ## 2. Que hay que medir
 
 Un blueprint es bueno si **un ingeniero podria usarlo para implementar la
-tecnica**. Eso se descompone en tres cosas que son critica y
+technica**. Eso se descompone en **cinco** cosas que son critica y
 separadamente verificables:
 
 ### A. Fidelidad — ¿refleja el paper?
@@ -126,13 +127,114 @@ Declarar el Hito 2 cerrado con solo A+B+C seria **el mismo error de forma** que
 tener el umbral de calidad calibrado contra un tramposo: un gate verde que no
 dice lo que la palabra «cumplido» sugiere.
 
+### E. Escritura — ¿sale escrito como lo haria un humano?
+
+**No es una metrica: es la especificacion del artefacto.** Es lo que se le pide
+al modelo que produzca, y las metricas de §3 comprueban si lo ha producido.
+Concreta el **P2** de §5.5, que hasta aqui solo decia «dos secciones».
+
+Formulada por el responsable el 2026-10-11: *«que se comporte como lo haria un
+humano al enfrentarse a la misma tarea»* — cita el paper consultado,
+entrecomilla lo exacto, referencia a los autores, y todo lo demas que hace
+quien realmente ha trabajado la fuente.
+
+**Por que estas reglas y no «que suene bien» — el publico real.** El responsable
+no esta construyendo esto para publicar en revista: se esta especializando en
+**diseno y evaluacion de arneses**, el agente es su instrumento, y la salida
+queda **mayoritariamente privada**. De vez en cuando sale a la luz — **blog
+propio, CV, o un hallazgo si lo hay** — **y siempre tras revision de expertos
+humanos**. Eso cambia el calculo:
+
+- **Un error de cita deja de ser un test fallado y pasa a ser un evento
+  reputacional.** Un experto **pillara** una cita inventada, y **una sola
+  pillada desacredita el documento entero** — y con el, la afirmacion de que el
+  trabajo es riguroso, que es justamente lo que el CV necesita demostrar.
+  **B9/B10/B11 son proteccion, no burocracia.**
+- **El blueprint es ademas como el responsable aprende el campo.** Si la manera
+  de enterarse de como funciona PEARL es leer lo que genera el agente, **una
+  fabricacion no es un fallo de calidad: es desinformacion sobre el campo que
+  intenta dominar** — y es peor que inutil, porque **no puede detectarla** (no
+  domina el idioma ni el paper) **y se la cree**. Por eso **R4 y R5 son
+  condicion para que el sistema ensene algo verdadero**, no un extra.
+- **El publico deja de ser «un ingeniero» y pasa a ser «un experto».** La
+  dimension B preguntaba *¿un ingeniero sabria por donde empezar mañana?* —
+  umbral bajo. Un experto detecta relleno plausible y atribucion vaga al
+  primer parrafo, y **4.0 del juez no garantiza eso**.
+
+| # | regla | en cristiano |
+|---|---|---|
+| **R1** | **Dice de donde sale** | *«Segun Miyai et al. (2025)…»*, no *«el sistema selecciona tareas»* sin mas |
+| **R2** | **Entrecomillado ⇔ literal** | comillas **solo** cuando la frase es identica al original |
+| **R3** | **Parrafrasis sin comillas, pero atribuida** | con tus palabras + quien lo dice; nunca comillas sobre texto reescrito |
+| **R4** | **No atribuye lo que la fuente no dice** | si el paper no lo contempla, no aparece atribuido a el |
+| **R5** | **Declara los silencios** | *«el paper no especifica como se fija epsilon»* en vez de rellenarlo |
+| **R6** | **Separa lo suyo de lo del paper** | *propuesta del blueprint* vs *fuente* — marcado, no mezclado |
+| **R7** | **Bibliografia de lo realmente consultado** | autores correctos, referenciando los papers usados |
+
+**R4 y R5 son las que separan a un modelo de un humano.** Un LLM rellena los
+huecos y se los atribuye a la fuente; quien ha leído el documento dice *«esto
+no esta aqui»*.
+
+**Y son exactamente las que fallaron en H1-H5.** El blueprint de Task-CoEvolve
+invento modulos (R4), prometio garantias que `REPORT_COEVOLVE.md` descarto
+(R4), y jamas dijo que el paper no contempla conectarlo a un release gate (R5).
+
+**Tres prerequisitos sin los cuales R1-R7 no se pueden ni cumplir:**
+
+1. **Extraccion de autores al ingerir.** Hoy **no existe el campo**: `documents`
+   solo tiene `id, path, title, paper_hash, ingested_at, metadata`, y `metadata`
+   es `NULL` en los 5 papers de tecnica. Los autores estan **solo dentro del
+   texto** del chunk 0. Hay que extraerlos y **verificar cada nombre literal en
+   ese chunk** antes de guardarlo — igual que todo lo demas.
+2. **El juez calibrado (§6 dec. 5, punto 5c).** R4 y R5 **no son mecanicas**:
+   requiere comparar el blueprint con el paper y notar lo que falta. Sin
+   calibrar al juez con los defectos ya conocidos de Task-CoEvolve, R4/R5 se
+   estarian declarando cumplidas sin que nadie las verifique de verdad.
+3. **Bibliografia publicable, no solo procedencia interna.** Comprobado
+   campo a campo: **autores** solo en el texto del chunk 0 · **anio** no
+   extraido · **arXiv propio** **no aparece** en el chunk 0 de ninguno de los
+   10 documentos · **venue/DOI** no extraido. Con `[doc:chunk]` el sistema se
+   rastrea a si mismo, pero **no puede producir una cita citable como la
+   haria un humano** — que es exactamente R7. Mientras la salida sea interna no
+   importa; **en cuanto salga al blog o al CV si**, y pasa a ser requisito:
+   autores + anio (+ arXiv/DOI si aparecen en los metadatos del PDF aunque no
+   en el texto extraido).
+
+**Un recurso que ya esta en el corpus y nadie ha usado:** de los 10
+documentos, **dos son sobre metodologia de evaluacion de arneses** — el doc 9
+(*Evaluation and Benchmarking of LLM Agents: A Survey*) y el doc 10
+(*Stop Comparing LLM Agents Without Disclosing the Harness*). O sea: **seguir
+los criterios cientificos del campo no es una aspiracion vaga, es comprobable
+contra el propio corpus.** El sistema podria fundamentar sus decisiones
+metodologicas citando esos papers en vez de inventarse una metodologia, y es
+gratis — y es exactamente el campo en el que el responsable se esta
+especializando.
+
+**Que existan las reglas no basta.** El modelo dira que las sigue y no las
+sigue: H3 salio de un prompt que no pedia citas, y H5 lo salvo el modelo *por
+su cuenta* una sola vez. **R1-R7 van en el prompt; B7-B11 son la prueba de que
+el prompt funciono.** Las dos, o no vale ninguna.
+
+| regla | se comprueba con |
+|---|---|
+| R1, R2 | **B7, B8, B9** |
+| R3, R4, R5 | **Q1** con el paper delante *(calibrado, §6 dec. 5)* |
+| R4 | **B11** (texto copiado sin comillas) · **B10** (fuente no ingerida) |
+| R6 | marcador de sintesis sin citas dentro |
+| R7 | **B10** |
+
 ---
 
 ## 3. La metrica propuesta
 
 Se mantiene la estructura del Hito 0/Hito 1: **suelo mecanico gratis + piso de
-calidad con juez + referencias hechas a mano**. Lo que no se mide no se
+calidad con juez + una referencia de verdad**. Lo que no se mide no se
 puede declarar cumplido.
+
+La diferencia respecto al Hito 1: alli la referencia (`golden_abstention`) se
+escribio a mano **porque el responsable conocia el dominio**. Aqui no — y el
+producto existe precisamente para que no hace falta que lo conozca (§3.3). **El
+corpus es el oro.**
 
 ### 3.1 Suelo mecanico (gratis, determinista)
 
@@ -149,6 +251,20 @@ sin tocar un LLM y que **no se pueden negociar**.
 | **B6** | `BLUEPRINT.md` **termina en una estructura markdown completa** | acaba en una tabla `| :---` sin filas, o en un ` ``` ` sin cerrar — es decir, `max_tokens=1500` no alcanzo y **nadie lo sabe** (medido: H1) |
 | **B7** | *(propuesta §5.5-P3)* **`BLUEPRINT.md` lleva `[doc:chunk]`** — umbral `>= 3` distintas (§6 dec. 1) | da **0**, que es exactamente lo que midio **H3** |
 | **B8** | *(propuesta)* **todas las citas resuelven**: cada `[doc:x:c]` apunta a un chunk existente y no vacio | una cita bien formada que **no existe** en la BD — B7 pasa, el anclaje es mentira |
+| **B9** | *(propuesta R2)* **toda cita literal entre «» aparece identica en su chunk** | el modelo pone comillas sobre texto que **no es literal** — atribuye a los autores una frase que no escribieron |
+| **B10** | *(propuesta R7)* **toda entrada de la bibliografia corresponde a un documento ingerido**, y sus autores **aparecen en su chunk 0** | una fuente o un autor que **no esta** en el corpus — el `0/64` del Hito 1 aplicado a la bibliografia |
+| **B11** | *(propuesta R4)* **ninguna frase larga (>= 8 palabras) del blueprint aparece en el corpus sin ir entrecomillada** | prosa copiada de la fuente sin decirlo — el plagio, medido mecanicamente |
+
+**B9, B10 y B11 son las comprobaciones de R2, R7 y R4** (§2.E), y las tres son
+`string match` / `lookup`: **0 tokens**. B11 es B9 al revés: no mira si lo que
+citas es exacto, sino si **te has copiado texto sin decirlo**. El umbral de 8
+palabras evita falsos positivos con nomenclatura (`Hájek full-set estimation`
+aparecera literal y esta bien, porque es nombre tecnico, no prosa ajena).
+
+**El orden importa.** R1-R7 van en el **prompt**; B7-B11 son la **prueba** de
+que el prompt funciono. Las dos cosas, o no vale ninguna: el modelo dira que
+cumple las reglas y no las cumple — H3 salio de un prompt que no pedia citas, y
+H5 lo salvo el modelo por su cuenta una sola vez.
 
 **B2 hoy no puede fallar.** El `agent_template.py` que genera
 `instantiate_agent_template` tiene un `run()` que recorre `STEPS` y anota
@@ -171,8 +287,8 @@ incumplimiento de una regla que nadie puso.**
 
 `procedures` sale del grafo sembrado asi que B3 es literalmente gratis
 (un `set` de nombres), y B1/B2/B4/B6 son gratis igual (B6 es leer las
-dos ultimas lineas del fichero). B7/B8 son un `grep` y un `lookup`. **B5 solo si
-se cambia el prompt.**
+dos ultimas lineas del fichero). **B7-B11 son `grep`, `lookup` y comparacion de
+cadenas: 0 tokens.** B5 solo si se cambia el prompt.
 
 ### 3.2 Piso de calidad (juez, si)
 
@@ -187,7 +303,7 @@ distinta al agente), **declaradas antes de medir**:
 | Q4 | **coherencia interna** *(propuesta, §6 dec. 6)* | ¿afirma algo que un `REPORT_*.md` del propio proyecto contradiga? H2 es el caso de prueba |
 
 Umbrales propuestos (a confirmar — **borrador de §6 dec. 3**): suelo en
-**B1-B8 = 100%**, juez `mean >= 4.0` en Q1-Q3 **y ninguna rubrica `< 3.0`**, y
+**B1-B11 = 100%**, juez `mean >= 4.0` en Q1-Q3 **y ninguna rubrica `< 3.0`**, y
 **Q4 = 0 contradicciones** (binario). El 4.0 es mas bajo que el 4.50 del Hito 1
 porque hay **3 rubricas en vez de una pregunta de 35 items**, o sea menos
 muestra y mas ruido por item: bajar el umbral compensa el MDE peor.
@@ -200,21 +316,61 @@ Propuesta: **re-juzgar los mismos 15 resultados una vez** (~30 k) y exigir
 `judge_sd <= 0.15` antes de interpretar la media. Sin ese numero, la nota del
 juez es un dato, no una medicion.
 
-### 3.3 Referencia escrita a mano (el trabajo que nadie ha hecho)
+### 3.3 La referencia: **el corpus es el oro** (no el responsable)
+
+*(Revisado el 2026-10-11. La propuesta original era «escribir 5 referencias a
+mano». Se descarto, y el motivo es de principio, no de tiempo.)*
 
 El problema real del Hito 2 **no es el score, es que no hay oro**: el juez no
 sabe si el blueprint es correcto para PEARL, solo si suena bien. Lo mismo que
-sin `golden_qa.jsonl` no se podria medir QA, sin referencias no se puede medir
-fidelidad.
+sin `golden_qa.jsonl` no se podria medir QA.
 
-Propuesta: **escribir a mano 5 blueprints de referencia** (una por tecnica
-sembrada), directamente de los papers, con lo que debe aparecer y lo que no
-deberia. Son ~5 documentos de trabajo, **0 tokens**.
+**Por que no la escribe el responsable:**
 
-Con ellas la fidelidad pasa a ser comprobable de verdad: se cuentan los pasos
-de referencia que el sistema **cubre**, los que **omite** y los que **inventa**.
-Ese triple — *cubierto / omitido / inventado* — es la medicion, y es el
-equivalente exacto de la fabricacion del Hito 0.
+> El producto existe **precisamente** porque el usuario no puede leer esos
+> papers — ni los actuales ni los que vendran en idiomas que no domina. Una
+> metrica que exige que el responsable conozca el dominio **solo funciona en
+> las 5 tecnicas de prueba y muere en cuanto hay produccion**.
+
+Y hay una segunda razon aun mas dura: **no podria auditar si la referencia es
+correcta**, porque no entiende el idioma. Solo veria que *esas palabras estan en
+el documento*, no que signifiquen lo que dice. **La revision humana sobre
+contenido no es viable aqui por principio.**
+
+**La alternativa — cuatro piezas:**
+
+| | pieza | que hace |
+|---|---|---|
+| **5a** | **El juez recibe el paper** | hoy Q1 le pregunta si los pasos corresponden al paper **sin darle el paper**: solo puede contestar «suena plausible». Con la fuente delante puede distinguir **cubierto / inventado / omitido** |
+| **5b** | **Referencia por extraccion anclada** | si se quiere un fichero material, que se **extraiga del paper y se verifique contra el**: cada paso tiene que tener un chunk que lo soporte; **lo sin soporte se descarta**. El borrador **no puede inventar** porque cualquier paso alucinado se cae al comprobarlo |
+| **5c** | **Calibracion con defectos ya conocidos** | **obligatorio.** Ver abajo |
+| **5d** | **Rol del responsable** | no redacta: **fija reglas y revisa discrepancias** — exactamente lo que hizo en el Hito 1, donde no escribio los 64 golden a mano sino que decidio que se midiera `0/64` |
+
+**5c es lo que convierte esto de «algo en lo que hay que confiar» en algo
+comprobado antes de gastar.** Tenemos en `data/agents/task-coevolve/BLUEPRINT.md`
+un blueprint con defectos **ya documentados**:
+
+| defecto conocido | rubrica que deberia pillarlo |
+|---|---|
+| Modulos inventados (`Adaptive Harness Execution Engine`, `History Profiler`) | **Q1** con el paper delante |
+| Promete *«garantias estadisticas»* que `REPORT_COEVOLVE.md` descarto | **Q4** con el informe delante |
+
+Si al juez con la fuente puesta **no le pillan ninguno de los dos, Q1 y Q4 no
+sirven** — y lo sabemos **antes** de pagar la medicion. Es el mismo truco que
+hizo el Hito 1 con `golden_abstention`: casos de oro ya construidos, gratis.
+
+**Coste:** ~5-15 k de contexto por paper x 15 blueprints ≈ **75-225 k**, mas
+**~10-20 k** de calibracion. **Tiempo del responsable: ~1 h** de revision de
+discrepancias, en vez de ~8 h de redaccion.
+
+**Lo que NO resuelve — y hay que declararlo:**
+
+1. **No valida el significado en un idioma que no domina.** El sistema se apoya
+   en que el modelo lee bien y el usuario no puede cazar un error de
+   comprension. Es una dependencia real, y va en el cierre de §7, no se
+   descubre despues.
+2. **5b sin 5c sigue sin ser independiente** si el mismo modelo extrae y
+   evalua. Por eso **5c es obligatorio, no opcional**.
 
 ### 3.4 Suite negativa (no existe, y es el criterio que mas pesa)
 
@@ -227,10 +383,25 @@ con el mismo hueco que tuvo que tapar el Hito 0 creando `golden_abstention`.
 
 | caso | que debe devolver | estado hoy |
 |---|---|---|
-| **N1** — tecnica que no existe en el grafo | que **no existe**, sin escribir blueprint | H5: **lo salvo el modelo, no el codigo** (`list_procedures(technique) or list_procedures()` tiro las 18 tecnicas ajenas) |
-| **N2** — tecnica en el grafo pero **no ingerida** en el corpus | **abstencion**: no hay evidencia, no se disena | sin medir nunca |
+| **N1** — tecnica que no existe en el grafo | que **no existe**, sin escribir blueprint | H5: **lo salvo el modelo, no el codigo** (`list_procedures(technique) or list_procedures()` tiro el grafo entero al prompt) |
+| **N2** — tecnica **ingerida pero no sembrada** | recuperar del corpus o **abstenerse**; **nunca** colar procedimientos ajenos | sin medir nunca |
 | **N3** — objetivo **contradicterio** con el corpus | senalar la contradiccion en vez de resolverla a su aire | sin medir nunca |
 | **N4** — objetivo que pide algo que el paper **descarta explicitamente** | **no** prometerlo (el caso H2, al reves) | sin medir nunca |
+
+**N2 estaba mal planteado en la version anterior** («tecnica en el grafo pero
+no ingerida»). Comprobado en la BD: **las 5 tecnicas sembradas las 5 tienen
+documento**, asi que **ese caso no existe** y no se podria probar. Pero si existe
+el contrario y es mas peligroso: hay **10 documentos y solo 5 tecnicas
+sembradas** — los docs 6-10 (dos surveys, Evo-Bench, «Harness as a Language»,
+«Stop Comparing…») **estan ingeridos y no sembrados**. Pedirles un blueprint
+devuelve `list_procedures()` vacio, **dispara el fallback y entran los 21
+procedimientos ajenos**. Es decir: **el material si esta, y el sistema en vez de
+recuperarlo se pone a mezclar**.
+
+**Una run no basta.** H5 fue suerte **una vez**; si probamos cada trampa una
+sola vez y pasa, **no hemos aprendido nada**. Se exige **3/3 por trampa**.
+
+Coste: 4 trampas x 3 runs = 12 llamadas ≈ **20-30 k**.
 
 N1/N2/N3/N4 se escriben **a mano, 0 tokens**, igual que los golden de QA. Son
 la contrapartida exacta de `golden_abstention`, y **N1 ademas es un fix de
@@ -247,20 +418,29 @@ Porque `build_blueprint` es **una llamada**, no un loop:
 |---|---|
 | 5 tecnicas x 3 runs = 15 blueprints | **~60-75k** |
 | juez Q1-Q3 sobre los 15 | **~30k** |
+| **+ 5a** juez con el **paper** delante (§3.3) | **~75-150k** |
 | **+ Q4** con contexto del informe interno (§6 dec. 6) | **~45k** |
 | **+ juez repetido** para `judge_sd` (§3.2) | **~75k** |
-| referencias a mano · suite negativa N1-N4 · **B8** | **0 tokens** (tiempo de diseño) |
-| **total (sin P1)** | **~225k** |
+| **+ 5c** calibracion con los defectos conocidos (§3.3) | **~10-20k** |
+| suite negativa N1-N4 (4 x 3 runs) | **~25k** |
+| extraccion de autores al ingerir (1 vez por paper) | **~10k** |
+| **B7-B11** (grep, lookup, comparacion de cadenas) | **0 tokens** (tiempo de diseño) |
+| **total (sin P1)** | **~330-430k** |
 | **+ A/B de P1** si se adopta (§5.7, 30 blueprints) | **~515k** |
-| **total con P1** | **~740k** |
+| **total con P1** | **~845-945k** |
 
-Frente a los ~11 M gastados en el Hito 1: **sin P1 es un orden y medio menos;
-con P1 sigue siendo ~15 veces mas barato**. No hace falta redondear a "dos
-ordenes" para que salga bien — el numero aguanta tal cual.
+Frente a los ~11 M gastados en el Hito 1: **sin P1 es ~25 veces mas barato;
+con P1, ~12 veces**. Sigue siendo un orden de magnitud entero por debajo, y el
+numero aguanta tal cual sin redondear a favor.
 
-*(Errata interna: la version anterior de esta tabla ponia **~100k** y no
-contemplaba Q4, el control de ruido del juez ni el A/B de P1. Los tres se
-anadieron al revisar que se escapaban medir.)*
+*(Erratas internas de esta tabla, ambas corregidas antes de medir y no despues:
+la primera version ponia **~100k** y no contemplaba Q4, el control de ruido del
+juez ni el A/B de P1; la segunda añadio esos tres pero **olvido el 5a**, que es
+la linea mas cara de todas — darle el paper al juez. Se anadio al reescribir
+§3.3.)*
+
+*(Notacion: **k** = miles de tokens, **M** = millones, para no confundir 11 M
+con 11.000k.)*
 
 Ojo: eso mide la **capacidad** (`api.blueprint()` directo). Lo que cuesta de
 verdad — y es una pregunta distinta — es si el agente **llama a la herramienta
@@ -341,7 +521,7 @@ que el modelo sea disciplinado — **depende de por donde pasa el dato**.
 |---|---|---|
 | **P1** | `build_blueprint` pasa por `LOOP.run()` en vez de `generate()` suelto | reutiliza lo construido; el blueprint pasa de ~1,5 k a ~20-30 k tokens |
 | **P1'** | **Correccion de P1**: el loop **dirige**, pero el blueprint se escribe con la **tool** `build_blueprint`, que conserva su propio presupuesto | ver R5 |
-| **P2** | El prompt de blueprint exige dos secciones: *lo que el paper dice* (con `[doc:chunk]`) y *mi propuesta de diseno* (marcada, sin cita) | cambia el prompt → obliga a re-medir, como en el Hito 0 y como `max_tokens` |
+| **P2** | El prompt de blueprint **exige las 7 reglas de escritura R1-R7 de §2.E**: dice de donde sale, entrecomilla solo lo literal, parafrasea atribuyendo, no atribuye lo que la fuente no dice, declara los silencios, separa lo propio, y cierra con bibliografia | cambia el prompt → obliga a re-medir, como en el Hito 0 y como `max_tokens` |
 | **P3** | **B7** en el suelo mecanico: el blueprint **lleva `[doc:chunk]`** | gratis (mismo `grep` que dio 0 en H3) |
 | **P4** | **Sin router.** Un solo regimen de honestidad, aplicado por afirmacion y no por peticion | — |
 
@@ -432,18 +612,43 @@ juez), ver §5.7.
 diseñado para producir, y Hito 2 se mide con una métrica que ya sabemos que va
 a dar 0 en el eje que importa.
 
-### Decisión 1 — B5/B7, citas `[doc:chunk]` en el blueprint
+### Decisión 1 — cómo se escribe y cómo se comprueba
 
-**Propuesta: SÍ. Umbral `>= 3` citas distintas** (módulos, dependencias y orden
-son tres secciones que afirman contenido del paper), **más el ratio**
-`citas / afirmaciones técnicas` **como diagnóstico, sin gatear**.
+**(a) La especificación — R1-R7 van en el prompt.** Formulada por el
+responsable: *«que se comporte como lo haría un humano»*. Las 7 reglas de §2.E
+son el contenido real de **P2** — hasta ahora decía solo «dos secciones», que
+era demasiado vago para implementarlo o para juzgarlo.
 
-Con P2 la exigencia va en el prompt, así que **B7 deja de ser imposible por
-construcción** y pasa a ser comprobable — que es lo único que la vuelve útil.
+**(b) Las comprobaciones — B7-B11, todas con umbral:**
 
-*Si se gatea el ratio desde ya:* cae el riesgo de una cita decorativa de 300
-palabras que salve B7 sin anclar nada. Por eso el ratio se **mide** primero y
-se gatea después, con datos.
+| check | umbral | coste |
+|---|---|---|
+| **B7** citas `[doc:chunk]` | **`>= 3` distintas** | 0 |
+| **B8** las citas resuelven | **100%** | 0 |
+| **B9** cita literal = texto original | **100%** | 0 |
+| **B10** bibliografía = documentos ingeridos y autores en su chunk 0 | **100%** | 0 |
+| **B11** prosa copiada sin comillas | **0 casos** (>= 8 palabras) | 0 |
+| ratio `citas / afirmaciones técnicas` | **se mide, no se gatea** | 0 |
+
+**Sin gatear el ratio desde ya**: cae el riesgo de una cita decorativa de 300
+palabras que salve B7 sin anclar nada. Se **mide** primero y se gatea después,
+con datos — que es la misma razón por la que B5 existía separado de B7.
+
+**(c) Tres prerequisitos que hay que hacer ANTES de poder exigir (a):**
+
+1. **Extracción de autores al ingerir** — hoy no existe el campo. Sin él, R1 y
+   R7 se piden sin tener con qué cumplirlas y el modelo rellenará los huecos.
+   *Trabajo puntual, una vez por paper, ~10 k.*
+2. **Bibliografía publicable** — autores + año (+ arXiv/DOI si están en los
+   metadatos del PDF). Sin esto `[doc:chunk]` solo sirve **dentro** del
+   sistema; **en cuanto salga al blog o al CV, R7 no se puede cumplir.**
+3. **Juez calibrado con los defectos ya conocidos (decisión 5, 5c)** — R4 y R5
+   no son mecánicas. *~10-20 k.*
+
+**Si se omite (c) pero se aprueba (a):** el prompt exigirá citas con autores
+que el sistema no tiene, y B10/B7 suspendrán por algo que no es culpa del
+modelo. **Ese sería exactamente el error de exigir una regla que no se puede
+cumplir.**
 
 ### Decisión 2 — presupuesto (`max_tokens`) y turnos
 
@@ -465,7 +670,7 @@ después de ver los números.*
 
 | eje | umbral |
 |---|---|
-| **B1-B8** (suelo mecánico) | **100%** — son deterministas, o pasan o se arregla el sistema |
+| **B1-B11** (suelo mecánico) | **100%** — son deterministas, o pasan o se arregla el sistema |
 | **Q1-Q3** (juez) | **`mean >= 4.0` Y ninguna rubrica `< 3.0`** |
 | **Q4** (nueva, ver decisión 6) | **0 contradicciones** — binario |
 | **`judge_sd`** (ruido del juez, §3.2) | **`<= 0.15`** — sin esto la media no es interpretable |
@@ -483,28 +688,49 @@ en el Hito 1 y el diseño de Hito 2 no los traía.**
 
 ### Decisión 4 — el fallback silencioso (§1.1)
 
-**Propuesta: arreglarlo como bug.** Técnica inexistente → `list_procedures(technique) or list_procedures()` **tira las 18 técnicas ajenas al prompt**.
+**Propuesta: arreglarlo como bug.** Técnica inexistente → `list_procedures(technique) or list_procedures()` **tira el grafo entero al prompt**.
 
 - **B3 lo detecta, pero después** — cuando ya se han pagado los tokens y el
   blueprint ya afirma procedimientos de técnicas que no son la suya.
 - **H5 enseña que hoy lo salva el modelo, no el código**: se negó a escribir el
-  blueprint *por suerte*, con las 18 técnicas metidas en el prompt. **Esa no es
+  blueprint *por suerte*, con el grafo metido en el prompt. **Esa no es
   una garantía, es un golpe de suerte.**
 
+*(Contado hoy: el grafo tiene **21 procedimientos** — 20 con técnica asignada y
+**1 sin `technique`**, que solo es alcanzable por el fallback. H5 anotó «18»;
+o el grafo ha crecido desde entonces o el recuento fue distinto. **No es
+grave, pero conviene no citar el número sin recontarlo antes de la run** — no
+sea que el test se apoye en una cifra que ya no es la buena.)*
+
 **Fix:** si `technique` no existe, devolver **vacío** y que el prompt diga «no
-existe». +1 test. **0 tokens.**
+existe». +1 test. **0 tokens.** Y de paso decidir qué hacer con el procedimiento
+**sin `technique`**, que hoy no puede pertenecer a ninguna.
 
-### Decisión 5 — referencias escritas a mano
+### Decisión 5 — ¿de dónde sale el oro de la fidelidad?
 
-**Propuesta: 5 ficheros en `evals/refs/`, uno por técnica sembrada, escritos por
-el responsable — no por el modelo.** Ese es precisamente el punto: si las
-escribe el modelo, Q1 se juzga a sí mismo.
+**Propuesta: el corpus, no el responsable.** Ver §3.3 para el razonamiento
+completo — resumido: *el producto existe precisamente porque el usuario no
+puede leer esos papers*, así que **ninguna métrica puede depender de que conozca
+el dominio**. La propuesta original («tú escribes 5 referencias») no era lenta:
+**era incompatible con el producto**, y encima no podrías auditar un idioma que
+no dominas.
 
-Alcance acotado y **0 tokens**: por paper, los **4-6 pasos que deben aparecer**
-y **lo que no debe aparecer**. Estimación ~1-2 h por técnica.
+**Se aprueba el paquete 5a-5d:**
 
-**Sin esto, Q1 no es falsable** y no se puede declarar cerrado Hito 2 — pasa a
-medir si el blueprint *suena* bien, que es exactamente H3.
+| pieza | qué | coste |
+|---|---|---|
+| **5a** | El juez recibe **el paper** (Q1) o el **informe interno** (Q4) | ~75-150 k |
+| **5b** | Referencia opcional **por extracción anclada** (cada paso con su chunk; lo sin soporte se descarta) | ~0 |
+| **5c** | **Calibración obligatoria** con los 2 defectos conocidos de Task-CoEvolve | ~10-20 k |
+| **5d** | Tu rol: **fijar reglas y revisar discrepancias**, no redactar | **~1 h** |
+
+**5c no es opcional.** Si el juez con la fuente delante no pilló ni los módulos
+inventados ni la contradicción con `REPORT_COEVOLVE.md`, **Q1 y Q4 no miden
+nada** — y es preferible saberlo por 20 k que descubrirlo tras la run completa.
+
+**Declarar lo que no cubre:** no valida el significado en un idioma que el
+responsable no domina. Va en el cierre de §7, con la misma honestidad con que
+el Hito 1 declaró que su MDE real era 0,458.
 
 ### Decisión 6 — H2, el problema de fondo
 
@@ -523,20 +749,29 @@ blueprint que contradice nuestros propios datos.
 
 ### Decisión 7 — B8, la cita que resuelve
 
-**Propuesta: SÍ, y es gratis.** Cada `[doc:x:c]` del blueprint se comprueba
-**contra la BD**: existe el documento, existe el chunk, y no está vacío.
-
-Coste: un lookup. **0 tokens.**
+**Aprobada.** Cada `[doc:x:c]` del blueprint se comprueba **contra la BD**:
+existe el documento, existe el chunk, y no está vacío. Un lookup. **0 tokens.**
 
 Es el hueco de forma: QA tenía `cite_precision` medido (0,943 en candF) y el
 diseño de blueprints se quedó con el `grep` — **la mitad de la comprobación**.
 Sin B8, tres citas a trozos irrelevantes sacan el eje de anclaje en verde.
 
+**B9, B10 y B11** (las comprobaciones de las reglas de escritura R2, R7 y R4)
+se aprueban **junto con la decisión 1**, porque nacen de §2.E y no existían
+cuando se escribió este punto.
+
 ### Decisión 8 — suite negativa N1-N4
 
 **Propuesta: SÍ, escrita a mano, 0 tokens.** Ver §3.4: técnica inexistente (N1),
-técnica no ingerida (N2), objetivo contradictorio (N3), objetivo que pide algo
-que el paper descarta (N4).
+técnica ingerida pero no sembrada (N2), objetivo contradictorio (N3), objetivo
+que pide algo que el paper descarta (N4).
+
+**Con dos condiciones añadidas tras revisarla:**
+
+1. **3/3 por trampa, no 1/1.** H5 fue suerte **una sola vez**. Si cada trampa
+   se prueba una vez y pasa, no se ha aprendido nada. ~20-30 k.
+2. **JSONL con la etiqueta esperada** — igual que `golden_abstention`. Sin eso,
+   *«¿se negó?»* lo decide quien mira. Y puntuación **binaria, sin suavizar**.
 
 **Es el criterio que más pesa y el que menos se ha medido.** El Hito 1 se cerró
 con el `0/64` como criterio **vinculante**; aquí no existía ningún equivalente.
