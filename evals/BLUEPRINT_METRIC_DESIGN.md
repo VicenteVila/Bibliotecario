@@ -595,6 +595,112 @@ Sin este A/B, P1 seria exactamente el error que documenta la Errata 1 del Hito
 
 ---
 
+### 5.8 Resultados — lo que midió el A/B (2026-10-11)
+
+Se corrieron los cuatro brazos sobre las mismas 5 técnicas × 3 runs = 15
+blueprints cada uno. Los resultados viven en `evals/result_blueprint_ab.json`;
+los del juez, en `evals/result_q1_r4r5.json`. Se fijaron los umbrales y el
+criterio **antes** de la primera run (§6 dec. 3).
+
+#### 5.8.1 Forma — el suelo mecánico (§3.1)
+
+| | A (baseline) | B (P2) | C (P1'+P2) | D (C+P3) |
+|---|---|---|---|---|
+| R1 citas con puntero | **0** | 2,47/run | 5,33/run | 4,40/run |
+| **B8 de esas, resuelven** | **0** | **0,20/run** | **2,73/run** | **3,07/run** |
+| R1 atribuye en prosa | — | 12/15 | 15/15 | 15/15 |
+| R5 declara silencios | — | 15/15 | 14/15 | 12/15 |
+| R7 sección Bibliografía | — | 14/15 | 13/15 | 10/15 |
+| B9 comillados literales | — | 0,53/run | 0,93/run | 1,27/run |
+| **B11 frases copiadas** | — | 0,53/run | **0,00/run** | **0,00/run** |
+| truncados | — | 0/15 | 0/15 | 0/15 |
+
+**P1' se queda.** C gana a B en B8 por 13× (2,73 vs 0,20) y corta el plagio a
+cero. El brazo B escribe punteros —2,47 por blueprint— pero **el 92% apunta a
+chunks que no existen**: es la fabricación de H3 medida mecánicamente. C la
+arregla porque el loop puede *ver* los chunks antes de citarlos.
+
+Ese es el criterio fijado antes de medir (§5.7): *«Si C no gana a B en B7/Q1,
+P1 se descarta.»* Gana, así que P1' se queda y **P1 (el loop escribiendo
+directo) sigue descartado** —§5.5, porque `loop.run()` genera cada turno con
+`max_tokens=1024` y bajaría el tope de 1500.
+
+#### 5.8.2 Sustancia — R4/R5 con el juez (Q1)
+
+Aquí la cosa se tuerce, y es el resultado más importante del Hito 2.
+
+| | Brazo C | Brazo D |
+|---|---|---|
+| **R4 cumple** (no atribuye lo que la fuente no dice) | **4/15** | 7/15 |
+| **R5 cumple** (declara los silencios) | **8/15** | 10/15 |
+| Fabricaciones atribuidas / blueprint | 2,67 | 1,20 |
+| Detalles rellenados / blueprint | 1,53 | 1,27 |
+
+El brazo C pasaba **todas** las comprobaciones mecánicas —citas que resuelven,
+cero frases copiadas, bibliografía en 13/15, atribución con «Según» en 15/15—
+y aun así **11 de 15 atribuían a la fuente cosas que la fuente no dice**.
+
+Es exactamente lo que §2.E advertía: *«R4 y R5 son las que separan a un modelo
+de un humano»* y *«no son mecánicas»*. **Un blueprint puede pasar B7-B11 entero
+y seguir siendo incorrecto. La forma se arregló; la sustancia no.**
+
+Y aquí la calibración 5c importa de verdad: sin ella no habría ninguna razón
+para creer el 4/15. Un juez sin calibrar habría puntuado alto estos blueprints
+—lucen rigurosos— y el Hito 2 habría cerrado sobre una cifra inventada.
+
+#### 5.8.3 P3 — verificación de atribución, y por qué no funciona
+
+P3 (`bibliotecario/agent/attribution.py`) comprueba **mecánicamente y sin coste**
+que los términos técnicos que se atribuyen al paper aparezcan en el chunk
+citado. Caza exactamente el fallo real de H1 —nombres de módulo inventados
+como «AdaptiveHarnessEngine»— y está testado (`tests/test_attribution.py`).
+
+**El verificador funciona. El reparador, no.** De las 15 runs del brazo D:
+
+- 6 **sin punteros** — nada que verificar (y no se marcan como limpias: eso
+  sería mentir con el mismo número, bug medido en la primera versión).
+- 6 **limpias** — la atribución ya verificaba.
+- 3 **reparadas** — las únicas que P3 tocó de verdad.
+
+Las 3 reparadas **empeoraron todas**:
+
+| run | violaciones tras reescribir | bibliografía | silencios |
+|---|---|---|---|
+| PEARL run1 | 6 | **perdida** | **perdida** |
+| PEARL run2 | **14** (antes, 6) | **perdida** | **perdida** |
+| Procedural Graphs run2 | 1 | **perdida** | **perdida** |
+
+Y R4 en esas 3: **0/3 cumplen**. La mejora aparente de C a D (4/15 → 7/15) es
+**ruido de generación estocástica**, no P3: el brazo D llama a `run_blueprint`
+igual que el C, y de las 3 runs que P3 modificó ninguna salió bien.
+
+**Causa concreta:** `_repair_prompt` pide *«el blueprint completo ya corregido»*.
+El modelo no hace una corrección quirúrgica: regenera el documento entero y
+pierde la sección de bibliografía (R7) y las declaraciones de silencio (R5) por
+el camino. **La verificación sin una reparación que no destruya no sirve.**
+
+Lo que queda en pie de P3: el verificador como **informe**, no como bucle. Que
+devuelva las violaciones marcadas en el propio blueprint —ya se hace cuando no
+hay reparación posible— y deje la decisión al responsable, en vez de reescribir
+a ciegas. Eso es un cambio pequeño sobre el código actual.
+
+**Hecho.** `verify_and_mark()` (`bibliotecario/agent/tools.py`) implementa
+exactamente eso: calcula las violaciones y devuelve el blueprint **sin tocarlo**,
+junto con el informe. Cuesta **cero `generate()` extra** y no puede destruir
+nada, que es el fallo medido de la reescritura. Está testado
+(`test_verify_and_mark_no_destruye_el_blueprint`: comprueba además que no llama
+al LLM). `verify_and_repair()` **se mantiene tal cual** —el brazo D del A/B la
+usó— para que los números de §5.8 sigan siendo reproducibles contra el código
+que corrió.
+
+*(Errata propia, declarada: la primera versión del brazo D llamaba a
+`build_blueprint_verified`, que se salta el loop. Salió con B8 = 0,00 —peor que
+el C que pretendía mejorar— y con `verificado=True` en runs sin ninguna cita.
+Los 15 registros se borraron y se rehicieron sobre el camino correcto P1'+P2+P3.
+Está anotado en el propio código para que no se repita.)*
+
+---
+
 ## 6. Lo que decide el responsable antes de medir
 
 **BORRADOR de propuestas — nada de lo que sigue está decidido.** Cada punto
@@ -816,3 +922,39 @@ lo que este documento puede declarar es que el blueprint **es fiel, es accionabl
 y esta anclado**. **No** que el agente generado **funcione**. El README promete
 lo segundo; decir «Hito 2 cerrado» sin esa fila seria exactamente la clase de
 engano que el Hito 1 paso a corregir en sus propias erratas.
+
+### 7.1 Estado real tras el A/B (2026-10-11) — **Hito 2 NO cerrado**
+
+Se midió, y el resultado es que **falta la fila que más pesa**. La tabla de
+cierre, con lo que ya está medido y lo que no:
+
+| eje (§2) | criterio | umbral | medido | estado |
+|---|---|---|---|---|
+| **A** Accionabilidad | B1-B4, §3.1 | suelo mecánico | 244 tests verdes | ✓ |
+| **B** Integridad | B5-B6 | — | — | pendiente |
+| **C** Funcionamiento | B7-B8 | B8 > 0 | **2,73/run (C), 3,07/run (D)** | ✓ |
+| **D** Escritura | **R4** | ≥ 8/15 | **4/15 (C), 7/15 (D)** | **✗ no llega** |
+| **D** Escritura | **R5** | ≥ 10/15 | **8/15 (C), 10/15 (D)** | **✗ en el filo** |
+| **D** Escritura | R1, R7, B9, B11 | §3.1 | ✓ en C y D | ✓ |
+| — | agente generado funciona (dec. 9) | — | **no medido** | **abierta** |
+
+**Por qué no se cierra:** R4 es el eje que §2.E llamó *«el que separa a un
+modelo de un humano»*, y queda en 4/15 sobre el mejor brazo con verificación.
+P3 no lo arregla (§5.8.3). Declarar «Hito 2 cerrado» ahora sería hacer
+exactamente lo que §7 prohíbe: tachar el umbral sin dejar el original.
+
+**Lo que sí está cerrado y no se reabre:**
+
+- **P1' se queda, P1 se descarta** — criterio fijado antes de medir (§5.7).
+- **P2 se queda** — R1/R5/R7/B9/B11 mejoran contra el baseline A.
+- **La calibración del juez sirve** — 5c: 2/2 defectos cogidos, score 2.
+- **El verificador mecánico de atribución sirve como informe** — caza H1.
+
+**El siguiente paso obvio**, y el único que ataca R4 de raíz sin destruir el
+documento: que P3 deje de reescribir y pase a **marcar las violaciones en el
+propio blueprint** (R6), dejando la corrección al responsable. Coste cero
+adicional —ya se calculan— y sin el daño medido de la reescritura.
+→ **Implementado**: `verify_and_mark()`. **Pendiente de medir** — no se ha
+corrido un brazo E con este modo, y no debe declararse que arregla R4 hasta
+que un A/B lo diga. La lección de §5.8.3 es precisamente esa: lo que suena bien
+y no se mide es el error que este documento existe para evitar.

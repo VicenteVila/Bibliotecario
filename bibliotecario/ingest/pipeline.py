@@ -6,7 +6,7 @@ from pathlib import Path
 
 from bibliotecario.core import storage
 from bibliotecario.core.embeddings import embed_blob, encode
-from bibliotecario.ingest import base, citations, quality, schemas
+from bibliotecario.ingest import base, bibliography, citations, quality, schemas
 from bibliotecario.ingest.image import extract_image
 from bibliotecario.ingest.pdf import extract_pdf
 from bibliotecario.ingest.text import extract_docx, extract_txt
@@ -51,9 +51,15 @@ def store(doc: base.Document) -> base.IngestResult:
                                      quality_score=q_score, quality_alerts=["duplicado: ya ingerido"],
                                      validation=validation)
         import json as _json
+        # Bibliografía: autores/año extraídos del propio texto y verificados
+        # literalmente antes de guardarse (§2.E, R1/R7). No pisa nada ya guardado.
+        meta = bibliography.merge_metadata(
+            doc.metadata if isinstance(doc.metadata, dict) else None,
+            bibliography.extract_bibliography(doc.text, title=doc.title),
+        )
         cur = conn.execute("INSERT INTO documents (path, title, paper_hash, metadata) VALUES (?,?,?,?)",
                            (doc.source, doc.title, fp,
-                            _json.dumps(doc.metadata, ensure_ascii=False, default=str)))
+                            _json.dumps(meta, ensure_ascii=False, default=str)))
         doc_id = cur.lastrowid
         chunks = base.chunk_text(doc.text)
         if chunks:
@@ -98,3 +104,53 @@ def ingest_dir(directory: str | Path, ocr: bool = False) -> dict:
     return {"ok": True, "total": len(files), "ingested": ok_n,
             "skipped_unsupported": sum(1 for p in d.iterdir() if p.is_file() and p.suffix.lower() not in _INBOX_EXTS),
             "files": results}
+
+
+def backfill_bibliography() -> dict:
+    """Extrae autores/año de los documentos **ya ingeridos**, desde sus primeros chunks.
+
+    Hace falta porque `store()` deduplica por hash y devuelve temprano: re-ingerir
+    un PDF no actualiza la fila. Los 10 documentos actuales se ingerieron antes
+    de que existiera esta extracción, así que su `metadata` no los tiene.
+
+    Usa los chunks 0-5 y **no pisa** ningún campo ya presente — `merge_metadata`
+    solo rellena lo vacío. Hace falta más de la cabecera: el **sello de arXiv
+    va girado 90° en el margen**, así que el extractor lo deja en los chunks
+    2-4 y no en el 0 (comprobado empíricamente en 9 de los 10 documentos).
+    """
+    import json as _json
+    scanned = updated = 0
+    detail = []
+    with storage.get_conn() as conn:
+        docs = conn.execute("SELECT id, title, metadata FROM documents ORDER BY id").fetchall()
+        for d in docs:
+            scanned += 1
+            rows = conn.execute(
+                "SELECT text FROM chunks WHERE doc_id=? AND chunk_idx BETWEEN 0 AND 5 ORDER BY chunk_idx",
+                (d["id"],),
+            ).fetchall()
+            if not rows:
+                continue
+            text = " ".join(r["text"] for r in rows)
+            try:
+                existing = _json.loads(d["metadata"]) if d["metadata"] else None
+            except (TypeError, ValueError):
+                existing = None
+            if not isinstance(existing, dict):
+                existing = None
+            merged = bibliography.merge_metadata(
+                existing, bibliography.extract_bibliography(text, title=d["title"])
+            )
+            if merged == (existing or {}):
+                detail.append({"doc_id": d["id"], "authors": (existing or {}).get("authors"),
+                               "year": (existing or {}).get("year"),
+                               "arxiv": (existing or {}).get("arxiv"), "changed": False})
+                continue
+            conn.execute("UPDATE documents SET metadata=? WHERE id=?",
+                         (_json.dumps(merged, ensure_ascii=False, default=str), d["id"]))
+            updated += 1
+            detail.append({"doc_id": d["id"], "authors": merged.get("authors"),
+                           "year": merged.get("year"), "arxiv": merged.get("arxiv"),
+                           "changed": True})
+    logger.info("Backfill bibliográfico: %d/%d documentos actualizados", updated, scanned)
+    return {"scanned": scanned, "updated": updated, "detail": detail}

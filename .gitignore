@@ -64,3 +64,5 @@ logs/
 *.docx
 *.doc
 *.epub
+# Paper ajeno, fuera del repo aunque no lleve extension
+Documentos/HarnessDev Can LLMs Create and Evolve Their Own Agent Harness

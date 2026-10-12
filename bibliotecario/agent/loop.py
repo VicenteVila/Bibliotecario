@@ -649,3 +649,30 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
                         what_failed="\n".join(failed[-5:]),
                         key_insights=_trajectory_fingerprint(turn, evidence, answer))
     return {"answer": answer, "turns": turn + 1, "evidence": evidence, "run_id": run_id}
+
+
+def run_blueprint(technique: str, goal: str, max_turns: int = 4,
+                  temperature: float | None = None) -> dict:
+    """P1' (§5): el loop **dirige**, pero el blueprint lo escribe la **tool**.
+
+    Por qué no se enruta `build_blueprint` al loop tal cual: `run()` genera
+    **cada turno** con `max_tokens=1024` y no hay presupuesto mayor para la
+    respuesta final. Hacerlo bajaría el tope de 1500 a 1024 y empeoraría el
+    blueprint (§5.5, la corrección que convirtió P1 en P1').
+
+    Aquí el loop corre para poder usar las herramientas —búsqueda y barrido
+    profundo— y reunir evidencia que la consulta simple de `_source_for` no
+    alcanza. Esa evidencia se le pasa a `build_blueprint`, que escribe con su
+    propio presupuesto. El brazo A/B del A/B es llamar a `build_blueprint`
+    directamente, sin esto.
+    """
+    from bibliotecario.agent.tools import build_blueprint
+
+    gathered = run(
+        f"Evidencia del corpus para implementar la técnica '{technique}' "
+        f"con objetivo: {goal}. Reúne los procedimientos y los chunks que los sostienen.",
+        max_turns=max_turns, isolated=True, temperature=temperature,
+    )
+    extra = "\n".join(gathered.get("evidence") or [])[:6000]
+    bp = build_blueprint(technique, goal, extra_source=extra)
+    return {**bp, "loop_turns": gathered["turns"], "evidence": gathered["evidence"]}

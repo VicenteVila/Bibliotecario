@@ -1,0 +1,28 @@
+[
+  {
+    "case": "Q1 módulos inventados (H1)",
+    "score": 2,
+    "verdict": "The answer invents modules ('History Profiler' and 'Adaptive Harness Execution Engine') that are not described in the paper, contradicting the reference.",
+    "model": "openai/gpt-oss-20b",
+    "usage": {
+      "prompt_tokens": 635,
+      "total_tokens": 939,
+      "completion_tokens": 304,
+      "prompt_tokens_details": null
+    },
+    "error": null
+  },
+  {
+    "case": "Q4 promesa contradicha (H4)",
+    "score": 2,
+    "verdict": "Contradicts the reference by claiming guarantees that are not stated.",
+    "model": "openai/gpt-oss-20b",
+    "usage": {
+      "prompt_tokens": 566,
+      "total_tokens": 755,
+      "completion_tokens": 189,
+      "prompt_tokens_details": null
+    },
+    "error": null
+  }
+]

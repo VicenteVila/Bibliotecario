@@ -361,3 +361,49 @@ def test_run_sin_iteraciones_no_escribe_turnos_negativos(tmp_path, monkeypatch):
     with storage.get_conn(db) as conn:
         row = conn.execute("SELECT metadata FROM harness_runs").fetchone()
     assert json.loads(row["metadata"])["turns"] == 0
+
+
+def test_run_blueprint_p1_prima_la_tool_sobre_el_loop(monkeypatch):
+    """P1' (§5): el loop reúne evidencia, pero el blueprint lo escribe la tool.
+
+    Regresión: enrutar `build_blueprint` al loop bajaría el tope de 1500 tokens
+    al `max_tokens=1024` con el que `run()` genera **cada turno** (§5.5). Aquí
+    se comprueba que la evidencia del loop llega a la tool y que el blueprint
+    devuelto es el de la tool, no el del turno.
+    """
+    from bibliotecario.agent import tools as T
+
+    seen: dict = {}
+    monkeypatch.setattr(
+        LOOP, "run",
+        lambda *a, **k: {"answer": "no usado", "turns": 3,
+                         "evidence": ["search_papers(q): hallazgo"], "run_id": "r1"},
+    )
+
+    def fake_build(technique, goal, extra_source=""):
+        seen["extra"] = extra_source
+        return {"technique": technique, "goal": goal, "procedures": ["p"],
+                "blueprint": "bp de la tool"}
+
+    monkeypatch.setattr(T, "build_blueprint", fake_build)
+
+    out = LOOP.run_blueprint("Task-CoEvolve", "validar release")
+
+    assert out["blueprint"] == "bp de la tool"
+    assert out["loop_turns"] == 3
+    assert "search_papers" in seen["extra"]
+
+
+def test_run_blueprint_sin_evidence_del_loop_sigue_escribiendo(monkeypatch):
+    """Aunque el loop no traiga nada, la tool escribe con su propio presupuesto."""
+    from bibliotecario.agent import tools as T
+
+    monkeypatch.setattr(
+        LOOP, "run",
+        lambda *a, **k: {"answer": "", "turns": 0, "evidence": [], "run_id": "r2"},
+    )
+    monkeypatch.setattr(
+        T, "build_blueprint",
+        lambda technique, goal, extra_source="": {"blueprint": "ok", "procedures": []},
+    )
+    assert LOOP.run_blueprint("Task-CoEvolve", "objetivo")["blueprint"] == "ok"

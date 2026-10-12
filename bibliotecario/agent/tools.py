@@ -180,18 +180,223 @@ def answer_multi_hop(question: str, top_k: int = 6) -> dict:
     return {"answer": answer, "citations": [f"[{d}:{c}] {next(h['title'] for h in hits if h['doc_id']==d and h['chunk']==c)}" for d, c in cites]}
 
 
-def build_blueprint(technique: str, goal: str) -> dict:
-    """Blueprint de implementación: camina el grafo procedimental y sintetiza guía accionable."""
+def _source_for(technique: str, procs, max_chunks: int = 8, max_chars: int = 7000) -> tuple[int | None, str]:
+    """Chunks de la fuente de la técnica, para poder atribuir lo que se diga.
+
+    P2 (§5): **no se puede exigir R1-R7 sin el texto al lado.** El prompt
+    anterior solo llevaba nombres de procedimientos y cadenas del grafo, así
+    que el modelo no tenía nada que citar — y por eso H3 midió 0 citas. Aquí se
+    pasan los chunks que nombran esos procedimientos, más el chunk 0 (donde
+    están autores y título, que es lo que R7 pide para la bibliografía).
+    """
+    from bibliotecario.core import storage
+    from bibliotecario.knowledge import graph as G
+
+    doc_id = None
+    for n in G.find_nodes(technique, kind="technique", limit=5):
+        if n.metadata.get("doc_id"):
+            doc_id = n.metadata["doc_id"]
+            break
+    if doc_id is None:
+        for p in procs:
+            if p.metadata.get("doc_id"):
+                doc_id = p.metadata["doc_id"]
+                break
+    if doc_id is None:
+        return None, ""
+
+    with storage.get_conn() as conn:
+        # Cabecera (título/autores/sello) + cualquier chunk que nombre un
+        # procedimiento: son los que la fuente sostiene de verdad.
+        idxs = {0}
+        for p in procs:
+            for r in conn.execute(
+                "SELECT chunk_idx FROM chunks WHERE doc_id=? AND text LIKE ? ORDER BY chunk_idx LIMIT 3",
+                (doc_id, f"%{p.label[:28]}%"),
+            ).fetchall():
+                idxs.add(r["chunk_idx"])
+        rows = conn.execute(
+            f"SELECT chunk_idx, text FROM chunks WHERE doc_id=? AND chunk_idx IN "
+            f"({','.join('?' * len(idxs))}) ORDER BY chunk_idx",
+            (doc_id, *sorted(idxs)),
+        ).fetchall()
+
+    used = 0
+    parts: list[str] = []
+    for r in rows:
+        piece = f"[chunk {r['chunk_idx']}] {r['text']}"
+        if used + len(piece) > max_chars:
+            break
+        parts.append(piece)
+        used += len(piece)
+    return doc_id, "\n\n".join(parts[:max_chunks])
+
+
+# Presupuesto del blueprint. 1500 no alcanzaba: R7 pide la bibliografía al FINAL
+# del documento y el corte la pegaba (medido en el A/B, 4/22 truncados).
+BLUEPRINT_MAX_TOKENS = 3000
+
+# Reglas R1-R7 de §2.E. Van en el prompt porque son escritura; B7-B11 son la
+# prueba mecánica de que se cumplen (§3.1).
+#
+# R1 lleva además el puntero `[doc:id:chunk]`: la cita en prosa es para el
+# lector, el puntero es para que B8 (citas que resuelven) se pueda comprobar
+# sin juicio humano. Sin él, la comprobación mecánica no tiene nada que seguir.
+_WRITING_RULES = """Reglas de escritura, obligatorias:
+R1. Di de donde sale cada afirmación: «Según <autores> (<año>) [doc:<id>:<chunk>]…», no «el sistema selecciona tareas» a secas. El puntero [doc:id:chunk] es obligatorio y tiene que apuntar a un chunk que hayas visto en FUENTE.
+R2. Comillas ⇔ literal: entrecomilla SOLO cuando la frase sea idéntica a la fuente. Si la reescribes, no la entrecomilles.
+R3. Parafrasea sin comillas, pero atribuyendo: tus palabras + quien lo dice.
+R4. No atribuyas a la fuente lo que la fuente no dice. Si algo no está en FUENTE, no aparezca como del paper.
+R5. Declara los silencios: si la fuente no especifica un detalle (cómo se fija un umbral, qué hacer con X), dilo — «el paper no especifica …» — en vez de rellenarlo.
+R6. Separa lo tuyo de lo de la fuente: marca explícitamente «propuesta del blueprint» para todo lo que no esté en FUENTE.
+R7. **Última sección del documento, sin falta**: «## Bibliografía», listando SOLO los documentos realmente consultados, cada uno con autores y año **tal como aparecen en la fuente** más su [doc:<id>]. Si no puedes extraer autores o año, di «no consta en la fuente»; no los inventes."""
+
+
+def build_blueprint(technique: str, goal: str, extra_source: str = "") -> dict:
+    """Blueprint de implementación: camina el grafo procedimental y sintetiza guía accionable.
+
+    P2 (§5): el prompt exige R1-R7 y va **con el texto de la fuente al lado**,
+    que es lo único que permite cumplirlas. Sin fuente no hay cita posible y la
+    exigencia sería papel mojado.
+
+    `extra_source` lo pasa P1' (el brazo C del A/B): la evidencia que el loop
+    reunió con las herramientas. En el brazo B va vacío, que es la condición
+    de un solo `generate()`.
+    """
     from bibliotecario.knowledge import procedural as P
-    procs = P.list_procedures(technique=technique) or P.list_procedures()
+    procs = P.list_procedures(technique=technique)
+    if not procs:
+        # N1 (§3.4). Antes: `or P.list_procedures()` tiraba el grafo entero al
+        # prompt — H5 lo tapó porque el modelo se negó por su cuenta, una vez.
+        # Hoy se niega el código: no se escribe blueprint de algo sin respaldo.
+        return {"technique": technique, "goal": goal, "procedures": [],
+                "blueprint": f"(no existe: no hay ningun procedimiento registrado para '{technique}' en el grafo)"}
     names = [p.label for p in procs[:20]]
     paths = PEARL.retrieve_evidence(f"{technique} {goal}", top_m=5)
     chain = "\n".join(" → ".join(f"{s['label']}" for s in p["steps"]) for p in paths)
-    prompt = (f"Guía accionable para implementar la técnica '{technique}' con objetivo: {goal}.\n"
-              f"Procedimientos conocidos: {', '.join(names)}\nCadenas del grafo:\n{chain}\n\n"
-              "Devuelve blueprint markdown: módulos, dependencias, orden, validación, riesgos.")
-    bp = generate(prompt, max_tokens=1500) or "(sin LLM: usa los procedimientos listados)"
-    return {"technique": technique, "goal": goal, "procedures": names, "blueprint": bp}
+    doc_id, source = _source_for(technique, procs)
+    if extra_source:
+        source = f"{source}\n\n[evidencia reunida por el loop]\n{extra_source}" if source else extra_source
+    if not source:
+        # Sin fuente no se puede cumplir R1-R7; se declara en vez de fingir.
+        return {"technique": technique, "goal": goal, "procedures": names, "doc_id": doc_id,
+                "blueprint": "(sin fuente: no hay chunks de la técnica, no se puede escribir con cita)"}
+    prompt = (
+        f"Escribe un blueprint de implementación de la técnica '{technique}' "
+        f"con objetivo: {goal}.\n\n"
+        f"FUENTE (únicas fuentes disponibles; no hay más):\n{source}\n\n"
+        f"Procedimientos registrados en el grafo desde esa fuente: {', '.join(names)}\n"
+        f"Cadenas del grafo:\n{chain}\n\n"
+        f"{_WRITING_RULES}\n\n"
+        "Devuelve blueprint markdown: módulos, dependencias, orden, validación, "
+        "riesgos, y la bibliografía."
+    )
+    # 1500 tokens cortaba la bibliografía: va al FINAL del documento, así que es
+    # lo primero que se pierde. Medido en el A/B — 4 de 22 blueprints salieron
+    # truncados. Se sube el tope; el coste por blueprint sube y hay que decirlo.
+    bp = generate(prompt, max_tokens=BLUEPRINT_MAX_TOKENS) or "(sin LLM: usa los procedimientos listados)"
+    return {"technique": technique, "goal": goal, "procedures": names,
+            "doc_id": doc_id, "blueprint": bp}
+
+
+def _cited_chunks(doc_id: int | None, blueprint: str) -> dict[tuple[int, int], str]:
+    """Carga el texto de los chunks que el blueprint cita, para verificarlos."""
+    if doc_id is None:
+        return {}
+    import re as _re
+    pairs = {(int(d), int(c)) for d, c in _re.findall(r"\[doc:(\d+):(\d+)\]", blueprint)}
+    if not pairs:
+        return {}
+    from bibliotecario.core import storage
+    out: dict[tuple[int, int], str] = {}
+    with storage.get_conn() as conn:
+        for d, c in sorted(pairs):
+            row = conn.execute("SELECT text FROM chunks WHERE doc_id=? AND chunk_idx=?",
+                               (d, c)).fetchone()
+            if row:
+                out[(d, c)] = row["text"]
+    return out
+
+
+def build_blueprint_verified(technique: str, goal: str, extra_source: str = "") -> dict:
+    """P3 (§5): genera, **verifica la atribución** y reescribe una vez si falla.
+
+    Por qué existe: el A/B midió que P2+P1' arreglan la forma —citas que
+    resuelven, bibliografía, cero plagio— pero no la sustancia: 11 de 15
+    blueprints del brazo C atribuían a la fuente cosas que la fuente no dice
+    (2,67 de media). Las siete reglas en el prompt no bastan. Aquí se comprueba
+    cada atribución contra el chunk citado y se devuelve al modelo **con las
+    violaciones concretas**, que es una instrucción que sí se puede seguir.
+
+    Cuesta dos `generate()`. Solo paga la segunda si la primera fabrica.
+    """
+    bp = build_blueprint(technique, goal, extra_source=extra_source)
+    return verify_and_repair(bp)
+
+
+def verify_and_repair(bp: dict) -> dict:
+    """P3 sobre un blueprint ya generado (por `build_blueprint` o por el loop).
+
+    Se separa de `build_blueprint_verified` para poder componer: el brazo D del
+    A/B es P1' + P2 + P3 — el loop reúne la evidencia, la tool escribe, y
+    **entonces** se verifica. Aplicar P3 sobre el camino de un solo `generate()`
+    pierde lo único que P1' aportaba (citas que resuelven), y así salió la
+    primera versión del brazo D: B8=0,00.
+    """
+    from bibliotecario.agent import attribution as A
+
+    if not bp.get("blueprint") or bp["blueprint"].startswith("("):
+        return {**bp, "verificado": False, "violaciones": []}
+
+    pointers = A._POINTER.findall(bp["blueprint"])
+    chunks = _cited_chunks(bp.get("doc_id"), bp["blueprint"])
+    # Un blueprint sin punteros no está "verificado": no hay nada que comprobar.
+    # Marcarlo como limpio sería mentir con el mismo número (medido: una run de
+    # Task-CoEvolve salió `verificado=True` con 0 citas).
+    if not pointers:
+        return {**bp, "verificado": None, "sin_punteros": True, "violaciones": []}
+    v1 = A.check_attributions(bp["blueprint"], chunks)
+    if not v1:
+        return {**bp, "verificado": True, "violaciones": [], "reescrituras": 0}
+
+    repair = generate(A._repair_prompt(bp["blueprint"], v1),
+                      max_tokens=BLUEPRINT_MAX_TOKENS)
+    if not repair:
+        # Sin reescritura posible: se devuelve el original **con las
+        # violaciones marcadas**, no un blueprint que parece limpio.
+        return {**bp, "verificado": False, "violaciones": v1, "reescrituras": 0}
+
+    chunks2 = _cited_chunks(bp.get("doc_id"), repair)
+    v2 = A.check_attributions(repair, chunks2)
+    return {**bp, "blueprint": repair, "verificado": not v2,
+            "violaciones": v2, "violaciones_previas": len(v1), "reescrituras": 1}
+
+
+def verify_and_mark(bp: dict) -> dict:
+    """P3 en modo informe: **marca** las violaciones, no reescribe.
+
+    Por qué existe y no se sustituye a `verify_and_repair`: la reescritura se
+    midió en el brazo D del A/B y empeora el blueprint — las 3 runs que tocó
+    salieron peor, perdiendo la bibliografía (R7) y los silencios (R5), y una
+    acabó con más violaciones de las que tenía (§5.8.3). Pid «el blueprint
+    completo ya corregido» y el modelo regenera el documento entero en vez de
+    corregir lo señalado.
+
+    Aquí no se pide eso: se devuelven las violaciones **junto** al blueprint
+    original, sin tocarlo. Cuesta cero `generate()` extra y el responsable
+    decide. R6 cubre el caso de no saber: una violación puede ser un término
+    legítimo que simplemente no está en ese chunk.
+    """
+    from bibliotecario.agent import attribution as A
+
+    if not bp.get("blueprint") or bp["blueprint"].startswith("("):
+        return {**bp, "verificado": False, "violaciones": []}
+
+    pointers = A._POINTER.findall(bp["blueprint"])
+    if not pointers:
+        return {**bp, "verificado": None, "sin_punteros": True, "violaciones": []}
+    v = A.check_attributions(bp["blueprint"], _cited_chunks(bp.get("doc_id"), bp["blueprint"]))
+    return {**bp, "verificado": not v, "violaciones": v, "reescrituras": 0}
 
 
 def instantiate_agent_template(technique: str, goal: str) -> dict:

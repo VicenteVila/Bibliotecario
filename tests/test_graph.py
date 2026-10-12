@@ -42,6 +42,175 @@ def test_procedural_registry():
         P.link("a", "relacion_invalida", "b")
 
 
+def test_build_blueprint_tecnica_inexistente_no_tira_el_grafo(monkeypatch):
+    """N1 (§3.4): no se escribe blueprint de una técnica sin respaldo.
+
+    Regresión: el fallback `or P.list_procedures()` metía **todas** las
+    técnicas en el prompt. H5 lo tapó porque el modelo se negó por su cuenta,
+    una vez — no es una garantía. Aquí se niega el código.
+    """
+    from bibliotecario.agent import tools as T
+    P.register_procedure("variance-weighted sampling", technique="Task-CoEvolve")
+    monkeypatch.setattr(T, "generate", lambda *a, **k: pytest.fail("no debe llamar al LLM"))
+    out = T.build_blueprint("Tecnica Que No Existe", "objetivo")
+    assert out["procedures"] == []
+    assert "no existe" in out["blueprint"]
+
+
+def test_build_blueprint_tecnica_conocida_usa_sus_procedimientos(monkeypatch):
+    from bibliotecario.agent import tools as T
+    P.register_procedure("Hájek estimation", technique="Task-CoEvolve")
+    monkeypatch.setattr(T.PEARL, "retrieve_evidence", lambda *a, **k: [])
+    monkeypatch.setattr(T, "generate", lambda *a, **k: "blueprint de prueba")
+    out = T.build_blueprint("Task-CoEvolve", "objetivo")
+    assert out["procedures"] == ["Hájek estimation"]
+
+
+def test_build_blueprint_sin_fuente_no_finge_cita(monkeypatch):
+    """R1-R7 exigen el texto de la fuente; sin chunks no hay nada que citar.
+
+    Se declara en vez de escribir un blueprint que parezca fundamentado.
+    """
+    from bibliotecario.agent import tools as T
+    P.register_procedure("Hájek estimation", technique="Task-CoEvolve")
+    monkeypatch.setattr(T.PEARL, "retrieve_evidence", lambda *a, **k: [])
+    monkeypatch.setattr(T, "generate", lambda *a, **k: pytest.fail("no debe llamar al LLM"))
+    out = T.build_blueprint("Task-CoEvolve", "objetivo")
+    assert "sin fuente" in out["blueprint"]
+
+
+def test_build_blueprint_prompt_lleva_fuente_y_reglas(tmp_path, monkeypatch):
+    """P2: el prompt tiene que llevar el texto de la fuente y R1-R7, o las
+    reglas son papel mojado — sin texto no se puede decir de donde sale nada.
+    """
+    from bibliotecario.agent import tools as T
+    db = tmp_path / "p2.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    with storage.get_conn(db) as conn:
+        conn.execute("INSERT INTO documents (path, title, paper_hash) VALUES (?,?,?)",
+                     ("f", "Paper P2", "hp2"))
+        conn.execute("INSERT INTO chunks (doc_id, chunk_idx, text, embedding) VALUES (?,?,?,?)",
+                     (1, 0, "Task-CoEvolve: Miyai et al. (2025). varianza ponderada.", b"\x00"))
+    P.register_procedure("variance-weighted task selection", technique="Task-CoEvolve", doc_id=1)
+    monkeypatch.setattr(T.PEARL, "retrieve_evidence", lambda *a, **k: [])
+    seen: list[str] = []
+    monkeypatch.setattr(T, "generate", lambda prompt, **k: seen.append(prompt) or "ok")
+
+    out = T.build_blueprint("Task-CoEvolve", "objetivo")
+
+    assert out["doc_id"] == 1
+    assert seen, "debe llamar al LLM"
+    prompt = seen[0]
+    assert "Miyai et al." in prompt          # el texto de la fuente va dentro
+    for rule in ("R1.", "R2.", "R3.", "R4.", "R5.", "R6.", "R7."):
+        assert rule in prompt, f"falta {rule}"
+
+
+def test_build_blueprint_verified_limpio_no_reescribe(tmp_path, monkeypatch):
+    """P3: si la atribución verifica, no se paga un segundo generate()."""
+    from bibliotecario.agent import tools as T
+    db = tmp_path / "v1.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    with storage.get_conn(db) as conn:
+        conn.execute("INSERT INTO documents (path, title, paper_hash) VALUES (?,?,?)",
+                     ("f", "P", "hv1"))
+        conn.execute("INSERT INTO chunks (doc_id, chunk_idx, text, embedding) VALUES (?,?,?,?)",
+                     (1, 0, "variance-weighted task selection over episodes.", b"\x00"))
+    P.register_procedure("variance-weighted task selection", technique="X", doc_id=1)
+    monkeypatch.setattr(T.PEARL, "retrieve_evidence", lambda *a, **k: [])
+    calls = []
+    monkeypatch.setattr(T, "generate", lambda prompt, **k:
+                        calls.append(prompt) or "usa variance-weighted task selection. [doc:1:0]")
+
+    out = T.build_blueprint_verified("X", "objetivo")
+
+    assert out["verificado"] is True
+    assert out["violaciones"] == []
+    assert len(calls) == 1, "limpio: no debe haber reescritura"
+
+
+def test_build_blueprint_verified_reescribe_si_fabrica(tmp_path, monkeypatch):
+    """P3: un módulo inventado provoca una reescritura con la violación concreta."""
+    from bibliotecario.agent import tools as T
+    db = tmp_path / "v2.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    with storage.get_conn(db) as conn:
+        conn.execute("INSERT INTO documents (path, title, paper_hash) VALUES (?,?,?)",
+                     ("f", "P", "hv2"))
+        conn.execute("INSERT INTO chunks (doc_id, chunk_idx, text, embedding) VALUES (?,?,?,?)",
+                     (1, 0, "variance-weighted task selection over episodes.", b"\x00"))
+    P.register_procedure("variance-weighted task selection", technique="X", doc_id=1)
+    monkeypatch.setattr(T.PEARL, "retrieve_evidence", lambda *a, **k: [])
+    seen: list[str] = []
+    answers = iter(["usa AdaptiveHarnessEngine. [doc:1:0]",
+                    "usa variance-weighted task selection. [doc:1:0]"])
+    monkeypatch.setattr(T, "generate", lambda prompt, **k:
+                        seen.append(prompt) or next(answers))
+
+    out = T.build_blueprint_verified("X", "objetivo")
+
+    assert out["reescrituras"] == 1
+    assert out["verificado"] is True
+    assert len(seen) == 2
+    assert "AdaptiveHarnessEngine" in seen[1], "la reescritura debe nombrar el fallo"
+    assert "1:0" in seen[1]
+
+
+def test_build_blueprint_verified_sin_punteros_no_finge_verificado(tmp_path, monkeypatch):
+    """Un blueprint sin citas no está 'verificado': no hay nada que comprobar.
+    Marcarlo como limpio sería mentir con el mismo número (medido en una run
+    real de Task-CoEvolve: verificado=True con 0 citas).
+    """
+    from bibliotecario.agent import tools as T
+    db = tmp_path / "v3.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    with storage.get_conn(db) as conn:
+        conn.execute("INSERT INTO documents (path, title, paper_hash) VALUES (?,?,?)",
+                     ("f", "P", "hv3"))
+        conn.execute("INSERT INTO chunks (doc_id, chunk_idx, text, embedding) VALUES (?,?,?,?)",
+                     (1, 0, "variance-weighted task selection over episodes.", b"\x00"))
+    P.register_procedure("variance-weighted task selection", technique="X", doc_id=1)
+    monkeypatch.setattr(T.PEARL, "retrieve_evidence", lambda *a, **k: [])
+    monkeypatch.setattr(T, "generate", lambda prompt, **k: "usa variance-weighted task selection.")
+
+    out = T.build_blueprint_verified("X", "objetivo")
+
+    assert out["verificado"] is None
+    assert out["sin_punteros"] is True
+    assert out["violaciones"] == []
+
+
+def test_verify_and_mark_no_destruye_el_blueprint(tmp_path, monkeypatch):
+    """P3 en modo informe: marca y NO reescribe.
+
+    Motivo medido: la reescritura del brazo D empeoró las 3 runs que tocó,
+    perdiendo la bibliografía y los silencios (§5.8.3). Este modo no debe
+    llamar al LLM ni alterar el texto.
+    """
+    from bibliotecario.agent import tools as T
+    db = tmp_path / "m1.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    with storage.get_conn(db) as conn:
+        conn.execute("INSERT INTO documents (path, title, paper_hash) VALUES (?,?,?)",
+                     ("f", "P", "hm1"))
+        conn.execute("INSERT INTO chunks (doc_id, chunk_idx, text, embedding) VALUES (?,?,?,?)",
+                     (1, 0, "variance-weighted task selection over episodes.", b"\x00"))
+    monkeypatch.setattr(T, "generate", lambda *a, **k: pytest.fail("no debe llamar al LLM"))
+    original = "usa AdaptiveHarnessEngine. [doc:1:0]"
+
+    out = T.verify_and_mark({"blueprint": original, "doc_id": 1})
+
+    assert out["blueprint"] == original, "no debe reescribir"
+    assert out["verificado"] is False
+    assert out["violaciones"][0]["termino"] == "AdaptiveHarnessEngine"
+    assert out["reescrituras"] == 0
+
+
 def test_pearl_pipeline_sin_llm(monkeypatch):
     monkeypatch.setattr(PEARL, "generate", lambda *a, **k: "")
     P.register_procedure("variance-weighted sampling", technique="Task-CoEvolve", doc_id=3)
