@@ -1,0 +1,329 @@
+[
+  {
+    "arm": "F",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_etiqueta": 2,
+      "mecanico_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint afirma que el modelo bloquea un release si el rendimiento cae por debajo de un umbral predefinido (ej. 90 % del rendimiento en entrenamiento).",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Se menciona que la validación antes de release se ejecuta sobre un conjunto hold‑out con entidades inductivas, algo que no aparece en el paper.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint afirma que el subgrafo contextual debe incluir los vecindarios de 1 salto de las entidades de la consulta, aunque el paper no especifica la profundidad de los vecindarios.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint establece que las rutas recuperadas por el LLM deben tener una longitud máxima de 3 saltos, detalle que no aparece en el paper.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint indica que la fase de contraste doble‑vista debe generar dos vistas que compartan exactamente la misma estructura de nodos esenciales, algo que el paper no menciona.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_etiqueta": 2,
+      "mecanico_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint afirma que el subgrafo extraído debe contener los vecindarios de 1 salto de las entidades de la consulta, aunque el paper solo menciona la unión de los vecindarios sin especificar su prof",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint establece un límite de 3 saltos para las rutas recuperadas por el LLM, mientras que el paper no menciona ningún límite de longitud de ruta.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 1,
+    "via": {
+      "juez_etiqueta": 1,
+      "mecanico_en_fuente": 1,
+      "juez_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "Generative Procedure Trajectory Sampling exposes both the action and its procedural prerequisites",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "Construcción inicial del grafo: Usar los tripletes extraídos para construir un grafo dirigido donde los nodos son procedimientos y las aristas representan relaciones de precondition, secuencia o depen",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Ejecución y registro de trazabilidad: Ejecutar el agente con la guía del grafo y registrar la trayectoria completa (acciones, herramientas, resultados) para análisis posterior.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Validación de release: Antes de cada release, ejecutar el agente en un entorno de staging con el grafo procedimental actualizado y verificar que todas las trayectorias críticas sigan los caminos válid",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": true,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 0,
+    "via": {
+      "mecanico_marcado": 2,
+      "juez_en_fuente": 1
+    },
+    "restantes": []
+  },
+  {
+    "arm": "F",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_etiqueta": 2,
+      "mecanico_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint menciona que el módulo de re-renderizado de objetivo y métrica depende de un archivo `goal.yaml`, algo que no aparece en el paper.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El documento describe un módulo de memoria de experimentos recientes que utiliza un buffer circular almacenado en `experiments.jsonl`, detalle no presente en la fuente.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "Base de datos ligera o archivo JSON para almacenamiento temporal de experimentos.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Algoritmo de análisis de árbol (ej. aglomeración por padre, cálculo de varianza de métricas por rama).",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Umbrales configurables (3 y 7) y tendencia estadística.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_en_fuente": 1,
+      "juez_etiqueta": 2
+    },
+    "restantes": [
+      {
+        "claim": "Validación: Confirmar que cada turno incluya los cinco componentes mediante inspección de prompts generados",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Módulo 5: Consejo de Estancamiento Incondicional con exactos turnos 4 y 8",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "\"Evaluar dos harnesses iniciales (incluyendo el actual) sobre el conjunto completo de tareas T\" – la fuente no indica que uno de los dos harnesses sea el actual.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "\"Evaluar dos harnesses de partida (por ejemplo, el harness actual y una versión base)\" – la fuente no menciona que uno de los harnesses sea el actual ni da ejemplos de versiones.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "\"El paper no especifica año\" – la fuente no contiene un año explícito, pero el blueprint no lo declara; sin embargo, la mención de un año no aparece en la fuente.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_en_fuente": 1,
+      "juez_etiqueta": 2
+    },
+    "restantes": [
+      {
+        "claim": "Requerimiento de mejora estadísticamente significativa en métricas de tarea (no especificado en la fuente)",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Descripción de riesgos y mitigaciones adicionales (p.ej. riesgo de sobreajuste y estimación inexacta de πt) que no aparecen en la fuente",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "Define T as a set of representative tasks (e.g., unit tests + integration)",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Suggest limiting K to 10 iterations",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Suggest risk‑mitigation strategies for overfitting that are not mentioned in the paper",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok_antes": true,
+    "r4_ok_ahora": true,
+    "acusaciones_antes": 0,
+    "acusaciones_ahora": 0,
+    "via": {},
+    "restantes": []
+  },
+  {
+    "arm": "F",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint menciona un riesgo de sobreajuste al conjunto de validación si se usa repetidamente para gating sin datos frescos, aunque el paper no menciona este riesgo.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint propone la implementación de versionado y backups automáticos de la capa wiki/, pero el paper no detalla ningún mecanismo de backup ni versionado.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint indica que el Skill Proposer podría generar propuestas no atómicas o complejas, violando el diseño, aunque el paper establece que las propuestas son atómicas.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "F",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok_antes": true,
+    "r4_ok_ahora": true,
+    "acusaciones_antes": 0,
+    "acusaciones_ahora": 0,
+    "via": {},
+    "restantes": []
+  }
+]

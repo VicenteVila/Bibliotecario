@@ -25,11 +25,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from bibliotecario import api
 from bibliotecario.core import storage
 from bibliotecario.knowledge import graph as G
+from bibliotecario.knowledge.study import normalize_pointers
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "evals" / "result_blueprint_ab.json"
 RUNS = 3
-ARMS = ("B", "C", "D")
+ARMS = ("B", "C", "D", "E")
 
 # Mínimo de palabras para que una frase copiada cuente como copia (B11).
 _MIN_PHRASE = 8
@@ -60,6 +61,25 @@ def score(blueprint: str, corpus: dict[int, str]) -> dict:
     joined = " ".join(re.sub(r"\s+", " ", t) for t in corpus.values())
     out["comillados"] = len(quoted)
     out["comillados_literales"] = sum(1 for q in quoted if re.sub(r"\s+", " ", q) in joined)
+    # B9 bajo la dec. 11: la cita literal pasa a ser el ANCLA de la atribución,
+    # así que deja de medir copia y pasa a medir cumplimiento — «¿cada
+    # atribución lleva su cita?». Se redefine aquí, con el original arriba a la
+    # vista (§6 dec. 11): los valores históricos de comillados_literales se
+    # leen bajo la definición antigua y así deben leerse.
+    anclas = re.findall(r"[\"“«']([^\"”»']{10,})[\"”»']\s*\[doc:(\d+):(\d+)\]", blueprint)
+    out["anclas"] = len(anclas)
+    # B5/B6 — Integridad (§7, fila B). Los dos gratuitos: leer bloques.
+    ok_b5, tot_b5, sin_b5, exentas = _b5_cita_por_modulo(blueprint)
+    out["b5_con_cita"] = ok_b5
+    out["b5_total"] = tot_b5
+    out["b5_sin_cita"] = sin_b5
+    out["b5_exentas"] = exentas
+    out["b6_completo"], out["b6_motivo"] = _b6_completo(blueprint)
+    out["anclas_en_fuente"] = sum(
+        1 for q, d, c in anclas
+        if re.sub(r"\s+", " ", q) in _chunk_text(int(d), int(c), corpus)
+    )
+    out["cumplimiento_b9"] = (len(anclas) / len(cites)) if cites else 0.0
     # B11: frase larga copiada sin comillas = plagio medido.
     out["frases_largas_copiadas"] = _copied_phrases(blueprint, corpus)
     # R1 y R5: se cumplen en prosa, no con puntero. Se comprueban a mano antes;
@@ -77,6 +97,151 @@ def _chunk_exists(doc_id: int, chunk_idx: int) -> bool:
         return conn.execute(
             "SELECT 1 FROM chunks WHERE doc_id=? AND chunk_idx=?", (doc_id, chunk_idx)
         ).fetchone() is not None
+
+
+def _b6_completo(blueprint: str) -> tuple[bool, str]:
+    """B6 — ¿el documento termina en una estructura markdown completa?
+
+    Falla si `max_tokens` no alcanzó y nadie se enteró: código sin cerrar,
+    tabla que acaba en su fila separadora, o prosa cortada a media frase.
+    Detectado originalmente en H1. Cuesta leer las últimas líneas.
+    """
+    t = blueprint.rstrip()
+    if not t:
+        return False, "vacio"
+    # 1. cercas de codigo sin cerrar
+    if t.count("```") % 2 != 0:
+        return False, "cerca_de_codigo_sin_cerrar"
+    lineas = [l for l in t.split("\n") if l.strip()]
+    ult = lineas[-1]
+    # 2. la ultima linea es una fila separadora de tabla: la tabla quedo sin filas
+    if ult.lstrip().startswith("|") and set(ult.replace("|", "").replace(":", "")
+                                            .replace("-", "").replace(" ", "")) == set():
+        return False, "tabla_sin_filas"
+    # 3. la ultima linea abre un bloque de codigo o un enlace incompleto
+    if ult.rstrip().endswith(("`", "[", "![", "(")):
+        return False, "bloque_incompleto"
+    # 4. prosa cortada: la ultima linea no termina en cierre razonable
+    if not re.search(r"[.!?\)\]}`*|>\d]$", ult.rstrip()):
+        return False, "prosa_cortada"
+    return True, ""
+
+
+_CABECERA = re.compile(r"^#{2,3}\s", re.MULTILINE)
+# cabecera que NOMBRA un módulo concreto («### Módulo 1: …»), singular.
+_MODULO_CAB = re.compile(r"^#{2,3}\s*[^\n]*M[oó]dulo(?!s)\b[^\n]*$",
+                         re.IGNORECASE | re.MULTILINE)
+# sección-contenedor: «Módulos», «Módulos y Dependencias», «Dependencias».
+_CONTENEDOR = re.compile(
+    r"^#{2,3}\s*[^\n]*(?:M[oó]dulos\b|Dependencias?\b)", re.IGNORECASE | re.MULTILINE)
+# item dentro de un contenedor: viñeta o numeración opcional seguida de negrita.
+_ITEM = re.compile(r"^(?P<ind>[ \t]*)(?:(?:[-*]|\d+\.)\s+)?\*\*", re.MULTILINE)
+_PUNTERO = re.compile(r"\[doc:\d+:\d+\]")
+_PROPUESTA = re.compile(r"propuesta del blueprint", re.IGNORECASE)
+
+
+def _bloques_modulos(texto: str) -> list[str]:
+    """Devuelve, en orden, el texto de cada módulo/dependencia principal.
+
+    **Errata séptima (2026-10-12).** B5 contó ya tres cosas distintas:
+
+    1. cualquier `N. **…**` del documento (errata 6) — solo 34/87 medían
+       módulos de verdad;
+    2. tras corregirlo, solo viñetas dentro de sección-contenedor;
+    3. **R8 hizo que el modelo reestructurara**: ahora los módulos son
+       **cabeceras** (`### Módulo 1: …`), y 6 de 15 blueprints del brazo G
+       salían con 0 items — **sin medir, no aprobados**.
+
+    Hoy se aceptan las dos formas, que §3.1 cubre igual:
+
+    - **cabecera que nombra un módulo** → su cuerpo hasta la siguiente cabecera;
+    - **sección-contenedor** (`Módulos`, `Dependencias`) → cada item con
+      viñeta o numeración **y negrita**, quedándose con la indentación mínima
+      para no contar sub-componentes anidados.
+    """
+    bloques: list[tuple[int, str]] = []
+
+    for m in _MODULO_CAB.finditer(texto):
+        resto = texto[m.end():]
+        nxt = _CABECERA.search(resto)
+        cuerpo = resto[:nxt.start()] if nxt else resto
+        if cuerpo.strip():
+            bloques.append((m.start(), m.group(0).strip() + "\n" + cuerpo))
+
+    for m in _CONTENEDOR.finditer(texto):
+        # un contenedor que además nombra un módulo singular ya está cogido
+        if _MODULO_CAB.match(m.group(0)):
+            continue
+        resto = texto[m.end():]
+        nxt = _CABECERA.search(resto)
+        seccion = resto[:nxt.start()] if nxt else resto
+        brutas = list(_ITEM.finditer(seccion))
+        if brutas:
+            min_ind = min(len(x.group("ind").expandtabs(4)) for x in brutas)
+            inicios = [x.start() for x in brutas
+                       if len(x.group("ind").expandtabs(4)) == min_ind]
+            for i, ini in enumerate(inicios):
+                fin = inicios[i + 1] if i + 1 < len(inicios) else len(seccion)
+                bloques.append((m.start() + ini, seccion[ini:fin]))
+            continue
+        # Sin viñetas en negrita. R8+R1 puede escribir cada módulo como bloque
+        # de cita literal + paráfrasis separado por línea en blanco (medido en
+        # G2: PEARL r1, cuatro bloques, los cuatro con puntero). Se toma cada
+        # párrafo por bloque. **Caveat**: una línea introductoria del estilo
+        # «Según X [doc:0:0]…» cuenta como una unidad más — solo aparece en
+        # formatos sin viñetas, y esa propia línea casi siempre lleva puntero.
+        trozos = re.split(r"\n\s*\n", seccion)
+        pos = 0
+        for trozo in trozos:
+            inicio_rel = seccion.find(trozo, pos)
+            if inicio_rel < 0 or not trozo.strip():
+                continue
+            pos = inicio_rel + len(trozo)
+            bloques.append((m.start() + inicio_rel, trozo))
+
+    bloques.sort(key=lambda x: x[0])
+    return [b for _, b in bloques]
+
+
+def _b5_cita_por_modulo(blueprint: str) -> tuple[int, int, list[int], int]:
+    """B5 — ¿cada módulo/dependencia principal lleva su `[doc:chunk]`?
+
+    Se normaliza ANTES de contar: al medir el brazo E se vio que 14 formatos
+    distintos conviven y solo 422/900 son canónicos. Un módulo con
+    `[doc:5:chunk 13]` SÍ lleva cita; no normalizarlo lo contaría como fallo y
+    B5 diría mentira.
+
+    Devuelve `(con_cita, total, lista_sin, exentas)`. `exentas` son los puntos
+    marcados `(propuesta del blueprint)`: **no pueden llevar puntero de origen
+    porque no tienen fuente**, así que se cuentan aparte (dec. 14). Se reportan
+    las dos ratios para que se vea cuánto explica la exención.
+    """
+    texto, _ = normalize_pointers(blueprint)
+    bloques = _bloques_modulos(texto)
+    if not bloques:
+        return 0, 0, [], 0
+
+    tot = len(bloques)
+    sin: list[int] = []
+    exentas = 0
+    for i, bloque in enumerate(bloques):
+        if _PUNTERO.search(bloque):
+            continue
+        sin.append(i + 1)
+        if _PROPUESTA.search(bloque):
+            exentas += 1
+    return tot - len(sin), tot, sin, exentas
+
+
+def _chunk_text(doc_id: int, chunk_idx: int, corpus: dict[int, str] | None = None) -> str:
+    """Texto del chunk (doc_id, chunk_idx). `corpus` se ignora: está indexado
+    por id de chunk, no por el par, así que hay que ir a la BD."""
+    with storage.get_conn() as conn:
+        r = conn.execute(
+            "SELECT text FROM chunks WHERE doc_id=? AND chunk_idx=?",
+            (doc_id, chunk_idx),
+        ).fetchone()
+    return r["text"] if r else ""
 
 
 def _copied_phrases(blueprint: str, corpus: dict[int, str]) -> int:
@@ -129,6 +294,8 @@ def run_one(arm: str, technique: str, run: int) -> dict:
             r = api.blueprint(technique, goal)
         elif arm == "D":
             r = api.blueprint_verified(technique, goal)
+        elif arm == "E":
+            r = api.blueprint_p4(technique, goal)
         else:
             r = api.blueprint_loop(technique, goal)
         bp = r.get("blueprint", "")
@@ -208,7 +375,13 @@ def _summary(done: list[dict], smoke: bool) -> None:
         print(f"    R1 atribuye en prosa («Según»)    {attr:6d}/{n}")
         print(f"    R5 declara silencios               {sil:6d}/{n}")
         print(f"    R7 seccion Bibliografia            {with_bib:6d}/{n}")
-        print(f"    B9 comillados literales            {lit:6.2f}/run")
+        print(f"    B9 comillados literales            {lit:6.2f}/run  (def. antigua)")
+        anclas = sum(r["checks"].get("anclas", 0) for r in rows) / n
+        en_fte = sum(r["checks"].get("anclas_en_fuente", 0) for r in rows) / n
+        cumple = sum(r["checks"].get("cumplimiento_b9", 0.0) for r in rows) / n
+        print(f"    B9' anclas literales (dec. 11)     {anclas:6.2f}/run")
+        print(f"    B9' de esas, estan en la fuente    {en_fte:6.2f}/run")
+        print(f"    B9' cumplimiento (anclas/citas)    {cumple:6.2f}     [umbral >= 1,00]")
         print(f"    B11 frases copiadas                {copied:6.2f}/run  (menor = mejor)")
         print(f"    truncados (<600 chars)             {trunc:6d}/{n}")
         if arm == "D":

@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS wiki_pages (
     slug TEXT NOT NULL UNIQUE,
     title TEXT NOT NULL,
     body TEXT NOT NULL,
-    kind TEXT NOT NULL CHECK(kind IN ('raw','accumulated','skill')),
+    kind TEXT NOT NULL CHECK(kind IN ('raw','accumulated','skill','study')),
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE TABLE IF NOT EXISTS harness_runs (
@@ -147,6 +147,26 @@ def init_db(path: Path | None = None):
             except Exception as e:
                 if "duplicate column" not in str(e).lower():
                     raise
+        # El CHECK de wiki_pages.kind no se puede ALTERar en SQLite: hay que
+        # recrear la tabla. 'study' añade la capa de comprension
+        # (knowledge/study.py) encima de raw/accumulated/skill.
+        row = conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='wiki_pages'"
+        ).fetchone()
+        if row and "'study'" not in (row["sql"] or ""):
+            conn.executescript(
+                "CREATE TABLE wiki_pages_new ("
+                " id INTEGER PRIMARY KEY,"
+                " slug TEXT NOT NULL UNIQUE,"
+                " title TEXT NOT NULL,"
+                " body TEXT NOT NULL,"
+                " kind TEXT NOT NULL CHECK(kind IN ('raw','accumulated','skill','study')),"
+                " updated_at TEXT NOT NULL DEFAULT (datetime('now')));"
+                " INSERT INTO wiki_pages_new (id, slug, title, body, kind, updated_at)"
+                "   SELECT id, slug, title, body, kind, updated_at FROM wiki_pages;"
+                " DROP TABLE wiki_pages;"
+                " ALTER TABLE wiki_pages_new RENAME TO wiki_pages;"
+            )
         conn.commit()
     finally:
         conn.close()

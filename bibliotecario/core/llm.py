@@ -294,6 +294,20 @@ def generate(prompt: str, max_tokens: int = 512, retries: int = 2,
                     out = _openai_compat(base, key or "", models[min(mi, len(models) - 1)],
                                         prompt, max_tokens, temperature=temp)
                 _mark_alive(name)
+                # Vacio != respuesta. Los proveedores devuelven "" cuando la
+                # llamada cae por rate limit o 504 silencioso, y aqui se
+                # trataba como exito: el "" se devolvia y el llamante lo leia
+                # como veredicto. Medido 2026-10-12: 2 de 3 llamadas seguidas
+                # al juez de ruta 5 salieron vacias y se contaron como
+                # violaciones del modelo. Se reintenta como si fuera
+                # retryable, con el mismo tope.
+                if not out.strip() and attempt < retries:
+                    wait = 5 * (attempt + 1)
+                    logger.warning("LLM %s devolvio vacio, reintento (%d)", name, attempt + 1)
+                    time.sleep(wait)
+                    attempt += 1
+                    mi += 1
+                    continue
                 return out
             except Exception as e:
                 kind = _classify(e)

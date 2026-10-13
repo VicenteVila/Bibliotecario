@@ -431,5 +431,1104 @@
     "r5_ok": true,
     "r5_rellenados": [],
     "verdict": "El blueprint es fiel al paper y no contiene fabricaciones ni silencios no declarados."
+  },
+  {
+    "arm": "E",
+    "technique": "PEARL",
+    "run": 0,
+    "error": "no parseable: We need to check R4 and R5 compliance. R4: No attributing to source what source does not say. R5: Declare silences; if b"
+  },
+  {
+    "arm": "E",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5."
+  },
+  {
+    "arm": "E",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona explícitamente el uso de bibliotecas de procesamiento de grafos como PyTorch Geometric y DGL, detalle que no aparece en el paper fuente."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene una atribución no respaldada por la fuente (bibliotecas de grafos), pero declara correctamente los silencios donde la fuente no especifica información."
+  },
+  {
+    "arm": "E",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un \"grafo procedural pre‑construido que codifique los flujos de trabajo esperados para las validaciones de release\", algo que el paper no menciona.",
+      "Se describe un \"mecanismo de extracción de tripletes de procedimiento a partir de registros de ejecuciones pasadas (exitosas y fallidas) de validaciones de release\", sin que el paper lo describa.",
+      "El blueprint sugiere que se definen \"métricas concretas (como umbrales de desviación permitida) para considerar una validación exitosa en un contexto de release\", detalle que el paper no ofrece."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [
+      "El blueprint declara que \"el paper no especifica cómo construir este grafo para el contexto de validación de release\".",
+      "Se indica que \"el paper no especifica cómo entrenar el modelo de guía\".",
+      "Se menciona que \"el paper no especifica métricas concretas (como umbrales de desviación permitida)\"."
+    ],
+    "verdict": "El blueprint contiene fabricaciones que no están respaldadas por la fuente, pero declara correctamente los silencios donde la fuente no especifica detalles."
+  },
+  {
+    "arm": "E",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el sistema incluye un \"Validador de Prerrequisitos\" que verifica antes de cada acción si los prerrequisitos están satisfechos, algo que no se menciona en el paper.",
+      "El blueprint describe un \"Refinador de Éxito vs. Fallo\" que ajusta el grafo basado en resultados de ejecución, detalle no presente en el artículo.",
+      "El blueprint propone métricas de validación como una tasa de cumplimiento de prerrequisitos >95% y un número mínimo de episodios, sin que el paper establezca tal criterio."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint indica que el paper no especifica un algoritmo exacto para la extracción de triplets y propone usar patrones de secuencia como heurística.",
+      "El blueprint señala que el paper no detalla la arquitectura del modelo de guía y sugiere un pequeño LLM condicionado al subgrafo.",
+      "El blueprint menciona que el paper no especifica umbrales de validación ni métricas exactas para release, por lo que propone los criterios propios."
+    ],
+    "verdict": "El blueprint contiene varias afirmaciones no respaldadas por el paper y no declara silencios para todas las omisiones, incumpliendo tanto R4 como R5."
+  },
+  {
+    "arm": "E",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el Procedural Graph se construye mediante *graph mutation* para reflejar patrones observados en ejecuciones exitosas o fallidas (doc:2:8), detalle que no aparece en el paper.",
+      "Se menciona que el módulo de generación de guía situacional expone tanto la acción como sus prerequisitos procedimentales (doc:2:11), aunque el paper solo indica que la guía bias a la siguiente acción",
+      "El blueprint indica que el grafo incluye un mecanismo de *failure‑vs‑success refiner* para autoevolución (doc:2:8 y doc:2:11), algo que el artículo no menciona."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene varias atribuciones no respaldadas por la fuente y, por tanto, no cumple con los requisitos de rigor de citación."
+  },
+  {
+    "arm": "E",
+    "technique": "ReASearch",
+    "run": 0,
+    "error": "no parseable: We need to check R4 and R5 compliance. R4: No attributing to source what source doesn't say. R5: Declare silences; if bl"
+  },
+  {
+    "arm": "E",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Riesgo: Sobrecarga de Prompt – el paper no menciona límites de longitud para el prompt re‑emitido.",
+      "Riesgo: Efecto de Compaction en Lecciones – el paper no especifica cómo se evita la degradación de `lessons.md` durante la compactación.",
+      "Riesgo: Sesgo en Asesoría de Estancamiento – el paper no detalla cómo se personaliza la asesoría tras 3+ y 7+ evaluaciones planas."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Validación de Estado Re‑Emitido – el paper no describe pasos de validación específicos.",
+      "Validación de Lecciones Persistentes – el paper no menciona pruebas de persistencia tras compactación.",
+      "Validación de Asesoría de Estancamiento – el paper no detalla cómo se verifica la aparición de la asesoría."
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos que no están respaldados por la fuente."
+  },
+  {
+    "arm": "E",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que \"MCP servers son insuficientes por sí mismos\", mientras que el paper indica que \"skills y MCP servers son insuficientes por sí mismos\"."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [
+      "El paper no especifica tecnologías concretas para estas dependencias.",
+      "El paper no especifica métricas de validación.",
+      "El paper no especifica cómo se define una \"evaluación plana\"."
+    ],
+    "verdict": "El blueprint contiene una atribución incorrecta sobre MCP servers y declara correctamente los silencios."
+  },
+  {
+    "arm": "E",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Validación de Consistencia del Historial",
+      "Validación de Presupuesto de Evaluación",
+      "Riesgo de Sobreajuste a Tareas Informativas (mitigación con entropía)"
+    ],
+    "verdict": "El blueprint contiene varias afirmaciones no presentes en la fuente, violando R5."
+  },
+  {
+    "arm": "E",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "La fórmula explícita de π_t = m × (w_t / Σ_{j∈T} w_j) no aparece en el artículo fuente."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint incluye una atribución incorrecta (la fórmula de π_t) y no presenta silencios indebidos."
+  },
+  {
+    "arm": "E",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el paper usa 10 iteraciones en los experimentos, aunque el texto fuente no menciona ningún número de iteraciones.",
+      "El blueprint indica que el paper prueba ρ=7% y 20% pero no da regla para elegirlo, algo que no aparece en la fuente.",
+      "El blueprint sugiere que el paper utiliza la estimación anclada para evitar inestabilidad cuando πt es pequeño, aunque la fuente solo menciona la estimación anclada sin referirse explícitamente a la i"
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [
+      "El blueprint declara que el paper no especifica cómo se eligen los dos harnesses iniciales, pero sí indica que son necesarios.",
+      "El blueprint señala que el paper no detalla el método exacto de muestreo ponderado, solo que se usa wt.",
+      "El blueprint indica que el paper no especifica el número máximo de iteraciones, aunque menciona que en experimentos se usaron 10."
+    ],
+    "verdict": "El blueprint contiene fabricaciones sobre el número de iteraciones y la elección de ρ, pero declara correctamente los silencios."
+  },
+  {
+    "arm": "E",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el Skill Proposer lee un archivo llamado skill-impact.md, aunque el paper no menciona tal archivo.",
+      "El blueprint indica que la validación antes de cada release se logra mediante el mecanismo de Gating & Rollback, detalle que no aparece en el paper.",
+      "El blueprint sugiere que se utiliza un muestreo estratificado de trazas para mitigar el riesgo de sobreajuste, pero el paper no menciona esta práctica."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint añade que el Skill Proposer utiliza un resumen conciso de los resultados de entrenamiento (pass/fail, predicciones y respuestas reales), información que el paper no especifica.",
+      "El blueprint menciona un riesgo de sobreajuste al conjunto de validación y propone una mitigación, aunque el paper no aborda este riesgo.",
+      "El blueprint propone un riesgo de estancamiento por umbral demasiado estricto y su mitigación, sin que el paper lo mencione."
+    ],
+    "verdict": "El blueprint contiene varias atribuciones y rellenos que no están respaldados por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "E",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El Skill Proposer depende de un archivo \"skill-impact.md\" para rastrear el impacto histórico de habilidades, algo que no se menciona en el paper.",
+      "El Skill Proposer utiliza un resumen de resultados de entrenamiento (pass/fail, predicciones y ground-truth) para generar propuestas, aunque el paper no menciona tal dependencia."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene fabricaciones en la descripción de dependencias del Skill Proposer, pero declara correctamente los silencios del paper."
+  },
+  {
+    "arm": "E",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un proceso de validación pre-release ejecutando un loop completo de WikiSkill sobre un conjunto holdout separado, algo que no se menciona en el paper.",
+      "El blueprint indica que el tamaño o la estratificación de Dval no se especifican y sugiere una frecuencia de validación fuera del loop evolutivo estándar, sin respaldo en el texto.",
+      "El blueprint menciona políticas de retención o compresión de las trazas en raw/ para controlar costos de almacenamiento, detalle que no aparece en la fuente."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene afirmaciones no respaldadas por la fuente, violando R4, pero declara correctamente los silencios, cumpliendo R5."
+  },
+  {
+    "arm": "R5",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Se asume que el LLM utilizado es GPT o similar, aunque el paper no especifica el modelo.",
+      "Se menciona un marco de redes neuronales de grafos (GNN) concreto para implementar el BGNN, aunque el paper no indica cuál se emplea.",
+      "Se propone un umbral de 1 % de caída en Hits@10 como criterio de validación, sin que el paper lo mencione."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint rellena el silencio sobre el modelo LLM con la suposición de GPT o similar.",
+      "El blueprint rellena el silencio sobre el marco GNN con la suposición de un framework concreto.",
+      "El blueprint rellena el silencio sobre un umbral de validación con la propuesta de 1 % de caída en Hits@10."
+    ],
+    "verdict": "El blueprint contiene varias atribuciones y suposiciones no respaldadas por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "R5",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple las reglas R4 y R5."
+  },
+  {
+    "arm": "R5",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo de Construcción del Procedural Graph (PG Builder)",
+      "Módulo de Validación Pre-Release (Pre-Release Validator)",
+      "Módulo de Retroalimentación y Evolución del Grafo (Graph Mutator)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El paper no especifica el algoritmo exacto para extraer tripletes desde el historial del agente, pero el blueprint propone un método de extracción",
+      "El paper no define cómo se construye el 'grafo esperado' ni qué constituye una desviación aceptable, sin embargo el blueprint lo detalla",
+      "El paper no menciona métricas de validación ni umbrales de aceptación para bloquear un release, pero el blueprint establece criterios de bloqueo"
+    ],
+    "verdict": "El blueprint contiene múltiples atribuciones y rellenos que no están respaldados por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "R5",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el módulo \"Extractor de Triplets de Procedimiento\" extrae triplets del historial de ejecución del agente durante pruebas pre‑release, aunque el paper no menciona extracción de ",
+      "Se menciona que el \"Constructor y Mutador de Grafo\" actualiza el grafo añadiendo nodos y aristas basados en feedback de éxito/fallo, sin que el paper describa tal mecanismo de mutación dinámica.",
+      "El blueprint describe un \"Modelo de Guía Situacional\" que sesga la acción siguiente del solver, pero el paper solo indica que el modelo localiza el nodo activo y traduce el subgrafo, sin hablar de bia"
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene varias atribuciones que no están respaldadas por la fuente, violando R4, aunque declara los silencios requeridos, cumpliendo R5."
+  },
+  {
+    "arm": "R5",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El marco de Procedural Graphs se actualiza nightly sobre logs de CI",
+      "El blueprint propone un módulo de Mutación del Grafo que inserta aristas basadas en feedback de validación",
+      "El Guidance Model es un clasificador ligero (ej. MLP) entrenado para predecir la probabilidad de éxito"
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [
+      "El paper no especifica un umbral definitivo para la puntuación de guía",
+      "El paper no especifica cómo definir los escenarios de staging críticos",
+      "El paper no especifica optimizaciones de inferencia para el modelo de guía"
+    ],
+    "verdict": "El blueprint contiene afirmaciones no respaldadas por la fuente y declara silencios correctamente."
+  },
+  {
+    "arm": "R5",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo de Re-renderizado de Objetivo y Métrica: dependencias de archivos goal.yaml y metric.json",
+      "Módulo de Memoria de Experimentos Recientes: dependencia de buffer circular experiments.db",
+      "Módulo de Lecciones Persistentes: mecanismo de compaction de contexto que preserva lessons.md"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Módulo de Re-renderizado de Objetivo y Métrica: asume que el objetivo y la métrica provienen de archivos de configuración",
+      "Módulo de Memoria de Experimentos Recientes: asume existencia de un archivo experiments.db",
+      "Módulo de Lecciones Persistentes: asume un mecanismo de compaction de contexto"
+    ],
+    "verdict": "El blueprint contiene varias atribuciones y rellenos que no están respaldados por la fuente, incumpliendo R4 y R5."
+  },
+  {
+    "arm": "R5",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "\"se carga una vez al iniciar el agente y permanece inmutable durante la sesión\" (no mencionado en la fuente)",
+      "\"Validar que todos los elementos mencionados estén presentes en el prompt de cada turno\" (no respaldado por la fuente)",
+      "\"Validar que la tabla tenga exactamente 20 entradas o menos\" (no especificado en la fuente)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "\"Validar que la tabla tenga exactamente 20 entradas o menos\" (suponiendo un límite que la fuente no menciona)",
+      "\"Validar que frases como “doubling envs didn’t help—bottleneck is FC width” aparezcan en el prompt tras ser registradas\" (no declarado por la fuente)",
+      "\"Validar que tras 3 y 7 pasos sin mejora, aparezca un bloque de asesoría\" (no especificado en la fuente)"
+    ],
+    "verdict": "El blueprint contiene fabricaciones y suposiciones no respaldadas por la fuente."
+  },
+  {
+    "arm": "R5",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona 4,000 repeticiones de Monte Carlo para estimar πt, aunque el paper no habla de este procedimiento.",
+      "El blueprint afirma que el ancla ¯pt se fija antes de la muestra, algo que no aparece en el paper.",
+      "El blueprint indica que los mismos valores de hiperparámetros se usan tanto para clasificación de texto online como para Terminal‑Bench 2.1, sin que el paper lo mencione."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [
+      "El blueprint declara que el paper no especifica un umbral mínimo de ˆS(h) para la liberación.",
+      "El blueprint señala que el paper no detalla cómo elegir los dos harnesses iniciales más allá de que sean dos.",
+      "El blueprint indica que el paper no explica cómo re‑incluir tareas resueltas tras mejorar el harness."
+    ],
+    "verdict": "El blueprint contiene varias afirmaciones que no están respaldadas por la fuente, pero sí declara correctamente los vacíos del paper."
+  },
+  {
+    "arm": "R5",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo de Memoria de Experimentos Recientes depende de `experiments.db`, que no aparece en la fuente.",
+      "Módulo de Re-renderizado de Objetivo y Métrica menciona archivos `goal.yaml` y `metric.py`, inexistentes en la fuente.",
+      "La bibliografía indica año 2024 y autores, aunque la fuente no menciona explícitamente año ni nombres de autores."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint incluye la dependencia `experiments.db` para el módulo de memoria de experimentos sin declarar que la fuente no lo especifica.",
+      "Se menciona la dependencia de `goal.yaml` y `metric.py` en el módulo de re-renderizado sin indicar que la fuente no lo menciona.",
+      "Se proponen pasos de validación y mitigaciones en la sección de Riesgos sin señalar que la fuente no los detalla."
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos no declarados, incumpliendo los requisitos de rigor de citación."
+  },
+  {
+    "arm": "R5",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las normas de atribución y no rellena silencios."
+  },
+  {
+    "arm": "R5",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona que los dos harnesses iniciales son \"Terminus 2\" y \"primer candidato\", aunque el paper solo indica que se evalúan dos harnesses iniciales sin especificar nombres.",
+      "El blueprint afirma que el paper no explica cómo manejar tareas con nt=0 sin usar el piso ℓt, cuando el paper sí define ℓt como un piso positivo para tareas nunca resueltas."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [
+      "El paper no especifica un mínimo seguro para el parámetro ρ.",
+      "El paper no indica con qué frecuencia se actualizan las probabilidades de muestreo πt.",
+      "El paper menciona experimentos sobre la regla de desempate pero no cuantifica su impacto."
+    ],
+    "verdict": "El blueprint contiene atribuciones incorrectas y omisiones, por lo que no cumple con los requisitos de rigor de citación."
+  },
+  {
+    "arm": "R5",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint asume que el conjunto de validación Dval es un split fijo del 10‑20 % de los datos de entrenamiento, estratificado por tarea, aunque el paper no menciona esta definición ni el tamaño de D",
+      "El blueprint sugiere que el análisis de trazas por el Wiki Maintainer y la generación de propuestas por el Skill Proposer pueden introducir retrasos significativos en tareas de largo horizonte, sin qu",
+      "El blueprint propone que el sistema debe depurar o desactivar patrones obsoletos en la wiki, aunque el paper no describe ningún mecanismo de limpieza o desactivación de patrones."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint declara que el paper no especifica cómo se define Dval ni su tamaño, y luego añade la hipótesis de un split estratificado del 10‑20 % de los datos de entrenamiento.",
+      "El blueprint indica que el paper no aborda la representatividad de Dval y luego sugiere que la falta de representatividad podría causar fallos en producción.",
+      "El blueprint menciona que el paper no especifica mecanismos para depurar patrones obsoletos y luego propone la necesidad de dichos mecanismos."
+    ],
+    "verdict": "El blueprint contiene varias afirmaciones no respaldadas por el paper, violando tanto R4 como R5."
+  },
+  {
+    "arm": "R5",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5."
+  },
+  {
+    "arm": "R5",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone usar muestreo estratificado de trazas para evitar sobreajuste al conjunto de validación, aunque el paper no menciona esta técnica.",
+      "El blueprint sugiere implementar caché de resultados de validación para reducir latencia, aunque el paper no aborda optimización de infraestructura.",
+      "El blueprint señala que la dependencia de trazas de entrenamiento puede llevar a patrones erróneos, sin que el paper garantice la calidad o representatividad de dichas trazas."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene afirmaciones que no están respaldadas por la fuente, por lo que no cumple con R4, pero sí respeta R5."
+  },
+  {
+    "arm": "R5",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5."
+  },
+  {
+    "arm": "F",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el modelo bloquea un release si el rendimiento cae por debajo de un umbral predefinido (ej. 90 % del rendimiento en entrenamiento).",
+      "Se menciona que la validación antes de release se ejecuta sobre un conjunto hold‑out con entidades inductivas, algo que no aparece en el paper.",
+      "El blueprint indica que se mide Hits@10 y MRR como métricas de bloqueo de release, aunque el artículo no habla de un proceso de validación de release."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint declara que el aprendizaje contrastivo dual‑vista se aplica únicamente durante el entrenamiento, detalle no especificado en el paper.",
+      "Se añade la idea de un módulo de validación de release que no está presente en la fuente.",
+      "Se establece un umbral de aceptación (ej. 95 % del mejor Hits@10) para aprobar el release, información que no se menciona en el artículo."
+    ],
+    "verdict": "El blueprint contiene varias atribuciones y detalles que no están respaldados por la fuente, violando los requisitos de rigor de citación."
+  },
+  {
+    "arm": "F",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el subgrafo contextual debe incluir los vecindarios de 1 salto de las entidades de la consulta, aunque el paper no especifica la profundidad de los vecindarios.",
+      "El blueprint establece que las rutas recuperadas por el LLM deben tener una longitud máxima de 3 saltos, detalle que no aparece en el paper.",
+      "El blueprint indica que la fase de contraste doble‑vista debe generar dos vistas que compartan exactamente la misma estructura de nodos esenciales, algo que el paper no menciona."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint sugiere que el LLM‑guided path retrieval puede generar rutas que no existen en el KG y propone filtrar esas rutas, aunque el paper no menciona este riesgo ni la necesidad de tal filtrado.",
+      "El blueprint declara que el subgrafo contextual debe incluir vecindarios de 2 saltos para enriquecer la evidencia estructural, sin que el paper especifique tal profundidad.",
+      "El blueprint propone un test de regresión que exige que Hits@10 no disminuya más del 1 % respecto al release anterior, un umbral que no se menciona en el paper."
+    ],
+    "verdict": "El blueprint contiene atribuciones y supuestos no respaldados por la fuente, por lo que no cumple con los criterios de rigor de citación."
+  },
+  {
+    "arm": "F",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el subgrafo extraído debe contener los vecindarios de 1 salto de las entidades de la consulta, aunque el paper solo menciona la unión de los vecindarios sin especificar su prof",
+      "El blueprint establece un límite de 3 saltos para las rutas recuperadas por el LLM, mientras que el paper no menciona ningún límite de longitud de ruta.",
+      "El blueprint propone validar el rendimiento con un umbral de 5 % sobre Hits@10 del último release, detalle que no aparece en el artículo."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint rellena la longitud máxima de las rutas con 3 saltos, aunque el paper no especifica tal límite.",
+      "El blueprint añade un procedimiento de validación de Hits@10 con un umbral histórico, sin que el paper lo mencione.",
+      "El blueprint incluye una comprobación de dimensionalidad y ausencia de NaN en las salidas del BGNN, detalle no cubierto por el paper."
+    ],
+    "verdict": "El blueprint contiene varias afirmaciones y procedimientos que no están respaldados por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "F",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Generative Procedure Trajectory Sampling exposes both the action and its procedural prerequisites",
+      "graph mutation",
+      "procedure-triplet extraction"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Generative Procedure Trajectory Sampling exposes both the action and its procedural prerequisites",
+      "graph mutation",
+      "procedure-triplet extraction"
+    ],
+    "verdict": "El blueprint contiene varias afirmaciones que no están respaldadas por la fuente y rellena detalles que la fuente no menciona, incumpliendo tanto R4 como R5."
+  },
+  {
+    "arm": "F",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Construcción inicial del grafo: Usar los tripletes extraídos para construir un grafo dirigido donde los nodos son procedimientos y las aristas representan relaciones de precondition, secuencia o depen",
+      "Ejecución y registro de trazabilidad: Ejecutar el agente con la guía del grafo y registrar la trayectoria completa (acciones, herramientas, resultados) para análisis posterior.",
+      "Validación de release: Antes de cada release, ejecutar el agente en un entorno de staging con el grafo procedimental actualizado y verificar que todas las trayectorias críticas sigan los caminos válid"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Extracción de tripletes procedimentales: Implementar un módulo de *Generative Procedure Extraction* que analice las trayectorias de ejecución del agente (pasos, herramientas usadas, resultados) y gene",
+      "Localización del nodo activo: En cada paso de decisión durante la validación, localizar el nodo activo correspondiente al estado actual del agente basado en el historial de ejecución.",
+      "Mutación del grafo y refinamiento: Después de cada ejecución, aplicar *graph mutation* para actualizar el grafo basado en si la trayectoria fue exitosa o fallida, usando el *failure-vs-success refiner"
+    ],
+    "verdict": "El blueprint contiene varias atribuciones y supuestos no respaldados por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "F",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo de Extracción de Triplets de Procedimiento",
+      "Módulo de Mutación del Grafo (Autoevolución)",
+      "Módulo de Refiner de Éxito vs. Fracaso"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Módulo de Mutación del Grafo (Autoevolución) con propuestas de cambios estructurales",
+      "Módulo de Refiner de Éxito vs. Fracaso que evalúa mutaciones post‑ejecución",
+      "Declaración de que las mutaciones estructurales mejoran el rendimiento más allá del lote de entrenamiento"
+    ],
+    "verdict": "El blueprint contiene varias atribuciones y rellenos que no están respaldados por la fuente, por lo que no cumple los requisitos de rigor de citación."
+  },
+  {
+    "arm": "F",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona que el módulo de re-renderizado de objetivo y métrica depende de un archivo `goal.yaml`, algo que no aparece en el paper.",
+      "El documento describe un módulo de memoria de experimentos recientes que utiliza un buffer circular almacenado en `experiments.jsonl`, detalle no presente en la fuente.",
+      "El blueprint afirma que las lecciones persistentes se guardan en un archivo `lessons.md` que sobrevive a la compactación de contexto, información no citada en el artículo."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume la existencia de un contador de evaluaciones planas para activar el consejo de estancamiento, sin que el paper lo mencione.",
+      "Se presume que el árbol de búsqueda se convierte en una vista estructurada con señales de concentración de ramas, algo que el artículo no describe.",
+      "El blueprint declara que el agente lee el historial como estructura y no como filas TSV, aunque el paper no especifica este comportamiento."
+    ],
+    "verdict": "El blueprint incluye varias afirmaciones y detalles no respaldados por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "F",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Base de datos ligera o archivo JSON para almacenamiento temporal de experimentos.",
+      "Algoritmo de análisis de árbol (ej. aglomeración por padre, cálculo de varianza de métricas por rama).",
+      "Umbrales configurables (3 y 7) y tendencia estadística."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Umbrales configurables (3 y 7) y tendencia estadística.",
+      "Base de datos ligera o archivo JSON para almacenamiento temporal de experimentos.",
+      "Mecanismo de actualización post-experimento."
+    ],
+    "verdict": "El blueprint incluye varias especificaciones y mecanismos que no aparecen en la fuente, por lo que incumple tanto R4 como R5."
+  },
+  {
+    "arm": "F",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 1: Capa Estática de Reglas",
+      "Validación: Confirmar que cada turno incluya los cinco componentes mediante inspección de prompts generados",
+      "Módulo 5: Consejo de Estancamiento Incondicional con exactos turnos 4 y 8"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Módulo 5: Consejo de Estancamiento Incondicional con exactos turnos 4 y 8",
+      "Módulo 6: Revisión Estructurada del Árbol de Búsqueda con métricas de concentración de ramas y señales de meseta",
+      "Módulo 3: Memoria de Experimentos Recientes que no repite experimentos inválidos"
+    ],
+    "verdict": "El blueprint incluye varias afirmaciones y detalles que no están presentes en la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "F",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "\"Evaluar dos harnesses iniciales (incluyendo el actual) sobre el conjunto completo de tareas T\" – la fuente no indica que uno de los dos harnesses sea el actual.",
+      "\"Evaluar dos harnesses de partida (por ejemplo, el harness actual y una versión base)\" – la fuente no menciona que uno de los harnesses sea el actual ni da ejemplos de versiones.",
+      "\"El paper no especifica año\" – la fuente no contiene un año explícito, pero el blueprint no lo declara; sin embargo, la mención de un año no aparece en la fuente."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene atribuciones que la fuente no hace (R4 violado) pero no rellena silencios no especificados (R5 cumplido)."
+  },
+  {
+    "arm": "F",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Uso de un *hold‑out set* para validación externa (no mencionado en la fuente)",
+      "Requerimiento de mejora estadísticamente significativa en métricas de tarea (no especificado en la fuente)",
+      "Descripción de riesgos y mitigaciones adicionales (p.ej. riesgo de sobreajuste y estimación inexacta de πt) que no aparecen en la fuente"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint rellena la idea de un *hold‑out set* sin que la fuente lo indique",
+      "Incluye la noción de validación interna comparando Ŝ(h) entre iteraciones, detalle ausente en la fuente",
+      "Añade criterios de éxito estadístico y riesgos de estimación Monte Carlo que la fuente no menciona"
+    ],
+    "verdict": "El blueprint viola tanto R4 como R5 al atribuir a la fuente información que no contiene y al no declarar los silencios."
+  },
+  {
+    "arm": "F",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Define T as a set of representative tasks (e.g., unit tests + integration)",
+      "Suggest limiting K to 10 iterations",
+      "Suggest risk‑mitigation strategies for overfitting that are not mentioned in the paper"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Define T as a set of representative tasks (e.g., unit tests + integration)",
+      "Suggest limiting K to 10 iterations",
+      "Suggest risk‑mitigation strategies for overfitting"
+    ],
+    "verdict": "El blueprint contiene afirmaciones no respaldadas por la fuente y rellena silencios, por lo que no cumple los requisitos de rigor de citación."
+  },
+  {
+    "arm": "F",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "No violations detected; blueprint accurately reflects the source."
+  },
+  {
+    "arm": "F",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona un riesgo de sobreajuste al conjunto de validación si se usa repetidamente para gating sin datos frescos, aunque el paper no menciona este riesgo.",
+      "El blueprint propone la implementación de versionado y backups automáticos de la capa wiki/, pero el paper no detalla ningún mecanismo de backup ni versionado.",
+      "El blueprint indica que el Skill Proposer podría generar propuestas no atómicas o complejas, violando el diseño, aunque el paper establece que las propuestas son atómicas."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [
+      "El blueprint declara que el paper no especifica un umbral absoluto de rendimiento para release, lo cual es correcto porque el paper no menciona releases.",
+      "El blueprint señala que el paper no especifica cómo manejar el sobreajuste al conjunto de validación, una declaración de silencio válida.",
+      "El blueprint indica que el paper no especifica mecanismos de backup o versionado para el wiki, otra declaración de silencio que cumple R5."
+    ],
+    "verdict": "El blueprint contiene varias fabricaciones que no están respaldadas por la fuente, aunque declara correctamente los silencios donde la fuente no proporciona información."
+  },
+  {
+    "arm": "F",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con los requisitos de citación y declara los silencios correctamente."
+  },
+  {
+    "arm": "G",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el módulo de recuperación guiada por LLM contribuye directamente al rendimiento en Hits@10, aunque el paper no menciona Hits@10 como métrica de evaluación.",
+      "Se sugiere que el objetivo contrastivo dual‑vista preserva semánticas invariantes bajo perturbaciones estructurales leves, algo que el artículo no menciona.",
+      "El blueprint propone aumentar el peso del contraste o aplicar filtrado basado en entropía de relaciones como mitigación de ruido, sin que el paper describa dichas estrategias."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint rellena la ausencia de información sobre la contribución de las rutas retenidas al rendimiento en Hits@10.",
+      "Se rellena la falta de detalle sobre la preservación de semánticas invariantes bajo perturbaciones estructurales leves.",
+      "El blueprint asume que la BGNN garantiza que rutas idénticas tengan interpretaciones distintas según el contexto, sin que el paper lo especifique explícitamente."
+    ],
+    "verdict": "El blueprint contiene afirmaciones y rellenos que no están respaldados por la fuente, incumpliendo los requisitos de rigor de citación."
+  },
+  {
+    "arm": "G",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con los requisitos de rigor de citación."
+  },
+  {
+    "arm": "G",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint establece que el agente debe alcanzar un Hits@10 ≥ 0.65 y MRR ≥ 0.45, aunque el paper no especifica valores numéricos de umbral.",
+      "Se indica que el tiempo de preprocesamiento no debe exceder 500 ms por consulta, pero el paper solo menciona que la fase de extracción y recuperación es más rápida sin dar un límite numérico.",
+      "El blueprint limita el número de rutas retenidas a 10 por consulta, aunque el paper no menciona ninguna restricción sobre la cantidad de rutas seleccionadas."
+    ],
+    "verdict": "El blueprint contiene varias suposiciones no respaldadas por el paper, violando la regla R5."
+  },
+  {
+    "arm": "G",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 1: Extracción de triplets de procedimiento del historial de ejecución",
+      "Módulo 4: Validación pre-release mediante un refiner de éxito vs fracaso",
+      "El blueprint afirma que el paper describe un mecanismo de refinamiento contrastivo para penalizar patrones de fallo"
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene atribuciones que no están presentes en la fuente (R4 violado) pero declara correctamente los silencios donde la fuente no especifica (R5 cumplido)."
+  },
+  {
+    "arm": "G",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona un \"failure‑vs‑success refiner\" que contrasta trayectorias actuales con patrones históricos de éxito y fracaso, algo que el paper no describe.",
+      "Se propone un \"fallback\" a validación basada en pruebas unitarias cuando el grafo está vacío, aunque el paper no menciona tal mecanismo.",
+      "El blueprint sugiere un umbral numérico de aceptación basado en la proporción de pasos alineados con la guía de alto peso, pero el paper no especifica ningún umbral numérico."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint rellena la ausencia de un umbral numérico con una propuesta de nivel de confianza, aunque el paper solo indica que no especifica tal umbral.",
+      "Se añade una explicación de \"exploración o regularización\" para evitar sobreajuste, aunque el paper no menciona ningún mecanismo de exploración.",
+      "El blueprint declara requisitos de latencia y explicabilidad que no están presentes en el paper."
+    ],
+    "verdict": "El blueprint contiene varias atribuciones y rellenos que no están respaldados por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "G",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 2: Mutación del grafo procedural",
+      "Módulo 4: Refinador de éxito vs fracaso",
+      "El blueprint afirma que el modelo de guía penaliza acciones que se desvían de rutas conocidas"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint sugiere que el modelo de guía puede ser un LLM fine‑tuned o un clasificador basado en embeddings de grafo",
+      "El blueprint especifica métricas de éxito/fallo (cumplimiento de objetivos, uso correcto de herramientas, evitación de repeticiones)",
+      "El blueprint define que un procedimiento es una acción individual, secuencia o bloque condicional"
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos no respaldados por la fuente"
+  },
+  {
+    "arm": "G",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo de Sistema de Prompts Dinámicos",
+      "Algoritmo de Análisis de Árbol de Búsqueda",
+      "Contador de Evaluaciones Planas"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Módulo de Re-renderizado de Objetivo y Métrica con tabla de métricas",
+      "Módulo de Memoria de Experimentos Recientes con tabla estructurada",
+      "Módulo de Lecciones Persistentes con archivo lessons.md"
+    ],
+    "verdict": "El blueprint contiene fabricaciones y omisiones que violan las reglas R4 y R5."
+  },
+  {
+    "arm": "G",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint no atribuye a la fuente información que no contiene y declara correctamente los silencios del paper."
+  },
+  {
+    "arm": "G",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona \"control de versiones y pruebas de integridad en CI/CD\" para la capa estática, algo que no aparece en la fuente.",
+      "El blueprint indica que después de 7 evaluaciones planas se inserta un consejo más específico, mientras que la fuente solo menciona la inserción de un consejo tras 3+ y 7+ evaluaciones.",
+      "El blueprint sugiere que la revisión estructurada del árbol se calcule cada N turnos o con algoritmos incrementales, detalle que la fuente no especifica."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene varias atribuciones no respaldadas por la fuente, pero declara silencios donde la fuente no especifica detalles."
+  },
+  {
+    "arm": "G",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5."
+  },
+  {
+    "arm": "G",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint reproduce fielmente la información del paper sin atribuir nada que no esté presente en la fuente."
+  },
+  {
+    "arm": "G",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "error": "no parseable: {\"r4_ok\":"
+  },
+  {
+    "arm": "G",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5."
+  },
+  {
+    "arm": "G",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona que el wiki es \"write-once\", una política no explícita en la fuente; la fuente solo indica que el wiki \"never reset\" y \"persists and compounds\"."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene una fabricación (write‑once) pero cumple con la declaración de silencios."
+  },
+  {
+    "arm": "G",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona que el Skill Proposer recibe el archivo \"skill-impact.md\" como contexto histórico, aunque el paper no lo menciona.",
+      "El blueprint sugiere que el Skill Proposer utilice muestreo estratificado de trazas para diagnosticar causas raíz, detalle no presente en el paper.",
+      "El blueprint propone un margen de mejora (por ejemplo, R(Tval,k) > Rbest + ε) para evitar inestabilidad, algo que el paper no especifica."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene fabricaciones que no están respaldadas por la fuente, pero no rellena silencios."
+  },
+  {
+    "arm": "H",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El agente debe alcanzar o superar el Hits@10 mínimo registrado en el último release exitoso",
+      "El tiempo de inferencia por tripleta no debe aumentar más del 20% respecto al release anterior",
+      "El uso de memoria GPU durante la validación no debe superar el pico registrado en el release anterior más un 15%"
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [
+      "El paper no especifica umbrales de desempeño mínimo para decidir el pase a release",
+      "El paper no especifica criterios operativos de validación de releases en entornos de producción",
+      "El paper no detalla requisitos de estabilidad en ejecuciones consecutivas con diferentes semillas"
+    ],
+    "verdict": "El blueprint incluye afirmaciones que no están en la fuente, violando R4, aunque declara correctamente los silencios, cumpliendo R5."
+  },
+  {
+    "arm": "H",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "\"k=1 default\" for subgraph construction",
+      "\"top‑k=5\" for path retrieval",
+      "\"threshold >0.3\" for BGNN alignment similarity"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "\"Módulo 1 produce subgrafo no vacíos y conectados\"",
+      "\"Módulo 2 retiene entre 1 y k rutas por consulta\"",
+      "\"Módulo 4 genera embeddings con norma L2 cercana a 1\""
+    ],
+    "verdict": "El blueprint contiene afirmaciones y parámetros que no están presentes en la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "H",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Establecer un umbral de Hits@10 ≥ 0.65 para la validación",
+      "Limitar el número de rutas candidatas recuperadas por consulta a un máximo de 20 (top‑20)",
+      "Aplicar early stopping cuando la pérdida de contraste de subgrafo aumente durante 3 épocas consecutivas"
+    ],
+    "verdict": "El blueprint incluye varias suposiciones y parámetros no respaldados por la fuente, violando la regla R5."
+  },
+  {
+    "arm": "H",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "«graph mutation» – el grafo se muta dinámicamente incorporando nuevos tripletes extraídos de ejecuciones recientes",
+      "«failure‑vs‑success refiner» – se utiliza un refinador que contrasta trazas de éxito y fracaso para identificar qué transiciones procedurales conducen a resultados deseados",
+      "«Self‑Evolving Execution Structures» – el grafo se actualiza continuamente tras cada release exitoso"
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [
+      "El paper no especifica cómo se determina el umbral de suficiencia en la guía situacional para considerar una acción válida",
+      "El paper no describe el mecanismo detallado de cómo se ponderan o se eliminan tripletes durante la mutación del grafo",
+      "El paper no indica cómo se manejan los conflictos procedurales cuando múltiples tripletes sugieren acciones contradictorias"
+    ],
+    "verdict": "El blueprint contiene afirmaciones no respaldadas por la fuente (R4 incumplido) pero declara correctamente los silencios (R5 cumplido)."
+  },
+  {
+    "arm": "H",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "«procedure-triplet extraction»",
+      "«graph mutation»",
+      "«failure‑vs‑success refiner → graph mutation»"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "métrica de similitud coseno con umbral empírico 0.75",
+      "umbral de confianza del modelo de guía no especificado en el paper",
+      "ejecución nocturna en batch de los módulos 2 y 3"
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos no respaldados por la fuente, incumpliendo R4 y R5."
+  },
+  {
+    "arm": "H",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona que el grafo se muta dinámicamente tras cada ejecución, algo que no aparece en el paper.",
+      "Se propone un umbral de tolerancia de 0.7 para la divergencia entre acción y orientación del grafo, detalle no presente en la fuente.",
+      "El blueprint describe un proceso de autoevolución del grafo basado en resultados de éxito/fallo, sin referencia en el artículo original."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint rellena la falta de especificación del umbral de tolerancia con un valor empírico de 0.7.",
+      "Se añade una propuesta de arquitectura para el \"guidance model\" que no está descrita en el paper.",
+      "El blueprint sugiere un proceso de inicialización del grafo con procedimientos manuales, aunque el artículo no menciona cómo iniciar el grafo en ausencia de historial."
+    ],
+    "verdict": "El blueprint contiene varias fabricaciones y rellenos de silencios que no están respaldados por la fuente, incumpliendo los requisitos de rigor de citación."
+  },
+  {
+    "arm": "H",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Archivo de configuración estática (ej. `static_rules.yaml`)",
+      "Motor de renderizado de prompts (ej. Jinja2 template)",
+      "Dependencia: Algoritmo de análisis de árbol de búsqueda (ej. clustering de parámetros + visualización de métricas)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Archivo de configuración estática (ej. `static_rules.yaml`)",
+      "Motor de renderizado de prompts (ej. Jinja2 template)",
+      "Dependencia: Algoritmo de análisis de árbol de búsqueda (ej. clustering de parámetros + visualización de métricas)"
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos que no están respaldados por la fuente, por lo que no cumple con los requisitos de rigor de citación."
+  },
+  {
+    "arm": "H",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo de Re-renderizado de Objetivo y Métrica",
+      "Módulo de Memoria de Experimentos Recientes",
+      "Módulo de Lecciones Persistentes"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Dependencias: Archivo de configuración de objetivo/métrica (propuesta del blueprint)",
+      "Dependencias: Buffer circular de experimentos (propuesta del blueprint)",
+      "Validación de Integridad del Estado"
+    ],
+    "verdict": "El blueprint incluye varias secciones y dependencias que no aparecen en la fuente original, y también omite detalles que la fuente deja en silencio, violando tanto R4 como R5."
+  },
+  {
+    "arm": "H",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint respeta las normas de citación y declara los silencios correctamente."
+  },
+  {
+    "arm": "H",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Usar ρ=15% como punto de equilibrio entre costo y representatividad, ajustable según feedback de releases anteriores.",
+      "Declarar que la selección de subconjunto se realiza sin reemplazo, cuando el paper solo menciona la reducción de tamaño m = ⌈ρN⌉ sin especificar el método de muestreo."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene una afirmación no respaldada por la fuente (ρ=15%) y por lo tanto viola la regla R4, aunque cumple con la regla R5."
+  },
+  {
+    "arm": "H",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5, no atribuye información no presente en la fuente ni rellena silencios."
+  },
+  {
+    "arm": "H",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con los requisitos de citación y no contiene falsificaciones ni silencios no declarados."
+  },
+  {
+    "arm": "H",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5."
+  },
+  {
+    "arm": "H",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint no contiene atribuciones incorrectas ni rellenos no respaldados por la fuente."
+  },
+  {
+    "arm": "H",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Dependencias: entorno de ejecución, conjunto de habilidades activas (skills/), capa raw/ para almacenar trazas.",
+      "Riesgo: Sobreajuste al conjunto de validación (Dval) si se usa repetidamente para gating.",
+      "Mitigación: Usar un conjunto de validación separado y estático para pre-release, distinto del usado en entrenamiento; rotar o renovar periódicamente Dval para evitar fuga de información."
+    ],
+    "verdict": "El blueprint contiene varias afirmaciones no respaldadas por la fuente, violando la regla R5."
   }
 ]

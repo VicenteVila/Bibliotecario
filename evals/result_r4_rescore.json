@@ -1,0 +1,254 @@
+[
+  {
+    "arm": "E",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok_antes": true,
+    "r4_ok_ahora": true,
+    "acusaciones_antes": 0,
+    "acusaciones_ahora": 0,
+    "via": {},
+    "restantes": []
+  },
+  {
+    "arm": "E",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 1,
+    "acusaciones_ahora": 1,
+    "via": {
+      "juez_etiqueta": 1
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint menciona explícitamente el uso de bibliotecas de procesamiento de grafos como PyTorch Geometric y DGL, detalle que no aparece en el paper fuente.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint propone un \"grafo procedural pre‑construido que codifique los flujos de trabajo esperados para las validaciones de release\", algo que el paper no menciona.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Se describe un \"mecanismo de extracción de tripletes de procedimiento a partir de registros de ejecuciones pasadas (exitosas y fallidas) de validaciones de release\", sin que el paper lo describa.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint sugiere que se definen \"métricas concretas (como umbrales de desviación permitida) para considerar una validación exitosa en un contexto de release\", detalle que el paper no ofrece.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 1,
+    "via": {
+      "juez_etiqueta": 1,
+      "juez_en_fuente": 1,
+      "mecanico_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint afirma que el sistema incluye un \"Validador de Prerrequisitos\" que verifica antes de cada acción si los prerrequisitos están satisfechos, algo que no se menciona en el paper.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 1,
+    "via": {
+      "juez_en_fuente": 2,
+      "juez_etiqueta": 1
+    },
+    "restantes": [
+      {
+        "claim": "Se menciona que el módulo de generación de guía situacional expone tanto la acción como sus prerequisitos procedimentales (doc:2:11), aunque el paper solo indica que la guía bias a la siguiente acción",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 1,
+    "via": {
+      "juez_en_fuente": 1,
+      "mecanico_en_fuente": 1,
+      "juez_etiqueta": 1
+    },
+    "restantes": [
+      {
+        "claim": "Riesgo: Sesgo en Asesoría de Estancamiento – el paper no detalla cómo se personaliza la asesoría tras 3+ y 7+ evaluaciones planas.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 1,
+    "acusaciones_ahora": 1,
+    "via": {
+      "juez_etiqueta": 1
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint afirma que \"MCP servers son insuficientes por sí mismos\", mientras que el paper indica que \"skills y MCP servers son insuficientes por sí mismos\".",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok_antes": true,
+    "r4_ok_ahora": true,
+    "acusaciones_antes": 0,
+    "acusaciones_ahora": 0,
+    "via": {},
+    "restantes": []
+  },
+  {
+    "arm": "E",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 1,
+    "acusaciones_ahora": 1,
+    "via": {
+      "juez_etiqueta": 1
+    },
+    "restantes": [
+      {
+        "claim": "La fórmula explícita de π_t = m × (w_t / Σ_{j∈T} w_j) no aparece en el artículo fuente.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_etiqueta": 2,
+      "mecanico_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint afirma que el paper usa 10 iteraciones en los experimentos, aunque el texto fuente no menciona ningún número de iteraciones.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint sugiere que el paper utiliza la estimación anclada para evitar inestabilidad cuando πt es pequeño, aunque la fuente solo menciona la estimación anclada sin referirse explícitamente a la i",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "mecanico_en_fuente": 1,
+      "juez_etiqueta": 2
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint indica que la validación antes de cada release se logra mediante el mecanismo de Gating & Rollback, detalle que no aparece en el paper.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint sugiere que se utiliza un muestreo estratificado de trazas para mitigar el riesgo de sobreajuste, pero el paper no menciona esta práctica.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 2,
+    "acusaciones_ahora": 1,
+    "via": {
+      "mecanico_en_fuente": 1,
+      "juez_etiqueta": 1
+    },
+    "restantes": [
+      {
+        "claim": "El Skill Proposer utiliza un resumen de resultados de entrenamiento (pass/fail, predicciones y ground-truth) para generar propuestas, aunque el paper no menciona tal dependencia.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "E",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint propone un proceso de validación pre-release ejecutando un loop completo de WikiSkill sobre un conjunto holdout separado, algo que no se menciona en el paper.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint indica que el tamaño o la estratificación de Dval no se especifican y sugiere una frecuencia de validación fuera del loop evolutivo estándar, sin respaldo en el texto.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint menciona políticas de retención o compresión de las trazas en raw/ para controlar costos de almacenamiento, detalle que no aparece en la fuente.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  }
+]

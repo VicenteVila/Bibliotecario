@@ -1,0 +1,132 @@
+{
+  "_meta": {
+    "descripcion": "Set de calibracion del juez para R4 (Fase 0 del plan). Cada item fue verificado MECHANICAMENTE contra los chunks reales de la base, no a ojo. Se uso para validar el prompt nuevo de Q1 antes de medir nada.",
+    "fecha": "2026-10-11",
+    "definicion_R4": "No presentar como de la fuente algo que no esta en la fuente. Puentear al goal esta permitido si la frase lleva la marca de propuesta junto a la afirmacion (no en otra seccion del documento).",
+    "tres_categorias": [
+      "EN_FUENTE -> PASS. El juez NO debe acusarlo, aunque el blueprint lo diga sin etiqueta: es cierto.",
+      "NO_EN_FUENTE + etiqueta adyacente -> PASS bajo la R4 nueva. Es honesto: dice que no sale de la fuente.",
+      "NO_EN_FUENTE + sin etiqueta -> FAIL. Es fabricacion presentada como hecho."
+    ],
+    "metodo_de_verificacion": "SELECT text FROM chunks WHERE doc_id=? y busqueda literal del termino. 13/13 coincidieron con lo esperado.",
+    "correccion": "Errata propia: la primera version busco terminos en espanol sobre papers en ingles. Al menos dos items quedaron mal etiquetados. Toda busqueda literal usa ahora terminos independientes del idioma (numeros, identificadores, .md/.yaml) o se comprueba en ingles."
+  },
+  "items": [
+    {
+      "claim": "Weight floor for tasks never solved so far = 0.125",
+      "doc_id": 3,
+      "in_source": true,
+      "labelled": false,
+      "esperado": "PASS",
+      "nota": "El juez lo acuso en los 3 runs de Task-CoEvolve. Falso positivo: esta en doc3 chunk43, con la formula en chunk13."
+    },
+    {
+      "claim": "0.125",
+      "doc_id": 3,
+      "in_source": true,
+      "labelled": false,
+      "esperado": "PASS",
+      "nota": "Igual que arriba, forma directa del numero."
+    },
+    {
+      "claim": "Rbest",
+      "doc_id": 5,
+      "in_source": true,
+      "labelled": false,
+      "esperado": "PASS",
+      "nota": "3 hits en doc5. El juez lo acuso como fabricado."
+    },
+    {
+      "claim": "lessons.md",
+      "doc_id": 4,
+      "in_source": true,
+      "labelled": false,
+      "esperado": "PASS",
+      "nota": "7 hits en doc4. El juez dijo que el paper no menciona el nombre del archivo: lo menciona."
+    },
+    {
+      "claim": "self-evolving",
+      "doc_id": 2,
+      "in_source": true,
+      "labelled": false,
+      "esperado": "PASS",
+      "nota": "42 hits. Esta en el propio titulo de doc2."
+    },
+    {
+      "claim": "gating and rollback",
+      "doc_id": 5,
+      "in_source": true,
+      "labelled": false,
+      "esperado": "PASS",
+      "nota": "3 hits en doc5."
+    },
+    {
+      "claim": "variance-weighted task selection",
+      "doc_id": 3,
+      "in_source": true,
+      "labelled": false,
+      "esperado": "PASS",
+      "nota": "3 hits en doc3."
+    },
+    {
+      "claim": "Módulo de Gate de Release decide si el agente esta listo para release",
+      "doc_id": 2,
+      "in_source": false,
+      "labelled": true,
+      "esperado": "PASS",
+      "nota": "NO esta en doc2, pero la linea siguiente dice 'Propuesta del blueprint: Este modulo no esta descrito en la fuente'. Adyacente y explicito -> PASS en R4 nueva."
+    },
+    {
+      "claim": "Umbral Hits@10 > 0.85 para aprobar el release",
+      "doc_id": 1,
+      "in_source": false,
+      "labelled": true,
+      "esperado": "PASS",
+      "nota": "NO en doc1; la linea siguiente dice 'El paper no especifica un procedimiento de validacion pre-release... esta logica se propone como extension'. Adyacente -> PASS."
+    },
+    {
+      "claim": "Módulo de Detección de Desviaciones Procedurales",
+      "doc_id": 2,
+      "in_source": false,
+      "labelled": true,
+      "esperado": "PASS",
+      "nota": "NO en doc2, pero lleva etiqueta 'Propuesta del blueprint' en la linea siguiente."
+    },
+    {
+      "claim": "Archivo goal.yaml y metric.yaml como dependencia",
+      "doc_id": 4,
+      "in_source": false,
+      "labelled": false,
+      "esperado": "FAIL",
+      "nota": "0 hits en doc4. Se presenta como 'Dependencias' de un modulo, sin ninguna marca de propuesta."
+    },
+    {
+      "claim": "El framework localiza el nodo activo del agente en cada paso de decision",
+      "doc_id": 2,
+      "in_source": true,
+      "labelled": false,
+      "esperado": "PASS",
+      "nota": "CORREGIDO 2026-10-11: mi verificacion original busco la frase en ESPANOL sobre un corpus en INGLES. doc2 chunk dice literalmente 'the framework localizes the active node from the agent's trajectory'. El blueprint lo tradujo bien: no hay fabricacion."
+    },
+    {
+      "claim": "Módulo de Localización del Nodo Activo",
+      "doc_id": 2,
+      "in_source": true,
+      "labelled": false,
+      "esperado": "PASS",
+      "nota": "CORREGIDO 2026-10-11: mi verificacion original busco la frase en ESPANOL sobre un corpus en INGLES. doc2 chunk dice literalmente 'the framework localizes the active node from the agent's trajectory'. El blueprint lo tradujo bien: no hay fabricacion."
+    },
+    {
+      "claim": "Módulo de Deteccion describe rutas validas implicitas en el Procedural Graph",
+      "doc_id": 2,
+      "in_source": false,
+      "labelled": false,
+      "esperado": "FAIL",
+      "nota": "0 hits; la frase no lleva etiqueta propia. | verificado: 'valid path' 0 hits en doc2"
+    }
+  ],
+  "resumen": {
+    "PASS": 12,
+    "FAIL": 2
+  }
+}

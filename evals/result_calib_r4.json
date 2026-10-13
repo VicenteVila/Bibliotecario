@@ -1,0 +1,223 @@
+[
+  {
+    "claim": "Weight floor for tasks never solved so far = 0.125",
+    "doc_id": 3,
+    "in_source": true,
+    "labelled": false,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_en_fuente",
+    "found": [
+      "0.125",
+      "Weight",
+      "floor",
+      "tasks",
+      "never",
+      "solved",
+      "tasks never solved"
+    ],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "0.125",
+    "doc_id": 3,
+    "in_source": true,
+    "labelled": false,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_en_fuente",
+    "found": [
+      "0.125"
+    ],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "Rbest",
+    "doc_id": 5,
+    "in_source": true,
+    "labelled": false,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_en_fuente",
+    "found": [
+      "Rbest"
+    ],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "lessons.md",
+    "doc_id": 4,
+    "in_source": true,
+    "labelled": false,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_en_fuente",
+    "found": [
+      "lessons.md"
+    ],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "self-evolving",
+    "doc_id": 2,
+    "in_source": true,
+    "labelled": false,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_en_fuente",
+    "found": [
+      "self-evolving"
+    ],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "gating and rollback",
+    "doc_id": 5,
+    "in_source": true,
+    "labelled": false,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_en_fuente",
+    "found": [
+      "gating",
+      "rollback"
+    ],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "variance-weighted task selection",
+    "doc_id": 3,
+    "in_source": true,
+    "labelled": false,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_en_fuente",
+    "found": [
+      "variance-weighted",
+      "task",
+      "selection",
+      "variance-weighted task selection"
+    ],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "Módulo de Gate de Release decide si el agente esta listo para release",
+    "doc_id": 2,
+    "in_source": false,
+    "labelled": true,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_marcado",
+    "found": [
+      "Gate",
+      "decide"
+    ],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "Umbral Hits@10 > 0.85 para aprobar el release",
+    "doc_id": 1,
+    "in_source": false,
+    "labelled": true,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_en_fuente",
+    "found": [
+      "0.85",
+      "Hits@10",
+      "release"
+    ],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "Módulo de Detección de Desviaciones Procedurales",
+    "doc_id": 2,
+    "in_source": false,
+    "labelled": true,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_marcado",
+    "found": [],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "Archivo goal.yaml y metric.yaml como dependencia",
+    "doc_id": 4,
+    "in_source": false,
+    "labelled": false,
+    "esperado": "FAIL",
+    "decision": "FAIL",
+    "via": "juez_etiqueta",
+    "found": [],
+    "juez": {
+      "es_de_la_fuente": false,
+      "etiquetado_como_propuesta": false,
+      "presentado_como_hecho": false,
+      "verdict": "El claim no está presente en la fuente."
+    },
+    "acertado": true
+  },
+  {
+    "claim": "El framework localiza el nodo activo del agente en cada paso de decision",
+    "doc_id": 2,
+    "in_source": true,
+    "labelled": false,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "juez_en_fuente",
+    "found": [
+      "framework",
+      "localiza",
+      "decision"
+    ],
+    "juez": {
+      "es_de_la_fuente": true,
+      "etiquetado_como_propuesta": false,
+      "presentado_como_hecho": true,
+      "verdict": "El claim está respaldado por la fuente, ya que la fuente afirma que el framework localiza el nodo activo del agente en cada paso de decisión."
+    },
+    "acertado": true
+  },
+  {
+    "claim": "Módulo de Localización del Nodo Activo",
+    "doc_id": 2,
+    "in_source": true,
+    "labelled": false,
+    "esperado": "PASS",
+    "decision": "PASS",
+    "via": "mecanico_marcado",
+    "found": [],
+    "juez": null,
+    "acertado": true
+  },
+  {
+    "claim": "Módulo de Deteccion describe rutas validas implicitas en el Procedural Graph",
+    "doc_id": 2,
+    "in_source": false,
+    "labelled": false,
+    "esperado": "FAIL",
+    "decision": "FAIL",
+    "via": "juez_etiqueta",
+    "found": [
+      "Procedural",
+      "Graph"
+    ],
+    "juez": {
+      "es_de_la_fuente": false,
+      "etiquetado_como_propuesta": false,
+      "presentado_como_hecho": false,
+      "verdict": "El documento no menciona un módulo de detección que describa rutas válidas implícitas en el Procedural Graph."
+    },
+    "acertado": true
+  }
+]

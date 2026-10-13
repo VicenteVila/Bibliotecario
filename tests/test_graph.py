@@ -107,6 +107,53 @@ def test_build_blueprint_prompt_lleva_fuente_y_reglas(tmp_path, monkeypatch):
         assert rule in prompt, f"falta {rule}"
 
 
+def test_prompt_r6_es_en_linea_y_r1_es_suelo(tmp_path, monkeypatch):
+    """P4: la marca de propuesta tiene que ir JUNTO a la afirmacion, o no sirve.
+
+    Motivo medido: en Procedural Graphs r0 el modelo ya escribia
+    «Propuesta del blueprint» pero en otra linea, y el juez no lo acreditaba —
+    8 acusaciones que al re-puntuar quedaron en 1. Si la regla no esta en el
+    prompt con esa exigencia, el modelo repite el mismo fallo.
+    """
+    from bibliotecario.agent import tools as T
+    db = tmp_path / "r6.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    with storage.get_conn(db) as conn:
+        conn.execute("INSERT INTO documents (path, title, paper_hash) VALUES (?,?,?)",
+                     ("f", "P", "hr6"))
+        conn.execute("INSERT INTO chunks (doc_id, chunk_idx, text, embedding) VALUES (?,?,?,?)",
+                     (1, 0, "variance-weighted task selection.", b"\x00"))
+    P.register_procedure("variance-weighted task selection", technique="X", doc_id=1)
+    monkeypatch.setattr(T.PEARL, "retrieve_evidence", lambda *a, **k: [])
+    seen: list[str] = []
+    monkeypatch.setattr(T, "generate", lambda prompt, **k: seen.append(prompt) or "ok")
+
+    T.build_blueprint("X", "objetivo")
+    prompt = seen[0]
+
+    lineas = prompt.split(chr(10))
+
+    def bloque(regla: str) -> str:
+        """R1 es multilínea desde la dec. 11 (la plantilla ocupa varias
+        líneas): hay que tomar la continuación, no solo la primera."""
+        out, dentro = [], False
+        for l in lineas:
+            if l.startswith(regla + "."):
+                dentro = True
+                out.append(l)
+            elif dentro and l.startswith((" ", "\t")):
+                out.append(l)
+            elif dentro:
+                break
+        return chr(10).join(out)
+
+    r4, r6, r1 = bloque("R4"), bloque("R6"), bloque("R1")
+    assert "misma l" in r4, "R4 debe permitir el puente solo con marca junto a la frase"
+    assert "misma l" in r6, "R6 debe exigir la marca en la propia frase"
+    assert "suelo" in r1, "R1 debe declararse suelo: sin ancla no salva R6"
+
+
 def test_build_blueprint_verified_limpio_no_reescribe(tmp_path, monkeypatch):
     """P3: si la atribución verifica, no se paga un segundo generate()."""
     from bibliotecario.agent import tools as T

@@ -243,12 +243,19 @@ BLUEPRINT_MAX_TOKENS = 3000
 # lector, el puntero es para que B8 (citas que resuelven) se pueda comprobar
 # sin juicio humano. Sin él, la comprobación mecánica no tiene nada que seguir.
 _WRITING_RULES = """Reglas de escritura, obligatorias:
-R1. Di de donde sale cada afirmación: «Según <autores> (<año>) [doc:<id>:<chunk>]…», no «el sistema selecciona tareas» a secas. El puntero [doc:id:chunk] es obligatorio y tiene que apuntar a un chunk que hayas visto en FUENTE.
-R2. Comillas ⇔ literal: entrecomilla SOLO cuando la frase sea idéntica a la fuente. Si la reescribes, no la entrecomilles.
-R3. Parafrasea sin comillas, pero atribuyendo: tus palabras + quien lo dice.
-R4. No atribuyas a la fuente lo que la fuente no dice. Si algo no está en FUENTE, no aparezca como del paper.
+R1. **Ancla cada afirmación a una cita literal, en este orden y en la misma línea:**
+    «<fragmento textual del paper, tal cual, en su idioma>» [doc:<id>:<chunk>] — <tu paráfrasis en español>.
+    Ejemplo correcto: «the framework localizes the active node» [doc:2:41] — el método localiza el nodo activo antes de decidir.
+    La cita va **PRIMERO**, entrecomillada, y tiene que ser **idéntica** a un trozo del chunk que hayas visto en FUENTE. Después el puntero. Después tu paráfrasis.
+    «Según el paper, el sistema selecciona tareas» a secas **no vale**: es una atribución sin ancla, y sin ancla no se puede comprobar nada.
+    **R1 es suelo: sin cita literal + puntero no hay salvación por ninguna otra regla.**
+    **Única excepción (dec. 15)**: las declaraciones de silencio de R5 («el paper no especifica/describe/indica…») **no llevan cita porque no tienen fuente que citar** — llevan la marca de R6. Una frase que declara un hueco no es una atribución. Fuera de esa excepción, R1 sigue siendo suelo sin tocar.
+R2. Comillas ⇔ literal, sin excepción: entrecomilla **solo** fragmentos idénticos a la fuente. Si cambias una palabra, no va entrecomillado — va en tu paráfrasis, después de la cita.
+R3. La paráfrasis va **después de la cita y el puntero, en la misma línea**, y no añade nada que la cita no sostenga: tus palabras explican la cita, no la extienden. Si necesitas ir más allá de lo que la cita dice, eso ya no es paráfrasis — es R4 y R6.
+R4. No presentes como de la fuente algo que no esté en FUENTE. Puentear hacia un objetivo que la fuente no trata está permitido **solo si la frase lleva la marca de la regla R6 junto a la afirmación** — misma línea o la inmediatamente siguiente.
 R5. Declara los silencios: si la fuente no especifica un detalle (cómo se fija un umbral, qué hacer con X), dilo — «el paper no especifica …» — en vez de rellenarlo.
-R6. Separa lo tuyo de lo de la fuente: marca explícitamente «propuesta del blueprint» para todo lo que no esté en FUENTE.
+R6. Separa lo tuyo de lo de la fuente **EN LA PROPIA FRASE**: escribe «(propuesta del blueprint)» o «(el paper no lo especifica)» **en la misma línea, o en la línea justo debajo del mismo punto**. Una marca en otra sección no vale: no se puede saber a que afirmación se refiere, y se lee como si fuera del paper. Nota: R6 no tapa R1 — si la frase atribuye algo al paper, lleva cita literal + puntero, aunque también diga que es propuesta.
+R8. **Cada módulo y cada dependencia lleva su propia cita dentro del propio punto.** Una cita en la cabecera de la sección («Según X [doc:0:0], los siguientes módulos son…») **no cubre los puntos de debajo**: cada módulo que enumeres necesita su cita literal + puntero **en su propia línea**, con el formato exacto de R1: «…» [doc:<id>:<chunk>]. **El puntero es `[doc:<id>:<chunk>]` y nada más**: «citado en §3.2.1», «(Figura 2)», «(ecuación 4)» o «Yang et al. 2026» **no son punteros** y no cuentan como cita. Si el módulo es propuesta tuya y no del paper, márcalo con R6 («(propuesta del blueprint)») **en vez** de citarlo: no le pongas un puntero que no hay. No vale citar solo el primero y dejar el resto sin ancla.
 R7. **Última sección del documento, sin falta**: «## Bibliografía», listando SOLO los documentos realmente consultados, cada uno con autores y año **tal como aparecen en la fuente** más su [doc:<id>]. Si no puedes extraer autores o año, di «no consta en la fuente»; no los inventes."""
 
 
@@ -405,16 +412,41 @@ def instantiate_agent_template(technique: str, goal: str) -> dict:
     slug = "".join(c if c.isalnum() else "-" for c in technique.lower())[:40].strip("-")
     outdir = data_dir() / "agents" / slug
     outdir.mkdir(parents=True, exist_ok=True)
+    # D (§2.D, dec. 13): el estado se CALCULA en runtime, no se escribe aquí.
+    # Antes el literal "todo" estaba en este fichero, así que el resultado se
+    # sabía antes de correrlo — 0 de 20 pasos se ejecutaron jamás (§8.6).
     code = f'''"""Agente {technique} — plantilla generada por Bibliotecario.
 Objetivo: {goal}
 Procedimientos: {", ".join(bp["procedures"][:8])}
+
+Cada paso consulta el corpus con su nombre de procedimiento y guarda el estado
+con score >= 0.30, `empty` si no llega, `error` si falla. Ningún estado está
+escrito en este fichero (dec. 13, D2, 2ª enmienda).
 """
 STEPS = {bp["procedures"][:8]!r}
 
+
 def run(context: dict) -> dict:
+    objetivo = str((context or {{}}).get("objetivo", "") or "")
     trace = []
     for step in STEPS:
-        trace.append({{"step": step, "status": "todo"}})
+        consulta = f"{{step}} {{objetivo}}".strip()
+        try:
+            from bibliotecario.agent.tools import deep_sweep
+            docs = (deep_sweep(consulta) or {{}}).get("docs", [])
+            mejor = max((c["score"] for d in docs for c in d["chunks"]), default=0.0)
+            # Umbral 0.30 fijado en la 2ª enmienda de dec. 13: deep_sweep
+            # devuelve docs para cualquier cadena, asi que "hay docs" no
+            # discrimina. Hueco medido: sin sentido <=0.154, real >=0.546.
+            if docs and mejor >= 0.30:
+                status = "done"
+                detalle = f"{{len(docs)}} docs, mejor score {{mejor:.3f}}"
+            else:
+                status = "empty"
+                detalle = f"{{len(docs)}} docs, mejor score {{mejor:.3f}} < 0.30"
+        except Exception as exc:  # noqa: BLE001 — un paso que falla no tumba el trace
+            status, detalle = "error", f"{{type(exc).__name__}}: {{exc}}"
+        trace.append({{"step": step, "status": status, "detalle": detalle}})
     return {{"technique": "{technique}", "goal": "{goal}", "trace": trace}}
 '''
     (outdir / "agent_template.py").write_text(code, encoding="utf-8")

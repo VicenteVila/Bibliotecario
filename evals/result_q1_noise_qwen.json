@@ -1,0 +1,1730 @@
+[
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "G",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": false,
+  "r5_ok": false,
+  "r5_rellenados": 1,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": false,
+  "r5_ok": false,
+  "r5_rellenados": 1,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": false,
+  "r5_ok": false,
+  "r5_rellenados": 1,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "PEARL",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": false,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 1,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "ReASearch",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true,
+  "motivo": "HTTP 429: {\"error\":{\"message\":\"Rate limit reached for model `qwen/qwen"
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true,
+  "motivo": "HTTP 429: {\"error\":{\"message\":\"Rate limit reached for model `qwen/qwen"
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 0,
+  "rep": 2,
+  "r4_ok": true,
+  "r5_ok": true,
+  "r5_rellenados": 0,
+  "r4_fab": 0,
+  "error": false
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true,
+  "motivo": "HTTP 429: {\"error\":{\"message\":\"Rate limit reached for model `qwen/qwen"
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true,
+  "motivo": "HTTP 429: {\"error\":{\"message\":\"Rate limit reached for model `qwen/qwen"
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 1,
+  "rep": 2,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true,
+  "motivo": "HTTP 429: {\"error\":{\"message\":\"Rate limit reached for model `qwen/qwen"
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 0,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true,
+  "motivo": "HTTP 429: {\"error\":{\"message\":\"Rate limit reached for model `qwen/qwen"
+ },
+ {
+  "arm": "H",
+  "technique": "WikiSkill",
+  "run": 2,
+  "rep": 1,
+  "r4_ok": null,
+  "r5_ok": null,
+  "error": true,
+  "motivo": "HTTP 429: {\"error\":{\"message\":\"Rate limit reached for model `qwen/qwen"
+ }
+]

@@ -25,6 +25,13 @@ _TECH = re.compile(
     r"[\"“«']([^\"”»']{6,})[\"”»']"          # entrecomillado
     r"|\b([A-Z][a-z]+(?:[A-Z][a-z]+){1,})\b"  # CamelCase: AdaptiveHarnessEngine
     r"|\b([a-z]+(?:[-_][a-z]+){2,})\b"        # kebab/snake de 3+ piezas
+    # P4: numeros tecnicos y ficheros. El verificador original solo miraba
+    # nombres de modulos, y por eso no cazó λ_t=0.125 ni goal.yaml — que son
+    # exactamente los que el juez se inventaba como ausentes.
+    r"|(\d+\.\d+%?)"                          # decimal: 0.125, 7.0
+    r"|(\d{1,3}%)"                            # porcentaje: 85%
+    r"|([A-Za-z]+@\d+)"                       # metrica: Hits@10, R@100
+    r"|([A-Za-z_][\w-]*\.(?:md|yaml|yml|json|txt|py|csv|toml))"  # fichero
 )
 
 # Frase con puntero a un chunk, que es lo que se puede verificar.
@@ -37,11 +44,12 @@ _WINDOW = 260
 
 
 def _terms(sentence: str) -> list[str]:
-    """Términos técnicos distintivos de una frase.
+    """Términos distintivos de una frase: los que tendrían que estar en la
+    fuente si la atribución es honesta.
 
-    Son lo que tendría que aparecer en la fuente si la atribución es honesta:
-    nombres de módulo, compuestos técnicos y lo entrecomillado. Las palabras
-    comunes no cuentan, o todo sería sospechoso.
+    Cubre nombres de módulo, compuestos técnicos, lo entrecomillado y —desde
+    P4— números técnicos y ficheros. Las palabras comunes no cuentan, o todo
+    sería sospechoso.
     """
     out: list[str] = []
     for m in _TECH.finditer(sentence):
@@ -105,3 +113,174 @@ def _repair_prompt(blueprint: str, violations: list[dict]) -> str:
         "«propuesta del blueprint» (R6). No lo dejes atribuido al paper.\n\n"
         "Devuelve el blueprint completo ya corregido, en markdown."
     )
+
+
+# ---------------------------------------------------------------- ruta 5 (§5.10)
+#
+# §5.9.2 midió que P4 empeora R4 (6/15 → 2/13): apretar la atribución amplía la
+# superficie donde fabricar, y las 17 acusaciones que quedan son semánticas —
+# no alcanzables con regex. §5.10 propone el verificador como crítico en el
+# bucle. Aquí está.
+#
+# La lección de P3 (§5.8.3) gobierna el diseño: **no se reescribe la prosa.**
+# P3 regeneraba el documento y destruyó citas, bibliografía y silencios en 3 de
+# 3. Aquí la única acción es **quitar el puntero**, que es una edición de cadena
+# determinista. Al quitarlo, la afirmación sale del denominador de R4 por
+# construcción — no se corrige la frase, se deja de presentarla como de la fuente.
+
+_CRITIC_PROMPT = """Estás verificando una cita de un blueprint de agente.
+
+La frase de abajo atribuye algo a un paper, apuntando a un trozo concreto de ese
+paper. El trozo está debajo.
+
+Pregunta única: **¿ese trozo sostiene lo que la frase le atribuye?**
+
+- NO sostiene si la frase presenta como dicho por el paper algo que el trozo
+  no dice: un nombre de módulo inventado, un número que no aparece, una
+  conclusión que el trozo no saca, o una relación causal que no está escrita.
+- SÍ sostiene si el trozo lo dice o lo deja inferir de forma directa. Una
+  paráfrasis en español de una idea en inglés **sí cuenta como sostenida**: no
+  exijas coincidencia literal, exige que la idea esté.
+- Si el trozo está vacío o es ilegible, responde "SIN_FUENTE".
+
+FRASE:
+{sentence}
+
+TROZO CITADO:
+{chunk}
+
+Responde con UNA sola palabra, sin explicación: SOSTIENE o NO_SOSTIENE o SIN_FUENTE."""
+
+
+def critic_claim(sentence: str, chunk: str, *, temperature: float = 0.0) -> str:
+    """¿La fuente sostiene lo que esta frase le atribuye?
+
+    Devuelve "SOSTIENE" | "NO_SOSTIENE" | "SIN_FUENTE". `temperature=0` a
+    propósito: §4.2 midió que el juez parpadea a temperatura no nula, y un
+    veredicto que parpadea no sirve para decidir.
+    """
+    from bibliotecario.core import llm
+    if not chunk.strip():
+        return "SIN_FUENTE"
+    out = llm.generate(
+        _CRITIC_PROMPT.format(sentence=sentence[:900], chunk=chunk[:7000]),
+        max_tokens=16, temperature=temperature,
+    ).strip().upper()
+    if "NO_SOSTIENE" in out:
+        return "NO_SOSTIENE"
+    if "SIN_FUENTE" in out:
+        return "SIN_FUENTE"
+    if "SOSTIENE" in out:
+        return "SOSTIENE"
+    # Errata corregida: antes caía aquí a "SIN_FUENTE", y un fallo de llamada
+    # (rate limit, 504, respuesta vacía) se contaba como fabricación. Un fallo
+    # del juez no es una mentira del modelo — §7 prohíbe maquillar en los dos
+    # sentidos, y este lo maquillaba contra el propio modelo.
+    return "FALLO"
+
+
+def _claim_span(blueprint: str, m: re.Match) -> tuple[int, int]:
+    """Extensión de la afirmación que acaba en el puntero `m`.
+
+    Misma lógica que `check_attributions`: el punto inmediatamente previo
+    cierra la frase, así que hay que ir a buscar el anterior.
+    """
+    end_sent = blueprint.rfind(".", 0, m.start())
+    if end_sent < 0:
+        start = m.start() - _WINDOW
+    else:
+        prev = max(blueprint.rfind(". ", 0, end_sent - 1),
+                   blueprint.rfind("\n", 0, end_sent - 1))
+        start = 0 if prev < 0 else prev + 1
+    return max(0, start), m.end() + 80
+
+
+def critic_attributions(blueprint: str, chunks: dict[tuple[int, int], str],
+                        *, temperature: float = 0.0,
+                        limit: int | None = None) -> dict:
+    """Crítica **una llamada por afirmación** (§5.10.2, opción A).
+
+    Se descartó la opción B —una llamada por blueprint— porque §4.2 mide que
+    el juez es fiable en lo mecánico y no en lo semántico; apretar ocho
+    afirmaciones en un mismo mensaje empeora justo donde ya es malo, y lo hace
+    baratísimo. A cuesta ~10k tokens por blueprint y es la única que sostiene
+    el argumento.
+
+    `limit` corta el número de afirmaciones criticadas: sirve para probar barato.
+
+    Devuelve `{"violaciones": [...], "fallos": [...]}`. **`fallos` no son
+    violaciones**: son llamadas al juez que no se pudieron leer (rate limit,
+    504, respuesta vacía). Contarlas como tal inflaría R4 con errores del
+    verificador — errata corregida el 2026-10-12.
+    """
+    seen: set[tuple[int, int]] = set()
+    out: list[dict] = []
+    fallos: list[dict] = []
+    for m in _POINTER.finditer(blueprint):
+        if limit is not None and len(out) + len(fallos) >= limit:
+            break
+        key = (int(m.group(1)), int(m.group(2)))
+        s, e = _claim_span(blueprint, m)
+        sentence = blueprint[s:e].strip()
+        chunk = chunks.get(key, "")
+        verdict = critic_claim(sentence, chunk, temperature=temperature)
+        if verdict == "FALLO":
+            fallos.append({"chunk": f"{key[0]}:{key[1]}", "frase": sentence[:220]})
+            continue
+        if verdict != "SOSTIENE":
+            out.append({"tipo": "puntero_roto" if verdict == "SIN_FUENTE"
+                        else "no_sostenida",
+                        "chunk": f"{key[0]}:{key[1]}", "pos": m.start(),
+                        "span": (s, e), "frase": sentence[:220]})
+        seen.add(key)
+    return {"violaciones": out, "fallos": fallos}
+
+
+_DEMOTED = " (propuesta del blueprint)"
+
+
+def demote_unsupported(blueprint: str, violations: list[dict]) -> tuple[str, dict]:
+    """Quita el puntero de las afirmaciones que la fuente no sostiene.
+
+    **No reescribe la frase**: sustituye `[doc:N:M]` por la marca de propuesta
+    en la misma posición. La prosa queda intacta palabra por palabra; lo único
+    que cambia es que la afirmación deja de presentarse como del paper, y por
+    tanto sale del denominador de R4.
+
+    Se procesa de atrás adelante para que los offsets no se muevan.
+    """
+    marks = {"no_sostenida": 0, "puntero_roto": 0}
+    for v in sorted(violations, key=lambda x: -x["pos"]):
+        m = _POINTER.match(blueprint, v["pos"])
+        if not m:
+            continue
+        if v["tipo"] == "puntero_roto":
+            # Se come tambien un espacio previo suelto: el puntero casi siempre
+            # va pegado a la frase («…es 0.125. [doc:1:5]») y dejar el hueco
+            # deja «0.125.  » con dos espacios.
+            a = m.start()
+            if a > 0 and blueprint[a - 1] == " ":
+                a -= 1
+            blueprint = blueprint[:a] + blueprint[m.end():]
+            marks["puntero_roto"] += 1
+        else:
+            blueprint = blueprint[:m.start()] + _DEMOTED + blueprint[m.end():]
+            marks["no_sostenida"] += 1
+    return blueprint, marks
+
+
+def critic_and_demote(blueprint: str, chunks: dict[tuple[int, int], str],
+                      *, temperature: float = 0.0,
+                      limit: int | None = None) -> dict:
+    """Ruta 5 completa: critica y degrada. **Nunca reescribe prosa.**
+
+    `reescrito` se mantiene en False a propósito — es la señal que distingue
+    esto de P3, que destruyó el documento en 3 de 3 (§5.8.3).
+    """
+    res = critic_attributions(blueprint, chunks, temperature=temperature,
+                              limit=limit)
+    violations = res["violaciones"]
+    fixed, marks = demote_unsupported(blueprint, violations)
+    return {"blueprint": fixed, "violaciones": violations, "fallos": res["fallos"],
+            "marcas": marks, "reescrito": False,
+            "degradadas": sum(marks.values())}

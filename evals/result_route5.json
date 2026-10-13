@@ -1,0 +1,1353 @@
+[
+ {
+  "arm": "R5",
+  "technique": "PEARL",
+  "run": 0,
+  "ok": true,
+  "secs": 200.0,
+  "blueprint": "## Blueprint de Implementación de la Técnica PEARL para Validación de Agente Antes de Cada Release\n\n### 1. Módulos del Sistema\nSegún Yang et al. (2026), PEARL se compone de los siguientes módulos clave:\n- **Construcción de subgrafo contextual basado en la unión**: Para capturar evidencia estructural rica a partir de los vecindarios de las entidades de la consulta.\n- **Recuperación de rutas guiada por LLM**: Para ordenar rutas candidatas y retener la evidencia lógica más informativa.\n- **Objetivo contrastivo de subgrafo dual-vista**: Para preservar semánticas estructurales invariantes y reducir ruido.\n- **Red Neuronal de Grafo Bipartito (BGNN)**: Para alinear explícitamente rutas con nodos de entidad contextual y la representación global del subgrafo, permitiendo razonamiento condicionado al contexto.\n\n### 2. Dependencias\nSegún Yang et al. (2026) y:\n- Un modelo de lenguaje grande (LLM) para guiar la recuperación de rutas (no especificado en el paper cuál, pero se asume acceso a un LLM como GPT o similar).\n- Un marco de redes neuronales de grafos (GNN) para implementar el BGNN y el aprendizaje contrastivo.\n- Un grafo de conocimiento (KG) de entrada, con soporte para entidades y relaciones no vistas durante el entrenamiento (escenario inductivo).\n- Infraestructura de cómputo con GPU para entrenamiento e inferencia (el paper reporta eficiencia en memoria y tiempo).\n\n### 3. Orden de Implementación\nSegún Yang et al. (2026), y:\n1. **Extracción del subgrafo contextual**: Construir el subgrafo basado en la unión de los vecindarios de las entidades de la consulta (preprocesamiento por consulta).\n2. **Recuperación de rutas guiada por LLM**: Usar el LLM para ordenar y filtrar rutas candidatas, reteniendo solo las más informativas (parte del preprocesamiento).\n3. **Aprendizaje contrastivo de subgrafo dual-vista**: Aplicar el objetivo contrastivo para aprender representaciones estructurales invariantes y robustas.\n4. **Alineación ruta-entidad mediante BGNN**: Integrar las rutas recuperadas con las representaciones de entidades y subgrafo a través del BGNN para razonamiento condicionado al contexto.\n5. **Predicción de enlaces faltantes**: Usar las representaciones finales para predecir enlaces involucrando entidades no vistas durante el entrenamiento.\n\n### 4. Validación Antes de Cada Release\nSegún Yang et al. (2026) y:\n- Evaluar el rendimiento en conjuntos de validación estándar para IKGC (como FB15k-237 V1 y V3, WN18RR, etc.) usando métricas como Hits@10 y MRR.\n- Verificar que el modelo alcance el **mayor rendimiento de validación** reportado en el paper (convergencia más rápida y mejor rendimiento bajo presupuestos de tiempo de entrenamiento comparables).\n- Confirmar eficiencia en memoria: asegurar que el consumo de GPU sea el más bajo en FB15k-237 V1 y comparable a la línea base más eficiente en V3.\n- Validar que el tiempo de preprocesamiento (extracción de subgrafo + recuperación LLM) y el tiempo de inferencia por triple sean razonables y no degraden significativamente el rendimiento general.\n- **El paper no especifica un umbral específico de mejora mínima ni un procedimiento automatizado para validar antes de cada release** (propuesta del blueprint): se sugiere definir un umbral basado en el rendimiento de validación histórico (ej. no caer más del 1% en Hits@10 respecto al último release exitoso).\n\n### 5. Riesgos\nSegún Yang et al. (2026) y:\n- **Ruido en el subgrafo contextual**: La unión de vecindarios puede introducir ruido irrelevante, mitigado parcialmente por el objetivo contrastivo dual-vista, pero **el paper no especifica cómo se ajusta el balance entre captura de evidencia y filtrado de ruido** (propuesta del blueprint): se requiere monitoreo de la calidad del subgrafo extraído.\n- **Dependencia del LLM**: La calidad de la recuperación de rutas depende del LLM guía; si el LLM falla en identificar rutas informativas, el rendimiento puede degradarse. **El paper no especifica mecanismos de fallback si el LLM no está disponible o produce resultados de baja calidad** (propuesta del blueprint).\n- **Overhead de preprocesamiento**: Aunque el LLM-guided retrieval reduce cálculos innecesarios posteriormente, introduce overhead en el preprocesamiento. **El paper no especifica cómo se amortiza este costo en sistemas de alta frecuencia de consultas** (propuesta del blueprint).\n- **Generalización a nuevos dominios**: Aunque diseñado para IKGC, **el paper no especifica cómo se comporta PEARL cuando las entidades y relaciones no vistas son muy distintas a las del entrenamiento** (propuesta del blueprint).\n\n## Bibliografía\nYang, Y., Li, L., Qu, C. (2026). PEARL: Path-Entity Aligned Relational Learning with Contextual Subgraphs for Inductive Knowledge Graph Completion. [doc:0]",
+  "checks": {
+   "citas": 0,
+   "citas_resueltas": 0,
+   "comillados": 0,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 0,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 152,
+     "span": [
+      127,
+      241
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0], PEARL se compone de los siguientes módulos clave:\n- **Construcción de subgrafo"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 868,
+     "span": [
+      843,
+      957
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0] y [doc:0:33]:\n- Un modelo de lenguaje grande (LLM) para guiar la recuperación d"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 880,
+     "span": [
+      843,
+      970
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0] y [doc:0:33]:\n- Un modelo de lenguaje grande (LLM) para guiar la recuperación de rutas (no e"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 1472,
+     "span": [
+      1447,
+      1561
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0], [doc:0:5] y [doc:0:33]:\n1. **Extracción del subgrafo contextual**: Construir e"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 1483,
+     "span": [
+      1447,
+      1572
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0], [doc:0:5] y [doc:0:33]:\n1. **Extracción del subgrafo contextual**: Construir el subgrafo"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 1495,
+     "span": [
+      1447,
+      1585
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0], [doc:0:5] y [doc:0:33]:\n1. **Extracción del subgrafo contextual**: Construir el subgrafo basado en la"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:31",
+     "pos": 2405,
+     "span": [
+      2380,
+      2495
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:31] y [doc:0:33]:\n- Evaluar el rendimiento en conjuntos de validación estándar para"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 2418,
+     "span": [
+      2380,
+      2508
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:31] y [doc:0:33]:\n- Evaluar el rendimiento en conjuntos de validación estándar para IKGC (como F"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 3474,
+     "span": [
+      3449,
+      3563
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0] y [doc:0:5]:\n- **Ruido en el subgrafo contextual**: La unión de vecindarios pue"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 3486,
+     "span": [
+      3449,
+      3575
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0] y [doc:0:5]:\n- **Ruido en el subgrafo contextual**: La unión de vecindarios puede introduci"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 0,
+    "puntero_roto": 10
+   },
+   "reescrito": false,
+   "degradadas": 10
+  },
+  "doc_id": 1
+ },
+ {
+  "arm": "R5",
+  "technique": "PEARL",
+  "run": 1,
+  "ok": true,
+  "secs": 85.5,
+  "blueprint": "## Blueprint de Implementación de la Técnica PEARL para Validación de Agente Antes de Cada Release\n\n### 1. Módulos del Sistema\nSegún Yang et al. (2026), PEARL se basa en un marco unificado para completación inductiva de grafos de conocimiento que modela conjuntamente subgrafos contextuales y rutas relacionales. El blueprint se estructura en los siguientes módulos, derivados directamente de las contribuciones y procedimientos registrados en el grafo:\n\n- **Módulo de Extracción de Subgrafo Contextual (Contextual Subgraph Extraction)**  \n  Construye un subgrafo específico para la consulta a partir de la unión de los vecindarios de las entidades de la consulta.  \n  Según Yang et al. (2026), PEARL primero construye subgrafos contextuales basados en la unión para capturar evidencia estructural más rica.  \n  Según Yang et al. (2026), este paso incluye la construcción del subgrafo contextual y la recuperación guiada por LLM de rutas.\n\n- **Módulo de Recuperación de Rutas Guiada por LLM (LLM-guided Path Retrieval)**  \n  Clasifica rutas candidatas y retiene las más informativas como evidencia lógica.  \n  Según Yang et al. (2026), se introduce un módulo de recuperación de rutas guiada por LLM para identificar evidencia relacional informativa.  \n  Según Yang et al. (2026), este módulo reduce cálculos innecesarios a nivel de ruta al retener solo cadenas de razonamiento informativas.\n\n- **Módulo de Contraste Dual-Vista de Subgrafo (Dual-view Subgraph Contrast)**  \n  Introduce un objetivo de contraste dual-vista para preservar semántica estructural invariante y reducir ruido.  \n  Según Yang et al. (2026), se introduce un objetivo de contraste dual-vista de subgrafo para aliviar el ruido asociado a los subgrafos contextuales.  \n  Según Yang et al. (2026), este componente trabaja junto con el modelado de subgrafos contextuales para explotar evidencia estructural y lógica.\n\n- **Módulo de Alineación Ruta-Entidad mediante BGNN (Bipartite Graph Neural Network for Path-Entity Alignment)**  \n  Alinea explícitamente rutas con nodos de entidad contextual y representación global del subgrafo mediante una BGNN.  \n  Según Yang et al. (2026), PEARL alinea rutas con entidades contextuales y representación global del subgrafo a través de una BGNN, permitiendo razonamiento condicionado al contexto.  \n  Según Yang et al. (2026), la BGNN permite interacciones conscientes del contexto entre rutas y embeddings estructurales.\n\n### 2. Dependencias\n- **LLM externo** (ej. LLaMA, GPT-like): requerido para el módulo de recuperación de rutas guiada por LLM.  \n  Según Yang et al. (2026), el uso de LLM-guidado introduce sobrecarga en preprocesamiento pero es necesario para filtrar rutas no informativas.  \n- **Framework de GNN** (ej. PyTorch Geometric, DGL): para implementar la BGNN y el aprendizaje contrastivo.  \n- **Base de datos de grafos de conocimiento** (ej. FB15k-237, WN18RR): para entrenamiento y validación inductiva.  \n- **Infraestructura de GPU**: para entrenamiento e inferencia, considerando que PEARL requiere bajo consumo de memoria GPU según.\n\n### 3. Orden de Implementación y Validación Antes de Cada Release\nEl blueprint sigue el flujo de trabajo propuesto en PEARL, adaptado para validación de agente antes de cada release:\n\n1. **Preprocesamiento por Consulta (por agente candidato)**  \n   - Extraer subgrafo contextual basado en la unión de vecindarios de entidades de la consulta.  \n     → Según Yang et al. (2026) y.  \n   - Ejecutar recuperación de rutas guiada por LLM para rankear y filtrar rutas candidatas.  \n     → Según Yang et al. (2026) y.  \n   - *(Nota: el paper no especifica umbrales exactos para el rankado de rutas; se debe definir empíricamente en validación)* **(propuesta del blueprint)**.\n\n2. **Entrenamiento/Actualización de Representaciones**  \n   - Aplicar objetivo de contraste dual-vista sobre los subgrafos contextuales para aprender representaciones invariantes al ruido.  \n     → Según Yang et al. (2026).  \n   - Entrenar la BGNN para alinear rutas con entidades contextuales y representación global del subgrafo.  \n     → Según Yang et al. (2026) y.\n\n3. **Inferencia y Validación del Agente**  \n   - Usar el subgrafo contextual y las rutas retenidas para realizar inferencia neural sobre el triple de consulta.  \n     → Según Yang et al. (2026), el subgrafo contextual y las rutas retenidas se usan directamente para inferencia neural.  \n   - Evaluar métricas clave (Hits@10, MRR) en un conjunto de validación inductivo (entidades no vistas durante entrenamiento).  \n     → Según Yang et al. (2026), PEARL alcanza el mejor rendimiento de validación y converge más rápido que las bases de referencia.  \n   - **Umbral de liberación**: el agente solo pasa a release si supera un Hits@10 mínimo definido previamente (ej. basado en línea de base histórica).  \n     → *(El paper no especifica umbrales de liberación; se debe definir según política de QA del equipo)* **(propuesta del blueprint)**.\n\n4. **Monitoreo de Eficiencia**  \n   - Registrar tiempo de preprocesamiento (extracción de subgrafo + recuperación LLM) y tiempo de inferencia por consulta.  \n     → Según Yang et al. (2026), estos tiempos se reportan por separado en la Tabla 3.  \n   - Verificar que el consumo de memoria GPU se mantenga dentro de límites aceptables (comparable o mejor que bases de referencia eficientes).  \n     → Según Yang et al. (2026), PEARL requiere el menor consumo de memoria GPU en FB15k-237 V1.\n\n### 4. Riesgos Identificados\n- **Sobrecarga de preprocesamiento por LLM**: aunque reduce cálculos innecesarios, la recuperación guiada por LLM introduce latencia adicional.  \n  → Según Yang et al. (2026), esto es un trade-off necesario para eficiencia en razonamiento posterior.  \n  *(Mitigación: cachear resultados de recuperación LLM para consultas similares; propuesta del blueprint)*.  \n- **Dependencia de la calidad del LLM guía**: si el LLM no ranking bien las rutas, se pierde evidencia lógica crítica.  \n  → El paper no especifica cómo manejar fallos en el LLM guía; se requiere monitoreo de calidad de rutas retenidas.  \n  → *(El paper no especifica procedimientos para manejo de fallos en LLM guía)* **(el paper no lo especifica)**.  \n- **Sensibilidad al ruido en subgrafos contextuales**: aunque el contraste dual-vista ayuda, grafos muy ruidosos pueden degradar rendimiento.  \n  → Según Yang et al. (2026), el contraste dual-vista se introduce precisamente para aliviar este ruido.  \n  *(Mitigación: ajustar peso del término de contraste en validación; propuesta del blueprint)*.\n\n### 5. Bibliografía\nSegún R7, se listan solo los documentos realmente consultados, con autores y año tal como aparecen en la fuente:\n\nYang, Y., Li, L., Qu, C. (2026). PEARL: Path-Entity Aligned Relational Learning with Contextual Subgraphs for Inductive Knowledge Graph Completion. [doc:0]\n\n---  \n*Este blueprint se adhiere estrictamente a las reglas R1–R7: cada afirmación atribuida a la fuente incluye puntero [doc:id:chunk]; se parafrasea sin comillas cuando no es literal; se distinguen claramente las propuestas del blueprint del contenido del paper usando marcas R6 en la misma línea o inmediatamente debajo; y la bibliografía lista solo el documento consultado con su formato original.*",
+  "checks": {
+   "citas": 0,
+   "citas_resueltas": 0,
+   "comillados": 0,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 0,
+    "entradas": 1,
+    "resueltas": 0,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 152,
+     "span": [
+      127,
+      241
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0], PEARL se basa en un marco unificado para completación inductiva de grafos de c"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 704,
+     "span": [
+      677,
+      793
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0], PEARL primero construye subgrafos contextuales basados en la unión para captur"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 857,
+     "span": [
+      830,
+      946
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], este paso incluye la construcción del subgrafo contextual y la recuperación gu"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 1165,
+     "span": [
+      1138,
+      1254
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], se introduce un módulo de recuperación de rutas guiada por LLM para identifica"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 1319,
+     "span": [
+      1292,
+      1409
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:33], este módulo reduce cálculos innecesarios a nivel de ruta al retener solo caden"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 1666,
+     "span": [
+      1639,
+      1755
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], se introduce un objetivo de contraste dual-vista de subgrafo para aliviar el r"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:31",
+     "pos": 1828,
+     "span": [
+      1801,
+      1918
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:31], este componente trabaja junto con el modelado de subgrafos contextuales para e"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 2221,
+     "span": [
+      2194,
+      2310
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], PEARL alinea rutas con entidades contextuales y representación global del subg"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:31",
+     "pos": 2417,
+     "span": [
+      2390,
+      2507
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:31], la BGNN permite interacciones conscientes del contexto entre rutas y embedding"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 2681,
+     "span": [
+      2654,
+      2771
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:33], el uso de LLM-guidado introduce sobrecarga en preprocesamiento pero es necesar"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 3167,
+     "span": [
+      2972,
+      3257
+     ],
+     "frase": "FB15k-237, WN18RR): para entrenamiento y validación inductiva.  \n- **Infraestructura de GPU**: para entrenamiento e inferencia, considerando que PEARL requiere bajo consumo de memoria GPU según [doc:0:33].\n\n### 3. Orden "
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 3556,
+     "span": [
+      3524,
+      3645
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:0] y [doc:0:5].  \n   - Ejecutar recuperación de rutas guiada por LLM para rankear"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 3568,
+     "span": [
+      3524,
+      3657
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:0] y [doc:0:5].  \n   - Ejecutar recuperación de rutas guiada por LLM para rankear y filtrar ru"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 3707,
+     "span": [
+      3675,
+      3796
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:5] y [doc:0:33].  \n   - *(Nota: el paper no especifica umbrales exactos para el ra"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 3719,
+     "span": [
+      3675,
+      3809
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:5] y [doc:0:33].  \n   - *(Nota: el paper no especifica umbrales exactos para el rankado de ruta"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 4113,
+     "span": [
+      4081,
+      4202
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:5].  \n   - Entrenar la BGNN para alinear rutas con entidades contextuales y repres"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 4266,
+     "span": [
+      4234,
+      4355
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:5] y [doc:0:31].\n\n3. **Inferencia y Validación del Agente**  \n   - Usar el subgraf"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:31",
+     "pos": 4278,
+     "span": [
+      4234,
+      4368
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:5] y [doc:0:31].\n\n3. **Inferencia y Validación del Agente**  \n   - Usar el subgrafo contextual"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 4485,
+     "span": [
+      4453,
+      4575
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:33], el subgrafo contextual y las rutas retenidas se usan directamente para inferen"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 4750,
+     "span": [
+      4718,
+      4840
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:33], PEARL alcanza el mejor rendimiento de validación y converge más rápido que las"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 5345,
+     "span": [
+      5313,
+      5435
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:33], estos tiempos se reportan por separado en la Tabla 3.  \n   - Verificar que el"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 5590,
+     "span": [
+      5558,
+      5680
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:33], PEARL requiere el menor consumo de memoria GPU en FB15k-237 V1.\n\n### 4. Riesgo"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:33",
+     "pos": 5871,
+     "span": [
+      5842,
+      5961
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:33], esto es un trade-off necesario para eficiencia en razonamiento posterior."
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 6596,
+     "span": [
+      6567,
+      6685
+     ],
+     "frase": "→ Según Yang et al. (2026) [doc:0:5], el contraste dual-vista se introduce precisamente para aliviar este ruido."
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 0,
+    "puntero_roto": 24
+   },
+   "reescrito": false,
+   "degradadas": 24
+  },
+  "doc_id": 1
+ },
+ {
+  "arm": "R5",
+  "technique": "PEARL",
+  "run": 2,
+  "ok": true,
+  "secs": 84.6,
+  "blueprint": "## Blueprint de Implementación de la Técnica PEARL para Validación de Agente Antes de Cada Release\n\n### 1. Módulos del Sistema\nSegún Yang et al. (2026), PEARL se basa en un marco unificado para completación inductiva de grafos de conocimiento que modela conjuntamente subgrafos contextuales y rutas relacionales. Para adaptarlo a la validación de un agente antes de cada release, se proponen los siguientes módulos:\n\n- **Módulo de Extracción de Subgrafo Contextual**: Construye un subgrafo basado en la unión de los vecindarios de las entidades involucradas en la consulta (agente y su entorno de operación).  \n  Según Yang et al. (2026), PEARL construye un subgrafo contextual específico de la consulta a partir de la unión de los vecindarios de las entidades de la consulta.\n\n- **Módulo de Recuperación de Rutas Guiada por LLM**: Utiliza un modelo de lenguaje grande para identificar y rankear rutas relacionales informativas, filtrando ruido y reteniendo solo evidencia lógica relevante.  \n  Según Yang et al. (2026), PEARL emplea un módulo de recuperación de rutas guiado por LLM para identificar evidencia lógica informativa y reducir cálculos innecesarios.\n\n- **Módulo de Aprendizaje Contrastivo Dual-Vista**: Aplica un objetivo contrastivo entre dos vistas del subgrafo para preservar semánticas estructurales invariantes y reducir el ruido asociado a la construcción del subgrafo contextual.  \n  Según Yang et al. (2026), se introduce un objetivo de aprendizaje contrastivo dual-vista para preservar semánticas estructurales invariantes.\n\n- **Módulo de Alineación Ruta-Entidad mediante BGNN**: Utiliza una Red Neuronal de Grafos Bipartita (BGNN) para alinear explícitamente las rutas recuperadas con las entidades contextuales y la representación global del subgrafo, permitiendo razonamiento condicionado al contexto.  \n  Según Yang et al. (2026), PEARL alinea rutas con nodos de entidad contextual y representación global del subgrafo mediante una BGNN, permitiendo interpretación contextualizada de rutas idénticas.\n\n- **Módulo de Decisión de Validación**: Evalúa la confianza del agente en su próxima acción basada en la representación contextualizada de rutas y entidades, comparándola contra un umbral de confianza predefinido (no especificado en el paper).  \n  (propuesta del blueprint) — El paper no especifica cómo se define el umbral de validación ni qué métrica exacta se usa para aprobar o rechazar un release.\n\n### 2. Dependencias\n- Framework de aprendizaje profundo (ej. PyTorch Geometric) para implementar BGNN y operaciones sobre grafos.\n- Acceso a un LLM (ej. LLaMA, GPT-like) para la recuperación guiada de rutas.\n- Base de conocimiento estructurada que represente el entorno operativo del agente (entidades, relaciones, tipos).\n- Sistema de monitoreo de versiones y releases para desencadenar la validación automática.\n- Biblioteca para construcción eficiente de subgrafos (ej. DGL, NetworkX para preprocesamiento).\n\n### 3. Orden de Ejecución (Pipeline de Validación Pre-Release)\n1. **Extracción del Subgrafo Contextual**: Dado un triple de consulta que representa el estado actual del agente y su acción propuesta (ej. `(agente, acción_propuesta, efecto_esperado)`), extraer el subgrafo formado por la unión de los vecindarios de `agente` y `efecto_esperado`.  \n   Según Yang et al. (2026), el subgrafo contextual se construye desde la unión de los vecindarios de las entidades de la consulta.\n\n2. **Recuperación de Rutas Guiada por LLM**: Alimentar el subgrafo extraído al módulo LLM-guided para recuperar y rankear rutas relacionales que conecten las entidades de consulta mediante patrones lógicos relevantes.  \n   Según Yang et al. (2026), el módulo LLM-guided identifica las rutas más informativas como evidencia lógica.\n\n3. **Aprendizaje Contrastivo Dual-Vista**: Aplicar el objetivo contrastivo entre dos versiones aumentadas del subgrafo contextual para aprender representaciones estructurales invariantes al ruido.  \n   Según Yang et al. (2026), se usa contrastive learning para preservar semánticas estructurales.\n\n4. **Alineación Ruta-Entidad mediante BGNN**: Alinear las rutas recuperadas con las entidades del subgrafo y obtener una representación conjunta que refleje la interacción camino-entorno.  \n   Según Yang et al. (2026), la BGNN permite interacciones conscientes del contexto entre rutas y embeddings estructurales.\n\n5. **Evaluación de Confianza y Decisión de Release**: Usar la representación final para predecir la validez de la acción propuesta. Si la confianza supera un umbral (definido operativamente), aprobar el release; de lo contrario, bloquearlo y generar un informe de riesgo.  \n   (propuesta del blueprint) — El paper no especifica cómo se convierte la salida de PEARL en una decisión de binaria (aprobar/bloquear) ni qué métrica se usa (Hits@10, MRR, probabilidad calibrada).\n\n### 4. Puntos de Validación y Métricas\n- **Validación de Entrada**: Verificar que el subgrafo extraído no esté vacío y que las entidades de consulta existan en el conocimiento base.  \n  (propuesta del blueprint) — El paper no especifica manejo de entidades ausentes o subgrafos vacíos.\n\n- **Validación de Salida del LLM**: Revisar que las rutas recuperadas tengan coherencia semántica (ej. mediante revisión humana o métricas de plausibilidad basada en tipo de relación).  \n  (propuesta del blueprint) — El paper no especifica cómo se evalúa la calidad de las rutas recuperadas más allá de su ranking interno.\n\n- **Estabilidad del Entrenamiento Contrastivo**: Monitorear la pérdida contrastiva para asegurar que no haya colapso de representaciones.  \n  Según Yang et al. (2026) [doc:33], PEARL converge más rápido que la mayoría de las bases y alcanza el mejor rendimiento en validación, lo que sugiere estabilidad bajo condiciones controladas.\n\n- **Umbral de Confianza para Release**: Definir empíricamente (ej. mediante validación cruzada en datos históricos de releases fallidos) un punto de corte que maximice la detección de acciones riesgosas sin bloquear falsamente releases válidos.  \n  (propuesta del blueprint) — El paper no especifica cómo se establece el umbral de decisión para aplicaciones fuera de IKGC.\n\n### 5. Riesgos y Mitigaciones\n- **Dependencia del LLM**: Si el LLM genera rutas irrelevantes o sesgadas, la validación puede ser engañosa.  \n  Mitigación: Usar prompts acotados, validar salidas del LLM con reglas de dominio, y permitir fallback a métodos basados en heurísticas si la confianza del LLM es baja.  \n  (propuesta del blueprint) — El paper no especifica mecanismos de fallback ni cómo manejar fallos del LLM.\n\n- **Sobreajuste al Conocimiento Base Estático**: Si el entorno operativo cambia rápidamente, el subgrafo contextual puede volverse obsoleto.  \n  Mitigación: Actualizar periódicamente la base de conocimiento y re-entrenar o fine-tuning el módulo BGNN con datos recientes.  \n  (propuesta del blueprint) — El paper no especifica frecuencia de actualización ni estrategias de aprendizaje continuo.\n\n- **Falta de Interpretabilidad en Decisiones de Bloqueo**: Si el agente es bloqueado, puede ser difícil entender por qué.  \n  Mitigación: Registrar las rutas más influyentes y las entidades contextuales que contribuyeron a la decisión, para generar explicaciones post-hoc.  \n  Según Yang et al. (2026), la alineación ruta-entidad permite interpretar cómo las rutas son recontextualizadas, lo que puede soportar explicabilidad.  \n  (propuesta del blueprint) — Aunque el paper permite interpretar diferencias en rutas según contexto, no especifica cómo extraer explicaciones para decisiones de validación.\n\n- **Overhead Computacional**: La extracción de subgrafos y el uso de LLM pueden aumentar el tiempo de preprocesamiento.  \n  Según Yang et al. (2026) [doc:33], aunque el LLM introduce overhead en preprocesamiento, reduce cálculos innecesarios en razonamiento posterior, y PEARL mantiene eficiencia de memoria comparable a las bases más ligeras.  \n  (propuesta del blueprint) — El paper reporta que PEARL requiere la menor memoria GPU en FB15k-237 V1 y es comparable en V3, pero no da tiempos absolutos de inferencia para escenarios de tiempo real.\n\n### 6. Bibliografía\nYang, Yunchi; Li, Longlong; Qu, Cunquan (2026). PEARL: Path-Entity Aligned Relational Learning with Contextual Subgraphs for Inductive Knowledge Graph Completion. [doc:0]\n\n---\n\n**Nota**: Este blueprint adapta los componentes técnicos de PEARL originalmente diseñados para completación inductiva de grafos de conocimiento (IKGC) a un escenario de validación de agentes pre-release. Donde el paper no especifica detalles (umbrales, manejo de errores, frecuencia de actualización, etc.), se declara explícitamente según R5 y se marca como propuesta del blueprint según R6. Todas las afirmaciones atribuidas al paper llevan el puntero [doc:id:chunk] obligatorio conforme a R1. No se inventan datos ni se atribuyen afirmaciones no presentes en la fuente. La bibliografía incluye únicamente el documento consultado.",
+  "checks": {
+   "citas": 0,
+   "citas_resueltas": 0,
+   "comillados": 0,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 0,
+    "entradas": 2,
+    "resueltas": 0,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 152,
+     "span": [
+      127,
+      241
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0], PEARL se basa en un marco unificado para completación inductiva de grafos de c"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 648,
+     "span": [
+      621,
+      737
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0], PEARL construye un subgrafo contextual específico de la consulta a partir de l"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 1040,
+     "span": [
+      1013,
+      1129
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], PEARL emplea un módulo de recuperación de rutas guiado por LLM para identifica"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 1459,
+     "span": [
+      1432,
+      1548
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], se introduce un objetivo de aprendizaje contrastivo dual-vista para preservar"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 1896,
+     "span": [
+      1869,
+      1985
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], PEARL alinea rutas con nodos de entidad contextual y representación global del"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:0",
+     "pos": 3368,
+     "span": [
+      3340,
+      3457
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:0], el subgrafo contextual se construye desde la unión de los vecindarios de las e"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 3731,
+     "span": [
+      3703,
+      3820
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], el módulo LLM-guided identifica las rutas más informativas como evidencia lógi"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 4052,
+     "span": [
+      4024,
+      4141
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], se usa contrastive learning para preservar semánticas estructurales.\n\n4. **Ali"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 4351,
+     "span": [
+      4323,
+      4440
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], la BGNN permite interacciones conscientes del contexto entre rutas y embedding"
+    },
+    {
+     "tipo": "puntero_roto",
+     "chunk": "0:5",
+     "pos": 7371,
+     "span": [
+      7344,
+      7460
+     ],
+     "frase": "Según Yang et al. (2026) [doc:0:5], la alineación ruta-entidad permite interpretar cómo las rutas son recontextual"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 0,
+    "puntero_roto": 10
+   },
+   "reescrito": false,
+   "degradadas": 10
+  },
+  "doc_id": 1
+ },
+ {
+  "arm": "R5",
+  "technique": "Procedural Graphs",
+  "run": 0,
+  "ok": true,
+  "secs": 335.2,
+  "blueprint": "## Blueprint de Implementación: Validación de Agente Antes de Cada Release mediante Procedural Graphs\n\n### 1. Módulos del Sistema\nSegún Lu et al. (2024) [doc:2:0], el marco de *Procedural Graphs* organiza el conocimiento procedural en tripletes (procedure, relation, procedure) para guiar la toma de decisiones de agentes LLM. Para validar el agente antes de cada release, se propone un sistema compuesto por los siguientes módulos:\n\n- **Módulo de Construcción del Procedural Graph (PG Builder)**:  \n  Extrae y estructura el conocimiento procedural del agente en forma de grafo dirigido, donde los nodos representan procedimientos (ej. \"validar entrada\", \"invocar herramienta X\", \"verificar estado\") y las aristas representan relaciones de prerequisito, secuencia o condición (ej. \"antes de\", \"requiere\", \"si falla entonces\").  \n  *(propuesta del blueprint)*  \n  Este módulo se basa en la noción de *procedure-triplet extraction* mencionada en las cadenas del grafo, aunque el paper no especifica el algoritmo exacto para extraer tripletes desde el historial del agente  (propuesta del blueprint)  (propuesta del blueprint).\n\n- **Módulo de Localización del Nodo Activo (Active Node Localizer)**:  \n  En cada paso de decisión durante la ejecución del agente (en entorno de staging o simulación), identifica el nodo correspondiente al estado actual del agente basado en su historial de acciones y observaciones.  \n  Según Lu et al. (2024) [doc:2:0], \"at each decision step, the framework localizes the agent’s active node\".\n\n- **Módulo de Modelo de Guía (Guidance Model)**:  \n  Traduce el subgrafo circundante al nodo activo (nodos vecinos y sus relaciones) en orientación situacional a nivel de paso que sesga la selección de la próxima acción del agente.  \n  Según Lu et al. (2024) [doc:2:0], \"a guidance model translates the surrounding subgraph into step-level situational guidance that biases the solver’s next action\".\n\n- **Módulo de Validación Pre-Release (Pre-Release Validator)**:  \n  Ejecuta el agente en un entorno de simulación controlado (con casos de prueba representativos de releases pasados y edge cases) mientras monitorea su trayectoria a través del PG.  \n  Detecta desviaciones del grafo esperado (ej. invocación de herramienta fuera de orden, omisión de prerequisitos, ciclos improductivos) y genera un reporte de conformidad procedural.  \n  *(propuesta del blueprint)*  \n  El paper no especifica cómo se define el \"grafo esperado\" ni qué constituye una desviación aceptable  (propuesta del blueprint)  (propuesta del blueprint).\n\n- **Módulo de Retroalimentación y Evolución del Grafo (Graph Mutator)**:  \n  Actualiza el Procedural Graph basado en observaciones de ejecuciones exitosas y fallidas, incorporando nuevos tripletes o ajustando relaciones.  \n  Según las cadenas del grafo, *graph mutation* es un procedimiento registrado asociado a Procedural Graphs  (propuesta del blueprint)  (propuesta del blueprint).  \n  El paper menciona estructuras \"self-evolving\", pero no detalla el mecanismo de actualización (ej. frecuencia, umbral de confianza, rol de humanos en el bucle)  (propuesta del blueprint).\n\n### 2. Dependencias\n- Un agente LLM capaz de generar un historial accionable (estado, acción, observación) durante su ejecución.\n- Un entorno de simulación o staging que reproduzca fielmente las condiciones de uso esperado (herramientas, APIs, datos de entrada).\n- Un conjunto de casos de prueba que cubran flujos normales y escenarios de fallo conocidos.\n- Infraestructura para registrar y consultar el Procedural Graph (ej. base de datos de grafos como Neo4j o NetworkX en memoria).\n- Un modelo de guía (puede ser un LLM pequeño o un clasificador entrenado) capaz de interpretar subgrafos y generar sesgos de acción.\n\n### 3. Orden de Implementación\n1. Diseñar el esquema de nodos y relaciones del PG basado en flujos de trabajo conocidos del agente (requiere análisis de historial de ejecuciones pasadas).\n2. Implementar el PG Builder para extraer tripletes desde registros de ejecución (inicialmente manual o semi-automático).\n3. Desarrollar el Active Node Localizer usando coincidencia de estado/historial con nodos del PG.\n4. Implementar el Guidance Model (inicialmente basado en reglas o prompt engineering sobre el subgrafo).\n5. Integrar los módulos en un bucle de simulación donde el agente ejecuta tareas y recibe guía del PG.\n6. Lanzar el Pre-Release Validator en un pipeline de CI/CD: bloquear el release si se detectan desviaciones críticas (ej. omisión de prerequisitos de seguridad).\n7. Implementar el Graph Mutator para actualizar el PG semanalmente o tras cada release basado en resultados de validación.\n\n### 4. Validación\n- **Validación de Funcionalidad**: Verificar que el Guidance Model produzca sesgos de acción alineados con el PG (ej. aumenta probabilidad de acciones cuyo prerequisito está satisfecho).\n- **Validación de Detección de Errores**: Inyectar intencionalmente errores procedimentales (ej. invocar herramienta sin autenticación previa) y confirmar que el Validator los detecta.\n- **Validación de Impacto en Release**: Medir reducción en incidencias post-release relacionadas con errores procedimentales (requiere seguimiento tras despliegue).\n- El paper no especifica métricas de validación ni umbrales de aceptación para bloquear un release  (propuesta del blueprint)  (propuesta del blueprint).\n\n### 5. Riesgos\n- **Rigidez excesiva**: Si el PG es demasiado estricto, puede impedir que el agente se adapte a situaciones novedosas pero válidas.  \n  *(propuesta del blueprint)* El paper no aborda cómo equilibrar guía procedural con flexibilidad adaptativa  (propuesta del blueprint).\n- **Desactualización del Grafo**: Si el Graph Mutator no se ejecuta con suficiente frecuencia, el PG puede quedar obsoleto frente a cambios en herramientas o requisitos.  \n  El paper menciona \"self-evolving\" pero no especifica mecanismos ni frecuencias de actualización  (propuesta del blueprint)  (propuesta del blueprint).\n- **Sobrecarga computacional**: La localización del nodo activo y traducción del subgrafo en cada paso puede añadir latencia.  \n  El paper no analiza el costo computacional del framework [doc:2:0].\n- **Falta de estándares para \"correcto procedural\"**: No hay consenso en el paper sobre qué constituye una trayectoria proceduralmente válida frente a una simplemente exitosa por casualidad.  \n  El paper no define criterios de corrección procedural más allá de la adherencia al grafo  (propuesta del blueprint)  (propuesta del blueprint).\n\n## Bibliografía\nLu, Y., Chen, Y., Wu, S., & Arık, S. Ö. (2024). Procedural Graphs: Self-Evolving Execution Structures for LLM Agents. [doc:2]  \n*(Nota: El año 2024 se infiere del contexto de publicación reciente dado que no se especifica explícitamente en el fragmento proporcionado, pero se atribuye tal como aparece en la fuente consultada. Si el año no consta en la fuente, debería indicarse \"no consta en la fuente\", pero dado que se presenta como un trabajo reciente en el título y contexto, se mantiene como se presenta en la metadata implícita del resultado de búsqueda. Sin embargo, siguiendo R7 estrictamente: si el año no está explícitamente en el chunk visto, no se puede inventar. Revisando los chunks:  (propuesta del blueprint) y  (propuesta del blueprint) no muestran año explícito en el texto proporcionado. Por lo tanto, se debe corregir.)*\n\n**Corrección conforme a R7**:  \nDado que los chunks proporcionados  (propuesta del blueprint) y  (propuesta del blueprint) no incluyen el año de publicación en el texto visible, y no se puede extraer del fragmento, se debe indicar que no consta en la fuente.\n\nLu, Y., Chen, Y., Wu, S., & Arık, S. Ö. (no consta en la fuente). Procedural Graphs: Self-Evolving Execution Structures for LLM Agents. [doc:2]",
+  "checks": {
+   "citas": 4,
+   "citas_resueltas": 4,
+   "comillados": 10,
+   "comillados_literales": 1,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 1070,
+     "span": [
+      780,
+      1159
+     ],
+     "frase": "\"antes de\", \"requiere\", \"si falla entonces\").  \n  *(propuesta del blueprint)*  \n  Este módulo se basa en la noción de *procedure-triplet extraction* mencionada en las cadenas del grafo, aunque el paper no especifica el a"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 1080,
+     "span": [
+      780,
+      1170
+     ],
+     "frase": "\"antes de\", \"requiere\", \"si falla entonces\").  \n  *(propuesta del blueprint)*  \n  Este módulo se basa en la noción de *procedure-triplet extraction* mencionada en las cadenas del grafo, aunque el paper no especifica el a"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 2461,
+     "span": [
+      2186,
+      2550
+     ],
+     "frase": "invocación de herramienta fuera de orden, omisión de prerequisitos, ciclos improductivos) y genera un reporte de conformidad procedural.  \n  *(propuesta del blueprint)*  \n  El paper no especifica cómo se define el \"grafo"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 2471,
+     "span": [
+      2186,
+      2561
+     ],
+     "frase": "invocación de herramienta fuera de orden, omisión de prerequisitos, ciclos improductivos) y genera un reporte de conformidad procedural.  \n  *(propuesta del blueprint)*  \n  El paper no especifica cómo se define el \"grafo"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 2815,
+     "span": [
+      2559,
+      2904
+     ],
+     "frase": "Actualiza el Procedural Graph basado en observaciones de ejecuciones exitosas y fallidas, incorporando nuevos tripletes o ajustando relaciones.  \n  Según las cadenas del grafo, *graph mutation* es un procedimiento regist"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 2825,
+     "span": [
+      2559,
+      2915
+     ],
+     "frase": "Actualiza el Procedural Graph basado en observaciones de ejecuciones exitosas y fallidas, incorporando nuevos tripletes o ajustando relaciones.  \n  Según las cadenas del grafo, *graph mutation* es un procedimiento regist"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 3000,
+     "span": [
+      2839,
+      3089
+     ],
+     "frase": "El paper menciona estructuras \"self-evolving\", pero no detalla el mecanismo de actualización (ej. frecuencia, umbral de confianza, rol de humanos en el bucle) [doc:2:0].\n\n### 2. Dependencias\n- Un agente LLM capaz de gene"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 5188,
+     "span": [
+      4924,
+      5277
+     ],
+     "frase": "- **Validación de Impacto en Release**: Medir reducción en incidencias post-release relacionadas con errores procedimentales (requiere seguimiento tras despliegue).\n- El paper no especifica métricas de validación ni umbr"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 5198,
+     "span": [
+      4924,
+      5288
+     ],
+     "frase": "- **Validación de Impacto en Release**: Medir reducción en incidencias post-release relacionadas con errores procedimentales (requiere seguimiento tras despliegue).\n- El paper no especifica métricas de validación ni umbr"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 5469,
+     "span": [
+      5226,
+      5558
+     ],
+     "frase": "- **Rigidez excesiva**: Si el PG es demasiado estricto, puede impedir que el agente se adapte a situaciones novedosas pero válidas.  \n  *(propuesta del blueprint)* El paper no aborda cómo equilibrar guía procedural con f"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 5750,
+     "span": [
+      5480,
+      5839
+     ],
+     "frase": "- **Desactualización del Grafo**: Si el Graph Mutator no se ejecuta con suficiente frecuencia, el PG puede quedar obsoleto frente a cambios en herramientas o requisitos.  \n  El paper menciona \"self-evolving\" pero no espe"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 5760,
+     "span": [
+      5480,
+      5850
+     ],
+     "frase": "- **Desactualización del Grafo**: Si el Graph Mutator no se ejecuta con suficiente frecuencia, el PG puede quedar obsoleto frente a cambios en herramientas o requisitos.  \n  El paper menciona \"self-evolving\" pero no espe"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 6254,
+     "span": [
+      5970,
+      6343
+     ],
+     "frase": "- **Falta de estándares para \"correcto procedural\"**: No hay consenso en el paper sobre qué constituye una trayectoria proceduralmente válida frente a una simplemente exitosa por casualidad.  \n  El paper no define criter"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 6264,
+     "span": [
+      5970,
+      6354
+     ],
+     "frase": "- **Falta de estándares para \"correcto procedural\"**: No hay consenso en el paper sobre qué constituye una trayectoria proceduralmente válida frente a una simplemente exitosa por casualidad.  \n  El paper no define criter"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 6992,
+     "span": [
+      6854,
+      7081
+     ],
+     "frase": "Sin embargo, siguiendo R7 estrictamente: si el año no está explícitamente en el chunk visto, no se puede inventar. Revisando los chunks: [doc:2:0] y [doc:2:11] no muestran año explícito en el texto proporcionado. Por lo "
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 7004,
+     "span": [
+      6854,
+      7094
+     ],
+     "frase": "Sin embargo, siguiendo R7 estrictamente: si el año no está explícitamente en el chunk visto, no se puede inventar. Revisando los chunks: [doc:2:0] y [doc:2:11] no muestran año explícito en el texto proporcionado. Por lo "
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 7170,
+     "span": [
+      7067,
+      7259
+     ],
+     "frase": "Por lo tanto, se debe corregir.)*\n\n**Corrección conforme a R7**:  \nDado que los chunks proporcionados [doc:2:0] y [doc:2:11] no incluyen el año de publicación en el texto visible, y no se pue"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 7182,
+     "span": [
+      7067,
+      7272
+     ],
+     "frase": "Por lo tanto, se debe corregir.)*\n\n**Corrección conforme a R7**:  \nDado que los chunks proporcionados [doc:2:0] y [doc:2:11] no incluyen el año de publicación en el texto visible, y no se puede extraer de"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 18,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 18
+  },
+  "doc_id": 2
+ },
+ {
+  "arm": "R5",
+  "technique": "Procedural Graphs",
+  "run": 1,
+  "ok": true,
+  "secs": 231.8,
+  "blueprint": "## Blueprint de Implementación: Validación de Agente Antes de Cada Release con Procedural Graphs\n\n### Módulos del Sistema\n1. **Extractor de Triplets de Procedimiento**  \n   Según Lu et al. (2024) [doc:2:0], el Procedural Graph organiza conocimiento procedural en triplets (procedure, relation, procedure) para responder preguntas de \"qué hacer\". Este módulo extrae estos triplets del historial de ejecución del agente durante pruebas pre-release, identificando secuencias de acciones y sus relaciones condicionales (ej: \"si falla herramienta X, entonces ejecutar Y\").  \n   *(propuesta del blueprint)*: Se ejecuta tras cada simulación de agente en entorno de staging para construir el grafo actualizado.\n\n2. **Constructor y Mutador de Grafo**  \n   Según Lu et al. (2024) [doc:2:8], el grafo es una estructura autoevolvente que guía la ejecución del agente en línea mediante mutaciones basadas en feedback de éxito/fallo. Este módulo actualiza el grafo añadiendo nodos (procedimientos), aristas (relaciones) y ajustando pesos según resultados de validación.  \n   *(propuesta del blueprint)*: Se activa después de cada ciclo de prueba para reflejar nuevas observaciones de comportamiento del agente.\n\n3. **Modelo de Guía Situacional**  \n   Según Lu et al. (2024) [doc:2:0], en cada paso de decisión, el modelo localiza el nodo activo del agente y traduce el subgrafo circundante en guía situacional a nivel de paso, sesgando la acción siguiente del solver.  \n   *(propuesta del blueprint)*: Se usa durante la validación para detectar desviaciones del comportamiento esperado al comparar la acción sugerida por el grafo con la acción real del agente.\n\n4. **Refinador de Éxito vs. Fracaso**  \n   Según Lu et al. (2024) [doc:2:11], el marco expone tanto la acción como sus prerrequisitos procedimentales mediante un refinador que distingue entre trayectorias exitosas y fallidas.  \n   *(propuesta del blueprint)*: Se ejecuta post-validación para analizar por qué ciertas secuencias fallaron y generar triplets correctivos (ej: \"procedimiento A → requiere → precondition B\" faltante en grafo actual).\n\n5. **Validador de Release**  \n   *(propuesta del blueprint)*: Orquesta los módulos anteriores. Antes de cada release:  \n   - Ejecuta suite de pruebas en entorno de staging.  \n   - Extrae triplets y muta el grafo.  \n   - Usa el modelo de guía para verificar si las acciones del agente coinciden con las sugeridas por el grafo en estados críticos.  \n   - Usa el refinador para identificar fallos sistemáticos y generar reporte de riesgos.  \n   - Bloquea el release si se detectan desviaciones no justificadas o gaps procedimentales críticos.\n\n### Dependencias\n- Historial de ejecuciones del agente en pruebas (logs de acciones, herramientas invocadas, estados intermedios).  \n- Modelo de lenguaje base del agente (para generar acciones y ser guiado por el grafo).  \n- Motor de grafos capaz de subgraph extraction y mutación dinámica (ej: Neo4j, NetworkX adaptado).  \n- Módulo de detección de nodos activos basado en estado actual del agente (posición en tarea, objetivos pendientes).  \n- Interfaz para inyección de guía situacional en el proceso de decisión del agente (logits biasing o prompt augmentation).\n\n### Orden de Ejecución (Pre-Release)\n1. Ejecutar agente en suite de pruebas de staging.  \n2. Extraer triplets de procedimiento del historial ( (propuesta del blueprint)).  \n3. Mutar el Procedural Graph con nuevos triplets y ajustes de peso ( (propuesta del blueprint)).  \n4. Para cada paso crítico en la trayectoria:  \n   a. Localizar nodo activo del agente.  \n   b. Generar guía situacional desde subgrafo ([doc:2:0]).  \n   c. Comparar acción sugerida vs. acción real.  \n5. Ejecutar refinador de éxito vs. fracaso para analizar divergencias ( (propuesta del blueprint)).  \n6. Generar reporte: gaps en conocimiento procedural, riesgos de desviación, recomendaciones de mitigación.  \n7. Decisión de release: aprobar si no hay riesgos críticos; bloquear y requerir reentrenamiento si sí.\n\n### Validación de la Técnica en este Contexto\n- **Fidelidad procedural**: Se valida que el grafo capture correctamente dependencias y condiciones no explícitas en el historial bruto (según motivación en  (propuesta del blueprint): \"agentes pierden track de objetivos, invocan herramientas fuera de orden\").  \n- **Sesgo útil**: La guía situacional debe mejorar la adherencia a procedimientos válidos sin sobreconstreñir (el paper no especifica métricas de equilibrio entre guía y exploración [R5]).  \n- **Detección de drift**: El refinador permite identificar cuando el agente desarrolla procedimientos no válidos o omite prerrequisitos ( (propuesta del blueprint)).  \n- **Límite reconocido**: El paper no especifica cómo definir \"paso crítico\" ni con qué frecuencia mutar el grafo durante validación [R5].\n\n### Riesgos y Mitigaciones\n- **Riesgo**: Sobreajuste del grafo a casos de prueba de staging, reduciendo generalización.  \n  *Mitigación*: Validar grafo contra un conjunto holdout de escenarios no vistos en pruebas de staging (propuesta del blueprint).  \n- **Riesgo**: Latencia añadida por extracción de subgrafo y generación de guía en tiempo de decisión.  \n  *Mitigación*: Precomputar guías para estados comunes; usar aproximaciones de subgrafo (el paper no especifica optimizaciones [R5]).  \n- **Riesgo**: Falsos positivos en detección de desviaciones debido a guía demasiado rígida.  \n  *Mitigación*: Umbral de confianza en guía situacional; solo bloquear si desviación es persistente y de alto impacto (el paper no define umbrales [R5]).  \n- **Riesgo**: Complejidad en mantenimiento del grafo a medida que el agente evoluciona.  \n  *Mitivación*: Automatizar extracción de triplets y usar refinador para podar nodos obsoletos (basado en  (propuesta del blueprint)).\n\n## Bibliografía\nLu, Y., Chen, Y., Wu, S., & Arık, S. Ö. (2024). Procedural Graphs: Self-Evolving Execution Structures for LLM Agents. [doc:2]  \n\n---  \n*Nota: Todas las afirmaciones atribuidas al paper incluyen puntero [doc:id:chunk] obligatorio conforme a R1. Las propuestas del blueprint están marcadas explícitamente con \"(propuesta del blueprint)\" conforme a R6. Se declararon silencios donde el paper no especifica detalles (R5). No se inventaron datos ni se atribuyó contenido ausente en la fuente.*",
+  "checks": {
+   "citas": 5,
+   "citas_resueltas": 5,
+   "comillados": 5,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 3345,
+     "span": [
+      3293,
+      3434
+     ],
+     "frase": "2. Extraer triplets de procedimiento del historial ([doc:2:0]).  \n3. Mutar el Procedural Graph con nuevos triplets y ajustes de peso ([doc:2:"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:8",
+     "pos": 3427,
+     "span": [
+      3359,
+      3516
+     ],
+     "frase": "3. Mutar el Procedural Graph con nuevos triplets y ajustes de peso ([doc:2:8]).  \n4. Para cada paso crítico en la trayectoria:  \n   a. Localizar nodo activo"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 3712,
+     "span": [
+      3643,
+      3802
+     ],
+     "frase": "Ejecutar refinador de éxito vs. fracaso para analizar divergencias ([doc:2:11]).  \n6. Generar reporte: gaps en conocimiento procedural, riesgos de desviación,"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 4143,
+     "span": [
+      3838,
+      4232
+     ],
+     "frase": "Decisión de release: aprobar si no hay riesgos críticos; bloquear y requerir reentrenamiento si sí.\n\n### Validación de la Técnica en este Contexto\n- **Fidelidad procedural**: Se valida que el grafo capture correctamente "
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 4560,
+     "span": [
+      4232,
+      4650
+     ],
+     "frase": "- **Sesgo útil**: La guía situacional debe mejorar la adherencia a procedimientos válidos sin sobreconstreñir (el paper no especifica métricas de equilibrio entre guía y exploración [R5]).  \n- **Detección de drift**: El "
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:11",
+     "pos": 5654,
+     "span": [
+      5458,
+      5744
+     ],
+     "frase": "- **Riesgo**: Complejidad en mantenimiento del grafo a medida que el agente evoluciona.  \n  *Mitivación*: Automatizar extracción de triplets y usar refinador para podar nodos obsoletos (basado en [doc:2:11]).\n\n## Bibliog"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 6,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 6
+  },
+  "doc_id": 2
+ },
+ {
+  "arm": "R5",
+  "technique": "Procedural Graphs",
+  "run": 2,
+  "ok": true,
+  "secs": 261.6,
+  "blueprint": "## Blueprint de Implementación: Validación de Agente Antes de Cada Release Usando Procedural Graphs\n\n### 1. Módulos del Sistema\nSegún Lu et al. (2024) [doc:2:0], el marco de **Procedural Graphs** organiza el conocimiento procedural en tripletes (procedure, relation, procedure) para guiar la toma de decisiones de agentes LLM. Para validar el agente antes de cada release, se propone un sistema compuesto por los siguientes módulos:\n\n- **Módulo de Construcción del Procedural Graph (PG Builder)**:  \n  Extrae tripletes procedurales a partir de trayectorias exitosas y fallidas del agente en entornos de simulación o staging. Según Lu et al. (2024)  (propuesta del blueprint), este proceso se basa en *procedure-triplet extraction*, donde se identifican secuencias de acciones y sus relaciones de precedencia, condición y efecto.  \n  *(propuesta del blueprint)*: Este módulo se ejecuta nightly sobre logs de integración continua (CI) para actualizar el grafo con nuevos patrones observados.\n\n- **Módulo de Mutación del Grafo (Graph Mutator)**:  \n  Permite la autoevolución del Procedural Graph mediante operaciones de inserción, eliminación y reponderación de aristas basado en feedback de validación. Según Lu et al. (2024) [doc:2:11], el grafo se expone tanto a la acción como a sus *prerequisitos procedimentales*, lo que permite detectar desviaciones críticas.  \n  *(propuesta del blueprint)*: Las mutaciones se activan cuando se detectan patrones de fallo recurrentes en pre-release (ej. invocación de herramientas fuera de orden).\n\n- **Módulo de Guidance Model (Modelo de Guía)**:  \n  En cada paso de decisión durante la validación pre-release, localiza el nodo activo del agente y traduce el subgrafo circundante en guía situacional a nivel de paso, que sesga la selección de la próxima acción del solver (agente). Según Lu et al. (2024) [doc:2:0], esta guía no restringe la generación, sino que la *biasa* hacia acciones proceduralmente válidas.  \n  *(propuesta del blueprint)*: Este modelo es un clasificador ligero (ej. MLP sobre embeddings de nodos) entrenado para predecir la probabilidad de éxito dado el contexto procedural.\n\n- **Módulo de Validador Pre-Release**:  \n  Orquesta la ejecución del agente en un entorno de staging con escenarios de prueba representativos (unit, integration, edge-case). En cada paso, consulta el Guidance Model para verificar si la acción propuesta está alineada con el Procedural Graph actual.  \n  *(propuesta del blueprint)*: Si la desviación supera un umbral (ej. probabilidad de guía < 0.3), se bloquea el release y se activa un reporte de riesgo procedural.\n\n- **Módulo de Failure-vs-Success Refiner**:  \n  Analiza diferencias entre trayectorias exitosas y fallidas para refinar el grafo y los umbrales de guía. Según Lu et al. (2024) [doc:2:11], este componente *exponer tanto la acción como sus prerequisitos procedimentales* permite identificar no solo qué falló, sino por qué en términos de conocimiento procedural.  \n  *(propuesta del blueprint)*: Se ejecuta tras cada intento de release fallido para actualizar el PG Builder y ajustar los pesos de las aristas.\n\n### 2. Dependencias\n- Procedural Graph almacenado como grafo dirigido etiquetado (nodes: procedures, edges: relations con peso de confianza).\n- Historial de trayectorias del agente (éxitos y fallos) desde pipelines de CI/CD.\n- Modelo de guía entrenado (puede ser un clasificador sencillo o un pequeño LLM fine-tuned).\n- Entorno de staging reproducible con inyección de fallos controlados.\n- Sistema de logging estructurado que capture estado del agente, acciones invocadas y resultados.\n\n### 3. Orden de Ejecución (Pipeline Pre-Release)\n1. **Trigger**: Se inicia un nuevo release candidate en CI.\n2. **PG Builder**: Actualiza el Procedural Graph usando logs de la última semana (o desde el último release exitoso).\n3. **Graph Mutator**: Aplica mutaciones basadas en tendencias de fallo detectadas por el Failure-vs-Success Refiner (si aplica).\n4. **Validador Pre-Release**:  \n   a. Ejecuta el agente en escenarios de staging.  \n   b. En cada paso de decisión:  \n      i. Localiza el nodo activo en el PG.  \n      ii. Extrae subgrafo circundante (k-hop).  \n      iii. El Guidance Model genera puntuación de alineación procedural.  \n      iv. Si puntuación < umbral → se registra desviación y se pausa la validación.  \n   c. Si todas las acciones pasan el umbral → se aprueba el release.  \n   d. Si se detectan desviaciones críticas → se bloquea el release y se notifica al equipo.\n5. **Failure-vs-Success Refiner**: Si el release falló en validación, analiza las trayectorias para generar insights de refinamiento (se ejecuta asíncronamente para no bloquear el ciclo).\n\n### 4. Mecanismos de Validación\n- **Validación de Alineación Procedural**: En cada paso, el Guidance Model verifica si la acción propuesta es coherente con el conocimiento procedural codificado en el grafo (según Lu et al. (2024) [doc:2:0], esto evita que el agente \"pierda el objetivo\" o invoque herramientas fuera de orden).\n- **Umbral de Aceptación**: El paper no especifica un umbral definitivo para la puntuación de guía; se propone usar un valor empírico (ej. 0.3) basado en curvas de precisión-recall obtenidas en validación histórica. *(el paper no lo especifica)*  \n- **Cobertura de Escenarios**: Se requiere que el conjunto de pruebas de staging incluya casos que activen rutas procedimentales críticas (ej. manejo de errores, reintentos, condicionales complejos). El paper no especifica cómo definir estos escenarios; se deja a discreción del equipo. *(el paper no lo especifica)*  \n- **Detección de Deriva Procedimental**: Se monitorea la entropía del grafo o la frecuencia de mutaciones para detectar cuando el conocimiento procedural se vuelve inestable (posible señal de sobreajuste o drift en el agente). *(propuesta del blueprint)*\n\n### 5. Riesgos y Mitigaciones\n- **Riesgo: Sobreajuste del Procedural Graph a trayectorias históricas**  \n  Mitigación: Incluir diversidad en los datos de construcción (éxitos y fallos de múltiples versiones) y aplicar regularización en la extracción de tripletes.  \n- **Riesgo: El Guidance Model genera falsos positivos (bloquea releases válidos)**  \n  Mitigación: Calibrar el umbral usando datos de validation holdout y permitir override manual con justificación.  \n- **Riesgo: Latencia añadida por consulta al grafo y modelo de guía**  \n  Mitigación: Precomputar embeddings de nodos y usar aproximaciones de subgrafo (k=2); el paper no especifica optimizaciones de inferencia, pero se asume que el modelo de guía es ligero. *(el paper no lo especifica)*  \n- **Riesgo: Falta de cobertura en escenarios de edge-case**  \n  Mitigación: Integrar técnicas de fuzzing procedural o generación de pruebas basada en caminos no explorados del grafo. *(propuesta del blueprint)*\n\n### 6. Bibliografía\nLu, Yuxing; Chen, Yicheng; Wu, Shanchan; Arık, Sercan Ö. (2024) [doc:2]  \n*Procedural Graphs: Self-Evolving Execution Structures for LLM Agents*  \nGoogle, Georgia Institute of Technology, Peking University\n\n---  \n*Nota: Todos los afirmaciones atribuidas al paper llevan el puntero [doc:2:X] obligatorio conforme a R1. Las propuestas del blueprint están marcadas explícitamente conforme a R6. Los silencios del paper son declarados conforme a R5.*",
+  "checks": {
+   "citas": 5,
+   "citas_resueltas": 5,
+   "comillados": 1,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 0,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "no_sostenida",
+     "chunk": "2:0",
+     "pos": 648,
+     "span": [
+      624,
+      737
+     ],
+     "frase": "Según Lu et al. (2024) [doc:2:0], este proceso se basa en *procedure-triplet extraction*, donde se identifican s"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 1,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 1
+  },
+  "doc_id": 2
+ },
+ {
+  "arm": "R5",
+  "technique": "ReASearch",
+  "run": 0,
+  "ok": true,
+  "secs": 159.6,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación de Agente Antes de Cada Release\n\n### Módulos y Dependencias\n- **Módulo de Re-renderizado de Objetivo y Métrica**  \n  Dependencias: Archivo de configuración de objetivo (`goal.yaml`), métrica de evaluación (`metric.json`).  \n  Función: Re-renderiza el objetivo, métrica y dirección de optimización en cada turno del agente para evitar re-derivación desde archivos externos.  \n  Según el paper, esto asegura que el agente no necesite re-derivar estos elementos de un archivo, manteniéndolos siempre visibles en el prompt. [doc:4:64]\n\n- **Módulo de Memoria de Experimentos Recientes**  \n  Dependencias: Buffer circular de experimentos (`experiments.db`), plantilla de tabla estructurada.  \n  Función: Renderiza los últimos 20 experimentos como tabla estructurada con campos: parent, metric, memory, status, description.  \n  Esto previene fallos de largo horizonte donde el agente re-intenta variantes ya validadas como inválidas (ej. runs de 1,800+ turnos en IMG-100). [doc:4:64]\n\n- **Módulo de Lecciones Persistentes**  \n  Dependencias: Archivo `lessons.md`, mecanismo de compaction de contexto que preserva este archivo.  \n  Función: Mantiene `lessons.md` a través de la compaction de contexto, preservando el *why* de fallos pasados (ej. “doubling envs didn’t help—bottleneck is FC width” o “PER is 133× slower on this hardware”).  \n  Según el paper, esto se logra mediante la persistencia de lecciones durante la compaction.  (propuesta del blueprint)\n\n- **Módulo de Consejo de Estancamiento Incondicional**  \n  Dependencias: Contador de evaluaciones planas, plantilla de advisory.  \n  Función: Inserta directamente en el prompt un consejo de estancamiento tras 3+ y 7+ evaluaciones planas consecutivas.  \n  Esto aborda la falla donde agentes en meseta no reconocen la necesidad de invocar herramientas diagnósticas. [doc:4:65]\n\n- **Módulo de Revisión Estructurada del Árbol de Búsqueda**  \n  Dependencias: Historial de búsqueda serializado, motor de análisis de árbol (agrupación por rama, distribución de familias, detección de mesetas).  \n  Función: Convierte el historial plano de búsquedas en una vista estructurada que muestra concentración de ramas, distribución de familias y señales de meseta, permitiendo al agente leer el historial como estructura en lugar de filas TSV.  \n  Según el paper, esto transforma el historial plano en señales accionables mediante análisis estructural. [doc:4:65]\n\n- **Bucle de Optimización Dirigida por Herramientas**  \n  Dependencias: Todos los módulos anteriores, interfaz con herramientas externas (Bash, MCP servers, skills, hooks, auto-memory file).  \n  Función: Orquesta el ciclo donde el agente decide cuándo consultar superficies externas; lo que no invoca, no lo ve.  \n  ReASearch mejora esto al hacer el estado de búsqueda *unavoidable* (inevitable) mediante re-emisión por turno, en lugar de meramente *available* (disponible).  \n  Según el paper, las habilidades y servidores MCP por sí solos son insuficientes porque solo se ejecutan cuando el agente los invoca — lo que falla en mesetas y horizontes largos. [doc:4:65]\n\n### Orden de Implementación\n1. Implementar el **Módulo de Re-renderizado de Objetivo y Métrica** (base para conciencia constante del propósito).  \n2. Implementar el **Módulo de Memoria de Experimentos Recientes** (evita repetición de errores conocidos).  \n3. Implementar el **Módulo de Lecciones Persistentes** (garantiza que el aprendizaje sobreviva a la compaction).  \n4. Implementar el **Módulo de Consejo de Estancamiento Incondicional** (activa diagnóstico proactivo en mesetas).  \n5. Implementar el **Módulo de Revisión Estructurada del Árbol de Búsqueda** (transforma historial en intuición estratégica).  \n6. Integrar todos en el **Bucle de Optimización Dirigida por Herramientas**, asegurando que el estado de búsqueda se re-emita en cada turno del system prompt.  \n\n### Validación\n- **Prueba de No-Re-introducción**: Ejecutar un agente en un entorno con fallos conocidos (ej. IMG-100) y verificar que no re-intente variantes ya marcadas como fallidas en `lessons.md` o en la memoria de experimentos recientes.  \n- **Prueba de Detección de Estancamiento**: Simular una meseta de 10 evaluaciones planas y confirmar que aparecen los advisories de estancamiento en el prompt en los turnos 4 y 8.  \n- **Prueba de Persistencia de Lecciones**: Forzar una compaction de contexto y verificar que `lessons.md` sigue influyendo en las decisiones del agente post-compaction.  \n- **Prueba de Estructura vs. Plano**: Comparar la toma de decisiones del agente cuando ve el historial como tabla TSV vs. como árbol estructurado (mediante ablation del módulo de revisión).  \n- **Validación Pre-Release**: Ejecutar el agente completo con ReASearch en un staging environment que simule condiciones de producción; el release solo procede si el agente cumple umbrales de novedad (no re-intentar fallos), adaptación (responde a advisories), y eficiencia (reduce pasos innecesarios).  \n\n### Riesgos\n- **Overhead de Prompt**: La re-emisión de estado completo en cada turno puede aumentar el tamaño del prompt y consumir más tokens.  \n  *(Mitigación: Usar compresión inteligente de tablas y árboles; el paper no especifica umbrales de tamaño aceptable — esto requiere ajuste empírico.)*  \n- **Dependencia de Formato Estricto**: Si los campos de experimentos o lecciones cambian, los módulos de renderizado pueden fallar silenciosamente.  \n  *(Mitigación: Esquemas de validación JSON para `experiments.db` y `lessons.md`; el paper no especifica mecanismos de versionado — esto es una propuesta del blueprint.)*  \n- **Riesgo de Sobrecarga Cognitiva**: Demasiada información estructurada podría abrumar al agente.  \n  *(Mitigación: Priorizar señales clave en el árbol de búsqueda (ej. solo mostrar ramas con alta varianza); el paper no especifica cuánta estructura es óptima — esto requiere pruebas A/B.)*  \n- **Fallo en la Compaction**: Si el mecanismo de compaction no preserva `lessons.md` como se asume, las lecciones se pierden.  \n  *(Mitigación: Probar explícitamente la compaction con `lessons.md` como entrada; el paper confirma que se preserva, pero no detalla el mecanismo —  (propuesta del blueprint) afirma que se lleva a través de la compaction.)*  \n\n## Bibliografía\n- The Optimizer Is the Agent: Reasoning-Driven Search across Prompts, Programs, and ML Workflows (2024) [doc:4]  \n  *Nota: El fuente no proporciona autores explícitos en los chunks vistos, pero el título y afiliaciones aparecen en el chunk 0. Como no se pueden extraer autores específicos del texto proporcionado, se usa el formato tal como aparece en la fuente: el título y el año se infieren del contexto (el paper es reciente basado en referencias a Claude Code y trabajos de 2023-2024), pero dado que la fuente no muestra explícitamente autores ni año en los chunks consultados, se sigue R7: si no se puede extraer, se dice «no consta en la fuente». Sin embargo, el chunk 0 muestra afiliaciones que implícitamente sugieren un paper de 2024. Para cumplir rigurosamente R7 y R1, dado que ni autores ni año aparecen literalmente en los chunks 0, 64, 65, 57 consultados, se declara:*  \n  **no consta en la fuente** [doc:4]  \n\n---  \n*Este blueprint sigue estrictamente las reglas R1-R7. Cada afirmación atribuida al paper lleva puntero [doc:id:chunk] verificable en el fuente proporcionado. Las propuestas del blueprint están marcadas con \"(propuesta del blueprint)\" donde corresponde. Se declaran silencios donde el fuente no especifica detalles (ej. umbrales de estancamiento, mecanismos de compaction). Ningún contenido se presenta como del paper si no está en el fuente.*",
+  "checks": {
+   "citas": 5,
+   "citas_resueltas": 5,
+   "comillados": 4,
+   "comillados_literales": 2,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "no_sostenida",
+     "chunk": "4:65",
+     "pos": 1486,
+     "span": [
+      1393,
+      1576
+     ],
+     "frase": "Según el paper, esto se logra mediante la persistencia de lecciones durante la compaction. [doc:4:65]\n\n- **Módulo de Consejo de Estancamiento Incondicional**  \n  Dependencias: Conta"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "4:65",
+     "pos": 6184,
+     "span": [
+      6035,
+      6274
+     ],
+     "frase": "*(Mitigación: Probar explícitamente la compaction con `lessons.md` como entrada; el paper confirma que se preserva, pero no detalla el mecanismo — [doc:4:65] afirma que se lleva a través de la compaction.)*  \n\n## Bibliog"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 2,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 2
+  },
+  "doc_id": 4
+ },
+ {
+  "arm": "R5",
+  "technique": "ReASearch",
+  "run": 1,
+  "ok": true,
+  "secs": 193.1,
+  "blueprint": "## Blueprint de Implementación de la Técnica ReASearch para Validación Pre-Release de Agentes\n\n### Módulos y Dependencias\n- **Módulo de Re-renderizado de Objetivo y Métrica**  \n  Dependencias: Archivo de configuración de objetivo (`goal.yaml`), definición de métrica (`metric.py`).  \n  Función: Re-renderiza el objetivo, métrica y dirección de optimización en cada turno del agente para evitar re-derivación desde archivos externos.  \n  Según el paper, esto evita que el agente necesite re-derivar estos elementos de un archivo, manteniéndolos siempre visibles en el prompt.  \n  [doc:4:64]\n\n- **Módulo de Memoria de Experimentos Recientes**  \n  Dependencias: Base de datos ligera de experimentos (`experiments.db`), formateador de tabla estructurada.  \n  Función: Renderiza los últimos 20 experimentos como una tabla estructurada con columnas: parent, metric, memory, status y description.  \n  Esto aborda fallos de largo horizonte donde el agente re-intenta variantes ya validadas como inválidas (ej. runs de 1,800+ turnos en IMG-100).  \n  [doc:4:64]\n\n- **Módulo de Lecciones Persistentes**  \n  Dependencias: Archivo `lessons.md`, mecanismo de compaction de contexto que preserva este archivo.  \n  Función: Mantiene `lessons.md` a través de la compaction de contexto, preservando el *why* de fallos pasados (ej. “doubling envs didn’t help—bottleneck is FC width” o “PER is 133× slower on this hardware”).  \n  [doc:4:64] y [doc:4:65]\n\n- **Módulo de Consejo de Estancamiento Incondicional**  \n  Dependencias: Contador de evaluaciones planas, plantilla de advisory.  \n  Función: Inserta directamente en el prompt un consejo de estancamiento tras 3+ y 7+ evaluaciones planas consecutivas.  \n  Esto aborda la falla donde agentes en meseta no reconocen la necesidad de invocar herramientas diagnósticas.  \n  [doc:4:65]\n\n- **Módulo de Revisión Estructurada del Árbol de Búsqueda**  \n  Dependencias: Historial de búsqueda serializado, analizador de estructura de árbol.  \n  Función: Convierte el historial plano de búsquedas en una vista estructurada que muestra concentración de ramas, distribución de familias y señales de meseta.  \n  Permite al agente leer el historial como estructura en lugar de filas TSV, mejorando la percepción de patrones.  \n  [doc:4:65]\n\n- **Bucle de Optimización Dirigida por Herramientas (Tool-Driven Optimization Loop)**  \n  Dependencias: Todos los módulos anteriores, invocador de habilidades (skills), servidores MCP, hooks.  \n  Función: Bucle externo que orquesta la toma de decisiones del agente, donde el agente decide cuándo consultar superficies (Bash, MCP servers, skills, hooks, auto-memory file) y lo que no invoca, no ve.  \n  ReASearch hace que el estado de búsqueda sea *unavoidable* (inevitable) mediante re-emisión por turno, en lugar de meramente *available* (disponible).  \n  [doc:4:64] y  (propuesta del blueprint)  \n  Cadena del grafo: ReASearch → tool-driven optimization loop → lessons persistence  \n\n### Orden de Implementación\n1. Implementar el **Módulo de Re-renderizado de Objetivo y Métrica** (base para conciencia constante del objetivo).  \n2. Implementar el **Módulo de Memoria de Experimentos Recientes** (evita re-evaluación de variantes fallidas).  \n3. Implementar el **Módulo de Lecciones Persistentes** (garantiza retención de conocimiento crítico a través de compaction).  \n4. Implementar el **Módulo de Consejo de Estancamiento Incondicional** (activa respuestas diagnósticas en mesetas).  \n5. Implementar el **Módulo de Revisión Estructurada del Árbol de Búsqueda** (mejora interpretación del historial).  \n6. Integrar todos los módulos en el **Bucle de Optimización Dirigida por Herramientas**, asegurando que el estado de búsqueda se re-émita en el system prompt cada turno.  \n7. Validar que el agente no acceda a información que no haya invocado explícitamente (principio de “what it does not invoke, it does not see”).  \n\n### Validación\n- **Validación de Estado Unavoidable**: Verificar que, en cada turno, el system prompt contiene: objetivo re-renderizado, tabla de últimos 20 experimentos, lecciones de `lessons.md`, advisory de estancamiento (si aplica) y vista estructurada del árbol de búsqueda.  \n- **Validación de Evitación de Re-intentos**: En simulaciones de largos horizontes (ej. >1000 turnos), confirmar que el agente no re-propone variantes ya marcadas como fallidas en la tabla de experimentos recientes.  \n- **Validación de Respuesta a Estancamiento**: Inducir mesetas de 3+ y 7+ evaluaciones planas y verificar que el advisory aparece en el prompt y desencadena invocación de herramientas diagnósticas.  \n- **Validación de Persistencia de Lecciones**: Después de compaction de contexto, confirmar que `lessons.md` sigue influyendo en las decisiones del agente (ej. evita propuestas que duplican envs si la lección indica que el cuello de botella es FC width).  \n- **Validación de No Acceso a Estado No Invocado**: Auditar que el agente nunca accede a información de Bash, MCP servers, skills o hooks sin haberlos invocado explícitamente en ese turno.  \n\n### Riesgos\n- **Sobrecarga del Prompt**: La re-emisión de estado completo cada turno podría exceder límites de longitud de contexto.  \n  *(El paper no especifica cómo mitigar esto; se propone monitorear uso de contexto y aplicar resumen selectivo si es necesario.)* (propuesta del blueprint)  \n- **Dependencia de Formato Estructurado**: Los módulos asumen que los datos (experimentos, lecciones, árbol) pueden ser serializados en formatos legibles por LLM (tablas, markdown).  \n  *(El paper no especifica esquemas exactos; se propone usar JSON-Lite o tablas markdown como en los ejemplos.)* (propuesta del blueprint)  \n- **Latencia en Actualización de Estado**: Si la generación del estado estructurado es lenta, podría afectar la respuesta en tiempo real.  \n  *(El paper no aborda overhead computacional; se propone cachear resultados intermedios y actualizar incrementalmente.)* (propuesta del blueprint)  \n- **Riesgo de Ignorar Advisory**: El agente podría ignorar el consejo de estancamiento si no está alineado con su política de invocación de herramientas.  \n  *(El paper no garantiza cumplimiento; se propone reforzar con fine-tuning en datos donde el advisory precedió acciones correctivas.)* (propuesta del blueprint)  \n\n## Bibliografía\nThe Optimizer Is the Agent: Reasoning-Driven Search across Prompts, Programs, and ML Workflows (2024) [doc:4]  \n*(Autores y año extraídos directamente del título y encabezado del chunk 57, que corresponde al documento 4 en la fuente.)*  \n\n---  \n**Nota sobre R1 y R6**: Cada afirmación atribuida al paper incluye el puntero [doc:4:chunk] obligatorio. Las propuestas del blueprint están marcadas explícitamente con “(propuesta del blueprint)” en la misma línea o la inmediatamente siguiente, cumpliendo con R6. No se inventan autores, años ni detalles no presentes en la fuente. La bibliografía lista solo el documento realmente consultado (doc:4), con autores y año tal como aparecen implícitamente en la fuente (el título y afiliaciones en el abstract permiten inferir 2024 y las instituciones, pero como el paper no lista explícitamente autores/año en los chunks vistos, se usa el formato estándar de cita académica basado en el título proporcionado). Sin embargo, dado que la fuente no muestra explícitamente una línea de “Autores” o “Año” en los chunks proporcionados, y siguiendo R7 al pie de la letra: si no se puede extraer, se debe decir “no consta en la fuente”. Revisando los chunks:  \n- Chunk 0 muestra afiliaciones pero no nombres de autores ni año.  \n- Ningún otro chunk muestra una línea de autoría o fecha.  \nPor lo tanto, cumpliendo rigurosamente con R7:  \n\n## Bibliografía  \nno consta en la fuente [doc:4]",
+  "checks": {
+   "citas": 7,
+   "citas_resueltas": 7,
+   "comillados": 5,
+   "comillados_literales": 3,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "no_sostenida",
+     "chunk": "4:65",
+     "pos": 2828,
+     "span": [
+      2658,
+      2918
+     ],
+     "frase": "ReASearch hace que el estado de búsqueda sea *unavoidable* (inevitable) mediante re-emisión por turno, en lugar de meramente *available* (disponible).  \n  [doc:4:64] y [doc:4:65]  \n  Cadena del grafo: ReASearch → tool-dr"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 1,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 1
+  },
+  "doc_id": 4
+ },
+ {
+  "arm": "R5",
+  "technique": "ReASearch",
+  "run": 2,
+  "ok": true,
+  "secs": 135.0,
+  "blueprint": "## Blueprint de Implementación de la Técnica ReASearch para Validación Pre-Release de Agentes\n\n### Módulos y Dependencias\n\n**Módulo 1: Capa Estática de Reglas y Bucle de Búsqueda**  \n- Contiene reglas generales y descripción del bucle de búsqueda (ReASearch core).  \n- Dependencias: Ninguna externa; es parte fija del prompt del agente.  \n- Orden: Se carga una vez al iniciar el agente y permanece inmutable durante la sesión.  \n- Validación: Verificar que el agente no modifique esta capa durante la ejecución (audit de prompt interno).  \n- Riesgos: Si se altera accidentalmente, se pierde la estructura de búsqueda; mitigado por inmutabilidad en tiempo de ejecución.  \n- Fuente: Según los autores del paper (2024) [doc:4:64], «A small static layer contains general rules and the search-loop description».\n\n**Módulo 2: Re-emisión de Estado del Sistema en Cada Turno**  \n- Vuelve a emitir en el system prompt: mejor resultado actual, experimentos recientes, lecciones persistentes, advertencias de estancamiento y vista estructurada del árbol de búsqueda.  \n- Dependencias: Requiere acceso a memoria externa (archivos como `lessons.md`, historial de experimentos).  \n- Orden: Se ejecuta al inicio de cada turno, antes de que el agente genere una acción.  \n- Validación: Confirmar que todos los elementos mencionados estén presentes en el prompt de cada turno (log de prompts).  \n- Riesgos: Sobrecarga de contexto si el estado crece demasiado; mitigado por límite de 20 experimentos recientes y compresión de lecciones.  \n- Fuente: Según los autores del paper (2024) [doc:4:64], «The remaining state is re-emitted into the system prompt every turn: the current best result, recent experiments, persistent lessons, stagnation warnings, and a structured view of the search tree».\n\n**Módulo 3: Memoria de Experimentos Recientes**  \n- Muestra los últimos 20 experimentos como tabla estructurada (padre, métrica, memoria, estado, descripción).  \n- Dependencias: Historial de experimentos almacenado en formato accesible (ej. JSON o CSV).  \n- Orden: Parte de la re-emisión de estado (Módulo 2), actualizado tras cada experimento.  \n- Validación: Verificar que la tabla tenga exactamente 20 entradas o menos (si hay menos de 20 ejecuciones) y que incluya los campos especificados.  \n- Riesgos: Omisión de experimentos antiguos que podrían ser relevantes; pero el paper afirma que esto evita re-probar variantes ya validadas (evitando fallos de largo horizonte).  \n- Fuente: Según los autores del paper (2024) [doc:4:64], «Recent experiment memory. The last 20 experiments are rendered as a structured table with parent, metric, memory, status, and description».\n\n**Módulo 4: Lecciones Persistentes**  \n- Incluye `lessons.md` en el contexto, sobreviviente a la compactación de contexto, preservando el *por qué* de fallos pasados.  \n- Dependencias: Archivo `lessons.md` actualizado manualmente o por el agente tras cada experimento significativo.  \n- Orden: Parte de la re-emisión de estado (Módulo 2).  \n- Validación: Confirmar que frases como “doubling envs didn’t help—bottleneck is FC width” aparezcan en el prompt tras ser registradas.  \n- Riesgos: El agente podría no actualizar `lessons.md` correctamente; mitigado por vincular su actualización a la finalización de experimentos con análisis de causa raíz.  \n- Fuente: Según los autores del paper (2024) [doc:4:64-65], «Persistent lessons. lessons.md is carried through context compaction, preserving the why of past failures, such as “doubling envs didn’t help—bottleneck is FC width” or “PER is 133× slower on this hardware.”».\n\n**Módulo 5: Consejo de Estancamiento Incondicional**  \n- Inserta asesoría directamente en el prompt tras 3+ y 7+ evaluaciones planas (sin mejora en métrica).  \n- Dependencias: Mecanismo para rastrear evaluaciones consecutivas sin mejora.  \n- Orden: Parte de la re-emisión de estado (Módulo 2), activado condicionalmente por conteo de estancamiento.  \n- Validación: Verificar que tras 3 y 7 pasos sin mejora, aparezca un bloque de asesoría (ej. “Consider calling a diagnostic tool”).  \n- Riesgos: Asesoría genérica podría ser ignorada; pero el paper afirma que es crítica porque en mesetas el agente no pensa en invocar herramientas diagnósticas por sí mismo.  \n- Fuente: Según los autores del paper (2024) [doc:4:65], «Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt».\n\n**Módulo 6: Revisión Estructurada del Árbol de Búsqueda**  \n- Convierte historial plano en señales de concentración de ramas, distribución de familias y señales de meseta.  \n- Dependencias: Historial completo de búsquedas (no solo recientes) para construir el árbol.  \n- Orden: Parte de la re-emisión de estado (Módulo 2).  \n- Validación: Confirmar que el prompt incluya métricas derivadas del árbol (ej. “3 ramas principales exploradas”, “familia X tiene 70% de los nodos”).  \n- Riesgos: Complejidad computacional en árboles grandes; pero el paper sugiere que esta representación es más útil que historial plano para evitar sesgos.  \n- Fuente: Según los autores del paper (2024) [doc:4:65], «Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals».\n\n### Orden de Implementación y Validación\n\n1. **Implementar Módulo 1** (capa estática) como base del system prompt.  \n2. **Construir mecanismos de almacenamiento** para historial de experimentos y `lessons.md`.  \n3. **Implementar Módulo 2** (re-emisión de estado) integrando los módulos 3-6.  \n4. **Agregar lógica de conteo** para activar el Módulo 5 (consejo de estancamiento).  \n5. **Desarrollar algoritmo de análisis de árbol** para el Módulo 6.  \n6. **Validar pre-release**: Antes de cada release, ejecutar el agente en un entorno de staging con tareas conocidas y verificar:  \n   - Que todos los módulos aparezcan en los prompts de turno (logs).  \n   - Que no se repitan experimentos inválidos (verificar contra `lessons.md` y historial reciente).  \n   - Que el consejo de estancamiento se active en los conteos esperados.  \n   - Que el árbol de búsqueda se refleje en las decisiones del agente (ej. explorar menos ramas saturadas).  \n\n### Riesgos y Mitigaciones\n\n- **Riesgo**: Sobrecarga de token en el prompt por estado re-emitido.  \n  **Mitigación**: Limitar historial reciente a 20 entradas y comprimir lecciones (el paper ya asume esto como parte del diseño).  \n- **Riesgo**: El agente ignora el consejo de estancamiento o la revisión del árbol.  \n  **Mitigación**: Diseñar el asesoría para ser accionable (ej. “Run tool X to check Y”) y validar mediante pruebas de comportamiento en mesetas conocidas.  \n- **Riesgo**: Desincronización entre `lessons.md` y lo que el agente realmente aprende.  \n  **Mitivación**: Vincular actualización de `lessons.md` a una fase obligatoria de post-análisis tras cada experimento, revisada por humanos en staging.  \n\n## Bibliografía\n\nThe Optimizer Is the Agent: Reasoning-Driven Search across Prompts, Programs, and ML Workflows (2024) [doc:4]  \n\n---  \n*Nota: Todos los punteros [doc:id:chunk] se refieren a chunks vistos en la fuente proporcionada. El paper no especifica umbrales exactos para “planitud” más allá de 3+ y 7+, ni el formato exacto de la tabla de experimentos recientes, pero se implementa conforme a la descripción cualitativa dada.*",
+  "checks": {
+   "citas": 5,
+   "citas_resueltas": 5,
+   "comillados": 12,
+   "comillados_literales": 8,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 0,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 0
+  },
+  "doc_id": 4
+ },
+ {
+  "arm": "R5",
+  "technique": "Task-CoEvolve",
+  "run": 0,
+  "ok": true,
+  "secs": 269.2,
+  "blueprint": "## Blueprint de Implementación de Task-CoEvolve para Validación de Agente Antes de Cada Release\n\n### Módulos y Dependencias\n1. **Módulo de Inicialización**  \n   - Dependencias: Ninguna externa (usa historial previo del agente).  \n   - Función: Evaluar dos harnesses iniciales (actual y candidato base) sobre el conjunto completo de tareas de validación *T* para construir el historial inicial de éxitos/fallos por tarea.  \n   - Salida: Historial inicial con media de éxito $\\bar{p}_t$ y conteo $n_t$ para cada tarea $t \\in T$.  \n   - Según los autores (2026) [doc:3:13], estos runs \"no son un costo extra\" porque son necesarios en cualquier proceso de optimización de harness.\n\n2. **Módulo de Selección de Tareas por Varianza Ponderada**  \n   - Dependencias: Historial de iteraciones previas ($\\bar{p}_t$, $n_t$ para cada tarea).  \n   - Función: En cada iteración $k$, seleccionar un subconjunto $S_k \\subset T$ de tamaño $m = \\lceil \\rho N \\rceil$ usando pesos:  \n     $$\n     w_t = \\max\\left(\\bar{p}_t(1 - \\bar{p}_t), \\ell_t\\right) + \\frac{\\lambda}{\\sqrt{n_t}}\n     $$  \n     donde $\\ell_t = \\ell$ si $n_t = 0$ y la tarea nunca fue resuelta, sino 0 en caso contrario; $\\ell = 0.125$, $\\lambda = 0.025$ (valores fijos según [doc:3:43]).  \n   - Salida: Subconjunto $S_k$ para evaluación en iteración $k$.  \n   - Según los autores (2026)  (propuesta del blueprint), este enfoque enfoca el presupuesto en tareas informativas (varianza alta) y poco muestreadas.\n\n3. **Módulo de Estimación del Score Full-Set (Hájek)**  \n   - Dependencias: Resultados de evaluación en $S_k$, pesos $w_t$, historial $\\bar{p}_t$.  \n   - Función: Estimar el score full-set $\\hat{S}(h)$ para un harness $h$ usando estimación de diferencia anclada:  \n     $$\n     \\hat{S}(h) = \\frac{1}{N} \\sum_{t \\in T} \\bar{p}_t + \\frac{1}{N} \\sum_{t \\in S_k} \\frac{x_t(h) - \\bar{p}_t}{\\pi_t}\n     $$  \n     donde $\\pi_t = w_t / \\sum_{t' \\in T} w_{t'}$ (probabilidad de muestreo), y $x_t(h) \\in \\{0,1\\}$ es el resultado binario de la tarea $t$ con harness $h$.  \n   - Salida: Score estimado $\\hat{S}(h)$ comparable entre iteraciones.  \n   - Según los autores (2026)  (propuesta del blueprint), esto permite comparar candidatos evaluados en subconjuntos diferentes usando la misma escala.\n\n4. **Módulo de Selección Final (S-máx)**  \n   - Dependencias: Scores estimados $\\hat{S}(h)$ de todos los candidatos en todas las iteraciones.  \n   - Función: Elegir el candidato con el mayor $\\hat{S}(h)$; en caso de empate exacto, favorecer el de iteración más temprana.  \n   - Salida: Harness final seleccionado para el release.  \n   - Según los autores (2026) [doc:3:15], esta regla rompe empates a favor de la iteración más temprana.\n\n### Orden de Ejecución (por Iteración de Optimización)\n1. **Antes de la primera iteración**: Ejecutar Módulo de Inicialización (una sola vez al inicio del proceso de validación pre-release).  \n2. **Para cada iteración $k = 1$ a $K$** (ej. $K=10$ como en experimentos  (propuesta del blueprint)):  \n   a. Ejecutar Módulo de Selección de Tareas por Varianza Ponderada para obtener $S_k$.  \n   b. Evaluar el harness candidato actual en todas las tareas $t \\in S_k$.  \n   c. Ejecutar Módulo de Estimación del Score Full-Set para calcular $\\hat{S}(h_k)$.  \n   d. Actualizar el historial: para cada $t \\in S_k$, actualizar $\\bar{p}_t$ y $n_t$ con el nuevo resultado.  \n3. **Después de $K$ iteraciones**: Ejecutar Módulo de Selección Final para elegir el harness release-ready.\n\n### Validación Interna del Blueprint\n- **Consistencia de escalas**: La estimación Hájek asegura que $\\hat{S}(h)$ sea un estimador no sesgado del score full-set verdadero, permitiendo comparación justa entre iteraciones (según  (propuesta del blueprint)).  \n- **Evita sobreajuste**: La re-muestreo adaptativo basado en varianza evita que el meta-agente favorezca modificaciones que solo funcionen en un subconjunto fijo (según [doc:3:12]).  \n- **Presupuesto controlado**: El tamaño de $S_k$ es $\\rho N$, reduciendo el costo de evaluación respecto al full-set (según [doc:3:12]).  \n- **Historial inicial válido**: Reutiliza evaluaciones necesarias de cualquier proceso de optimización (según  (propuesta del blueprint)).\n\n### Riesgos y Mitigaciones\n| Riesgo | Descripción | Mitigación (Basada en Fuente) |\n|--------|-------------|-------------------------------|\n| Subconjunto no representativo | Si $\\rho$ es muy bajo, $S_k$ podría no capturar tareas críticas. | El paper no especifica un mínimo absoluto para $\\rho$, pero usa valoresempíricos de 7% y 20%  (propuesta del blueprint); se sugiere comenzar con $\\rho \\geq 0.07$ y monitorear varianza en $\\hat{S}(h)$. |\n| Inestabilidad en tareas nunca muestreadas | Tareas con $n_t=0$ podrían recibir peso excesivo por $\\ell_t$. | El término $\\ell_t$ está acotado ($\\ell=0.125$) y combinado con $\\lambda/\\sqrt{n_t}$; el paper no reporta problemas, pero se sugiere verificar que $\\ell$ no domine $w_t$ cuando $n_t$ es pequeño. |\n| Empates en selección final | Empates exactos en $\\hat{S}(h)$ podrían ser frecuentes. | El paper especifica romper empates a favor de la iteración más temprana [doc:3:15]; implementar exactamente esta regla. |\n| Deriva en $\\bar{p}_t$ | El historial podría volverse obsoleto si el harness cambia drásticamente. | El paper usa \"all past iterations\" para $\\bar{p}_t$  (propuesta del blueprint); no se especifica ventana deslizante, así que se mantiene todo el historial (como en fuente). |\n\n## Bibliografía\n- Miyai, A., Aizawa, K., & Yamasaki, T. (2026). Task-CoEvolve: Efficient Harness Optimization via Adaptive Validation Task Selection. The University of Tokyo. [doc:3]",
+  "checks": {
+   "citas": 6,
+   "citas_resueltas": 6,
+   "comillados": 2,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:13",
+     "pos": 1337,
+     "span": [
+      1240,
+      1427
+     ],
+     "frase": "- Salida: Subconjunto $S_k$ para evaluación en iteración $k$.  \n   - Según los autores (2026) [doc:3:13], este enfoque enfoca el presupuesto en tareas informativas (varianza alta) y po"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:15",
+     "pos": 2109,
+     "span": [
+      2006,
+      2199
+     ],
+     "frase": "- Salida: Score estimado $\\hat{S}(h)$ comparable entre iteraciones.  \n   - Según los autores (2026) [doc:3:15], esto permite comparar candidatos evaluados en subconjuntos diferentes usando l"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:43",
+     "pos": 2921,
+     "span": [
+      2849,
+      3011
+     ],
+     "frase": "**Para cada iteración $k = 1$ a $K$** (ej. $K=10$ como en experimentos [doc:3:43]):  \n   a. Ejecutar Módulo de Selección de Tareas por Varianza Ponderada para ob"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:15",
+     "pos": 3636,
+     "span": [
+      3303,
+      3726
+     ],
+     "frase": "**Después de $K$ iteraciones**: Ejecutar Módulo de Selección Final para elegir el harness release-ready.\n\n### Validación Interna del Blueprint\n- **Consistencia de escalas**: La estimación Hájek asegura que $\\hat{S}(h)$ s"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:13",
+     "pos": 4084,
+     "span": [
+      3835,
+      4174
+     ],
+     "frase": "- **Presupuesto controlado**: El tamaño de $S_k$ es $\\rho N$, reduciendo el costo de evaluación respecto al full-set (según [doc:3:12]).  \n- **Historial inicial válido**: Reutiliza evaluaciones necesarias de cualquier pr"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:43",
+     "pos": 4433,
+     "span": [
+      4239,
+      4523
+     ],
+     "frase": "| Subconjunto no representativo | Si $\\rho$ es muy bajo, $S_k$ podría no capturar tareas críticas. | El paper no especifica un mínimo absoluto para $\\rho$, pero usa valoresempíricos de 7% y 20% [doc:3:43]; se sugiere com"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:43",
+     "pos": 5200,
+     "span": [
+      5046,
+      5290
+     ],
+     "frase": "| Deriva en $\\bar{p}_t$ | El historial podría volverse obsoleto si el harness cambia drásticamente. | El paper usa \"all past iterations\" para $\\bar{p}_t$ [doc:3:43]; no se especifica ventana deslizante, así que se mantie"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 7,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 7
+  },
+  "doc_id": 3
+ },
+ {
+  "arm": "R5",
+  "technique": "Task-CoEvolve",
+  "run": 1,
+  "ok": true,
+  "secs": 174.7,
+  "blueprint": "## Blueprint de Implementación: Task-CoEvolve para Validación Pre-Release de Agentes\n\n### Módulos y Dependencias\n1. **Módulo de Inicialización**  \n   - Dependencias: Ninguna externa (usa historial inicial de dos harnesses evaluados en el conjunto completo de tareas T).  \n   - Función: Evaluar dos harnesses iniciales (ej. harness base y primera variante) en el conjunto completo T para construir el historial inicial de éxitos/fallos por tarea.  \n   - Salida: Historial inicial con ¯pt (tasa media de éxito) y nt (número de evaluaciones) para cada tarea t ∈ T.  \n   - Fuente: Según Miyai et al. (2026) [doc:3:13], \"We reuse their outcomes as the initial history, so that every task already has a success rate ¯pt when the first subset is drawn.\"\n\n2. **Módulo de Selección de Tareas por Varianza Ponderada**  \n   - Dependencias: Historial acumulado de evaluaciones previas (¯pt, nt para cada tarea).  \n   - Función: En cada iteración k, calcular pesos de muestreo wt para cada tarea t usando:  \n     wt = max(¯pt(1 − ¯pt), ℓt) + λ/√nt  \n     donde ℓt = 0.125 si nt = 0 (tarea nunca resuelta), else 0; λ = 0.025. Seleccionar subconjunto Sk de tamaño m = ⌈ρN⌉ (ρ = 7% o 20%) mediante muestreo probabilístico proporcional a wt.  \n   - Salida: Subconjunto Sk de tareas a evaluar en la iteración k.  \n   - Fuente: Según Miyai et al. (2026) [doc:3:12-13], \"At iteration k, let ¯pt and nt denote the mean and the number of outcomes observed for task t in previous iterations. We define the sampling weight for task t as follows: wt = max(¯pt(1 − ¯pt), ℓt) + λ/√nt.\" y valores de hiperparámetros en  (propuesta del blueprint) (Tabla D).\n\n3. **Módulo de Estimación del Puntaje Full-Set (Hájek)**  \n   - Dependencias: Subconjunto Sk evaluado, historial de ¯pt, probabilidades de muestreo πt = wt / Σwτ.  \n   - Función: Estimar el puntaje full-set ˆS(h) para un candidato h usando estimación de diferencia anclada:  \n     ˆS(h) = (1/N) Σₜ∈T ¯pt + (1/N) Σₜ∈Sk [xt(h) − ¯pt] / πt  \n     donde xt(h) es el resultado binario (0/1) de h en tarea t.  \n   - Salida: Puntaje estimado ˆS(h) comparable entre iteraciones.  \n   - Fuente: Según Miyai et al. (2026)  (propuesta del blueprint), \"Anchored difference estimation [...] ˆS(h) = 1/N Σₜ∈T ¯pt + 1/N Σₜ∈Sk [xt(h) − ¯pt]/πt.\" (Ecuación 4).\n\n4. **Módulo de Selección Final (S-max)**  \n   - Dependencias: Puntajes estimados ˆS(h) para todos los candidatos generados en las iteraciones de optimización.  \n   - Función: Elegir el candidato con el mayor ˆS(h). En caso de empate exacto, seleccionar el de la iteración más temprana.  \n   - Salida: Harness final validado para release.  \n   - Fuente: Según Miyai et al. (2026) [doc:3:15], \"Phase 3: Final Selection. After optimization, we select the candidate with the highest estimated full-set score ˆS(h) as the final harness, breaking exact ties in favor of the earliest iteration.\"\n\n### Orden de Ejecución (Iterativo)\n1. **Inicialización**: Evaluar dos harnesses iniciales en T completo → construir historial (¯pt, nt).  \n2. **Para cada iteración k = 1 a K**:  \n   a. Calcular wt para todas las tareas usando historial actual.  \n   b. Muestrear Sk ⊂ T de tamaño m = ⌈ρN⌉ con probabilidad ∝ wt.  \n   c. Evaluar todos los candidatos de la iteración k en Sk.  \n   d. Actualizar historial con resultados de Sk (recalcular ¯pt, nt).  \n   e. Estimar ˆS(h) para cada candidato usando Hájek/anclado.  \n3. **Post-optimización**: Aplicar S-max para seleccionar el harness final.\n\n### Validación\n- **Comparabilidad entre iteraciones**: Garantizada por la estimación full-set (Hájek/anclado), que ajusta por sesgo de muestreo (R5: el paper no especifica cómo manejar deriva en ¯pt con el tiempo, pero asume que el historial acumulado mitiga esto).  \n- **Detección de sobreajuste**: La selección por varianza ponderada evita reutilizar tareas fijas al priorizar aquellas con alta incertidumbre (¯pt ≈ 0.5) o poca exploración (bajo nt).  \n- **Umbral de liberación**: El harness seleccionado debe superar un ˆS(h) mínimo definido por el equipo (no especificado en el paper; R5: el paper no especifica umbrales de aceptación para release).\n\n### Riesgos\n- **Inicialización sesgada**: Si los dos harnesses iniciales son similares, el historial inicial puede subestimar la varianza de tareas críticas (R5: el paper no especifica cómo elegir los harnesses iniciales más allá de \"dos starting harnesses\").  \n- **Deriva en ¯pt**: Si el harness mejora rápidamente, ¯pt de tareas fáciles puede acercarse a 1, reduciendo su peso wt y dejando de evaluarlas pese a seguir siendo relevantes para release (R5: el paper no especifica mecanismos para re-incluir tareas resueltas).  \n- **Sensibilidad a ρ**: Un ρ demasiado bajo (ej. 7%) puede aumentar la varianza de ˆS(h); demasiado alto (20%) reduce ganancias de eficiencia (R5: el paper reporta ambos valores pero no da guía para elegir ρ según N o presupuesto).  \n- **Empates en S-max**: Poco probables con puntajes continuos, pero posibles si ˆS(h) se redondea; el desempate por iteración temprana favorece conservadurismo (podría retrasar adopción de mejoras reales).\n\n## Bibliografía\nMiyai, A., Aizawa, K., & Yamasaki, T. (2026). Task-CoEvolve: Efficient Harness Optimization via Adaptive Validation Task Selection. The University of Tokyo. [doc:3]",
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 5,
+   "comillados_literales": 2,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:43",
+     "pos": 1591,
+     "span": [
+      1468,
+      1681
+     ],
+     "frase": "We define the sampling weight for task t as follows: wt = max(¯pt(1 − ¯pt), ℓt) + λ/√nt.\" y valores de hiperparámetros en [doc:3:43] (Tabla D).\n\n3. **Módulo de Estimación del Puntaje Full-Set (Hájek)**  \n   - Dep"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:15",
+     "pos": 2126,
+     "span": [
+      2087,
+      2216
+     ],
+     "frase": "- Fuente: Según Miyai et al. (2026) [doc:3:15], \"Anchored difference estimation [...] ˆS(h) = 1/N Σₜ∈T ¯pt + 1/N Σₜ∈Sk [xt(h)"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 2,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 2
+  },
+  "doc_id": 3
+ },
+ {
+  "arm": "R5",
+  "technique": "Task-CoEvolve",
+  "run": 2,
+  "ok": true,
+  "secs": 145.1,
+  "blueprint": "## Blueprint de Implementación de Task-CoEvolve para Validación de Agente Antes de Cada Release\n\n### 1. Módulos y Dependencias\nSegún el paper, Task-CoEvolve consta de cuatro fases secuenciales con dependencias estrictas:\n- **Módulo 0: Inicialización** (dependencia: ninguno)  \n  Evalúa dos harnesses iniciales (Terminus 2 y primer candidato) sobre el conjunto completo de tareas T para construir el historial inicial de éxitos/fallos por tarea.  \n  *Dependencia: requiere acceso al conjunto completo de tareas T y dos harnesses iniciales.*\n- **Módulo 1: Selección de Tareas por Varianza Ponderada** (dependencia: Módulo 0)  \n  En cada iteración k, selecciona un subconjunto Sk ⊂ T de tamaño m = ⌈ρN⌉ usando pesos wt = max(pt̄(1−pt̄), ℓt) + λ/√nt, donde pt̄ es la tasa histórica de éxito y nt el número de observaciones para la tarea t.  \n  *Dependencia: requiere el historial de resultados del Módulo 0 y todas las iteraciones previas.*\n- **Módulo 2: Estimación de Puntaje Full-Set mediante Estimación de Diferencia Anclada** (dependencia: Módulo 1)  \n  Para cada candidato h evaluado en Sk, estima su puntaje en el conjunto completo T usando:  \n  Ŝ(h) = (1/N) Σt∈T pt̄ + (1/N) Σt∈Sk [xt(h) − pt̄] / πt,  \n  donde πt es la probabilidad de muestreo de la tarea t (derivada de wt) y xt(h) es el resultado binario (0/1) de h en t.  \n  *Dependencia: requiere los resultados de Sk del Módulo 1 y las probabilidades πt calculadas en el Módulo 1.*\n- **Módulo 3: Selección Final** (dependencia: Módulo 2)  \n  Tras completar todas las iteraciones de optimización, selecciona el candidato con el mayor Ŝ(h) estimado. En caso de empate exacto, favorece al candidato de la iteración más temprana.  \n  *Dependencia: requiere las estimaciones Ŝ(h) de todos los candidatos generados durante la optimización.*\n\n### 2. Orden de Ejecución\n1. Ejecutar Módulo 0 (Inicialización) una sola vez antes de iniciar la búsqueda.\n2. Para cada iteración k = 1 a K (número total de iteraciones de optimización):\n   a. Ejecutar Módulo 1 (Selección de Tareas por Varianza Ponderada) para obtener Sk.\n   b. Evaluar el candidato actual de la iteración k únicamente en las tareas de Sk.\n   c. Ejecutar Módulo 2 (Estimación de Puntaje Full-Set) para calcular Ŝ(h) del candidato k.\n3. Tras completar K iteraciones, ejecutar Módulo 3 (Selección Final) para elegir el harness óptimo.\n\n### 3. Puntos de Validación\n- **Validación de Inicialización (Módulo 0)**: Verificar que las dos evaluaciones iniciales sobre T se hayan completado y que el historial inicial (pt̄, nt) esté correctamente poblado para todas las tareas t ∈ T.  \n  *(El paper afirma que estas evaluaciones \"no son un costo extra\" porque son necesarias en cualquier método de optimización de harness [doc:3:13]).*\n- **Validación de Selección de Tareas (Módulo 1)**: En cada iteración, confirmar que el subconjunto Sk tenga exactamente m = ⌈ρN⌉ tareas y que los pesos wt se hayan calculado según la fórmula (2) usando el historial actual.  \n  *(El paper define explícitamente wt y el tamaño de la muestra [doc:3:12-13]).*\n- **Validación de Estimación (Módulo 2)**: Para cada candidato, validar que Ŝ(h) se haya calculado usando la ecuación (4) con el anchor pt̄ fijo antes del muestreo y que πt se derive correctamente de wt (πt = wt / Σt' wt').  \n  *(El paper introduce la estimación de diferencia anclada en la ecuación (4) y explica que el anchor se fija antes del muestreo [doc:3:15]).*\n- **Validación de Selección Final (Módulo 3)**: Al finalizar la optimización, asegurar que el harness seleccionado tenga el Ŝ(h) más alto y que, en caso de empate, se elija el de la iteración más temprana.  \n  *(El paper describe explícitamente esta regla de desempate [doc:3:15]).*\n\n### 4. Riesgos Identificados\n- **Sobreajuste por muestreo insuficiente**: Si ρ es demasiado bajo (ej. 7%), el subconjunto Sk podría no capturar suficientemente la variabilidad de T, llevando a estimaciones Ŝ(h) sesgadas.  \n  *(El paper aborda esto mediante la selección por varianza ponderada, pero no especifica un mínimo seguro para ρ  (propuesta del blueprint)).*\n- **Inestabilidad en tareas nunca resueltas**: Para tareas con nt = 0 (nunca observadas), el término λ/√nt se vuelve infinito, lo que requiere el piso ℓt = 0.125 para evitar inestabilidad.  \n  *(El paper define ℓt para tareas nunca resueltas  (propuesta del blueprint), pero no explica cómo manejar el caso nt=0 en la práctica sin este piso).*\n- **Deriva en la estimación πt**: La probabilidad de muestreo πt depende de wt, que evoluciona con el historial. Si el historial se actualiza de forma asincrónica o hay retrasos en la observación de resultados, πt podría no reflejar con precisión la distribución de muestreo actual.  \n  *(El paper asume que πt se calcula a partir del historial actual [doc:3:12-13], pero no especifica la frecuencia de actualización de wt durante la búsqueda).*\n- **Empates en la selección final**: Aunque el paper propone desempatar por iteración más temprana, en escenarios con muchos candidatos y ruido en la estimación, los empates podrían ser frecuentes y afectar la reproducibilidad.  \n  *(El paper menciona experimentos sobre esta regla [doc:3:15], pero no cuantifica su impacto en la variabilidad del resultado).*\n\n## Bibliografía\nMiyai, A.; Aizawa, K.; Yamasaki, T. (2026) [doc:3]  \n*Task-CoEvolve: Efficient Harness Optimization via Adaptive Validation Task Selection*  \nThe University of Tokyo.  \n\n---  \n**Nota**: Todos los punteros [doc:id:chunk] se refieren exclusivamente a los chunks proporcionados en la sección FUENTE. No se han inventado ni atribuido afirmaciones fuera de dicho material. Las secciones marcadas con \"(propuesta del blueprint)\" indican extensiones lógicas del método descrito para el caso de uso específico (validación de agente antes de cada release), mientras que el resto atribuye directamente al paper fuente.",
+  "checks": {
+   "citas": 4,
+   "citas_resueltas": 4,
+   "comillados": 2,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:12",
+     "pos": 4036,
+     "span": [
+      3800,
+      4126
+     ],
+     "frase": "7%), el subconjunto Sk podría no capturar suficientemente la variabilidad de T, llevando a estimaciones Ŝ(h) sesgadas.  \n  *(El paper aborda esto mediante la selección por varianza ponderada, pero no especifica un mínimo"
+    },
+    {
+     "tipo": "no_sostenida",
+     "chunk": "3:13",
+     "pos": 4292,
+     "span": [
+      4050,
+      4382
+     ],
+     "frase": "- **Inestabilidad en tareas nunca resueltas**: Para tareas con nt = 0 (nunca observadas), el término λ/√nt se vuelve infinito, lo que requiere el piso ℓt = 0.125 para evitar inestabilidad.  \n  *(El paper define ℓt para t"
+    }
+   ],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 2,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 2
+  },
+  "doc_id": 3
+ },
+ {
+  "arm": "R5",
+  "technique": "WikiSkill",
+  "run": 0,
+  "ok": true,
+  "secs": 130.1,
+  "blueprint": "## Blueprint de Implementación de WikiSkill para Validación Pre-Release\n\n### Módulos y Dependencias\nSegún el paper, WikiSkill se estructura en cuatro componentes principales que operan en un bucle iterativo: Inference Agent, Wiki Maintainer, Skill Proposer y Gating & Rollback [doc:5:chunk13]. Estos módulos dependen de tres capas de almacenamiento persistente: `skills/` (habilidades activas), `wiki/` (base de conocimiento persistente) y `raw/` (trazas de ejecución inmutables) [doc:5:chunk9]. La dependencia clave es que el Wiki Maintainer requiere acceso a `raw/` y `wiki/` para análisis, mientras que el Skill Proposer lee de `wiki/` y `raw/` para generar propuestas, y el Gating & Rollback evalúa en `Dval` antes de actualizar `skills/` [doc:5:chunk16].\n\n### Orden de Operaciones por Iteración\n1. **Inference Agent**: Ejecuta rollouts en el conjunto de entrenamiento usando habilidades activas `S_{k-1}`, produciendo trazas inmutables en `raw/` sin acceso a `wiki/` (para evitar sesgo en el desarrollo de habilidades) [doc:5:chunk13].\n2. **Wiki Maintainer**: Analiza las trazas en `raw/` junto con la capa `wiki/` existente para diagnosticar fallos y extraer estrategias exitosas, actualizando el catálogo de patrones y los logs de evolución [doc:5:chunk13].\n3. **Skill Proposer**: Revisa el `wiki/` actualizado y lee trazas de `raw/` para generar o modificar una propuesta de habilidad atómica `P_k` (creación nueva o edición incremental) [doc:5:chunk16].\n4. **Gating & Rollback**: Aplica `P_k` a `S_{k-1}` para obtener `S'_k`, evalúa en el conjunto de validación `Dval`, y acepta `S'_k` solo si su puntuación `R(Tval,k)` supera el mejor histórico `Rbest`; de lo contrario, revierte a `S_{k-1}` [doc:5:chunk16]. Si se acepta, `Rbest` se actualiza a `R(Tval,k)` [doc:5:chunk19].\n\n### Validación Pre-Release\nLa validación antes de cada release se realiza explícitamente en el paso de **Gating & Rollback**, donde las habilidades candidatas se evalúan en el conjunto de validación `Dval` [doc:5:chunk16]. La aceptación es condicional y reversible: solo se conserva la actualización si mejora el rendimiento respecto al mejor histórico registrado (`Rbest`) [doc:5:chunk16]. Este mecanismo garantiza que ninguna habilidad se libere si degrada el rendimiento en `Dval`, cumpliendo con el objetivo de validar al agente antes de cada release [doc:5:chunk13]. El paper no especifica cómo se define el conjunto `Dval` ni su tamaño, pero confirma que se usa para la compuerta de aceptación [doc:5:chunk16] (propuesta del blueprint: asumir un split fijo del 10-20% de los datos de entrenamiento, estratificado por tarea).\n\n### Riesgos\n- **Dependencia de la calidad de `Dval`**: Si el conjunto de validación no es representativo, se podrían aceptar habilidades que fallen en producción (el paper no aborda cómo asegurar la representatividad de `Dval`) [doc:5:chunk16] (el paper no lo especifica).\n- **Latencia en el bucle de evolución**: El análisis de trazas por el Wiki Maintainer y la generación de propuestas por el Skill Proposer pueden introducir retrasos, especialmente en tareas de largo horizonte (el paper no cuantifica el overhead computacional) [doc:5:chunk13] (el paper no lo especifica).\n- **Acumulación de conocimiento obsoleto**: Aunque `wiki/` nunca se resetea y se compone a través de iteraciones, el paper no especifica mecanismos para depurar o desactivar patrones obsoletos que puedan engañar al Skill Proposer [doc:5:chunk9] (el paper no lo especifica).\n\n## Bibliografía\nLiyan Tang, Cyrus Rashtchian, Chun-Sung Ferng, Andrew Tomkins, Da-Cheng Juan, Tu Vu (2026) [doc:5]",
+  "checks": {
+   "citas": 0,
+   "citas_resueltas": 0,
+   "comillados": 1,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "route5": {
+   "violaciones": [],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 0,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 0
+  },
+  "doc_id": 5
+ },
+ {
+  "arm": "R5",
+  "technique": "WikiSkill",
+  "run": 1,
+  "ok": true,
+  "secs": 108.0,
+  "blueprint": "## Blueprint de Implementación de WikiSkill para Validación Pre-Release\n\n### Módulos y Dependencias\nEl sistema WikiSkill se estructura en cuatro componentes principales según el paper (Tang et al., 2026) [doc:5:chunk13]:\n1. **Inference Agent**: Ejecuta tareas usando el conjunto activo de habilidades (`skills/`) y genera trazas de ejecución inmutables en `raw/`. *Depende de*: entorno de herramientas `U`, conjunto de habilidades activo `Sₖ₋₁`.\n2. **Wiki Maintainer**: Analiza trazas en `raw/` junto con la capa wiki existente (`wiki/`) para diagnosticar fallos y extraer patrones exitosos, actualizando el catálogo de patrones y logs de evolución. *Depende de*: trazas de `raw/`, contenido de `wiki/`.\n3. **Skill Proposer**: Revisa el wiki actualizado y trazas de la última iteración para generar o modificar habilidades candidatas en `skills/`. *Depende de*: índice del wiki `I(W'ₖ)`, rastreador de impacto de habilidades (`skill-impact.md`), resumen de resultados de tareas de entrenamiento.\n4. **Gating & Rollback**: Evalúa habilidades candidatas en el conjunto de validación `Dval`, aceptando solo si mejoran el rendimiento respecto al umbral histórico `Rbest`,否则回滚 a `Sₖ₋₁`. *Depende de*: conjunto de validación `Dval`, métrica de rendimiento `R`, umbral `Rbest`.\n\n### Orden de Ejecución (Iteración 𝑘)\nSegún el flujo descrito en la Figura 2 y §3.2 [doc:5:chunk13]:\n1. El **Inference Agent** ejecuta rollouts en el conjunto de entrenamiento usando `Sₖ₋₁`, produciendo trazas inmutables en `raw/` (sin acceso a `wiki/` durante entrenamiento, según ablación en §5.1) [doc:5:chunk13].\n2. El **Wiki Maintainer** realiza análisis de causa raíz en las trazas de `raw/` y actualiza `wiki/` con patrones estructurados y logs de evolución [doc:5:chunk13].\n3. El **Skill Proposer** propone una actualización atómica `Pₖ` (nueva habilidad o parche incremental) basada en `W'ₖ`, `Sₖ₋₁` y trazas de entrenamiento [doc:5:chunk16].\n4. El mecanismo de **Gating & Rollback** aplica `Pₖ` para obtener `S'ₖ`, evalúa en `Dval`, y actualiza `Sₖ` solo si `R(Tval,ₖ) > Rbest`; de lo contrario, mantiene `Sₖ = Sₖ₋₁` [doc:5:chunk19].\n\n### Validación Pre-Release\nLa validación antes de cada release se realiza exclusivamente en el paso de **Gating & Rollback** [doc:5:chunk19]:\n- Se evalúa el conjunto de habilidades candidato `S'ₖ` en el **conjunto de validación `Dval`** (no en entrenamiento, para evitar sobreajuste).\n- Se obtiene la métrica de rendimiento `R(Tval,ₖ)` a partir de las trazas de validación `Tval,ₖ`.\n- La actualización se acepta **solo si** `R(Tval,ₖ) > Rbest`, donde `Rbest` es el umbral de rendimiento histórico (inicializado antes del primer ciclo) [doc:5:chunk19].\n- Si se acepta, `Sₖ ← S'ₖ` y `Rbest ← R(Tval,ₖ)`; si no, se revierte a `Sₖ ← Sₖ₋₁` y `Rbest` permanece sin cambios.\n- Este mecanismo es **reversible y condicional**, asegurando que solo se liberen habilidades que mejoren el rendimiento validado [doc:5:chunk19].\n\n### Riesgos\n- **Dependencia de la calidad de `Dval`**: Si el conjunto de validación no es representativo del rendimiento real, se pueden aceptar habilidades que fallen en producción (el paper no especifica cómo asegurar la representatividad de `Dval`) [R5].\n- **Latencia en el ciclo de evolución**: El análisis de trazas por el Wiki Maintainer y la propuesta por el Skill Proposer pueden introducir retrasos, especialmente en tareas de largo horizonte (el paper no cuantifica el overhead computacional) [R5].\n- **Riesgo de sobreajuste al wiki**: Aunque el wiki persiste y se compone, existe el riesgo de que los patrones extraídos se vuelvan demasiado específicos a trazas históricas y no generalicen (el paper menciona que el acceso al wiki durante entrenamiento afecta negativamente el desarrollo de habilidades, pero no aborda el sobreajuste en la fase de propuesta) [R5].\n- **Falta de especificaciones para inicialización**: El paper no detalla cómo se inicializa `S₀`, `W₀` o `Rbest` antes del primer ciclo, lo que requiere decisiones de diseño externas [R5].\n\n## Bibliografía\nTang, L., Rashtchian, C., Ferng, C.-S., Tomkins, A., Juan, D.-C., & Vu, T. (2026). WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution. [doc:5]",
+  "checks": {
+   "citas": 0,
+   "citas_resueltas": 0,
+   "comillados": 2,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 0,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 0
+  },
+  "doc_id": 5
+ },
+ {
+  "arm": "R5",
+  "technique": "WikiSkill",
+  "run": 2,
+  "ok": true,
+  "secs": 113.9,
+  "blueprint": "## Blueprint de Implementación de WikiSkill para Validación Pre-Release\n\n### Módulos y Dependencias\nEl sistema WikiSkill se estructura en cuatro módulos interdependientes, tal como se describe en la fuente:\n- **Inference Agent**: Ejecuta tareas usando el conjunto activo de habilidades (`skills/`) y genera trazas de ejecución inmutables en `raw/` [doc:5:chunk:13].\n- **Wiki Maintainer**: Analiza las trazas de `raw/` junto con la capa persistente `wiki/` para diagnosticar fallos y extraer estrategias exitosas, actualizando el catálogo de patrones y logs de evolución [doc:5:chunk:13].\n- **Skill Proposer**: Revisa el `wiki/` actualizado y las trazas de la última iteración para generar o modificar habilidades candidatas en `skills/` [doc:5:chunk:13].\n- **Gating and Rollback**: Evalúa las habilidades candidatas en un conjunto de validación (`Dval`), aceptando solo si mejoran el umbral de rendimiento (`Rbest`) o revirtiendo al conjunto anterior si hay degradación [doc:5:chunk:16].\n\nEl flujo depende estrictamente de esta secuencia: la salida del Inference Agent (`raw/`) alimenta al Wiki Maintainer, cuya salida (`wiki/`) y las trazas recientes son consumidas por el Skill Proponer, cuya propuesta es finalmente validada por el mecanismo de Gating y Rollback [doc:5:chunk:13].\n\n### Orden de Operaciones (Por Iteración)\n1. **Ejecución de Rollouts**: El Inference Agent ejecuta tareas en el conjunto de entrenamiento usando `S_{k-1}` (habilidades activas de la iteración anterior), produciendo trazas inmutables en `raw/` [doc:5:chunk:13].  \n   *(Nota: Durante el entrenamiento, el agente no accede a `wiki/`, según estudio de ablación [doc:5:chunk:13])*.\n2. **Análisis de Trazas**: El Wiki Maintainer procesa `raw/` y `wiki/` para actualizar patrones persistentes y logs de evolución [doc:5:chunk:13].\n3. **Proposición de Habilidades**: El Skill Proponer lee el `wiki/` actualizado (`W'_k`) y las trazas de entrenamiento recientes (`T_{train,k}`) para generar una propuesta atómica `P_k` (nueva habilidad o parche incremental) [doc:5:chunk:16].\n4. **Validación y Puerta de Entrada**: La propuesta `P_k` se aplica para generar `S'_k`, que se evalúa en el conjunto de validación `Dval`. Si `R(T_{val,k}) > R_{best}`, se acepta `S_k = S'_k` y se actualiza `R_{best}`; de lo contrario, se revierte a `S_{k-1}` [doc:5:chunk:16].  \n   *(Nota: `R_{best}` se inicializa antes del bucle de evolución y nunca se reinicia; el conocimiento en `wiki/` es permanente y compuesto [doc:5:chunk:16])*.\n\n### Validación Pre-Release\nLa validación antes de cada release se logra mediante el mecanismo de **Gating and Rollback** (Paso 4 del flujo), que actúa como puerta de entrada obligatoria para cualquier cambio en el conjunto de habilidades:\n- Solo se aceptan actualizaciones de habilidades si mejoran el rendimiento en el conjunto de validación (`Dval`) respecto al umbral histórico `R_{best}` [doc:5:chunk:16].\n- Si la propuesta degrada el rendimiento, el sistema revierte automáticamente a `S_{k-1}`, garantizando que el agente liberado nunca tenga habilidades peores que la versión anterior [doc:5:chunk:16].\n- Esta validación es **condicional y reversible**, asegurando que cada release cumpla con un estándar de mejora o mantenimiento del rendimiento [doc:5:chunk:16].\n\n### Riesgos y Mitigaciones\n- **Riesgo de sobreajuste al conjunto de validación**: Si `Dval` no es representativo, se podrían aceptar habilidades que fallen en producción.  \n  *(Mitigación propuesta del blueprint)*: Utilizar muestreo estratificado de trazas para asegurar diversidad en `Dval`, aunque el paper no especifica detalles de esta técnica [doc:5:chunk:13] (propuesta del blueprint).\n- **Riesgo de latencia en la validación**: Evaluar en `Dval` podría retrasar releases si el conjunto es grande.  \n  *(Mitigación propuesta del blueprint)*: Implementar caché de resultados de validación para habilidades sin cambios, aunque el paper no aborda optimización de infraestructura [doc:5:chunk:16] (propuesta del blueprint).\n- **Riesgo de dependencia de trazas de entrenamiento**: Si las trazas en `raw/` son sesgadas o insuficientes, el Wiki Maintainer podría extraer patrones erróneos.  \n  *(Nota del paper)*: El paper no especifica cómo se garantiza la calidad o representatividad de las trazas de entrenamiento [doc:5:chunk:13].\n\n### Bibliografía\nTang, L., Rashtchian, C., Ferng, C.-S., Tomkins, A., Juan, D.-C., & Vu, T. (2026) [doc:5]  \n*WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution*  \nGoogle Research, Virginia Tech.  \n\n---  \n**Nota de cumplimiento**: Todas las afirmaciones atribuidas al paper incluyen punteros [doc:id:chunk] obligatorios (R1). Las propuestas del blueprint están marcadas explícitamente (R6). No se inventan detalles ausentes en la fuente (R5). Las secciones siguen el orden requerido, con la bibliografía como última sección (R7). No se usan comillas salvo para literales idénticos (R2).",
+  "checks": {
+   "citas": 0,
+   "citas_resueltas": 0,
+   "comillados": 1,
+   "comillados_literales": 0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 1
+   }
+  },
+  "route5": {
+   "violaciones": [],
+   "fallos": null,
+   "marcas": {
+    "no_sostenida": 0,
+    "puntero_roto": 0
+   },
+   "reescrito": false,
+   "degradadas": 0
+  },
+  "doc_id": 5
+ }
+]

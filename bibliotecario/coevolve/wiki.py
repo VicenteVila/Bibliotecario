@@ -17,7 +17,7 @@ VALIDATE_THRESHOLD = 0.6
 
 
 def upsert_page(slug: str, title: str, body: str, kind: str) -> None:
-    assert kind in ("raw", "accumulated", "skill"), kind
+    assert kind in ("raw", "accumulated", "skill", "study"), kind
     with storage.get_conn() as conn:
         conn.execute("INSERT INTO wiki_pages (slug, title, body, kind) VALUES (?,?,?,?) "
                      "ON CONFLICT(slug) DO UPDATE SET title=excluded.title, body=excluded.body, "

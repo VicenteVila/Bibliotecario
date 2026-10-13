@@ -1,0 +1,300 @@
+[
+  {
+    "arm": "R5",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_etiqueta": 2,
+      "mecanico_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "Se asume que el LLM utilizado es GPT o similar, aunque el paper no especifica el modelo.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Se menciona un marco de redes neuronales de grafos (GNN) concreto para implementar el BGNN, aunque el paper no indica cuál se emplea.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok_antes": true,
+    "r4_ok_ahora": true,
+    "acusaciones_antes": 0,
+    "acusaciones_ahora": 0,
+    "via": {},
+    "restantes": []
+  },
+  {
+    "arm": "R5",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_etiqueta": 2,
+      "mecanico_marcado": 1
+    },
+    "restantes": [
+      {
+        "claim": "Módulo de Construcción del Procedural Graph (PG Builder)",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Módulo de Retroalimentación y Evolución del Grafo (Graph Mutator)",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint afirma que el módulo \"Extractor de Triplets de Procedimiento\" extrae triplets del historial de ejecución del agente durante pruebas pre‑release, aunque el paper no menciona extracción de ",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "Se menciona que el \"Constructor y Mutador de Grafo\" actualiza el grafo añadiendo nodos y aristas basados en feedback de éxito/fallo, sin que el paper describa tal mecanismo de mutación dinámica.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint describe un \"Modelo de Guía Situacional\" que sesga la acción siguiente del solver, pero el paper solo indica que el modelo localiza el nodo activo y traduce el subgrafo, sin hablar de bia",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_etiqueta": 2,
+      "juez_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "El marco de Procedural Graphs se actualiza nightly sobre logs de CI",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El Guidance Model es un clasificador ligero (ej. MLP) entrenado para predecir la probabilidad de éxito",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 1,
+    "via": {
+      "mecanico_marcado": 1,
+      "juez_etiqueta": 1,
+      "mecanico_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "Módulo de Memoria de Experimentos Recientes: dependencia de buffer circular experiments.db",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "\"se carga una vez al iniciar el agente y permanece inmutable durante la sesión\" (no mencionado en la fuente)",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "\"Validar que todos los elementos mencionados estén presentes en el prompt de cada turno\" (no respaldado por la fuente)",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "\"Validar que la tabla tenga exactamente 20 entradas o menos\" (no especificado en la fuente)",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 1,
+    "via": {
+      "mecanico_en_fuente": 2,
+      "juez_etiqueta": 1
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint afirma que el ancla ¯pt se fija antes de la muestra, algo que no aparece en el paper.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 1,
+    "via": {
+      "juez_etiqueta": 1,
+      "mecanico_marcado": 1,
+      "mecanico_en_fuente": 1
+    },
+    "restantes": [
+      {
+        "claim": "Módulo de Memoria de Experimentos Recientes depende de `experiments.db`, que no aparece en la fuente.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok_antes": true,
+    "r4_ok_ahora": true,
+    "acusaciones_antes": 0,
+    "acusaciones_ahora": 0,
+    "via": {},
+    "restantes": []
+  },
+  {
+    "arm": "R5",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 2,
+    "acusaciones_ahora": 2,
+    "via": {
+      "juez_etiqueta": 2
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint menciona que los dos harnesses iniciales son \"Terminus 2\" y \"primer candidato\", aunque el paper solo indica que se evalúan dos harnesses iniciales sin especificar nombres.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint afirma que el paper no explica cómo manejar tareas con nt=0 sin usar el piso ℓt, cuando el paper sí define ℓt como un piso positivo para tareas nunca resueltas.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint asume que el conjunto de validación Dval es un split fijo del 10‑20 % de los datos de entrenamiento, estratificado por tarea, aunque el paper no menciona esta definición ni el tamaño de D",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint sugiere que el análisis de trazas por el Wiki Maintainer y la generación de propuestas por el Skill Proposer pueden introducir retrasos significativos en tareas de largo horizonte, sin qu",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint propone que el sistema debe depurar o desactivar patrones obsoletos en la wiki, aunque el paper no describe ningún mecanismo de limpieza o desactivación de patrones.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok_antes": true,
+    "r4_ok_ahora": true,
+    "acusaciones_antes": 0,
+    "acusaciones_ahora": 0,
+    "via": {},
+    "restantes": []
+  },
+  {
+    "arm": "R5",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok_antes": false,
+    "r4_ok_ahora": false,
+    "acusaciones_antes": 3,
+    "acusaciones_ahora": 3,
+    "via": {
+      "juez_etiqueta": 3
+    },
+    "restantes": [
+      {
+        "claim": "El blueprint propone usar muestreo estratificado de trazas para evitar sobreajuste al conjunto de validación, aunque el paper no menciona esta técnica.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint sugiere implementar caché de resultados de validación para reducir latencia, aunque el paper no aborda optimización de infraestructura.",
+        "via": "juez_etiqueta"
+      },
+      {
+        "claim": "El blueprint señala que la dependencia de trazas de entrenamiento puede llevar a patrones erróneos, sin que el paper garantice la calidad o representatividad de dichas trazas.",
+        "via": "juez_etiqueta"
+      }
+    ]
+  },
+  {
+    "arm": "R5",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok_antes": true,
+    "r4_ok_ahora": true,
+    "acusaciones_antes": 0,
+    "acusaciones_ahora": 0,
+    "via": {},
+    "restantes": []
+  }
+]
