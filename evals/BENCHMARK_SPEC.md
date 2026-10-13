@@ -1,0 +1,392 @@
+# Especificación del Benchmark
+
+> **Documento congelado.** Se declara **antes** de medir. Si algo aquí cambia, se
+> declara como *benchmark nuevo con línea base nueva* — nunca en silencio, nunca
+> mezclando series.
+>
+> Fundamento: `Documentos/Stop Comparing LLM Agents Without Disclosing the Harness.pdf`
+> y `Documentos/EVO-BENCH CAN LANGUAGE MODELS IMPROVE AGENT HARNESS.pdf`.
+> **Estado: PROPUESTO — pendiente de ratificación.**
+
+---
+
+## 0. Qué es este documento y qué no
+
+**Es** la regla fija con la que se dice si un arnés funciona.
+
+**No es** un resultado. No hay ningún número medido bajo esta especificación todavía.
+
+**Y aclara un punto que estaba ambigüo:** los números del Hito 0-2 **no son
+resultados de benchmark**. Son **diagnóstico de QA**: no había `D^eval`, ni
+Harness Card, ni criterio `Sens(x)`, ni presupuesto, ni bases. Siguen siendo
+útiles — pero **no se comparan entre sí como si fueran un experimento.**
+
+---
+
+## 1. Propósito
+
+Responder a **una sola pregunta**, de la forma más dura posible:
+
+> **¿El arnés diseñado por el agente, con un corpus que crece, funciona mejor
+> que el arnés de partida — y es mejor por el conocimiento que leyó, no por
+> casualidad?**
+
+Para que esa respuesta sea atribuible, hace falta **inmutabilidad del benchmark**
+y **varianza por arnés medible**. Las dos cosas se declaran aquí.
+
+---
+
+## 2. Estructura en dos capas
+
+El sistema evalúa dos cosas distintas que **no se confunden**:
+
+| capa | qué mide | estado |
+|---|---|---|
+| **A — Fidelidad del diseño** | ¿el arnés se apoya en la fuente y no inventa? | ✅ **existe**, umbrales ya declarados en Hito 0-2 |
+| **B — Rendimiento del arnés** | ¿el arnés cumple su cometido? | ❌ **no existe** — hay que construirla |
+
+**Relación:** A es **puerta de paso**, B es **resultado**. Un arnés que no pasa
+A no llega a ser juzgado en B. Pero pasar A **no es éxito** — es el mínimo para
+que el resultado de B sea interpretable.
+
+*Evo-Bench* mide solo B (tareas resueltas). *Stop Comparing* exige declarar el
+arnés para que B sea atribuible. Nosotros necesitamos las dos: **A porque el
+conocimiento viene de papers, B porque de lo contrario no sabemos si sirve.**
+
+---
+
+## 2.1 La distinción estructural: ETCSOVG es invariante, el arnés no
+
+> *«un agente que diseñe páginas web no debería tener el mismo arnés idéntico que
+> un agente que diseñe juegos de plataformas, a pesar de que el principio rector
+> ETCSOVG sea el mismo»*
+
+| | qué es | ¿cambia por dominio? |
+|---|---|---|
+| **ETCSOVG** | el **vocabulario de declaración** — las 7 capas que todo arnés tiene | **NO** |
+| **Contenido de cada capa** | lo que **hay dentro** | **SÍ** — web ≠ juegos |
+| **Disciplina del benchmark** | congelados, `D^eval`, `Sens`, presupuesto | **NO** |
+| **Suite / scorer / `Overall(d)`** | **qué significa «cumplir»** en ese dominio | **SÍ** |
+
+**Consecuencias operativas:**
+
+1. `Overall` es **por dominio**: `Overall(d, H)`. **Nunca se comparan notas entre
+   dominios** — un 47 en web no es un 47 en juegos.
+2. Arneses de dominios distintos **solo se comparan a nivel ETCSOVG**: qué capas
+   están débiles, qué cambió, por qué se espera que afecte a estabilidad / deriva
+   / lag de control.
+3. Si se quiere una cifra global de «¿mejora el agente?», el **peso entre dominios
+   se declara antes de medir** (Evo-Bench usa 2:2:1).
+
+**Y esto es el mecanismo de transferencia:** los papers enseñan principios
+**generales** (domain-agnostic, ETCSOVG); el dominio es donde se prueba que los
+entendió. Aplicar una idea de *Harness-of-Harness* —que nunca habló de
+videojuegos— a un arnés de juegos **es transferencia**, y solo es medible si el
+dominio `d` y su `D^eval_d` están congelados y ocultos.
+
+---
+
+## 3. Congelados
+
+Esto **no se toca** durante ninguna ejecución. Cualquier cambio requiere
+declaración formal de benchmark nuevo.
+
+### 3.1 Identidad del experimento
+- **Dominios** — ver §4.0. Lista cerrada; añadir un dominio = benchmark nuevo.
+- **Modelo de política** — uno solo, fijo en todas las celdas.
+- **Configuración de endpoint** — idéntica en todos los arneses. **Ningún ajuste
+  de API específico de arnés** (*«intentionally a harness study rather than a
+  decoding study»*).
+- **Juez** — `gemini-3.1-flash-lite`, `temperature=0`, JSON forzado.
+  **Ya caracterizado** (§8.12/§8.13): 0% flips, 0 fallos, discrimina.
+  *No se vuelve a calibrar. No se cambia a mitad de serie.*
+- **Prompt del juez** y su plantilla — fijos.
+- **Suites** `D^val` y `D^eval`, sus tamaños y sus repartos.
+- **Semilla** del split y de cualquier muestreo — declarada.
+- **Guion de evaluación** / pipeline de scorers.
+- **Orden de tareas** y **entorno de ejecución**.
+- **Parámetros de API** (salida máxima, *timeout*, configuración por defecto).
+- **Reglas de parada** y **presupuesto**.
+- **Lógica de agregación** y definiciones de métrica.
+- **Harness Card de cada arnés** — congelada al declarar el brazo.
+
+### 3.2 Lo único que varía
+**El arnés.** Es el factor controlado. Nada más.
+
+### 3.3 Qué queda fuera del alcance
+Comparar **modelos**. El modelo está fijo. Cualquier afirmación tipo
+«modelo X es mejor» queda **fuera de lo que este benchmark puede decir**.
+
+---
+
+## 4. Suites: `D^val` y `D^eval`
+
+### 4.0 Dominios declarados
+
+**Lista cerrada.** Añadir un dominio = benchmark nuevo con línea base nueva.
+
+| dominio | arnés | suite existente | scorer |
+|---|---|---|---|
+| **`web_development`** | **ReaWeb** (`c:\EW`) | `reaweb-harness/benchmark/tasks.yaml` — **14 tareas** | evaluator 10 ejes, *blocking gate* → techo **40** |
+| **`game_development`** | **ReaGame** (`c:\EG`) | `EG/benchmark/game_tasks.yaml` — **8 tareas** (4 arquetipos × 2) | evaluator 12 ejes, *gates P0* → techo **40** |
+
+**Por qué estos dos y no los 14 de CogniTeam:** son los **únicos** con un arnés
+real construido y con suite de tareas fija. CogniTeam define 14 dominios / 61
+arquetipos, pero solo 5 están «soportados» y **solo 2 tienen arnés**. Los demás
+entran cuando tengan arnés — declaración de extensión, no de cambio.
+
+**Base del cometido por dominio:** cada arquetipo declara su misión en
+`archetype.yaml` — `objetivo_principal`, `features_obligatorias`, KPIs.
+*En CogniTeam no existe el término «cometido»*: el equivalente es el contrato
+`structure` + `verification` del arquetipo. **Ojo: solo 24/61 arquetipos definen
+`structure` y 17/61 `verification` — los demás pasan la compuerta vacía
+(`return {"passed": True, ..., "score": 1.0}`).** Eso es un agujero que el
+benchmark no puede heredar.
+
+### 4.1 Regla de partición
+
+| suite | rol | ¿el agente la ve? | ¿devuelve evidencia? |
+|---|---|---|---|
+| **`D^val`** | validación visible — se usa para iterar | **sí** | sí |
+| **`D^eval`** | evaluación final | **no** | **cero** — solo tras congelar el arnés |
+
+> *«During evolution, the evolver can request validation evaluations only on
+> `D^val`, while `D^eval` is reserved for final evaluation after the harness is
+> frozen.»* — Evo-Bench §3
+
+**Regla dura:** `D^eval` **nunca** se usa para elegir prompts, arneses o
+umbrales. Si se usa, deja de ser `D^eval` — se destruye y se crea otra con
+declaración de benchmark nuevo.
+
+### 4.2 Criterio de sensibilidad `Sens(x)` — **requisito de entrada**
+
+Una pregunta/task **solo entra** en el benchmark si **responde a cambios de arnés**.
+
+```
+Sens(x) = corr_pearson( {m_h(x)}_{h ∈ H_aux} , {Q_h^(−x)}_{h ∈ H_aux} )
+```
+donde `m_h(x)` = score de `x` bajo arnés `h`, y `Q_h^(−x)` = calidad *leave-one-out*
+del arnés `h` sobre el resto.
+
+**Regla: `Sens(x) ≤ 0` → descartada.** Justificación de Evo-Bench §4.2:
+*«high variance only captures the magnitude of performance differences and does
+not indicate whether these differences reflect the relative quality of harnesses.»*
+
+- Reparto: estratificado por dificultad, **distribuciones idénticas** entre
+  `D^val` y `D^eval`.
+- `H_aux` = conjunto fijo de arneses representativos usados para calcular la
+  sensibilidad. **Se congela** al construirlo.
+- **Criterio `Sens > 0` — declarado ahora, antes de medir.**
+
+### 4.3 Requisito técnico previo
+Calcular `Sens(x)` **exige score por pregunta**, no agregado.
+Hoy `result_q1_r4_all.json` guarda `r4_ok` booleano por brazo → **insuficiente.**
+→ *Acción previa: re-juzgar a nivel de pregunta.*
+
+---
+
+## 5. Métricas
+
+### 5.1 Capa A — Fidelidad del diseño
+
+Umbrales **ya declarados en Hito 0-2. Se mantienen intactos — no se re-bajan.**
+
+| métrica | umbral | estado |
+|---|---|---|
+| `R4` atribución | **≥ 8/15** | ✅ medido (E, 9/15) — §8.13 |
+| `R5` cita a fuente | **≥ 10/15** | ✅ medido (G, 13/15) — §8.12 |
+| `B5` cita en **cada** módulo | **100%** | ✅ medido — §8.9 (95,8% → lista de revisión) |
+| `R1` / `R2` / `R3` | umbrales Hito 0-2 | preservados |
+| Parseo del juez | **0 fallos** | ✅ §8.12/8.13 |
+
+> **Nota de régimen:** `B5` a **100%** con clasificación mecánica + revisión
+> humana obligatoria (dec. 17). Si `B5` llegara a re-bajarse, sería una violación
+> de §7 del `PROPOSITO.md`.
+
+### 5.2 Capa B — Rendimiento del arnés *(por construir)*
+
+| métrica | definición | dirección | fuente |
+|---|---|---|---|
+| **`Overall`** | score de `H_T` congelado en `D^eval` | ↑ | Evo-Bench |
+| **`AnytimeVal`** | media del mejor-so-far sobre el presupuesto; si cortas antes, **se arranca el resto** | ↑ | Evo-Bench |
+| **Scores por dominio** | desglose | ↑ | Evo-Bench |
+| **`RR(k)`** | prob. de volver a estado que avanza la tarea en ≤ `k` pasos. **Curva en `k ∈ {1,3,5,10}`**, no un número | ↑ | Stop Comparing |
+| **Context Retention** | fracción de archivos/tests/restricciones relevantes presentes en el contexto por paso | ↑ | Stop Comparing |
+| **Control Lag `τ`** | pasos entre anomalía detectada y señal correctora que llega a la política | ↓ | Stop Comparing |
+| **Recursos** | coste USD · tokens · **tiempo secuencial** | ↓ | Stop Comparing |
+
+> *«RR(k) as a curve over k ∈ {1,3,5,10}… preferable to a single number because
+> the choice of k trades promptness against eventual recovery.»* — Stop Comparing §5
+
+### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
+
+Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el
+modelo, **se reportan los cinco**, sin excepción:
+
+1. `HV` por modelo
+2. `MV` por arnés
+3. ratio `HV/MV`
+4. **recuento de inversiones de ranking** entre pares de modelos × pares de arneses
+5. `η²_p` — **siempre junto con** `ω²` o intervalo bootstrap **y** con el recuento
+   de inversiones. *«a large η²_p is neither necessary nor sufficient for ranking flips»*
+
+### 5.4 Instrumentación obligatoria: **TraceForge**
+
+Las tres métricas de trayectoria que *Stop Comparing* exige — **`RR(k)`**,
+**Context Retention** y **Control Lag `τ`** — **no se pueden medir sin trazar**.
+Son intrínsecamente temporales: necesitan saber qué vio el modelo en cada paso,
+qué anomalía se detectó y cuándo llegó la señal correctora.
+
+**`TraceForge` (`c:\TraceForge`) es el instrumento.** No es un añadido: es
+**requisito de medición** de §5.2. Sin él, `RR(k)`, Context Retention y `τ`
+quedan **no medibles** y el benchmark está incompleto.
+
+| lo que *Stop Comparing* exige | lo que TraceForge da |
+|---|---|
+| traza persistente con jerarquía de llamadas | `@trace()` / `span()`, `trace_id` que fluye por toda la ejecución |
+| coste por paso | coste automático por modelo (200+) |
+| latencia por nodo | duración por span + *streaming* (TTFT, *throughput*) |
+| auditoría de fallos post-ejecución | SQLite + CLI + informe HTML/Gantt + dashboard |
+| — | export **OpenTelemetry**, enmascaro **PII**, soporte *async* |
+
+**También cubre la capa `O` de ETCSOVG**, que es la más débil en *ambos* arneses:
+ReaWeb fue criticado exactamente por eso — *«echo de menos OpenTelemetry /
+Langfuse / Arize Phoenix… el BudgetTracker es reactivo, no analítico»*.
+
+> **Congelado:** el esquema de traza, los campos capturados y el punto de
+> instrumentación. Cambiar la instrumentación a mitad de serie invalida `RR(k)`.
+
+---
+
+## 6. Harness Card — **obligatoria para cada arnés**
+
+Sin ella, **el resultado no se publica.** Siete capas, todos los campos:
+
+| capa | campos mínimos |
+|---|---|
+| **E — Execution** | sustrato de ejecución, *sandbox*, acceso a FS, acceso a red, *timeout* de tarea, *timeout* de paso, máx. pasos, punto de entrada de evaluación |
+| **T — Tool** | lista de herramientas, estilo de esquema, política de selección, formato de error, clases de error reintentables, ¿visibles al modelo o *middleware* oculto |
+| **C — Context** | tope de contexto, política de orden, política de compresión/resumen, método de recuperación, memoria persistente, política de caché |
+| **S — Scheduling** | bucle del agente, regla de parada, política de reintento, escalada, delegación, *rollback* |
+| **O — Observability** | artefactos registrados, formato de trayectoria, *checkpoints*, trazas, logs de validación, ¿los fallos se pueden auditar después? |
+| **V — Verification** | parser de salida, validación de esquema, autochequeo, ejecución de tests, detección de anomalías, validación de parche final |
+| **G — Governance** | modelo de permisos, listas permitido/denegado, límites de efectos secundarios, manejo de secretos, puntos de aprobación humana |
+
+> *«A submission can provide more detail, but omitting any of these fields makes
+> it difficult to separate model effects from harness effects.»* — Stop Comparing, Tabla 3
+
+**Además se declara** qué capa(s) cambió este arnés respecto al anterior y **por
+qué se espera que afecte a estabilidad, deriva o lag de control** — una
+diferencia de arnés solo cuenta como *significativa* si cumple eso.
+
+---
+
+## 7. Presupuesto
+
+| parámetro | valor propuesto | estado |
+|---|---|---|
+| iteraciones | *(a declarar)* | **propuesto** |
+| pasos | *(a declarar)* | **propuesto** |
+| tiempo | *(a declarar)* | **propuesto** |
+| *snapshot* | cada evaluación consume **una** iteración; evalúa **instantánea inmutable**; **máx. 1 evaluación activa** | — |
+| presupuesto agotado | se **congela el mejor** y se pasa a `D^eval` | — |
+
+> Regla Evo-Bench: *«Analyze while evaluations run and restore the best revision
+> before freezing.»* — **no se congela el último, se congela el mejor.**
+
+**Criterio de la hipótesis:** **una hipótesis falsificable por iteración.**
+No se hacen ediciones empaquetadas.
+
+---
+
+## 8. Bases de referencia (fuera del ranking)
+
+| base | papel | `web_development` | `game_development` |
+|---|---|---|---|
+| **Semilla `H0`** | **suelo absoluto** — qué gana el diseño | *Prueba Gemini* (`c:\EW`) — modelo sin arnés: **69/100, 9/13 checks** | generación sin iteración (`curve[0]`) |
+| **Humano** | **techo** — qué queda por ganar | portfolio *Nora Velez* hecho a mano | `workspace/current` **curado a mano** (sprites + mapas + cables) |
+| **Arnés de referencia** | **techo ingenieril** | *(a declarar)* | *(a declarar)* |
+
+Sin las dos o tres, «mejoró» no significa nada: mejoró *respecto a qué*.
+
+> ⚠ **Advertencia sobre el techo de juegos:** el `workspace/current` de ReaGame
+> está **curado a mano** (los propios `lessons.md` lo etiquetan `[manual]`).
+> No es un techo de agente — es un techo humano. **Está bien usarlo como tal,
+> pero hay que declararlo como humano, no como agente.**
+
+---
+
+## 9. Protocolo de ejecución
+
+1. **Congelar** todo lo de §3 y **registrar la Harness Card** del brazo.
+2. **Fijar presupuesto** (§7) y **semilla**.
+3. **Iterar** solo contra `D^val`:
+   `diagnosticar → 1 hipótesis falsificable → editar → preflight barato →
+   evaluar snapshot inmutable → retener o revertir`
+4. **Congelar el mejor**, no el último.
+5. **Abrir `D^eval` una sola vez**, sin devolver evidencia.
+6. **Reportar** `Overall`, `AnytimeVal`, `RR(k)`, Context Retention, `τ`,
+   recursos, y la **Harness Card**.
+7. **Declarar** si pasó la **puerta A** (fidelidad) **antes** de leer el resultado de B.
+
+### Prohibiciones
+- ✗ Comparar sin Harness Card.
+- ✗ Re-bajar cualquier umbral de §5.1.
+- ✗ Usar `D^eval` para iterar.
+- ✗ Ajustar la API de forma específica de arnés.
+- ✗ Atribuir la mejora al modelo (el modelo está fijo).
+- ✗ Reportar solo un número de `RR` en vez de la curva.
+- ✗ Publicar sin recursos (coste, tokens, tiempo secuencial).
+
+---
+
+## 10. Lo que hay que construir antes de poder medir
+
+| # | pieza | bloquea | estado |
+|---|---|---|---|
+| 1 | **Re-juzgar a nivel de pregunta** → `m_h(x)` | `Sens(x)` | pendiente |
+| 2 | **Construir `H_aux`** y calcular `Sens(x)` | selección de preguntas | pendiente |
+| 3 | **Crear `D^eval` por dominio**, congelada y oculta | cualquier resultado de Capa B | **no existe** — ver §10.1 |
+| 4 | **Harness Cards** de los 8 brazos + ReaWeb + ReaGame | publicar | pendiente |
+| 5 | ~~Especificar el dominio de la Capa B~~ | — | ✅ **resuelto** → §4.0 |
+| 6 | **Semilla `H0` y base humana** | interpretabilidad | candidatos → §8 |
+| 7 | **Presupuesto** (iter/pasos/tiempo) | el loop | pendiente |
+| 8 | **Instrumentar con TraceForge** | `RR(k)`, Context Retention, `τ` | pendiente → §5.4 |
+| 9 | **Cerrar el agujero de arquetipos sin `structure`/`verification`** | el cometido es vacío en 37/61 | pendiente |
+
+### 10.1 Hallazgo crítico: **no existe ningún `D^eval` en todo el ecosistema**
+
+Revisados `Bibliotecario`, `CogniTeam`, `ReaWeb` y `ReaGame`:
+
+| | ¿hay `D^val`/`D^eval`? | ¿todo visible? |
+|---|---|---|
+| Bibliotecario | no | QA iterado contra prompts → contaminado |
+| CogniTeam | no — `evals/classification.yaml` (123 casos, solo clasificación) | sí |
+| ReaWeb | **no** — 14 tareas fijas en `tasks.yaml`, **inyectadas al prompt** | **sí** |
+| ReaGame | **no** — 8 tareas en `game_tasks.yaml`, **inyectadas al prompt** | **sí** |
+
+**El agente puede leer su propio evaluador, sus reglas y su suite.** La única
+cosa parecida a un *holdout* es el *gate* de aceptación `train`/`dev` de
+ReaGame — **y sus defaults siguen siendo tareas web** (`landing-page`,
+`ecommerce`) de ReaWeb, y **nunca se ha usado** (`harness_edits`: 0 filas).
+
+**Traducción:** el criterio central de Evo-Bench (*«evaluation-suite tasks are
+unavailable»*) **se cumple en cero proyectos**. Crear `D^eval` no es un detalle:
+**es lo primero que hace falta.**
+
+### 10.2 Otros hallazgos que condicionan el diseño
+
+- **Umbrales ya declarados y validados en dominio:** ambos arneses usan **techo
+  40** por *gates* P0. En ReaGame se validó empíricamente: **80 → 40** cuando el
+  gate detectó un juego sin cablear. **Ese umbral está declarado antes de medir
+  y no se debe tocar.**
+- **La comparabilidad por `task_hash` es frágil:** *ReaGame* demostró que
+  quitar los acentos cambia el hash (`4dfaa8fe…` vs `501c8e9b…`) y rompe la
+  serie. **Normalizar antes de hashear** — congelado nuevo.
+- **ReaGame: 7 de 8 tareas de la suite nunca se han ejecutado** y no existe
+  `leaderboard.*`. El runner tiene además `best = last` en vez de `max`.
+- **Meta-evolución nunca ha disparado:** `harness_edits = 0` en ReaGame;
+  en Bibliotecario `skills = 0`, `memory_items = 0`. **El bucle de mejora
+  existe y no se ha ejecutado nunca.**
+
+---
