@@ -124,6 +124,21 @@ Se declaran como `technique: null` en vez de inventarles un método:
 > instrumento de ablación reutilizable. **No son técnicas que sembrar; son
 > mediciones que citar.**
 
+> #### El conocimiento es usable, no solo almacenado *(2026-10-14)*
+>
+> Verificado sin tocar el grafo: `list_procedures()` devuelve las técnicas
+> nuevas con sus procedimientos — `HarnessDev` 7 · `SoL-Pi` 10 · `MetaSkill` 10
+> · `HARDE` 10 · `Agent as Its Own Optimizer` 7.
+>
+> `build_blueprint('HarnessDev', …)` generó un blueprint **con citas reales al
+> paper** (`doc:0:0`, `doc:0:6`, `doc:0:14`, `doc:0:1`, `doc:0:7`) cubriendo las
+> dos etapas del método, el contrato del *seed* y los **dos ejes de evaluación
+> (capacidad + eficiencia en tokens)**.
+>
+> → **El ciclo corpus → grafo → blueprint funciona de punta a punta** con el
+> conocimiento recién ingerido.
+
+
 
 ---
 
@@ -467,6 +482,8 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | 17 | **B-1 está construido pero nunca ha medido un juego real** — el workspace actual es una escena rota; falta correr la suite tras una generación | `evals/preflight/suite_runner.py` |
 | 18 | **`main.tscn` de ReaGame está roto** — el jugador cae sin aterrizar; `levels/mision1.tscn` sí funciona | §6.1 de `CONOCIMIENTO.md` |
 | ~~19~~ | ~~**`seed.py` sigue con 5 técnicas**~~ | ✅ **RESUELTO 2026-10-14** — 14 técnicas · 98 procedimientos · §3.4 |
+| 20 | **El modelo por defecto de Groq ya no existe** — `llama-3.3-70b-versatile` devuelve **HTTP 404 `model_not_found`**; la key además da **403** en `/models` y de forma intermitente en llamadas | `bibliotecario/config.py:15` · decisión del dueño de la key |
+| 21 | **Bug corregido: `chat_template_kwargs` se enviaba a Groq** — parámetro vLLM que Groq rechaza con HTTP 400 y **tumbaba el fallback del round-robin entero** | `bibliotecario/core/llm.py:147` — **arreglado 2026-10-14** |
 
 ---
 

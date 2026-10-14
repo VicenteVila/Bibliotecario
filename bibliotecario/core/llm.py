@@ -144,7 +144,11 @@ def _openai_compat_usage(base_url: str, api_key: str, model: str, prompt: str,
     payload = {"model": model,
                "messages": [{"role": "user", "content": prompt}],
                "max_tokens": max_tokens, "temperature": temperature}
-    if no_think:  # Nemotron/GLM: sin esto el razonamiento se filtra en content
+    # `chat_template_kwargs` es un parámetro de la plantilla vLLM (Nemotron/GLM):
+    # sin él el razonamiento se filtra en `content`. Groq NO lo admite y devuelve
+    # HTTP 400 `property 'chat_template_kwargs' is unsupported`, lo que tumbo
+    # el fallback entero del round-robin. Se envía salvo a Groq.
+    if no_think and "groq.com" not in base_url:
         payload["chat_template_kwargs"] = {"enable_thinking": False}
     req = urllib.request.Request(
         base_url.rstrip("/") + "/chat/completions", data=json.dumps(payload).encode(),
