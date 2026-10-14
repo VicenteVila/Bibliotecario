@@ -1,0 +1,41 @@
+# Suite estilo v1 (solo kind's de v1) para el MISMO fixture.
+# Sirve para demostrar que v1 aprueba el fixture roto (solo mira existencia)
+# mientras v2 lo reprueba.
+task: v1-fixture
+checks:
+  - id: build
+    kind: build
+    desc: "carga la escena"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador]
+    desc: "hay jugador"
+  - id: jugador-mueve
+    kind: moves
+    names: [Player]
+    action: ui_right
+    frames: 60
+    desc: "el jugador se mueve"
+  - id: moneda-existe
+    kind: node_exists
+    names: [Coin, Moneda]
+    desc: "hay moneda"
+  - id: meta-existe
+    kind: node_exists
+    names: [Goal, Meta]
+    desc: "hay meta"
+  - id: hud-existe
+    kind: canvas
+    desc: "hay HUD"
+  - id: hud-puntos
+    kind: label_match
+    text: puntos
+    desc: "el HUD muestra puntos"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, WinLabel]
+    desc: "hay estado de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reiniciar]
+    desc: "hay mecanismo de reinicio"

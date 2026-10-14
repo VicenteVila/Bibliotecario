@@ -520,6 +520,12 @@ Aunque se añadiera un `kind` que conduzca a un final, **el techo lo impide**.
 > resetea estado). **Pero el motor está congelado en §11**: añadir `kind`s
 > exige declarar **versión nueva del benchmark**, que es decisión del dueño —
 > **no se hace aquí unilateralmente.**
+>
+> **HECHO 2026-10-14 (enmienda 2, §11):** el dueño autorizó **A1**. Los 5 `kind`s
+> se implementaron en **`check_suite_v2.gd`** (archivo nuevo; v1 intacto) y se
+> validaron: v2 separa un fixture cableado de uno roto por **83.33 puntos**, donde
+> v1 los puntúa igual. **La brecha queda cerrada para las 60 tareas** — pero v2
+> es un benchmark nuevo y su uso en medición real requiere ratificación propia.
 
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
@@ -866,7 +872,7 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☑ **2026-10-14** |
 | **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☑ **2026-10-14** |
 | **§5.2.1 regla**: B-2 no se ratifica hasta que B-1 funcione end-to-end | sí | ☑ **2026-10-14** |
-| **§5.2.1 congelados B-1**: Godot 4.7.1, conjunto de tests, comando de ejecución | sí | ☑ **2026-10-14** |
+| **§5.2.1 congelados B-1**: Godot 4.7.1, conjunto de tests, comando de ejecución | sí | ☑ **2026-10-14** — *v1 intacto; v2 añadido como benchmark nuevo (enm. 2)* |
 | §5.4 instrumentación TraceForge obligatoria | sí | ☐ *sin ratificar* |
 | §6 Harness Card obligatoria | sí | ☐ *sin ratificar* |
 | §8 base semilla `H0` | *(candidatos en §8)* | ☐ *pendiente de valor* |
@@ -892,6 +898,28 @@ aquí con fecha y motivo — no se reescribe en silencio.)*
 | **por qué es correcto** | si B-1 y B-2 se construyeran a la vez **no se podría separar la varianza del juez de la varianza del arnés**. Primero el suelo determinista, después la capa de juicio. |
 | **artefacto** | `EG/.tools/godot` 4.7.1 · test `test_behaviour.gd` — **copia temporal, ReaGame no modificado** |
 | **ratificación** | **pendiente** — ver §11 |
+
+#### Enmienda 2 — *B-1 v2: se cierra la brecha de §5.2.2 con 5 `kind`s nuevos* · 2026-10-14
+
+| | |
+|---|---|
+| **objeto** | motor B-1 (`check_suite.gd`) — **versión nueva del benchmark**, no enmienda del congelado |
+| **antes (v1)** | 13 `kind`s: 8 estructurales + 5 cinéticos. **31 de 60 tareas** quedaban sin cobertura de comportamiento (§5.2.2). Victoria/derrota/reinicio sólo se comprobaban como `node_exists` sobre un nodo *llamado* Win/Restart. |
+| **ahora (v2)** | **18 `kind`s** = los 13 de v1 **+ 5 nuevos**: `hud_value_changes` · `state_after_action` · `wait_accumulates` · `reaches_state` · `restart_resets`. v2 observa **cambios en el tiempo**, no sólo existencia. |
+| **qué NO cambia** | **v1 queda intacto y runnable** (`check_suite.gd` + `suite_runner.py` sin tocar — `git diff` vacío). El motor de v2 es un **archivo nuevo** `check_suite_v2.gd`. Godot sigue siendo **4.7.1**. La fórmula, `BUILD=0` y los pesos son idénticos. |
+| **motivo** | §5.2.2 declaró, tras auditar las 15 familias, que B-1 **no cubría 31 de 60 tareas**: los 5 `kind`s cinéticos sólo aplican a avatares que se mueven por el espacio, y en Card/Idle/Rhythm/VN/Strategy/Tycoon/Simulation/Puzzle la verificación colapsaba al evaluador estático. Se pidió explícitamente al dueño y autorizó **A1**. |
+| **validación medida** *(no supuesta)* | dos fixtures sintéticos idénticos en estructura, uno cableado (`v2_ok`) y uno sin cablear (`v2_broken`): **v1 los puntúa IGUAL (11.11 vs 11.11)** — no distingue. **v2 los separa 83.33 puntos** (ok **100.00** vs roto **16.67**), y los 5 `kind`s nuevos **fallan en el roto cada uno por su razón** (HUD congelado · propiedad sin cambiar · sin acumulación pasiva · sin indicador de final visible · sin reset). |
+| **compatibilidad** | v2 ejecuta los `kind`s de v1 sin cambios — suite `v2-compat` = **4/4 PASS** (moves, settles, camera_follows). |
+| **arreglo de fondo** | al construir v2 aparecieron dos fallos reales del diseño v1, corregidos y declarados: (1) `frames` contaba iteraciones de `_process`, que en headless **desincronizan** de los ticks de física — el juego sólo avanza en física, así que v2 ata el progreso del check a `Engine.get_physics_frames()`; (2) el target se resolvía en `_initialize`, antes de que `_ready()` creara los nodos por script — v2 lo resuelve en `frames==1`, robusto tanto a nodos en `.tscn` como creados por script. |
+| **límite declarado** | `MAX_FRAMES` sube de 900 a **6000** como **válvula de seguridad contra colgadas** (no es presupuesto científico; el presupuesto real va en el `frames:` de cada check). |
+| **artefactos** | `evals/preflight/check_suite_v2.gd` · `suite_runner_v2.py` · `suites_v2/v2-fixture.yaml` · `suites_v2/v2-compat.yaml` · `fixtures/v2_ok/` · `fixtures/v2_broken/` |
+| **ratificación** | **propuesta** — v2 es un benchmark nuevo; requiere decisión del dueño para usarlo en medición real. v1 sigue siendo el vigente hasta entonces. |
+
+> **Regla derivada de la enmienda 2:** `M_B1` **v1** mide cinemática + existencia
+> (suelo). `M_B1` **v2** añade observación de cambios (HUD vivo, acumulación
+> pasiva, final alcanzable, reinicio efectivo). **Nunca se mezclan números v1 y
+> v2 en una misma serie** — son instrumentos distintos, como declaró la enmienda 1
+> para B-1/B-2. Un resultado v1 y un resultado v2 no son comparables.
 
 ---
 

@@ -1,0 +1,21 @@
+# Compatibilidad: v2 debe seguir ejecutando los kind's de comportamiento de v1.
+task: v2-compat
+checks:
+  - id: build
+    kind: build
+    desc: "carga"
+  - id: jugador-mueve
+    kind: moves
+    names: [Player]
+    action: ui_right
+    frames: 60
+    desc: "v1: el jugador se mueve"
+  - id: jugador-asienta
+    kind: settles
+    names: [Player]
+    frames: 90
+    desc: "v1: gravedad+colision"
+  - id: camara-sigue
+    kind: camera_follows
+    names: [Player]
+    desc: "v1: camara sigue"

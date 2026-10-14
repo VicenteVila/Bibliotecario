@@ -1,0 +1,51 @@
+# Suite de VALIDACIÓN del scorer Capa B-1 v2.
+# Ejercita los 5 kind's nuevos contra los fixtures sintéticos.
+# Debe PASS contra fixtures/v2_ok y FAIL contra fixtures/v2_broken.
+# Esta suite NO es una tarea de benchmark: es la prueba de que v2 discrimina.
+
+task: v2-fixture
+checks:
+  - id: build
+    kind: build
+    desc: "la escena carga"
+
+  # hud_value_changes — recoger la moneda debe subir el número del HUD
+  - id: hud-monedas-cambia
+    kind: hud_value_changes
+    label: [puntos]
+    action: ui_right
+    frames: 150
+    desc: "el número de puntos del HUD cambia al recoger la moneda"
+
+  # state_after_action — jugar una carta debe cambiar la propiedad del maná
+  - id: mana-baja-al-jugar
+    kind: state_after_action
+    names: [ManaLabel]
+    property: text
+    action: ui_up
+    frames: 40
+    desc: "la propiedad text del maná cambia al jugar una carta"
+
+  # wait_accumulates — el contador pasivo debe crecer SIN input
+  - id: ingresos-pasivos
+    kind: wait_accumulates
+    label: [pasivos]
+    frames: 180
+    desc: "el contador de monedas pasivas crece sin input"
+
+  # reaches_state — alcanzar la meta debe hacer VISIBLE la victoria
+  - id: victoria-visible
+    kind: reaches_state
+    texts: [victoria]
+    action: ui_right
+    frames: 320
+    desc: "el indicador de victoria se hace visible al alcanzar la meta"
+
+  # restart_resets — reiniciar debe volver el marcador a cero
+  - id: reinicio-resetea
+    kind: restart_resets
+    watch_label: [puntos]
+    drive_action: ui_right
+    restart_action: restart
+    frames: 300
+    desc: "reiniciar pone el marcador observado a cero"
