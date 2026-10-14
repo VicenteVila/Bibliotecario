@@ -8,8 +8,9 @@
 > y `Documentos/EVO-BENCH CAN LANGUAGE MODELS IMPROVE AGENT HARNESS.pdf`.
 > **Estado: RATIFICACIÓN PARCIAL — 2026-10-14.**
 > Ratificado: **bloque B-1** (§5.2.0, §5.2.1 fase B-1, fórmula, `BUILD=0`,
-> prohibición, regla B-2, congelados B-1). **Sin ratificar: todo lo demás**,
-> incluida la **fase B-2**. Ver §11.
+> prohibición, regla B-2, congelados B-1) **y §8.1 base humana
+> `game_development`** (intervalo medido `72.73`–`100.00`).
+> **Sin ratificar: todo lo demás**, incluida la **fase B-2**. Ver §11.
 
 ---
 
@@ -443,16 +444,44 @@ No se hacen ediciones empaquetadas.
 
 | base | papel | `web_development` | `game_development` |
 |---|---|---|---|
-| **Semilla `H0`** | **suelo absoluto** — qué gana el diseño | *Prueba Gemini* (`c:\EW`) — modelo sin arnés: **69/100, 9/13 checks** | generación sin iteración (`curve[0]`) |
-| **Humano** | **techo** — qué queda por ganar | portfolio *Nora Velez* hecho a mano | `workspace/current` **curado a mano** (sprites + mapas + cables) |
+| **Semilla `H0`** | **suelo absoluto** — qué gana el diseño | *Prueba Gemini* (`c:\EW`) — modelo sin arnés: **69/100, 9/13 checks** | generación sin iteración (`curve[0]`) — *pendiente* |
+| **Humano** | **techo** — qué queda por ganar | portfolio *Nora Velez* hecho a mano | **medido 2026-10-14** — ver §8.1 |
 | **Arnés de referencia** | **techo ingenieril** | *(a declarar)* | *(a declarar)* |
 
 Sin las dos o tres, «mejoró» no significa nada: mejoró *respecto a qué*.
 
-> ⚠ **Advertencia sobre el techo de juegos:** el `workspace/current` de ReaGame
-> está **curado a mano** (los propios `lessons.md` lo etiquetan `[manual]`).
-> No es un techo de agente — es un techo humano. **Está bien usarlo como tal,
-> pero hay que declararlo como humano, no como agente.**
+### 8.1 Base humana de `game_development` — **medida, no estimada**
+
+Medida el **2026-10-14** bajo la spec ratificada (fase **B-1**), suite
+`platformer-juego`, contra `workspace/current` de ReaGame — que los propios
+`lessons.md` etiquetan `[manual]`. **Es techo humano, no de agente.**
+
+| escena | M | Score | qué representa |
+|---|---|---|---|
+| `res://levels/mision1.tscn` | **11/11** | **100.00** | nivel completo y funcionando |
+| `res://main.tscn` | **8/11** | **72.73** | la escena que el proyecto **declara como punto de entrada** |
+
+> **La base humana no es un número: es un intervalo.**
+> `100.00` = lo que cuesta el arnés humano cuando el juego se juega.
+> `72.73` = lo que cuesta cuando **el punto de entrada está mal** — mismo
+> código, misma arquitectura, distinta escena de arranque.
+>
+> **Ambos son referencia legítima**, y declarar sólo el 100 ocultaría que un
+> humano también se equivoca en la parte que el `grep` no ve.
+
+**Los 27 puntos de diferencia son enteramente del punto de entrada.** Eso es
+la evidencia medida de que **Capa A-bis y Capa B son constructos distintos**:
+el evaluador estático aprueba ambas escenas por igual; el scorer de ejecución
+las separa en 27 puntos.
+
+**Cómo se usa:** toda generación futura se reporta **relativa a este intervalo**.
+Un resultado por debajo de `72.73` está por debajo de un humano con el punto de
+entrada roto. Uno por encima de `100.00` habría que revisarlo — o es real, o el
+scorer falla.
+
+> ⚠ **Reproducibilidad:** estas medidas salieron de `EG/.tools/godot` **4.7.1**
+> contra `workspace/current` **en la fecha indicada**. Si el workspace cambia,
+> **la base se re-mide y se anota**, no se reutiliza el número viejo.
 
 ---
 
@@ -486,14 +515,14 @@ Sin las dos o tres, «mejoró» no significa nada: mejoró *respecto a qué*.
 |---|---|---|---|
 | 1 | **Re-juzgar a nivel de pregunta** → `m_h(x)` | `Sens(x)` | pendiente |
 | 2 | **Construir `H_aux`** y calcular `Sens(x)` | selección de preguntas | pendiente |
-| 3 | **Crear `D^eval` por dominio**, congelada y oculta | cualquier resultado de Capa B | **no existe** — ver §10.1 |
+| 3 | ~~**Crear `D^eval` por dominio**~~ → **ampliar la suite de tareas** hasta tamaño que soporte el split, y *después* partir | cualquier resultado **definitivo** de Capa B | **reencuadrado** → §10.2 — *bloqueado por tareas, no por diseño* |
 | 4 | **Harness Cards** de los 8 brazos + ReaWeb + ReaGame | publicar | pendiente |
 | 5 | ~~Especificar el dominio de la Capa B~~ | — | ✅ **resuelto** → §4.0 |
-| 6 | **Semilla `H0` y base humana** | interpretabilidad | candidatos → §8 |
+| 6 | **Semilla `H0` y base humana** | interpretabilidad | ✅ **base humana medida** `game_development` → §8.1 · *`H0` y `web_development` pendientes* |
 | 7 | **Presupuesto** (iter/pasos/tiempo) | el loop | pendiente |
 | 8 | **Instrumentar con TraceForge** | `RR(k)`, Context Retention, `τ` | pendiente → §5.4 |
 | 9 | **Cerrar el agujero de arquetipos sin `structure`/`verification`** | el cometido es vacío en 37/61 | pendiente |
-| 10 | **Construir el scorer de Capa B por ejecución** (juegos: replay de trazas) | `Overall(game_development)` | pendiente → §5.2.1 |
+| 10 | ~~**Construir el scorer de Capa B por ejecución**~~ | `Overall(game_development)` | ✅ **Fase B-1 construida y validada** → §5.2.1 · *B-2 bloqueada* |
 | 11 | **Cerrar la visibilidad del evaluador** — el agente no debe poder leer su rúbrica | rúbrica oculta `ρ` | pendiente → §5.2.1 |
 
 ### 10.1 Hallazgo crítico: **no existe ningún `D^eval` en todo el ecosistema**
@@ -523,6 +552,42 @@ ReaGame — **defaults web heredados de ReaWeb, y nunca usado** (`harness_edits`
 **Traducción:** el criterio central de Evo-Bench (*«evaluation-suite tasks are
 unavailable»*) **se cumple en cero proyectos**. Crear `D^eval` no es un detalle:
 **es lo primero que hace falta.**
+
+### 10.2 Pero `D^eval` está bloqueada por TAREAS, no por diseño *(2026-10-14)*
+
+El bloqueante anterior se enunció como *«no existe `D^eval`»* — como si faltara
+escribir el split. **No es así.** Mirados los tamaños de suite:
+
+| benchmark | tareas | `D^val` / `D^eval` | tareas de eval por split |
+|---|---|---|---|
+| **Evo-Bench** | 608 | 160 / 448 | **448** |
+| **GameCraft-Bench** | 140 | *(no tiene split)* | — |
+| **GameDevBench** | 333 | *(no tiene split)* | — |
+| **ReaGame** | **8** | — | **~2** si se parte 6/2 |
+
+> **Con 8 tareas, un split `D^val`/`D^eval` deja ~2 tareas de evaluación.**
+> Eso **no tiene potencia estadística**: un solo fallo mueve la nota 50 puntos,
+> y la varianza entre runs dominaría cualquier señal de mejora real.
+>
+> **Escribir `D^eval` sobre 8 tareas produciría la *apariencia* de un split
+> riguroso con un dato que no lo es.** Eso es peor que no tenerlo, porque
+> habilitaría conclusiones inválidas con forma de resultado.
+
+**Por lo tanto, reencuadre del bloqueante nº 3:**
+
+| antes | ahora |
+|---|---|
+| *«Crear `D^eval` por dominio, congelada y oculta»* | ***Ampliar la suite de tareas de `game_development` hasta un tamaño que soporte un split con potencia, y DESPUÉS partir `D^val`/`D^eval`.*** |
+
+**Umbral declarado antes de diseñar el split:** el tamaño mínimo de la suite
+se fija **antes** de elegir el reparto — no al revés. Criterio de referencia:
+Evo-Bench usa **~2.8 tareas de eval por cada una de val** (448/160). Con ese
+ratio, un split con **≥20 tareas de `D^eval`** exigiría **≥56 tareas totales**.
+
+> **Esto no es una excusa para no medir.** B-1 ya funciona y ya mide contra la
+> base humana de §8.1. Lo que **no** se puede es *reportar un resultado de
+> Capa B como definitivo* hasta que la suite soporte el split.
+
 
 ### 10.2 Otros hallazgos que condicionan el diseño
 
@@ -573,7 +638,9 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 > | §5.2.1 congelados B-1 | el motor y el comando **ya están medidos**; el conjunto de tests se congela **al escribirse** |
 >
 > **No se ratifica aún** (y por tanto **no se usa como regla**): §2.1 · §3 ·
-> §4.0 · §4.1 · §4.2 · §5.1 · **fase B-2** · §5.4 · §6 · §7 · §8 · §10.3.
+> §4.0 · §4.1 · §4.2 · §5.1 · **fase B-2** · §5.4 · §6 · §7 ·
+> §8 parcialmente *(**base humana `game_development` SÍ medida y ratificada**;
+> `H0` y `web_development` siguen sin valor)* · §10.3.
 
 | item | propuesto | ratificado |
 |---|---|---|
@@ -594,7 +661,8 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | §5.4 instrumentación TraceForge obligatoria | sí | ☐ *sin ratificar* |
 | §6 Harness Card obligatoria | sí | ☐ *sin ratificar* |
 | §8 base semilla `H0` | *(candidatos en §8)* | ☐ *pendiente de valor* |
-| §8 base humana | *(candidatos en §8)* | ☐ *pendiente de valor* |
+| §8 base humana **`game_development`** = intervalo **`72.73`–`100.00`** medido 2026-10-14 | sí — **medido** | ☑ **2026-10-14** |
+| §8 base humana **`web_development`** | *(portfolio Nora Velez — sin medir)* | ☐ *pendiente de medida* |
 | **§7 presupuesto** | *(pendiente — **GameCraft sugiere 7200 s / 1800 s**)* | ☐ *pendiente de valor* |
 | §10.3 `D^eval` por dominio | *(bloqueante nº1)* | ☐ *pendiente de valor* |
 

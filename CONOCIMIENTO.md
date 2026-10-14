@@ -434,6 +434,24 @@ NO medición — un workspace contiene un juego, no ocho)*:
 > lo detuvo — ambas a la vez, **sin intervenir**. `falls` queda disponible
 > pero documentado como sólo válido con espacio libre encima.
 
+> #### §8.1 — La base humana de juegos está medida *(2026-10-14, ratificada)*
+>
+> | escena | M | Score |
+> |---|---|---|
+> | `levels/mision1.tscn` — nivel funcionando | 11/11 | **100.00** |
+> | `main.tscn` — entrada declarada, rota | 8/11 | **72.73** |
+>
+> **La base humana es un intervalo, no un número.** `100` = el arnés humano
+> cuando el juego se juega. `72.73` = cuando **el punto de entrada está mal** —
+> mismo código, distinta escena de arranque.
+>
+> **Los 27 puntos son enteramente del punto de entrada.** Eso es la evidencia
+> medida de que **A-bis y B son constructos distintos**: el evaluador estático
+> aprueba ambas por igual; el de ejecución las separa en 27.
+>
+> **Regla:** toda generación futura se reporta **relativa a este intervalo**.
+> Bajo `72.73` = por debajo de un humano con el punto de entrada roto.
+
 ---
 
 ## 7. TraceForge — el instrumento de trayectoria
@@ -463,7 +481,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 
 | # | hallazgo | dónde está el detalle |
 |---|---|---|
-| 1 | **No existe `D^eval` en ningún proyecto** — todo visible, y Bibliotecario iteró prompts contra su QA | §10.1 de `BENCHMARK_SPEC.md` |
+| 1 | **`D^eval` está bloqueada por TAREAS, no por diseño** — 8 tareas dejan ~2 de eval, sin potencia estadística. Umbral declarado: **≥56 tareas totales** para ≥20 de `D^eval` (ratio Evo-Bench 448/160) | §10.2 de `BENCHMARK_SPEC.md` |
 | 2 | **`Sens(x)` no se puede calcular** — no hay score por pregunta (`r4_ok` es booleano agregado) | `evals/result_q1_r4_all.json` |
 | 3 | **37/61 arquetipos sin `structure`/`verification`** → compuerta vacía | `cogniteam_archetypes.yaml` / `yaml_loader.py:612` |
 | 4 | **Meta-evolución nunca ha disparado**: `skills=0`, `memory_items=0`, `harness_edits=0` | DBs de Bibliotecario y ReaGame |
@@ -512,6 +530,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | el scorer de Capa B **B-1** (tests en Godot) | `evals/BENCHMARK_SPEC.md` §5.2.1 |
 | el scorer de Capa B **B-2** (replay, bloqueado) | `evals/BENCHMARK_SPEC.md` §5.2.1 + enmienda 1 |
 | el scorer B-1 (tests de comportamiento) | **`evals/preflight/suite_runner.py`** + `suites/*.yaml` + `check_suite.gd` |
+| **la base humana de juegos** (72.73–100.00) | `evals/BENCHMARK_SPEC.md` §8.1 · hallazgo en §6.1 |
 | el preflight de comportamiento (5/5) | `evals/preflight/test_behaviour.gd` · hallazgo en §6.1 |
 | el binario de Godot del arnés | `EG/.tools/godot` — **4.7.1.stable** |
 
