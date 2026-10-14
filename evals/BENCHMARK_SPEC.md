@@ -240,7 +240,7 @@ juego (§5.2.1). **Las dos se reportan por separado. No se agregan.**
 | **`game_development`** | estático 12 ejes → **A-bis** | **ejecución**: replay de trazas **o** tests en Godot | GameCraft / GameDevBench |
 | **`web_development`** | estático 10 ejes → **A-bis** | **ejecución**: functional testing en Chrome *(ya parcial: `functional_tester.py`)* | por definir |
 
-##### `game_development` — dos caminos, la literatura exige uno
+##### `game_development` — scorer en DOS FASES *(enmienda 1, tras preflight)*
 
 | | **GameCraft-Bench** | **GameDevBench** |
 |---|---|---|
@@ -253,47 +253,91 @@ juego (§5.2.1). **Las dos se reportan por separado. No se agregan.**
 | presupuesto | 7200 s agente / 1800 s verificador | — |
 | mejor agente | **41.46 %** | **53.8 %** |
 
-**Camino elegido: GameCraft.** Motivo: ReaGame **ya es un generador de juegos
-completos**, no un editor de tareas aisladas. GameCraft evalúa exactamente eso —
-*«can agents build playable games end to end»* — mientras GameDevBench evalúa
-**ediciones puntuales** sobre un proyecto existente (SWE-bench aplicado a Godot).
+**Decisión original: GameCraft** — ReaGame *ya* genera juegos completos, no edita
+tareas aisladas. **Pero el preflight (2026-10-14) demostró que el camino completo
+de GameCraft no es ejecutable hoy**, y que la mitad determinista de GameDevBench
+**sí lo es, y es gratis**. Se declara por tanto **dos fases**.
 
-**Especificación del scorer de Capa B (extraída de GameCraft §3.2):**
+###### Preflight (2026-10-14) — medido, no supuesto
+
+| comprobación | resultado |
+|---|---|
+| Godot | ✅ `4.7.1.stable` en `EG/.tools/godot` — headless, exit=0 |
+| Smoke test del juego | ✅ carga sin errores |
+| **Tests de comportamiento en motor** | ✅ **5/5 PASS** · `VALIDATION_PASSED` |
+| Xvfb / ffmpeg | ✅ instalados |
+| **xdotool** | ❌ **no instalado** |
+| **ReaGame emite trazas `Π`** | ❌ **no** |
+
+**Resultado del test de comportamiento** (copia temporal, ReaGame **no modificado**):
 
 ```
-Score = BUILD × (0.15·M + 0.35·D + 0.15·V + 0.35·A)
-
-BUILD = 0  si  el proyecto no lanza  O  ninguna traza parsea   ← CERO, no techo
+C1  el proyecto arranca y hay nodo jugador          PASS
+C2  el jugador es CharacterBody2D                   PASS   ← tipo real, no texto
+C3  tiene move_and_slide                            PASS
+C4  ui_left/ui_right/ui_accept registradas          PASS
+C5  se MUEVE bajo input  →  dx=85.00 px en 40 f.   PASS   ← COMPORTAMIENTO
 ```
 
-| cat. | nombre | pesos | qué mide |
-|---|---|---|---|
-| **M** | Core Mechanics | 0.15 | el bucle irreducible responde a la acción del jugador |
-| **D** | Content Depth | **0.35** | variedad, progresión, estados de juego tardíos |
-| **V** | Functional Visuals | 0.15 | legibilidad y feedback durante el juego |
-| **A** | Art & Presentation | **0.35** | *«sientes auténtico y publicable, no de debug»* |
+> **C5 es la diferencia de constructo.** El evaluador estático haría
+> `grep "move_and_slide"` y aprobaría un juego con la función escrita pero
+> **nunca conectada**. Este test **ejecuta el juego y mide el desplazamiento**.
+
+###### Las dos fases
+
+| fase | qué mide | scorer | coste | estado |
+|---|---|---|---|---|
+| **B-1** | **Core Mechanics (M)** | **tests de comportamiento en Godot** — determinista, binario | **0** | ✅ **viable hoy — preflight pasado** |
+| **B-2** | **D · V · A** | replay de trazas + juez multimodal (GameCraft) | alto | ❌ requiere `xdotool` + trazas `Π` |
+
+```
+Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)
+        └───── B-1, determinista ─────┘  └──── B-2, fase 2 ────┘
+```
+
+**Ventaja científica:** se gana un **suelo determinista** antes de introducir
+cualquier juez. Si B-1 y B-2 se construyeran a la vez, **no se podría separar la
+varianza del juez de la varianza del arnés**.
+
+**Regla:** **B-2 no se ratifica hasta que B-1 esté funcionando end-to-end.**
+
+###### Especificación B-1 *(ratificable ahora)*
+
+- **Binario por test** — `VALIDATION_PASSED` / `VALIDATION_FAILED` (GameDevBench).
+- **Se ejecuta en el motor**, headless. **Nunca** `grep` sobre el código.
+- **M = tests que pasan / tests escritos.**
+- **BUILD = 0** si el proyecto no carga → **nota final = 0** *(cero, no techo)*.
+- Cada test **mapea a una feature pedida en la tarea** — *«unit tests must only
+  test for features explicitly requested in the instructions»* (GameDevBench §2.2).
+- Tests **flexibles a múltiples soluciones** — no pueden forzar una implementación.
+- **Congelado:** motor (Godot 4.7.1), el conjunto de tests, el comando de ejecución.
+
+###### Especificación B-2 *(NO ratificar todavía)*
+
+Extraída de GameCraft §3.2, para cuando se construya:
+
+- **Trazas `Π` del agente** — 1–10 demos JSON, eventos de ratón/teclado,
+  ≤20 s, 30 fps, viewport 1280×720.
+- **Replay determinista** — `xdotool` + `Xvfb` + `ffmpeg`, muestreo 2 fps.
+- **Sin exploración por el verificador** — *«making scores depend on the
+  verifier's exploration policy.»* **Prohibido.**
+- **Rúbrica oculta `ρ`** — el agente **no ve** el checklist. *(En ReaGame hoy
+  el agente **puede leer su propio evaluador** — tiene que cerrarse.)*
+- **Ítems ≤24**, anclados `0 / 0.5 / 1`, **tope 0.5** a lo *label-only /
+  decorativo / widgets por defecto / formas programáticas*.
+- **`max`** para requisitos puntuales · **`mean`** para propiedades persistentes.
+- **Congelado:** viewport, fps, ventana, juez, plantilla del juez, pesos, fórmula.
+
+###### Restricción común a ambas fases
+
+- **Sin exploración por el verificador** en ninguna de las dos.
+- **Pesos** `M 0.15 · D 0.35 · V 0.15 · A 0.35` — heredados de GameCraft.
 
 > **¡Atención a la inversión!** GameCraft prioriza **Depth y Art (0.35 cada uno)**
 > sobre Mechanics y Visuals (0.15): *«a complete game should extend beyond minimal
 > mechanics and functional prototypes»*. El evaluador actual de ReaGame hace
 > **exactamente lo contrario** (`gameplay 2.0` el más pesado). **Esa inversión
 > se declara como hallazgo** — no se corrige por ahora; se deja a la vista.
-
-**Restricciones operativas heredadas** (GameCraft §3.2):
-
-- **Rúbrica oculta `ρ`** — el agente **no ve** el checklist. *(En ReaGame hoy
-  el agente **puede leer su propio evaluador** — eso tiene que cerrarse.)*
-- **Trazas `Π` del agente** — 1–10 demos JSON con eventos de ratón/teclado,
-  ≤20 s cada una, a 30 fps, viewport 1280×720.
-- **Replay determinista** — `xdotool` + `Xvfb` + `ffmpeg`, muestreo a 2 fps.
-- **Sin exploración por el verificador** — *«turning verification into an
-  autonomous exploration problem and making scores depend on the verifier's
-  exploration policy.»* **Prohibido.**
-- **Ítems ≤24**, anclados `0 / 0.5 / 1`, con **tope 0.5** a lo que sea
-  *label-only, decorativo, estático, widgets por defecto o formas programáticas*.
-- **`max`** para requisitos puntuales · **`mean`** para propiedades persistentes.
-- **Congelado:** motor (Godot), contrato de envío, viewport, fps, ventana,
-  juez, plantilla del juez, pesos, fórmula.
 
 ##### Métricas generales de Capa B
 
@@ -518,8 +562,13 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | §4.2 criterio `Sens > 0` | sí | ☐ |
 | §5.1 umbrales A (intactos Hito 0-2) | sí | ☐ |
 | **§5.2.0 reencuadre**: techo 40 y pesos → **Capa A-bis**, sin tocarlos | sí | ☐ |
-| **§5.2.1 scorer de Capa B** = GameCraft (`BUILD × 0.15M+0.35D+0.15V+0.35A`) | sí | ☐ |
+| **§5.2.1 scorer Capa B — FASE B-1** (`game_development`) = **tests de comportamiento en Godot** · binario · determinista · **preflight 2026-10-14: 5/5 PASS** | sí | ☐ |
+| **§5.2.1 scorer Capa B — FASE B-2** (`game_development`) = replay + juez multimodal (GameCraft) | **NO** — bloqueada (`xdotool`, trazas `Π`) | ☐ *dejar en blanco* |
+| **§5.2.1 fórmula** `Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)` | sí | ☐ |
+| **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☐ |
 | **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☐ |
+| **§5.2.1 regla**: B-2 no se ratifica hasta que B-1 funcione end-to-end | sí | ☐ |
+| **§5.2.1 congelados B-1**: Godot 4.7.1, conjunto de tests, comando de ejecución | sí | ☐ |
 | §5.4 instrumentación TraceForge obligatoria | sí | ☐ |
 | §6 Harness Card obligatoria | sí | ☐ |
 | §8 base semilla `H0` | *(candidatos en §8)* | ☐ |
@@ -529,8 +578,21 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 
 ### Enmiendas posteriores a la última ratificación
 
-**Ninguna.** Esta es la primera versión del documento. *(Cualquier cambio futuro
-tras ratificar se anota aquí con fecha y motivo — no se reescribe en silencio.)*
+**Ninguna ratificada aún.** *(Cualquier cambio futuro tras ratificar se anota
+aquí con fecha y motivo — no se reescribe en silencio.)*
+
+#### Enmienda 1 — *previa a la ratificación* · 2026-10-14
+
+| | |
+|---|---|
+| **objeto** | §5.2.1 scorer de Capa B (`game_development`) |
+| **antes** | *«Camino elegido: GameCraft»* — scorer único con replay + juez multimodal |
+| **ahora** | **dos fases** — **B-1** tests de comportamiento en Godot *(determinista, coste 0)* · **B-2** replay + juez multimodal *(GameCraft, bloqueado)* |
+| **motivo** | **preflight medido, no supuesto**: Godot 4.7.1 corre headless ✅ · **tests de comportamiento 5/5 PASS** ✅ · `xdotool` ausente ❌ · ReaGame **no emite trazas `Π`** ❌ |
+| **qué NO cambia** | los **pesos** `M 0.15 · D 0.35 · V 0.15 · A 0.35` · el **`BUILD = 0 → nota 0`** · la **prohibición de explorar** en el verificador |
+| **por qué es correcto** | si B-1 y B-2 se construyeran a la vez **no se podría separar la varianza del juez de la varianza del arnés**. Primero el suelo determinista, después la capa de juicio. |
+| **artefacto** | `EG/.tools/godot` 4.7.1 · test `test_behaviour.gd` — **copia temporal, ReaGame no modificado** |
+| **ratificación** | **pendiente** — ver §11 |
 
 ---
 

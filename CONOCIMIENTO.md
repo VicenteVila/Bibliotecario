@@ -133,6 +133,19 @@ under player input**.»*
 **Prohibido explícitamente**: **exploración autónoma por el verificador** —
 *«making scores depend on the verifier's exploration policy»*.
 
+> **Preflight 2026-10-14 — el replay NO es ejecutable en este ecosistema hoy.**
+> Medido, no supuesto:
+>
+> | pieza | estado |
+> |---|---|
+> | `Xvfb` | ✅ instalado |
+> | `ffmpeg` | ✅ instalado |
+> | **`xdotool`** | ❌ **ausente** |
+> | **ReaGame emite trazas `Π`** | ❌ **no** |
+>
+> → el scorer completo de GameCraft **queda en fase B-2, bloqueado**.
+> Ver `evals/BENCHMARK_SPEC.md` §5.2.1 y la **enmienda 1**.
+
 ### 3.2 GameDevBench — *evaluación por tests ejecutados*
 
 `c:\EG\GameDevBench,Evaluating agentic capabilities through game.pdf`
@@ -247,12 +260,30 @@ permanente, 503, flag experimental congelado al importar.
 | Memoria | `memory/memory.db` — `runs` 14, `lessons` 20, **`harness_edits` 0** |
 | Lecciones duras etiquetadas `[manual]` | `memory/lessons.md` |
 | Snapshots del arnés | `.agent/harness_snapshot.py` — `HARNESS_DIRS` + `task_hash` |
-| **Papers de benchmark de juegos (SIN LEER)** | `GameCraft-Bench….pdf`, `GameDevBench….pdf` |
+| **Papers de benchmark de juegos** | ✅ **ya leídos** — §3.1 GameCraft · §3.2 GameDevBench · extracciones en `/tmp/opencode/papers/` |
+| **Godot del arnés** | ✅ **`EG/.tools/godot` = 4.7.1.stable** — corre headless, exit=0 |
 | Sprites + pipelines de assets | `Sprites/` → `scripts/build_assets.py` |
 
 **Momento validado del umbral:** run `1171b26` codificó «juego sin cablear» como
 gate P0 → **el run siguiente quedó CAPADO a total=40** (80 → 40).
 Ese umbral está declarado antes de medir. **No se toca.**
+
+> **Preflight de comportamiento 2026-10-14** — sobre **copia temporal**,
+> **ReaGame no modificado**:
+>
+> ```
+> C1  el proyecto arranca y hay nodo jugador          PASS
+> C2  el jugador es CharacterBody2D                   PASS   ← tipo real, no texto
+> C3  tiene move_and_slide                            PASS
+> C4  ui_left/ui_right/ui_accept registradas          PASS
+> C5  se MUEVE bajo input  →  dx=85.00 px en 40 f.   PASS   ← COMPORTAMIENTO
+> === RESULTADO: 5/5 · VALIDATION_PASSED ===
+> ```
+>
+> **C5 es la diferencia de constructo.** El evaluador estático actual haría
+> `grep "move_and_slide"` y aprobaría un juego con la función escrita pero
+> **nunca conectada**. Este test **ejecuta el juego y mide el desplazamiento**.
+> → **la fase B-1 del scorer de Capa B es viable hoy y cuesta cero.**
 
 ---
 
@@ -298,6 +329,8 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | 13 | **El agente puede leer su propia rúbrica** — GameCraft exige rúbrica **oculta** | §5.2.1 de `BENCHMARK_SPEC.md` |
 | 14 | **Ningún paper de juegos tiene `D^eval`** — solo Evo-Bench construye el split | §10.1 de `BENCHMARK_SPEC.md` |
 | 15 | **Arquetipos por género**: respaldados por GameCraft, **rechazados por GameDevBench** | §10.2 de `BENCHMARK_SPEC.md` |
+| 16 | **B-2 bloqueada**: falta `xdotool` y ReaGame **no emite trazas `Π`** — el replay de GameCraft no es ejecutable | §5.2.1 enmienda 1 de `BENCHMARK_SPEC.md` |
+| 17 | **La suite B-1 es un test único de 5 checks** — falta escribir el conjunto por tarea | `evals/preflight/test_behaviour.gd` |
 
 ---
 
@@ -321,7 +354,10 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | los papers de benchmark de juegos (**YA LEÍDOS**) | `/tmp/opencode/papers/{gamecraft,gamedevbench}.txt` |
 | los PDFs originales de juegos | `EG/GameCraft-Bench….pdf`, `EG/GameDevBench….pdf` |
 | el reencuadre del evaluador de ReaGame | `evals/BENCHMARK_SPEC.md` §5.2.0 |
-| el scorer de Capa B (GameCraft) | `evals/BENCHMARK_SPEC.md` §5.2.1 |
+| el scorer de Capa B **B-1** (tests en Godot) | `evals/BENCHMARK_SPEC.md` §5.2.1 |
+| el scorer de Capa B **B-2** (replay, bloqueado) | `evals/BENCHMARK_SPEC.md` §5.2.1 + enmienda 1 |
+| el preflight de comportamiento (5/5) | **`evals/preflight/test_behaviour.gd`** · registro en `BENCHMARK_SPEC.md` enmienda 1 |
+| el binario de Godot del arnés | `EG/.tools/godot` — **4.7.1.stable** |
 
 ---
 
