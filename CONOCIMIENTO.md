@@ -482,7 +482,8 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | # | hallazgo | dónde está el detalle |
 |---|---|---|
 | ~~1~~ | ~~**`D^eval` está bloqueada por TAREAS, no por diseño** — 8 tareas dejan ~2 de eval, sin potencia estadística. Umbral declarado: **≥56 tareas totales** para ≥20 de `D^eval` (ratio Evo-Bench 448/160)~~ | ✅ **RESUELTO 2026-10-14** — suite ampliada a **60 tareas** (8+52) en `evals/game_tasks_expanded.yaml`, umbral ≥56 cumplido; Puzzle=3 y Shooter=3 declarados en déficit; §4.4 de `BENCHMARK_SPEC.md` |
-| 2 | **`Sens(x)` no se puede calcular** — no hay score por pregunta (`r4_ok` es booleano agregado) | `evals/result_q1_r4_all.json` |
+| ~~2~~ | ~~**`Sens(x)` no se puede calcular** — no hay score por pregunta (`r4_ok` es booleano agregado)~~ | ✅ **PARCIALMENTE RESUELTO 2026-10-14** — era cierto solo para el brazo **R4/Q1**. **Para juegos no aplica**: B-1 sí emite puntuación numérica **por tarea** (`res.score`, float, JSON). Lo que sigue faltando para `Sens(x)` son los **K arneses auxiliares** (coste), §10.2.1 de `BENCHMARK_SPEC.md` |
+| 22 | **El split fiel a Evo-Bench está bloqueado por COSTE** — exige `Sens(x)`, que a su vez exige K arneses auxiliares evaluados sobre las 60 tareas; generarlos consume claves a `target_h: 3`. Un split aleatorio **no** es Evo-Bench y se declara placeholder | §10.2.1 de `BENCHMARK_SPEC.md` |
 | 3 | **37/61 arquetipos sin `structure`/`verification`** → compuerta vacía | `cogniteam_archetypes.yaml` / `yaml_loader.py:612` |
 | 4 | **Meta-evolución nunca ha disparado**: `skills=0`, `memory_items=0`, `harness_edits=0` | DBs de Bibliotecario y ReaGame |
 | 5 | **`task_hash` frágil a acentos** → rompe series comparables | `EG/.agent/harness_snapshot.py:98-103` |

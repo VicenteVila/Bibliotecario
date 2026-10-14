@@ -677,6 +677,53 @@ ratio, un split con **≥20 tareas de `D^eval`** exigiría **≥56 tareas totale
 > base humana de §8.1. Lo que **no** se puede es *reportar un resultado de
 > Capa B como definitivo* hasta que la suite soporte el split.
 
+#### 10.2.1 El umbral se cumplió, pero el split aún no se puede dibujar — depende de `Sens(x)`, no de una decisión *(2026-10-14)*
+
+§4.4 amplió la suite a **60 tareas** y el umbral ≥56 quedó **cumplido**. Eso
+levanta el bloqueante *«faltan tareas»*, pero **no** habilita a dibujar el split
+todavía — y la razón hay que leerla en Evo-Bench, no inventarla.
+
+**Cómo construye Evo-Bench su split realmente** (§4.2 y §5 del paper):
+
+1. `Sens(x)` = correlación de Pearson entre la puntuación de la tarea bajo cada
+   arnés auxiliar `{m_h(x)}` y la calidad global del arnés `Q_h^(−x)`
+   (media *leave-one-task-out* sobre todas las tareas salvo `x`).
+2. **Se eliminan las tareas con `Sens(x) ≤ 0`** — no distinguen calidad de arnés.
+3. Difficulty = `1 − Perf(x)`; se estratifica por difficulty y se selecciona la
+   mayor `Sens` dentro de cada estrato.
+4. El reparto val/eval es aleatorio **dentro de cada estrato**, de modo que las
+   dos mitades comparten la distribución de difficulty.
+
+**Es un procedimiento calculado, no una decisión de diseño.** Un split fiel a
+Evo-Bench exige:
+
+| requisito | ¿lo tenemos en juegos? |
+|---|---|
+| puntuación **por tarea** (no agregada) | ✅ **Sí** — B-1 emite `res.score = 100·m_pass/m_total`, float por tarea, en JSON (`evals/preflight/suite_runner.py`) |
+| **K arneses auxiliares** distintos evaluados sobre el pool | ❌ **No** — no existe ninguno; hay que generarlos y ejecutar las 60 tareas contra cada uno |
+
+> **Corrección del bloqueante nº 2:** *«`Sens(x)` no se puede calcular — no hay
+> score por pregunta»* era cierto para el brazo **R4/Q1**, que guardaba `r4_ok`
+> booleano agregado. **Para juegos no aplica**: B-1 sí produce puntuación numérica
+> por tarea. Lo que falta para `Sens(x)` en juegos son los **K arneses auxiliares**,
+> no el score.
+
+> **Por lo tanto el split fiel a Evo-Bench está bloqueado por COSTE**, en la misma
+> decisión que el bloqueante nº 17: generar arneses auxiliares y correr 60 tareas
+> por arnés a `target_h: 3` consume las claves del dueño del proyecto.
+
+**Lo que sí se puede dibujar hoy** es un reparto estratificado por familia
+(determinista, sin `Sens`). Pero **no es el split de Evo-Bench** y se declara
+como **placeholder**: no puede eliminar tareas con `Sens ≤ 0`, que es justo lo
+que da potencia al split real. Si se dibuja, debe **reemplazarse** — no
+*refinarse* — cuando `Sens(x)` sea calculable, porque el conjunto de tareas
+elegibles cambia.
+
+> **Regla derivada:** nunca reportar un número de `D^eval` como «split
+> Evo-Bench» salvo que `Sens(x)` se haya calculado y las tareas con `Sens ≤ 0`
+> se hayan excluido de hecho. Un split aleatorio etiquetado como Evo-Bench
+> sería **falsa atribución de método**.
+
 
 ### 10.2 Otros hallazgos que condicionan el diseño
 
