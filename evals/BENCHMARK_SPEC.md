@@ -187,6 +187,95 @@ Calcular `Sens(x)` **exige score por pregunta**, no agregado.
 Hoy `result_q1_r4_all.json` guarda `r4_ok` booleano por brazo → **insuficiente.**
 → *Acción previa: re-juzgar a nivel de pregunta.*
 
+### 4.4 Expansión de la suite — familias, no invención *(2026-10-14)*
+
+**Situación:** la suite de `game_development` tiene **8 tareas** en **4 arquetipos**
+(`platformas`, `puzzle`, `arcade`, `rpg-lite`). §10.2 declaró que eso **no soporta
+un split `D^val`/`D^eval` con potencia estadística**.
+
+**Eje de expansión: las 15 familias de GameCraft-Bench.** No se inventa una
+taxonomía propia — GameCraft las eligió *«to cover distinct game-construction
+demands rather than surface genres alone»* y las validó con **140 tareas** y un
+**oracle de Godot**.
+
+| familia | GameCraft | ¿cubierto hoy? |
+|---|---|---|
+| Platformer | 19 | ✅ `platformer-juego`, `platformer-niveles` |
+| Puzzle | 8 | ✅ `puzzle-memory`, `puzzle-sliding` |
+| Shooter | 7 | ✅ `arcade-shooter`, `arcade-olas` |
+| Roguelike | 14 | ~ `rpg-quest`, `rpg-boss` *(género afín, no idéntico)* |
+| **Open World** | 15 | ❌ |
+| **Strategy** | 17 | ❌ |
+| **Tycoon** | 16 | ❌ |
+| **Visual novel** | 11 | ❌ |
+| **Simulation** | 6 | ❌ |
+| **Card game** | 5 | ❌ |
+| **Horror** | 5 | ❌ |
+| **Rhythm** | 5 | ❌ |
+| **Idle** | 4 | ❌ |
+| **Racing** | 4 | ❌ |
+| **Sports** | 4 | ❌ |
+
+**Reglas de la expansión** (declaradas antes de escribir):
+
+1. **Familias del benchmark ≠ arquetipos de CogniTeam.** Las familias vienen de
+   GameCraft (validadas externamente); los arquetipos son la fuente de
+   conocimiento del dominio. **No se mezclan.**
+2. **Las 8 tareas existentes se conservan intactas** — están congeladas.
+3. **Mínimo 3 tareas por familia**, objetivo **4** → **≥56 tareas totales**.
+4. **Cada tarea describe experiencia de jugador observable**, no implementación
+   — instrucción de GameCraft: *«specifying the intended experience without
+   prescribing implementation details»*.
+5. **Ninguna tarea contiene checklist de rúbrica** — la rúbrica va aparte
+   (§5.2.1 B-2) y **el agente no la ve**.
+6. **Dentro de una familia, las tareas se diferencian por mecánica y alcance**,
+   no por re-texto. Dos tareas de la misma familia con las mismas mecánicas
+   son **redundantes y se descartan**.
+7. **`turns: 16` y `target_h: 3`** se mantienen salvo declaración en contrario.
+8. **Toda tarea nueva entra como `D^val` hasta que la suite alcance el tamaño
+   objetivo**; el reparto `D^val`/`D^eval` se fija **después**, de una vez,
+   con la suite completa — nunca tarea a tarea.
+
+> **Umbral de §10.2 reafirmado:** la suite debe llegar a **≥56 tareas** antes
+> de diseñar el split. Con 15 familias × 4 = **60**, el objetivo queda cubierto.
+
+#### Resultado medido — 2026-10-14
+
+Las 52 tareas nuevas se escribieron con la división de trabajo en 4 lotes y se
+consolidaron en **`evals/game_tasks_expanded.yaml`** (viven en Bibliotecario,
+**no** en ReaGame, porque ReaGame no se modifica). Validación automática sobre
+el fichero consolidado: 52/52 ids únicos, formato `id`/`family`/`task`/`turns`/
+`target_h` correcto, **0 fugas de nombres de nodos o APIs de Godot** en la prosa,
+**0 checklists de rúbrica**, y las 52 exigen explícitamente HUD visible +
+victoria + derrota/final + reinicio.
+
+| familia | existentes (ReaGame) | nuevas | total |
+|---|---|---|---|
+| Platformer | 2 | 2 | **4** |
+| Puzzle | 2 | 1 | **3** |
+| Shooter | 2 | 1 | **3** |
+| Roguelike *(=`rpg-quest`,`rpg-boss`)* | 2 | 4 | **6** |
+| Open World | 0 | 4 | **4** |
+| Strategy | 0 | 4 | **4** |
+| Tycoon | 0 | 4 | **4** |
+| Visual novel | 0 | 4 | **4** |
+| Card game | 0 | 4 | **4** |
+| Horror | 0 | 4 | **4** |
+| Simulation | 0 | 4 | **4** |
+| Rhythm | 0 | 4 | **4** |
+| Idle | 0 | 4 | **4** |
+| Racing | 0 | 4 | **4** |
+| Sports | 0 | 4 | **4** |
+| **TOTAL** | **8** | **52** | **60** |
+
+**Umbral ≥56: CUMPLIDO (60).** **Mínimo 3/familia: cumplido en las 15.**
+
+> **Déficit declarado, no maquillado:** el objetivo era 4/familia. **Puzzle=3 y
+> Shooter=3** se quedan en el mínimo; no se rellenaron con tareas redundantes
+> porque la regla 6 prohinde re-texto. Si más adelante se añade una 4ª tarea
+> genuina a cada una, el total sube a 62 — pero **el umbral ≥56 ya está cumplido
+> hoy** y el split puede diseñarse con la suite actual.
+
 ---
 
 ## 5. Métricas

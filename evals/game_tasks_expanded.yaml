@@ -1,0 +1,331 @@
+# Suite de benchmark de game_development — EXPANSIÓN por familias GameCraft.
+#
+# Proviene de: 8 tareas congeladas en ReaGame (benchmark/game_tasks.yaml,
+#   campo `archetype` CogniTeam) + 52 tareas nuevas de ESTE fichero
+#   (campo `family` GameCraft). Regla §4.4.1: familias ≠ arquetipos, no se mezclan.
+#   Por eso las 52 nuevas viven aquí y NO en ReaGame: ReaGame no se modifica.
+#
+# Umbral declarado ANTES de escribir (§10.2 / §4.4): >=56 tareas totales
+#   antes de diseñar el split D^val/D^eval.
+# Resultado medido: 8 + 52 = 60 >= 56  → umbral CUMPLIDO.
+#   Mínimo 3/familia: cumplido en las 15 familias.
+#   Objetivo 4/familia: Puzzle=3 y Shooter=3 quedan en 3 (mínimo sí, objetivo no);
+#   Roguelike=6 (2 rpg-* existentes + 4 nuevas). Se declara el déficit, no se maquilla.
+#
+# Las tareas nuevas entran como D^val hasta que el split se fije de una vez (§4.4.8).
+# turns: 16, target_h: 3 en todas (§4.4.7).
+# Ninguna tarea contiene checklist de rúbrica: la rúbrica va en B-2 y el agente no la ve.
+
+suite:
+  - id: openworld-exploration-isla
+    family: Open World
+    task: "Crea un juego de mundo abierto en una isla: el jugador explora libremente un archipiélago con playas, selva y montañas, descubriendo 8 puntos de interés que se marcan en un minimapa. Un HUD visible muestra descubrimientos, tiempo jugado y vida. Al descubrir todos los puntos de interés el jugador gana la partida; si la vida llega a cero por caídas o criaturas hostiles, pierde. Tras cualquier final se puede reiniciar la partida desde cero. Incluye salto, nado básico entre islas cercanas y una cámara que sigue al jugador."
+    turns: 16
+    target_h: 3
+
+  - id: openworld-vuelo-planeador
+    family: Open World
+    task: "Crea un juego de mundo abierto de exploración aérea: el jugador planea con un ala delta entre picos flotantes y ruinas suspendidas, recogiendo 10 artefactos repartidos por el mapa. Un HUD visible muestra artefactos recolectados, altitud y velocidad. Al reunir los 10 artefactos se obtiene la victoria; si cae al vacío o pierde todo el control del planeo, el juego termina en derrota y permite reiniciar. El viento cambia suavemente para que cada vuelo se sienta distinto."
+    turns: 16
+    target_h: 3
+
+  - id: openworld-moto-desierto
+    family: Open World
+    task: "Crea un juego de mundo abierto de conducción en un desierto enorme: el jugador maneja una moto todoterreno recogiendo 15 cromos esparcidos por dunas, cañones y un oasis. Un HUD visible muestra cromos, velocidad y daño del vehículo. Al recoger todos los cromos gana la partida; si el daño acumulado por choques fuertes llega al máximo, hay derrota y se puede reiniciar. Incluye un ciclo de día y noche simple, saltos por rampas y una cámara aérea que sigue a la moto."
+    turns: 16
+    target_h: 3
+
+  - id: openworld-sobrevivencia-bosque
+    family: Open World
+    task: "Crea un juego de mundo abierto de supervivencia ligera en un bosque extenso: el jugador recoge madera, piedra y bayas durante 3 días de juego para mantener el hambre y la salud, y construye un refugio con una hoguera grande. Un HUD visible muestra salud, hambre, recursos y el día actual. Sobrevivir los 3 días con la hoguera encendida da la victoria; si el hambre o la salud llegan a cero antes de tiempo, hay derrota y se puede reiniciar. De noche aparecen criaturas hostiles, mientras que de día puede explorar con más seguridad."
+    turns: 16
+    target_h: 3
+
+  - id: strategy-tacticos-turnos
+    family: Strategy
+    task: "Crea un juego táctico por turnos en un mapa de cuadrícula: el jugador mueve 4 unidades de tipos variados (arquero, sanador, tanque y asesino) contra un ejército rival, usando cobertura y ventajas de posición. Un HUD visible muestra el turno actual, la salud de cada unidad y el objetivo de la batalla. Eliminar a todas las unidades enemigas da la victoria; si todas las unidades del jugador mueren, hay derrota y se puede reiniciar la batalla. Incluye pantallas claras de victoria y derrota con opción de jugar de nuevo."
+    turns: 16
+    target_h: 3
+
+  - id: strategy-defensa-torres
+    family: Strategy
+    task: "Crea un juego de estrategia de defensa con oleadas: el jugador coloca torres de tipos distintos a lo largo de un camino por donde avanzan enemigos, gestionando un presupuesto de monedas. Un HUD visible muestra el oro disponible, la oleada actual, las vidas de la base y el coste de las torres. Sobrevivir 15 oleadas da la victoria; si 20 enemigos llegan al final del camino, la base pierde todas sus vidas y hay derrota con reinicio disponible. Cada oleada trae enemigos más fuertes y hay jefes en las oleadas 5, 10 y 15."
+    turns: 16
+    target_h: 3
+
+  - id: strategy-conquista-territorios
+    family: Strategy
+    task: "Crea un juego de estrategia de conquista en un mapa de territorios adyacentes: el jugador controla un imperio inicial y ataca a sus vecinos acumulando tropas para tomar regiones una a una. Un HUD visible muestra tropas disponibles, territorios controlados y el turno del rival. Controlar el 75% del mapa otorga la victoria; si el rival conquista la capital del jugador o reduce sus territorios a uno solo, hay derrota y se puede reiniciar. En cada turno el rival toma decisiones sencillas de ataque y defensa."
+    turns: 16
+    target_h: 3
+
+  - id: strategy-guerra-economica
+    family: Strategy
+    task: "Crea un juego de estrategia de guerra económica en tiempo real: el jugador gestiona minas de oro y granjas para financiar el entrenamiento de soldados, que envía a atacar la base enemiga mientras defiende la propia. Un HUD visible muestra los recursos por segundo, el ejército actual y la salud de ambas bases. Destruir la base enemiga da la victoria; si la base del jugador es destruida, hay derrota y se puede reiniciar la partida. Incluye un punto de reclutamiento y rutas de ataque simples por el mapa."
+    turns: 16
+    target_h: 3
+
+  - id: tycoon-parque-diversiones
+    family: Tycoon
+    task: "Crea un juego de tycoon de parque de diversiones: el jugador coloca atracciones como rueda de la fortuna, montaña rusa y puestos de comida, cobrando entrada a los visitantes que llegan por la calle. Un HUD visible muestra el dinero, los visitantes felices y la satisfacción media del parque. Alcanzar 5000 monedas y una satisfacción del 80% da la victoria; si el dinero baja de cero y el parque se cierra, hay derrota y se puede reiniciar. Los visitantes se quejan si no hay baños ni comida cerca de las atracciones."
+    turns: 16
+    target_h: 3
+
+  - id: tycoon-fabrica-productos
+    family: Tycoon
+    task: "Crea un juego de tycoon de fábrica: el jugador construye extractores de mineral, fundidoras y ensambladoras conectadas por cintas para producir y vender productos terminados. Un HUD visible muestra los recursos acumulados, la tasa de producción y las ganancias. Producir y vender 100 productos otorga la victoria; si los costos de mantenimiento superan las ganancias durante demasiado tiempo y la cuenta llega a cero, hay derrota con opción de reinicio. El jugador puede mejorar las máquinas para producir más rápido."
+    turns: 16
+    target_h: 3
+
+  - id: tycoon-colonia-espacial
+    family: Tycoon
+    task: "Crea un juego de tycoon de colonia espacial en Marte: el jugador construye generadores de energía, extractores de agua y granjas de comida para mantener con vida a 20 colonos mientras expande la base. Un HUD visible muestra energía, agua, comida, población y el día de la misión. Mantener a todos los colonos con vida durante 5 días da la victoria; si un recurso crítico se agota y los colonos no sobreviven, hay derrota y se puede reiniciar la misión. Las tormentas de arena reducen la energía de los paneles solares en ciertos días."
+    turns: 16
+    target_h: 3
+
+  - id: tycoon-zoo-animales
+    family: Tycoon
+    task: "Crea un juego de tycoon de zoológico: el jugador compra animales, construye recintos con el hábitat adecuado y cobra entrada a los visitantes, mejorando instalaciones para aumentar la satisfacción. Un HUD visible muestra el dinero, los visitantes, el número de especies y el bienestar animal. Tener 8 especies distintas con bienestar alto y acumular 10000 monedas otorga la victoria; si el bienestar animal cae demasiado por recintos inadecuados, los visitantes abandonan el zoológico y hay derrota con reinicio disponible. Un vendedor ambulante ofrece animales raros cada cierto tiempo."
+    turns: 16
+    target_h: 3
+
+  - id: visualnovel-mystery-accusation
+    family: Visual novel
+    task: "Crea una novela visual de misterio en Godot: interpretas a una detective que interroga a cinco sospechosos eligiendo opciones de diálogo, y cada respuesta abre o cierra ramas distintas de la conversación. La pantalla muestra siempre un HUD con la hora del día, las pistas recopiladas y el nivel de confianza de cada sospechoso. Durante la investigación puedes examinar escenas para hallar pistas ocultas que desbloquean preguntas nuevas. El juego termina en victoria cuando acusas al culpable correcto con al menos tres pistas en el HUD, y en derrota (finales malos) cuando acusas al inocente o se te acaba el tiempo. Al ver cualquier final aparece una pantalla con la opción de reiniciar la investigación desde cero."
+    turns: 16
+    target_h: 3
+
+  - id: visualnovel-romance-routes
+    family: Visual novel
+    task: "Crea una novela visual romántica en Godot ambientada en una academia, donde el jugador conversa con cuatro personajes y cada elección modifica una barra de afinidad visible en el HUD junto al retrato y el nombre del personaje actual. El jugador avanza por capítulos leyendo diálogos, eligiendo respuestas y regalando objetos que suben o bajan la afinidad de manera acumulativa. Hay una ruta de victoria cuando alcanzas el capítulo final con la afinidad del personaje elegido al máximo y obtienes su final feliz, y rutas de derrota cuando la afinidad cae a cero o llegas al final sin ninguna ruta desbloqueada. Tras mostrarse el final correspondiente, el juego ofrece reiniciar desde el primer capítulo para explorar otra ruta."
+    turns: 16
+    target_h: 3
+
+  - id: visualnovel-survival-deadline
+    family: Visual novel
+    task: "Crea una novela visual de supervivencia con límite de tiempo en Godot: el jugador está atrapado en una casa durante una tormenta y dispone de 12 acciones antes de que llegue el final de la noche. Cada acción (esconderse, buscar herramientas, calmar a alguien, forzar una puerta) consume horas que se ven descontadas en el HUD, que también muestra la salud, los objetos en el inventario y el estado de pánico. Las decisiones encadenan escenas con consecuencias visibles, como puertas que se abren o personajes que se marchan. La victoria se produce al salir de la casa con el contador de horas aún positivo, y la derrota cuando la salud llegue a cero o las horas se agotan encerrado. Cuando aparece el resumen del final, el jugador puede reiniciar la noche desde el principio."
+    turns: 16
+    target_h: 3
+
+  - id: visualnovel-rhythm-duel
+    family: Visual novel
+    task: "Crea una novela visual de duelo mágico en Godot donde las conversaciones se resuelven con ráfagas de decisiones rápidas: mientras un oponente lanza un discurso agresivo, el jugador debe elegir la réplica antes de que se vacíe un temporizador circular mostrado en el HUD junto a la vida y la energía del héroe. Acertar la réplica correcta resta vida al rival y suma energía, fallar o dejar pasar el tiempo quita vida al jugador y rompe la cadena de combo. Entre duelos el jugador elige mejoras de hechizos que cambian el daño y la duración de los temporizadores. La victoria es derrotar al jefe final con vida restante, la derrota es que la vida llegue a cero en cualquier duelo, y tras la pantalla de resultado se puede reiniciar la aventura entera."
+    turns: 16
+    target_h: 3
+
+  - id: card-duel-mana-clash
+    family: Card game
+    task: "Crea un juego de cartas de duelo por turnos en Godot frente a un rival controlado por la máquina: cada jugador tiene 30 de vida, gana una mano de cartas cada turno y acumula un recurso de maná que crece una unidad por turno para pagar cartas de ataque, defensa y hechizo. El tablero muestra las dos filas de cartas en juego, el mazo, el descarte y un HUD con vida, maná y cartas restantes de ambos bandos. El jugador arrastra cartas de su mano a la mesa, y las unidades atacan automáticamente al rival o se bloquean entre sí cuando chocan. La victoria ocurre al reducir la vida rival a cero antes que la tuya, y la derrota cuando tu vida llega a cero. La pantalla de fin de partida permite revancha inmediata para reiniciar el duelo."
+    turns: 16
+    target_h: 3
+
+  - id: card-deckbuilder-run
+    family: Card game
+    task: "Crea un juego de cartas tipo roguelike de construcción de mazo en Godot: el jugador recorre un mapa de nodos y elige rutas entre combates, tiendas y eventos, y en cada combate enfrenta a monstruos con mazos propios usando cartas de ataque, bloqueo y efectos especiales. Durante el combate el HUD muestra vida, maná disponible, cartas en mano, mazo y descarte, y entre combates muestra la puntuación, el piso alcanzado y las cartas ganadas. Tras vencer a un enemigo elige una de tres recompensas para añadir o mejorar cartas, y en la tienda puede gastar monedas. La victoria es derrotar al jefe del piso 10 con el HUD visible, la derrota es perder toda la vida en un combate, y desde la pantalla de resultado se puede empezar una nueva partida con un mazo inicial."
+    turns: 16
+    target_h: 3
+
+  - id: card-memory-precision
+    family: Card game
+    task: "Crea un juego de cartas de memoria en Godot con tablero de 4x4 cartas boca abajo que el jugador voltea de dos en dos buscando parejas iguales. El HUD muestra el tiempo transcurrido, las parejas encontradas, el número de intentos y un multiplicador de combo que crece al acertar seguidas y se rompe al fallar. Las cartas se voltean con una animación breve y las parejas correctas desaparecen con un efecto brillante. La victoria se logra completar las 8 parejas antes de que se agote el tiempo del nivel, y la derrota llega cuando el cronómetro llega a cero o se supera el límite de intentos. Al mostrarse la pantalla final con la puntuación hay un botón para reiniciar el tablero con las cartas barajadas de nuevo."
+    turns: 16
+    target_h: 3
+
+  - id: card-lane-defense
+    family: Card game
+    task: "Crea un juego de cartas de defensa en carriles en Godot: el jugador tiene tres carriles y debe colocar cartas de unidades y torretas para detener oleadas de enemigos que avanzan hacia su base. Cada turno el jugador recibe cartas y energía limitada, y arrastra las cartas a un carril para invocar una unidad que lucha contra los enemigos de ese mismo carril. El HUD muestra la energía actual, la mano disponible, la vida de la base, el número de oleada y el tiempo hasta la siguiente. La victoria consiste en sobrevivir las 8 oleadas completas con la base en pie, la derrota en que la vida de la base llegue a cero. Al terminar la partida aparece un resumen con la opción de reiniciar desde la oleada uno."
+    turns: 16
+    target_h: 3
+
+  - id: horror-maze-flashlight
+    family: Horror
+    task: "Crea un juego de terror en primera persona en Godot donde el jugador huye de un laberinto infinito buscando tres llaves mientras una criatura lo persigue. El jugador se mueve con las teclas, gira la cámara con el ratón y usa una linterna con batería limitada; el HUD muestra la batería restante, las llaves recogidas de 3 y un medidor de cercanía de la criatura que late cuando está cerca. Si la criatura lo alcanza la pantalla se tiñe de rojo y se pierde, y encontrar las tres llaves abre la salida que da la victoria. Tras cada final aparece una pantalla oscura con la opción de reiniciar la partida en un laberinto nuevo."
+    turns: 16
+    target_h: 3
+
+  - id: horror-stealth-hiding
+    family: Horror
+    task: "Crea un juego de terror de sigilo en Godot: el jugador debe completar cinco tareas repartidas por una casa (reparar un cuadro, apagar velas, recoger objetos) mientras un asesino patrulla y lo escucha si camina demasiado rápido. El HUD muestra las tareas completadas de 5, el pulso del corazón que sube cuando el asesino está cerca y una barra de agotamiento que disminuye al correr. Puedes esconderte en armarios y taquillas para que el asesino pierda tu rastro, pero salir en el momento equivocado lo atrae. La victoria se logra terminar las cinco tareas y salir por la puerta principal, la derrota cuando el asesino te atrapa. En la pantalla de captura o escape hay un botón para reiniciar la casa."
+    turns: 16
+    target_h: 3
+
+  - id: horror-generator-survival
+    family: Horror
+    task: "Crea un juego de terror de supervivencia por tiempo en Godot: el jugador queda encerrado en un parque abandonado y debe aguantar cinco minutos encendiendo generadores repartidos por el mapa para mantener la luz. El HUD muestra el cronómetro restante, los generadores activados de 4, la energía de la linterna y un medidor de terror que sube en la oscuridad y baja cerca de las luces. Un monstruo vagará más rápido cuanto más generadores has encendido, y si te toca pierdes vida; quedarte sin vida o sin tiempo antes de activar los cuatro generadores es derrota, sobrevivir los cinco minutos con los cuatro activos es victoria. Puedes correr, distraer al monstruo con ruido y recargar la linterna en los generadores. La pantalla final muestra el resultado y permite reiniciar la ronda completa."
+    turns: 16
+    target_h: 3
+
+  - id: horror-ritual-escape
+    family: Horror
+    task: "Crea un juego de terror de escape ritual en Godot donde el jugador debe reunir cinco símbolos sagrados repartidos por una mansión mientras una sombra lo acecha y va poseyendo habitaciones. El HUD muestra los símbolos recogidos de 5, la cordura que baja al mirar a la sombra y el mapa de habitaciones seguras en miniatura. Para recoger un símbolo hay que completar un pequeño puzle de ordenar velas antes de que la sombra llegue a la habitación. La victoria se alcanza al colocar los cinco símbolos en el altar del sótano y escapar por la trampilla, y la derrota al perder toda la cordura o ser alcanzado por la sombra. Tras el final se ofrece reiniciar la mansión con los símbolos reubicados."
+    turns: 16
+    target_h: 3
+
+  - id: racing-circuit
+    family: Racing
+    task: "Crea un juego de carreras de circuito 2D: el jugador conduce un coche con las flechas, circula en un óvalo contra tres rivales controlados por la CPU y debe completar tres vueltas para ganar la carrera. Un HUD visible muestra la vuelta actual, la posición en la que va y el tiempo transcurrido. Si el jugador se sale de la pista más de cinco segundos seguidos, pierde la carrera. Al terminar, ya sea victoria o derrota, se puede reiniciar la carrera con una tecla."
+    turns: 16
+    target_h: 3
+
+  - id: racing-time-trial
+    family: Racing
+    task: "Crea un juego de contrarreloj 2D: el jugador corre por una pista con obstáculos y debe cruzar cinco checkpoints antes de que se agote el tiempo. El HUD muestra el tiempo restante, la velocidad actual y cuántos checkpoints ha alcanzado. Cruzar todos los checkpoints y llegar a la meta da la victoria; si el temporizador llega a cero antes, es derrota. Tras cualquier resultado se puede reiniciar la prueba desde cero."
+    turns: 16
+    target_h: 3
+
+  - id: racing-obstacle-dodge
+    family: Racing
+    task: "Crea un juego de carreras de obstáculos 2D: el jugador pilota un kart por una carretera infinita esquivando conos, charcos y otros vehículos que se acercan. El HUD muestra la distancia recorrida, la puntuación y la vida restante. Esquivar obstáculos suma puntos y llegar a dos mil metros de distancia da la victoria, mientras que chocar demasiadas veces y perder toda la vida causa derrota. Cuando la carrera termina, ya sea por victoria o derrota, se puede reiniciar para intentar superar la puntuación."
+    turns: 16
+    target_h: 3
+
+  - id: racing-fuel-rally
+    family: Racing
+    task: "Crea un juego de rally 2D por etapas: el jugador conduce por un camino con curvas, recoge depósitos de combustible dispersos y debe llegar a la meta de la etapa antes de que el tanque se vacíe. El HUD muestra el nivel de combustible, la etapa actual y el tiempo transcurrido. Si el combustible se agota antes de llegar a la meta, es derrota; llegar con combustible restante da la victoria. Tras completar o fallar la etapa se puede reiniciar y volver a intentar."
+    turns: 16
+    target_h: 3
+
+  - id: sports-soccer
+    family: Sports
+    task: "Crea un juego de fútbol 2D de un contra uno: el jugador controla un futbolista con las flechas, chuta con espacio y debe marcar cinco goles antes que el rival controlado por la CPU. El partido dura tres minutos y un HUD muestra el marcador, el tiempo restante y qué equipo tiene el balón. Llegar primero a cinco goles o tener más goles al terminar el tiempo da la victoria; si el rival marca más, es derrota. Tras el final del partido se puede reiniciar para jugar de nuevo."
+    turns: 16
+    target_h: 3
+
+  - id: sports-basketball
+    family: Sports
+    task: "Crea un juego de baloncesto 2D de precisión: el jugador se mueve con las flechas para posicionarse en la cancha, ajusta el ángulo y la potencia del tiro y debe encestar la pelota en el aro. Un HUD visible muestra los puntos, los tiros restantes y el tiempo disponible. Encestar al menos doce de quince tiros da la victoria; no alcanzar esa marca al agotar los tiros es derrota. Cuando la ronda termina, se puede reiniciar para intentar superar el resultado."
+    turns: 16
+    target_h: 3
+
+  - id: sports-tennis
+    family: Sports
+    task: "Crea un juego de tenis 2D de un contra uno: el jugador controla una raqueta con las flechas y golpea la pelota con espacio, compitiendo contra un oponente controlado por la CPU. El partido es al mejor de cinco games y un HUD muestra el marcador del game, el marcador del partido y quién saca. Ganar tres games antes que el rival da la victoria; si el rival llega primero a tres, es derrota. Tras cada partido se puede reiniciar para jugar otra vez."
+    turns: 16
+    target_h: 3
+
+  - id: sports-bowling
+    family: Sports
+    task: "Crea un juego de bolos 2D: el jugador lanza una bola por la pista controlando la dirección y el giro, intentando derribar todos los pinos en cada tirada. Se juegan tres rondas y un HUD muestra los puntos acumulados, la ronda actual y los pinos que quedan de pie. Superar la puntuación mínima establecida al final de las tres rondas da la victoria; quedarse por debajo causa derrota. Después de la última tirada se puede reiniciar para intentar mejorar la puntuación."
+    turns: 16
+    target_h: 3
+
+  - id: rhythm-note-highway
+    family: Rhythm
+    task: "Crea un juego de ritmo 2D estilo guitarra: notas de distintos colores caen desde arriba hacia una zona de acierto y el jugador debe pulsar la tecla correspondiente justo cuando cada nota llegue a la línea. Un HUD muestra la puntuación, la racha de aciertos consecutivos y una barra de vida que baja cada vez que se falla. Superar la puntuación mínima al final de la canción da la victoria; si la barra de vida llega a cero antes, es derrota. Cuando la canción termina, se puede reiniciar para intentar mejorar la marca."
+    turns: 16
+    target_h: 3
+
+  - id: rhythm-runner
+    family: Rhythm
+    task: "Crea un juego de carreras rítmicas 2D: el personaje corre automáticamente por el escenario y el jugador debe saltar con espacio o agacharse con flecha abajo exactamente al ritmo de la música para superar los obstáculos que aparecen en compás. Un HUD muestra la puntuación, la distancia recorrida y la precisión de los aciertos respecto al ritmo. Llegar al final del nivel con al menos una vida restante da la victoria; perder las tres vidas por fallos de ritmo causa derrota. Tras terminar o fallar se puede reiniciar el nivel desde el principio."
+    turns: 16
+    target_h: 3
+
+  - id: rhythm-drum-pads
+    family: Rhythm
+    task: "Crea un juego de pads de batería rítmico 2D: cuatro pads aparecen en pantalla y el sistema muestra una secuencia de golpes que el jugador debe repetir en el orden y momento exactos, con secuencias cada vez más largas. Un HUD muestra la ronda alcanzada, la puntuación acumulada y los intentos fallidos. Completar quince rondas seguidas sin errores da la victoria; cometer tres errores causa derrota. Al fallar o ganar se puede reiniciar desde la primera ronda."
+    turns: 16
+    target_h: 3
+
+  - id: rhythm-lane-defense
+    family: Rhythm
+    task: "Crea un juego de defensa rítmica 2D: enemigos aparecen en cuatro carriles avanzando al ritmo de la música y el jugador debe presionar la tecla del carril correspondiente en el momento exacto para repelerlos antes de que lleguen a la base. Un HUD muestra la salud de la base, la oleada actual y la puntuación. Sobrevivir a diez oleadas completas da la victoria; si la salud de la base llega a cero, es derrota. Después de cada partida se puede reiniciar y volver a intentarlo."
+    turns: 16
+    target_h: 3
+
+  - id: idle-clicker-fabrica
+    family: Idle
+    task: "Crea un juego idle de fábrica en Godot donde haces clic en una gran lingote de oro para ganar monedas, compras máquinas que producen monedas automáticamente y el precio de cada máquina sube con cada compra. Hay un HUD visible con monedas, ingresos por segundo y el contador de clics. Ganas la partida al alcanzar una meta de riqueza total mostrada en pantalla, pierdes si no llegas a esa meta antes de que se agote el temporizador de la sesión, y tras cualquier final puedes reiniciar desde cero. Incluye efectos de número flotante al hacer clic y una tabla de productores con cifras que crecen en tiempo real."
+    turns: 16
+    target_h: 3
+
+  - id: idle-minero-prestigio
+    family: Idle
+    task: "Crea un juego idle de minería en Godot donde picas manualmente para extraer mineral, contratas picos automáticos y desbloqueas capas más profundas del pozo que rinden más. Cuando acumulas suficiente prestigio puedes reiniciar toda la partida a cambio de un multiplicador permanente que hace que todo vuelva a crecer más rápido, y el HUD muestra mineral, ingresos por segundo, capas desbloqueadas y tu nivel de prestigio actual. Victoria al alcanzar el nivel de prestigio máximo disponible en la pantalla, derrota si el temporizador de la ronda llega a cero antes de lograrlo, y desde el final puedes empezar de nuevo. Incluye una ventana de confirmación antes de prestigiar y animación de reseteo del progreso."
+    turns: 16
+    target_h: 3
+
+  - id: idle-taberna-parroquianos
+    family: Idle
+    task: "Crea un juego idle de taberna en Godot donde los parroquianos llegan solos y consumen, tú inviertes en más mesas, bardos y bebidas para aumentar la reputación y los ingresos pasivos. Hay eventos aleatorios con ventana de tiempo, como una feria o una pelea, que multiplican o reducen la ganancia y se anuncian claramente en el HUD junto a monedas, reputación, aforo y temporizador del evento. Ganas al llevar la reputación de la taberna al rango de leyenda marcado en pantalla, pierdes si la reputación llega a cero o se acaba el tiempo de la temporada, y al terminar puedes reiniciar con la taberna vacía. Incluye una cola de mejora donde cada compra encarece la siguiente y barras de progreso visibles."
+    turns: 16
+    target_h: 3
+
+  - id: idle-mazmorra-heroes
+    family: Idle
+    task: "Crea un juego idle de mazmorra en Godot donde reclutas héroes que pelean automáticamente contra oleadas de monstruos por pisos, y tú decides a qué piso enviarlos y qué equipo comprarles. El HUD muestra monedas, piso alcanzado, héroes activos, daño por segundo del grupo y un temporizador de oleada. Victoria al conquistar el piso 50 indicado en el marcador, derrota si una oleada arrasa a todos tus héroes y no puedes reclutar a nadie más, y tras cada final puedes reiniciar la expedición. Incluye subidas de nivel de héroe con elección de mejora y una sala del tesoro que aparece cada ciertos pisos."
+    turns: 16
+    target_h: 3
+
+  - id: simulation-granja-temporadas
+    family: Simulation
+    task: "Crea un juego de simulación de granja en Godot donde siembras cultivos en parcelas, riegas, cosechas y vendes en el mercado con precios que fluctúan cada día. Las estaciones y el clima cambian con un calendario visible, sequía o lluvia afectan el crecimiento, y el HUD muestra monedas, día, estación, clima y nivel de agua del suelo. Victoria al alcanzar la fortuna objetivo de la temporada antes de que acabe el año, derrota si te quedas sin dinero para pagar la hipoteca al final del trimestre, y tras cualquiera de los dos resultados puedes reiniciar la granja. Incluye animales que producen leche u huevos pasivamente y una pantalla de precios del mercado actualizada cada día."
+    turns: 16
+    target_h: 3
+
+  - id: simulation-ciudad-presupuesto
+    family: Simulation
+    task: "Crea un juego de simulación de ciudad en Godot donde colocas zonas residenciales, comerciales e industriales, construyes servicios como escuelas y parques, y cobras impuestos cada ciclo. La felicidad, la población y el presupuesto se actualizan en un HUD visible y la gente se muda o se va según tu gestión. Victoria al llevar la población y la felicidad a los objetivos marcados en el panel de metas, derrota si la alcaldía quiebra o la felicidad se desploma hasta el límite, y al final puedes reiniciar el municipio. Incluye un gráfico de evolución de ingresos y gastos y coste creciente por cada nueva construcción."
+    turns: 16
+    target_h: 3
+
+  - id: simulation-restaurante-cocina
+    family: Simulation
+    task: "Crea un juego de simulación de restaurante en Godot donde llegan comandas con platos y tiempos de espera, tú asignas cocineros y camareros para preparar y servir antes de que el cliente se impaciente. El HUD muestra caja, satisfacción media, platos en cola y reloj del turno, y cada plato servido a tiempo suma propina. Victoria al cumplir la meta de ingresos del turno antes de que se cierre el local, derrota si la satisfacción media cae por debajo del umbral o se acumulan tres abandones, y tras el cierre puedes reiniciar el turno. Incluye cartas de menú con ingredientes limitados y mejora de equipamiento entre turnos."
+    turns: 16
+    target_h: 3
+
+  - id: simulation-parque-tematico
+    family: Simulation
+    task: "Crea un juego de simulación de parque temático en Godot donde colocas atracciones, puestos de comida y bancos, y los visitantes caminan por los caminos disfrutando o quejándose según la calidad del recorrido. El HUD muestra dinero, visitantes dentro, satisfacción general y valor de la entrada, y cada atracción consume mantenimiento continuo. Victoria al alcanzar la puntuación de prestigio del parque marcada en el panel antes de que se acabe la temporada, derrota si la satisfacción o la caja llegan a cero, y desde la pantalla final puedes reiniciar el parque. Incluye colas visibles en las atracciones y la posibilidad de subir el precio de la entrada cuando la demanda lo permita."
+    turns: 16
+    target_h: 3
+
+  - id: roguelike-mazmorra-perdicion
+    family: Roguelike
+    task: "Crea un roguelike de mazmorra en Godot con habitaciones generadas de forma distinta en cada partida, enemigos con patrones variados y objetos que se recogen para mejorar ataque, defensa o velocidad. Cada muerte es definitiva y cierra la partida, el HUD muestra vida, piso actual, oro y mejoras activas, y una escalera al final de cada planta avanza hacia el jefe. Victoria al derrotar al jefe del piso 10, derrota al quedarte sin vidas en cualquier combate, y tras cualquiera de los dos finales puedes volver a empezar una mazmorra nueva. Incluye tienda entre plantas con oro y pociones de vida con usos limitados."
+    turns: 16
+    target_h: 3
+
+  - id: roguelike-superviviente-arena
+    family: Roguelike
+    task: "Crea un roguelike de arena en Godot donde tu personaje ataca automáticamente y enemigos infinitos se cierran desde los bordes, tú solo mueves y esquivas. Cada vez que subes de nivel eliges una de tres mejoras visibles (alcance, cadencia, daño o armas nuevas) y el HUD muestra nivel, experiencia, vida y el tiempo sobrevivido. Victoria al llegar vivo a los 10 minutos del cronómetro marcado, derrota cuando la vida llegue a cero, y desde la pantalla final puedes reiniciar la ronda. Incluye oleadas con jefes de vida alta cada 2 minutos y orbes de experiencia que sueltan los enemigos."
+    turns: 16
+    target_h: 3
+
+  - id: roguelike-cartas-sigilo
+    family: Roguelike
+    task: "Crea un roguelike de combate por cartas en Godot donde enfrentas encuentros por turnos con un mazo pequeño que crece al elegir una carta tras cada victoria. El HUD muestra vida, mano disponible, energía por turno y el mapa de la ruta con nodos de combate, elite y descanso. Victoria al recorrer la ruta completa y vencer al jefe final, derrota al perder toda la vida en cualquier encuentro, y tras cada final puedes reiniciar y barajar un viaje nuevo. Incluye cartas de ataque, defensa y efecto persistente, y un descanso que cura o mejora una carta con elección."
+    turns: 16
+    target_h: 3
+
+  - id: roguelike-armas-ruinas
+    family: Roguelike
+    task: "Crea un roguelike de acción en Godot donde recoges armas y modificadores que se combinan entre sí (por ejemplo fuego más proyectiles múltiples o hielo más rebote) y cada planta te ofrece una recompensa con dos o tres opciones al azar. El HUD muestra vida, armas equipadas con sus combinaciones, planta actual y un contador de maldiciones que añaden dificultad a cambio de botín. Victoria al llegar al núcleo final y destruirlo, derrota si las maldiciones te superan y la vida llega a cero, y puedes reiniciar con una generación de recompensas distinta. Incluye reroll limitado de las opciones de recompensa y un marcador de combos encadenados."
+    turns: 16
+    target_h: 3
+
+  - id: platformer-torre-rebote
+    family: Platformer
+    task: "Crea un juego de plataformas 2D vertical en Godot donde el jugador escala una torre apoyándose en paredes: al tocar un muro puede saltar de nuevo contra él para rebotar hacia arriba, y el movimiento aéreo permite cambiar de dirección con precisión. Hay plataformas móviles, pinchos y coleccionables repartidos en cada altura, con cámara que asciende siguiendo al jugador y HUD visible con vidas, altura máxima alcanzada y monedas. Victoria al llegar a la cima señalizada con una bandera antes de que se agote el tiempo, derrota al caer sobre los pinchos o quedarse sin vidas, y tras game over se puede reiniciar. Incluye un indicador de salto en pared y plataformas que se desmoronan al pisarlas."
+    turns: 16
+    target_h: 3
+
+  - id: platformer-gancho-tirolesa
+    family: Platformer
+    task: "Crea un juego de plataformas 2D en Godot con un gancho de agarre: el jugador lanza un gancho a puntos de anclaje fijos en el escenario, se impulsa oscilando como en una tirolesa y puede soltar en el momento justo para alcanzar islas lejanas. El HUD muestra tiempo restante, diamantes recogidos y un medidor de cargas de gancho, y los enemigos se superan saltando encima o enganchándolos con el gancho. Victoria al llegar a la meta flotante antes de que termine el cronómetro, derrota al caer al vacío o al agotarse el tiempo, y tras el final puedes reiniciar el nivel. Incluye cinemática de impulso al soltar, plataformas que se mueven en bucle y una ruta alternativa que premia el uso experto del gancho."
+    turns: 16
+    target_h: 3
+
+  - id: puzzle-cajas-almacen
+    family: Puzzle
+    task: "Crea un juego de puzzles de empujar cajas en Godot: el jugador mueve al personaje por una habitación y desliza cajas una casilla por pulsación, sin poder tirarlas hacia atrás, para colocarlas sobre las marcas objetivo del suelo. El HUD muestra nivel actual, movimientos usados, cajas colocadas y un temporizador opcional de parada. Victoria al cubrir todas las marcas de la pantalla, derrota si una caja queda encerrada contra una esquina y no hay forma de sacarla (con aviso y opción de reiniciar el nivel), y desde ambos resultados puedes repetir la fase o avanzar. Incluye al menos 15 niveles de dificultad creciente con muros indestructibles, hielo que desliza las cajas y un botón de deshacer el último movimiento."
+    turns: 16
+    target_h: 3
+
+  - id: shooter-shmup-lateral-jefe
+    family: Shooter
+    task: "Crea un shooter lateral estilo shmup en Godot donde la nave avanza sola por el escenario disparando, esquivando enemigos y recogiendo mejoras de tiro, y al final de cada fase aparece un jefe con barras de vida y patrones de disparo en fases. El HUD muestra vidas, puntuación, potencia de tiro y barra de vida del jefe, y las balas enemigas tienen formas y velocidades distintas. Victoria al derrotar al jefe final con sus tres fases de patrones, derrota al perder todas las vidas, y tras game over se puede reiniciar desde la primera fase. Incluye movilidad libre en los dos ejes con teclado, power-ups temporales de tiro triple o escudo y oleadas de enemigos con curvas de vuelo predecibles."
+    turns: 16
+    target_h: 3
+

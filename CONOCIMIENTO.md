@@ -481,7 +481,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 
 | # | hallazgo | dónde está el detalle |
 |---|---|---|
-| 1 | **`D^eval` está bloqueada por TAREAS, no por diseño** — 8 tareas dejan ~2 de eval, sin potencia estadística. Umbral declarado: **≥56 tareas totales** para ≥20 de `D^eval` (ratio Evo-Bench 448/160) | §10.2 de `BENCHMARK_SPEC.md` |
+| ~~1~~ | ~~**`D^eval` está bloqueada por TAREAS, no por diseño** — 8 tareas dejan ~2 de eval, sin potencia estadística. Umbral declarado: **≥56 tareas totales** para ≥20 de `D^eval` (ratio Evo-Bench 448/160)~~ | ✅ **RESUELTO 2026-10-14** — suite ampliada a **60 tareas** (8+52) en `evals/game_tasks_expanded.yaml`, umbral ≥56 cumplido; Puzzle=3 y Shooter=3 declarados en déficit; §4.4 de `BENCHMARK_SPEC.md` |
 | 2 | **`Sens(x)` no se puede calcular** — no hay score por pregunta (`r4_ok` es booleano agregado) | `evals/result_q1_r4_all.json` |
 | 3 | **37/61 arquetipos sin `structure`/`verification`** → compuerta vacía | `cogniteam_archetypes.yaml` / `yaml_loader.py:612` |
 | 4 | **Meta-evolución nunca ha disparado**: `skills=0`, `memory_items=0`, `harness_edits=0` | DBs de Bibliotecario y ReaGame |
@@ -533,6 +533,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | **la base humana de juegos** (72.73–100.00) | `evals/BENCHMARK_SPEC.md` §8.1 · hallazgo en §6.1 |
 | el preflight de comportamiento (5/5) | `evals/preflight/test_behaviour.gd` · hallazgo en §6.1 |
 | el binario de Godot del arnés | `EG/.tools/godot` — **4.7.1.stable** |
+| **la suite ampliada de juegos (60 tareas)** | `evals/game_tasks_expanded.yaml` · §4.4 de `BENCHMARK_SPEC.md` |
 
 ---
 
