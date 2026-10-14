@@ -46,7 +46,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | qué | dónde |
 |---|---|
 | **Propósito / navegación** | `PROPOSITO.md` (raíz) |
-| **Regla de medición** | `evals/BENCHMARK_SPEC.md` |
+| **Regla de medición** | `evals/BENCHMARK_SPEC.md` — **ratificación parcial 2026-10-14: bloque B-1** · §11 |
 | **Mapa de conocimiento** | `CONOCIMIENTO.md` (este) |
 | Umbrales y diseño de métricas | `evals/BLUEPRINT_METRIC_DESIGN.md` — §3.1 umbrales |
 | Decisiones numeradas | `evals/BLUEPRINT_METRIC_DESIGN.md` — §6 dec. 9-18 |

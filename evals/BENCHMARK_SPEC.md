@@ -6,7 +6,10 @@
 >
 > Fundamento: `Documentos/Stop Comparing LLM Agents Without Disclosing the Harness.pdf`
 > y `Documentos/EVO-BENCH CAN LANGUAGE MODELS IMPROVE AGENT HARNESS.pdf`.
-> **Estado: PROPUESTO — pendiente de ratificación.**
+> **Estado: RATIFICACIÓN PARCIAL — 2026-10-14.**
+> Ratificado: **bloque B-1** (§5.2.0, §5.2.1 fase B-1, fórmula, `BUILD=0`,
+> prohibición, regla B-2, congelados B-1). **Sin ratificar: todo lo demás**,
+> incluida la **fase B-2**. Ver §11.
 
 ---
 
@@ -553,32 +556,51 @@ unavailable»*) **se cumple en cero proyectos**. Crear `D^eval` no es un detalle
 Esta especificación **no vale nada hasta que se ratifique**, y una vez ratificada
 **no se toca** salvo declarando benchmark nuevo.
 
+> ### Ratificación parcial — 2026-10-14
+>
+> **Objetivo de esta ratificación: desbloquear la construcción del scorer B-1.**
+> Se ratifica el **bloque mínimo coherente** para poder medir con B-1. Todo lo
+> demás queda **explícitamente sin ratificar** — no se asume nada por silencio.
+>
+> | se ratifica | por qué es prerequisito de B-1 |
+> |---|---|
+> | §5.2.0 reencuadre | B-1 **existe porque** el evaluador estático pasó a A-bis |
+> | §5.2.1 fase B-1 | es el objeto de la ratificación |
+> | §5.2.1 fórmula | define la forma final — `M_B1` se llena hoy, `D/V/A` esperan a B-2 |
+> | §5.2.1 `BUILD = 0` | aplica a B-1: proyecto que no carga → nota 0 |
+> | §5.2.1 prohibición A-bis + B | evita que el número final diga dos cosas distintas |
+> | §5.2.1 regla B-2 | impide ratificar B-2 sin que B-1 funcione end-to-end |
+> | §5.2.1 congelados B-1 | el motor y el comando **ya están medidos**; el conjunto de tests se congela **al escribirse** |
+>
+> **No se ratifica aún** (y por tanto **no se usa como regla**): §2.1 · §3 ·
+> §4.0 · §4.1 · §4.2 · §5.1 · **fase B-2** · §5.4 · §6 · §7 · §8 · §10.3.
+
 | item | propuesto | ratificado |
 |---|---|---|
-| §2.1 ETCSOVG invariante · arnés por dominio | sí | ☐ |
-| §3 congelados (incl. **lista de dominios**) | sí | ☐ |
-| §4.0 dominios: `web_development`, `game_development` | sí | ☐ |
-| §4.1 partición `D^val`/`D^eval` (autoridad: Evo-Bench) | sí | ☐ |
-| §4.2 criterio `Sens > 0` | sí | ☐ |
-| §5.1 umbrales A (intactos Hito 0-2) | sí | ☐ |
-| **§5.2.0 reencuadre**: techo 40 y pesos → **Capa A-bis**, sin tocarlos | sí | ☐ |
-| **§5.2.1 scorer Capa B — FASE B-1** (`game_development`) = **tests de comportamiento en Godot** · binario · determinista · **preflight 2026-10-14: 5/5 PASS** | sí | ☐ |
-| **§5.2.1 scorer Capa B — FASE B-2** (`game_development`) = replay + juez multimodal (GameCraft) | **NO** — bloqueada (`xdotool`, trazas `Π`) | ☐ *dejar en blanco* |
-| **§5.2.1 fórmula** `Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)` | sí | ☐ |
-| **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☐ |
-| **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☐ |
-| **§5.2.1 regla**: B-2 no se ratifica hasta que B-1 funcione end-to-end | sí | ☐ |
-| **§5.2.1 congelados B-1**: Godot 4.7.1, conjunto de tests, comando de ejecución | sí | ☐ |
-| §5.4 instrumentación TraceForge obligatoria | sí | ☐ |
-| §6 Harness Card obligatoria | sí | ☐ |
-| §8 base semilla `H0` | *(candidatos en §8)* | ☐ |
-| §8 base humana | *(candidatos en §8)* | ☐ |
-| **§7 presupuesto** | *(pendiente — **GameCraft sugiere 7200 s / 1800 s**)* | ☐ |
-| §10.3 `D^eval` por dominio | *(bloqueante nº1)* | ☐ |
+| §2.1 ETCSOVG invariante · arnés por dominio | sí | ☐ *sin ratificar* |
+| §3 congelados (incl. **lista de dominios**) | sí | ☐ *sin ratificar* |
+| §4.0 dominios: `web_development`, `game_development` | sí | ☐ *sin ratificar* |
+| §4.1 partición `D^val`/`D^eval` (autoridad: Evo-Bench) | sí | ☐ *sin ratificar* |
+| §4.2 criterio `Sens > 0` | sí | ☐ *sin ratificar* |
+| §5.1 umbrales A (intactos Hito 0-2) | sí | ☐ *sin ratificar* |
+| **§5.2.0 reencuadre**: techo 40 y pesos → **Capa A-bis**, sin tocarlos | sí | ☑ **2026-10-14** |
+| **§5.2.1 scorer Capa B — FASE B-1** (`game_development`) = **tests de comportamiento en Godot** · binario · determinista · **preflight 2026-10-14: 5/5 PASS** | sí | ☑ **2026-10-14** |
+| **§5.2.1 scorer Capa B — FASE B-2** (`game_development`) = replay + juez multimodal (GameCraft) | **NO** — bloqueada (`xdotool`, trazas `Π`) | ☐ **dejar en blanco** |
+| **§5.2.1 fórmula** `Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)` | sí | ☑ **2026-10-14** |
+| **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☑ **2026-10-14** |
+| **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☑ **2026-10-14** |
+| **§5.2.1 regla**: B-2 no se ratifica hasta que B-1 funcione end-to-end | sí | ☑ **2026-10-14** |
+| **§5.2.1 congelados B-1**: Godot 4.7.1, conjunto de tests, comando de ejecución | sí | ☑ **2026-10-14** |
+| §5.4 instrumentación TraceForge obligatoria | sí | ☐ *sin ratificar* |
+| §6 Harness Card obligatoria | sí | ☐ *sin ratificar* |
+| §8 base semilla `H0` | *(candidatos en §8)* | ☐ *pendiente de valor* |
+| §8 base humana | *(candidatos en §8)* | ☐ *pendiente de valor* |
+| **§7 presupuesto** | *(pendiente — **GameCraft sugiere 7200 s / 1800 s**)* | ☐ *pendiente de valor* |
+| §10.3 `D^eval` por dominio | *(bloqueante nº1)* | ☐ *pendiente de valor* |
 
 ### Enmiendas posteriores a la última ratificación
 
-**Ninguna ratificada aún.** *(Cualquier cambio futuro tras ratificar se anota
+**Ninguna todavía.** *(Cualquier cambio futuro tras ratificar se anota
 aquí con fecha y motivo — no se reescribe en silencio.)*
 
 #### Enmienda 1 — *previa a la ratificación* · 2026-10-14
