@@ -448,6 +448,79 @@ Extraída de GameCraft §3.2, para cuando se construya:
 
 **Prohibido agregar A-bis y B en una sola nota.** Se reportan las dos.
 
+###### 5.2.2 Auditoría de cobertura de B-1 sobre las 15 familias *(2026-10-14 — resultado negativo declarado)*
+
+La suite pasó de 8 a 60 tareas (§4.4), pero **B-1 se escribió para las 8
+originales**, que eran todas de plataformas/puzzle/arcade — géneros con un
+avatar que se mueve por el espacio. Preguntado si el vocabulario de 13 `kind`s
+de `check_suite.gd` puede expresar las condiciones de victoria/derrota/HUD de
+las familias nuevas, la respuesta es **no en 31 de las 60 tareas**, y se
+declara el resultado negativo en lugar de maquillarlo.
+
+**Los 13 `kind`s, clasificados por lo que realmente verifican:**
+
+| grupo | `kind`s | qué verifican de verdad |
+|---|---|---|
+| **comportamiento** (5) | `moves` · `jump` · `settles`/`lands` · `falls` · `camera_follows` | que el avatar **responde cinéticamente** al input: desplazamiento, salto, gravedad+colisión, cámara |
+| **estructural** (8) | `build` · `node_exists` · `node_is` · `has_method` · `collision` · `canvas` · `label_match` · `scene_count` | que algo **existe** — un nodo con ese nombre, una clase, un método, una capa, un texto estático |
+
+**Hallazgo 1 — victoria, derrota y reinicio jamás se activan, en ninguna de las
+60 tareas.** Incluso en las 8 originales ratificadas, la victoria se comprueba
+como `node_exists` sobre un nodo **llamado** `Win`/`Victoria`/`Goal`, y el
+reinicio como `node_exists` sobre uno llamado `Restart`/`Reiniciar`. Es
+**presencia estructural, no comportamiento**: un juego con un nodo vacío llamado
+`Win` aprueba el check de victoria sin tener pantalla de victoria. **Ningún
+`kind` llega a un estado final ni lo verifica.**
+
+**Hallazgo 2 — el discriminador es si la tarea tiene avatar cinético.** Los 5
+`kind`s de comportamiento sólo aplican si el jugador es un cuerpo que se mueve
+por el espacio. Donde no lo hay, **toda la verificación colapsa a
+`label_match` (texto estático de HUD) + `node_exists`** — que es
+el evaluador estático con otro nombre:
+
+| familias con avatar — B-1 aplica *(29 tareas)* | familias sin avatar — B-1 no aplica *(31 tareas)* |
+|---|---|
+| Platformer 4 · Shooter 3 · Open World 4 · Racing 4 · Sports 4 · Horror 4 · Roguelike 6 | Puzzle 3 · Card game 4 · Visual novel 4 · Idle 4 · Simulation 4 · Rhythm 4 · Strategy 4 · Tycoon 4 |
+
+> **Evidencia de las suites ya ratificadas:** las dos de **puzzle** (originales)
+> contienen **cero** `kind`s de comportamiento — son sólo `build` +
+> `node_exists` + `label_match` + `canvas`. No es un fallo de las suites
+> nuevas; **era el límite ya presente y no declarado.**
+
+**Hallazgo 3 — cuatro capacidades que ningún `kind` puede expresar:**
+
+1. **Transición de estado por acción** — *«jugar una carta reduce el maná»*,
+   *«cambiar de turno avanza el contador»*, *«elegir opción abre rama»*.
+   `has_method` comprueba que el método **se llama** así, no que **haga** algo.
+2. **Acumulación pasiva sin input** — el corazón de **Idle/Simulation**: la
+   moneda sube sola. Los 5 `kind`s de comportamiento **todos** exigen
+   `Input.action_press`. Ninguno mide un contador creciendo **sin** intervención.
+3. **Corrección temporal** — el corazón de **Rhythm**: acertar la nota **en el
+   instante** correcto. No existe `kind` que mida sincronía.
+4. **Lectura de valor vivo del HUD** — `label_match` comprueba que un `Label`
+   **contiene** la palabra `puntos`. No comprueba que el número **cambie** al
+   recoger una moneda. Un HUD con `puntos: 0` congelado aprueba.
+
+**Hallazgo 4 — techo de 900 frames ≈ 15 s a 60 fps.** Ninguna condición de
+victoria de las 60 tareas es alcanzable en 15 s de input guionizado: piso 10 de
+un roguelike, 15 cromos de un mundo abierto, reputación de leyenda en un tycoon.
+Aunque se añadiera un `kind` que conduzca a un final, **el techo lo impide**.
+
+> **Consecuencia para la fórmula ratificada:**
+> `Score = BUILD × (0.15·M_B1 + …)`. El componente `M_B1` hoy mide
+> **solo mecánica cinética**, y para 31 de 60 tareas mide **solo existencia
+> estructural**. **No se re-baja ningún umbral**, pero se declara que `M_B1`
+> **no es todavía una medida de core mechanics** para la mitad de la suite —
+> es un **suelo** que verifica «arranca y hay algo ahí».
+
+> **Qué haría falta para cerrar la brecha** — 5 `kind`s nuevos:
+> `hud_value_changes` (valor vivo con delta), `state_after_action`
+> (acción → delta de propiedad), `wait_accumulates` (crecimiento sin input),
+> `reaches_state` (llegar a final y detectarlo), `restart_resets` (reinicio
+> resetea estado). **Pero el motor está congelado en §11**: añadir `kind`s
+> exige declarar **versión nueva del benchmark**, que es decisión del dueño —
+> **no se hace aquí unilateralmente.**
+
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
 Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el
