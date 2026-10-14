@@ -1,0 +1,47 @@
+# Suite Capa B-1 — puzzle-memory
+# Cada check verifica UNA feature pedida en la instrucción (GameDevBench §2.2).
+# Ratificado 2026-10-14. Una vez en uso, NO se modifica sin benchmark nuevo.
+#
+# Instrucción: "juego de memoria (memory match): una cuadrícula de cartas boca
+# abajo que el jugador voltea con clic, dos cartas iguales forman pareja, el
+# objetivo es emparejar todas las cartas para ganar, los movimientos son
+# limitados (agotarlos pierde la partida), tras terminar se puede reiniciar, y
+# el HUD muestra parejas encontradas y movimientos restantes."
+#
+# Nota: el input es el RATÓN, no el teclado — los checks de movimiento con
+# flechas no aplican. Se verifica estructura + estado observable.
+
+task: puzzle-memory
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+
+  # "cuadrícula de cartas"
+  - id: cartas-existen
+    kind: node_exists
+    names: [Card, Carta, card, MemoryCard, Tile, Ficha]
+    desc: "hay cartas/fichas"
+
+  # "el HUD muestra parejas encontradas"
+  - id: hud-parejas
+    kind: label_match
+    text: pareja
+    desc: "el HUD muestra parejas encontradas"
+
+  # "y movimientos restantes"
+  - id: hud-movimientos
+    kind: label_match
+    text: movim
+    desc: "el HUD muestra movimientos"
+
+  # "el HUD" (visible)
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+
+  # "tras terminar se puede reiniciar"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Reintentar, Reiniciar, Retry, Menu]
+    desc: "hay un mecanismo de reinicio"

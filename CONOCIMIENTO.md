@@ -285,6 +285,70 @@ Ese umbral está declarado antes de medir. **No se toca.**
 > **nunca conectada**. Este test **ejecuta el juego y mide el desplazamiento**.
 > → **la fase B-1 del scorer de Capa B es viable hoy y cuesta cero.**
 
+### 6.1 Scorer B-1 construido (2026-10-14) — y su primer hallazgo real
+
+| pieza | ruta |
+|---|---|
+| motor de checks | `evals/preflight/check_suite.gd` |
+| orquestador | `evals/preflight/suite_runner.py` |
+| 8 suites (una por tarea) | `evals/preflight/suites/*.yaml` |
+| ejecutar | `python3 evals/preflight/suite_runner.py [id-tarea]` |
+
+**Vocabulario de checks** *(todos comportamiento, ninguno `grep`)*:
+`build` · `node_exists` · `node_is` · `has_method` · `collision` · `canvas` ·
+`label_match` · `scene_count` · **`moves`** · **`jump`** · **`falls`** ·
+**`lands`** · **`camera_follows`**
+
+> #### Hallazgo — el evaluador estático aprueba un juego que no arranca
+>
+> `workspace/current` de ReaGame: `project.godot` declara
+> `run/main_scene="res://main.tscn"`. Al **ejecutar** esa escena:
+>
+> ```
+> f=2   is_on_floor=false  vel=(0.0, 60.0)
+> f=10  is_on_floor=false  vel=(0.0, 120.0)
+> f=20  y=518.3            vel=(0.0, 200.0)   ← el jugador CAE SIN PARAR
+> ```
+>
+> **El jugador cae desde el frame 0 y nunca aterriza.** `Ground` está en la
+> escena pero la colisión no funciona. **El punto de entrada del juego está roto.**
+>
+> Mientras tanto **`levels/mision1.tscn` funciona perfectamente**:
+>
+> ```
+> f=2   is_on_floor=true  vel=(0.0, 0.0)
+> f=10  press ui_accept
+> f=11  vel=(0.0, -400.0)   ← salta con el valor JUMP correcto
+> f=18  y=644.0             ← apex y aterriza
+> ```
+>
+> **El juego SÍ está hecho. Lo que está roto es el punto de entrada declarado.**
+> Un jugador que lance el programa recibe una escena rota.
+>
+> **El evaluador estático actual lo aprueba** — `player.gd` contiene
+> `move_and_slide`, `JUMP`, `GRAVITY`, todo el código correcto.
+> **El scorer B-1 lo detecta**: `platformer-juego` = **9/12**, con
+> `jugador-salta` FALLANDO.
+>
+> → **Es la primera prueba empírica de que Capa A-bis y Capa B miden cosas
+> distintas**, y de que la segunda ve lo que la primera no puede.
+
+**Resultado de las 8 suites contra el workspace actual** *(prueba del corredor,
+NO medición — un workspace contiene un juego, no ocho)*:
+
+| tarea | M | Score |
+|---|---|---|
+| **platformer-juego** | **9/12** | **75.00** |
+| platformer-niveles | 6/10 | 60.00 |
+| arcade-shooter | 5/10 | 50.00 |
+| rpg-quest | 5/11 | 45.45 |
+| arcade-olas | 4/9 | 44.44 |
+| rpg-boss | 4/12 | 33.33 |
+| puzzle-memory | 2/6 | 33.33 |
+| puzzle-sliding | 2/7 | 28.57 |
+
+**Uso correcto:** generar el juego para la tarea X → correr **solo** esa suite X.
+
 ---
 
 ## 7. TraceForge — el instrumento de trayectoria
@@ -330,7 +394,8 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | 14 | **Ningún paper de juegos tiene `D^eval`** — solo Evo-Bench construye el split | §10.1 de `BENCHMARK_SPEC.md` |
 | 15 | **Arquetipos por género**: respaldados por GameCraft, **rechazados por GameDevBench** | §10.2 de `BENCHMARK_SPEC.md` |
 | 16 | **B-2 bloqueada**: falta `xdotool` y ReaGame **no emite trazas `Π`** — el replay de GameCraft no es ejecutable | §5.2.1 enmienda 1 de `BENCHMARK_SPEC.md` |
-| 17 | **La suite B-1 es un test único de 5 checks** — falta escribir el conjunto por tarea | `evals/preflight/test_behaviour.gd` |
+| 17 | **B-1 está construido pero nunca ha medido un juego real** — el workspace actual es una escena rota; falta correr la suite tras una generación | `evals/preflight/suite_runner.py` |
+| 18 | **`main.tscn` de ReaGame está roto** — el jugador cae sin aterrizar; `levels/mision1.tscn` sí funciona | §6.1 de `CONOCIMIENTO.md` |
 
 ---
 
@@ -356,7 +421,8 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | el reencuadre del evaluador de ReaGame | `evals/BENCHMARK_SPEC.md` §5.2.0 |
 | el scorer de Capa B **B-1** (tests en Godot) | `evals/BENCHMARK_SPEC.md` §5.2.1 |
 | el scorer de Capa B **B-2** (replay, bloqueado) | `evals/BENCHMARK_SPEC.md` §5.2.1 + enmienda 1 |
-| el preflight de comportamiento (5/5) | **`evals/preflight/test_behaviour.gd`** · registro en `BENCHMARK_SPEC.md` enmienda 1 |
+| el scorer B-1 (tests de comportamiento) | **`evals/preflight/suite_runner.py`** + `suites/*.yaml` + `check_suite.gd` |
+| el preflight de comportamiento (5/5) | `evals/preflight/test_behaviour.gd` · hallazgo en §6.1 |
 | el binario de Godot del arnés | `EG/.tools/godot` — **4.7.1.stable** |
 
 ---

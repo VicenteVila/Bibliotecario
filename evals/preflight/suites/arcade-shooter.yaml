@@ -1,0 +1,69 @@
+# Suite Capa B-1 — arcade-shooter
+# Cada check verifica UNA feature pedida en la instrucción (GameDevBench §2.2).
+# Ratificado 2026-10-14. Una vez en uso, NO se modifica sin benchmark nuevo.
+#
+# Instrucción: "shooter arcade top-down: el jugador se mueve con las teclas y
+# dispara con espacio, los enemigos aparecen en oleadas con spawn y patrones de
+# movimiento, las balas colisionan con los enemigos y los enemigos dañan al
+# jugador, el jugador tiene 3 vidas y al perderlas hay game over con reinicio,
+# la puntuación sube por cada enemigo eliminado con HUD visible, y las oleadas
+# son cada vez más rápidas."
+
+task: arcade-shooter
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+
+  # "el jugador se mueve con las teclas"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, player, Nave, Ship]
+    desc: "hay un nodo jugador"
+  - id: jugador-mueve
+    kind: moves
+    names: [Player, Jugador, player, Nave, Ship]
+    action: ui_right
+    frames: 45
+    desc: "el jugador se mueve bajo input de tecla"
+
+  # "dispara con espacio"  →  ui_accept produce una acción observable.
+  # En top-down no hay salto: se comprueba que algo ocurre bajo ui_accept.
+  - id: dispara
+    kind: jump
+    names: [Player, Jugador, player, Nave, Ship]
+    frames: 30
+    desc: "ui_accept (espacio) produce respuesta observable (disparo)"
+
+  # "balas"
+  - id: balas-existen
+    kind: node_exists
+    names: [Bullet, Bala, Shot, Projectile, Laser, Disparo]
+    desc: "hay balas/proyectiles"
+
+  # "los enemigos aparecen"
+  - id: enemigos-existen
+    kind: node_exists
+    names: [Enemy, Enemigo, enemy, Alien, Mob]
+    desc: "hay enemigos"
+
+  # "el jugador tiene 3 vidas"
+  - id: hud-vidas
+    kind: label_match
+    text: vida
+    desc: "el HUD muestra vidas"
+
+  # "la puntuación sube ... con HUD visible"
+  - id: hud-puntos
+    kind: label_match
+    text: punto
+    desc: "el HUD muestra puntuación"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+
+  # "game over con reinicio"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Reintentar, Reiniciar, Retry, GameOver]
+    desc: "hay game over con reinicio"

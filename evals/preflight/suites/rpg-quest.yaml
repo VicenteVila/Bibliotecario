@@ -1,0 +1,73 @@
+# Suite Capa B-1 — rpg-quest
+# Cada check verifica UNA feature pedida en la instrucción (GameDevBench §2.2).
+# Ratificado 2026-10-14. Una vez en uso, NO se modifica sin benchmark nuevo.
+#
+# Instrucción: "RPG-lite top-down: el jugador explora un mapa con obstáculos y
+# colisiones, habla con un NPC que da una quest de 3 pasos, recoge objetos que
+# añade al inventario, tiene HP que baja al recibir daño y HP a 0 es game over
+# con reinicio, completa la quest para ganar, y el HUD muestra HP, inventario
+# y el objetivo actual de la quest."
+
+task: rpg-quest
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+
+  # "el jugador explora un mapa con obstáculos y colisiones"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, player]
+    desc: "hay un nodo jugador"
+  - id: jugador-mueve
+    kind: moves
+    names: [Player, Jugador, player]
+    action: ui_right
+    frames: 45
+    desc: "el jugador se mueve bajo input de flecha"
+  - id: colisiona-suelo
+    kind: lands
+    names: [Player, Jugador, player]
+    rise: 300
+    frames: 90
+    desc: "el jugador colisiona y se detiene (obstáculos/suelo)"
+
+  # "habla con un NPC"
+  - id: npc-existe
+    kind: node_exists
+    names: [NPC, Npc, npc, Personaje, Dialogue, Hablador]
+    desc: "hay un NPC"
+
+  # "recoge objetos que añade al inventario"
+  - id: objetos-existen
+    kind: node_exists
+    names: [Item, Objeto, object, Pickup, Loot, Moneda, Coin]
+    desc: "hay objetos recogibles"
+
+  # "el HUD muestra HP"
+  - id: hud-hp
+    kind: label_match
+    text: hp
+    desc: "el HUD muestra HP"
+
+  # "inventario"
+  - id: hud-inventario
+    kind: label_match
+    text: inventario
+    desc: "el HUD muestra inventario"
+
+  # "el objetivo actual de la quest"
+  - id: hud-quest
+    kind: label_match
+    text: quest
+    desc: "el HUD muestra el objetivo de la quest"
+
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+
+  # "HP a 0 es game over con reinicio"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Reintentar, Reiniciar, Retry, GameOver]
+    desc: "hay game over con reinicio"

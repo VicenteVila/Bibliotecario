@@ -1,0 +1,62 @@
+# Suite Capa B-1 — arcade-olas
+# Cada check verifica UNA feature pedida en la instrucción (GameDevBench §2.2).
+# Ratificado 2026-10-14. Una vez en uso, NO se modifica sin benchmark nuevo.
+#
+# Instrucción: "arcade de oleadas infinitas: 3 tipos de enemigos con velocidad y
+# comportamiento distintos, power-ups que aparecen en oleadas intermedias (doble
+# disparo, escudo), la dificultad sube con la oleada (más enemigos y más
+# rápidos), la puntuación se multiplica en rachas sin recibir daño, y el high
+# score se muestra en el game over con opción de reiniciar."
+
+task: arcade-olas
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+
+  # "3 tipos de enemigos"
+  - id: enemigos-existen
+    kind: node_exists
+    names: [Enemy, Enemigo, enemy, Mob, Alien]
+    desc: "hay enemigos"
+
+  # "power-ups que aparecen"
+  - id: powerups-existen
+    kind: node_exists
+    names: [Powerup, PowerUp, Power, Boost, Item, Pickup, Escudo, Shield]
+    desc: "hay power-ups"
+
+  # "la puntuación se multiplica en rachas"  →  HUD de racha/multiplicador
+  - id: hud-racha
+    kind: label_match
+    text: racha
+    desc: "el HUD muestra racha/multiplicador"
+
+  # "el high score se muestra en el game over"
+  - id: hud-highscore
+    kind: label_match
+    text: high
+    desc: "el HUD muestra high score"
+
+  # "con opción de reiniciar"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Reintentar, Reiniciar, Retry, GameOver]
+    desc: "hay game over con reinicio"
+
+  # HUD visible
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+
+  # "el jugador" (implícito en arcade)
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, player, Nave, Ship]
+    desc: "hay un nodo jugador"
+  - id: jugador-mueve
+    kind: moves
+    names: [Player, Jugador, player, Nave, Ship]
+    action: ui_right
+    frames: 45
+    desc: "el jugador se mueve bajo input de tecla"

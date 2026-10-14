@@ -1,0 +1,64 @@
+# Suite Capa B-1 — platformer-niveles
+# Cada check verifica UNA feature pedida en la instrucción (GameDevBench §2.2).
+# Ratificado 2026-10-14. Una vez en uso, NO se modifica sin benchmark nuevo.
+#
+# Instrucción: "plataformas con 3 niveles de dificultad creciente: enemigos con
+# patrón de movimiento en el nivel 2 y huecos más anchos en el nivel 3. La
+# victoria llega al completar el nivel 3, la derrota al perder todas las vidas,
+# y cada nivel tiene una meta que muestra la puntuación acumulada."
+
+task: platformer-niveles
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+
+  # "3 niveles"
+  - id: tres-niveles
+    kind: scene_count
+    min: 4
+    desc: "hay al menos 3 escenas de nivel (+ entrada)"
+
+  # "el jugador se mueve" (implícito en plataformas)
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, player]
+    desc: "hay un nodo jugador"
+  - id: jugador-mueve
+    kind: moves
+    names: [Player, Jugador, player]
+    action: ui_right
+    frames: 45
+    desc: "el jugador se mueve bajo input de flecha"
+  - id: jugador-salta
+    kind: jump
+    names: [Player, Jugador, player]
+    frames: 30
+    desc: "el jugador salta"
+
+  # "enemigos con patrón de movimiento"
+  - id: enemigos-existen
+    kind: node_exists
+    names: [Enemy, Enemigo, enemy, slime, bat]
+    desc: "hay enemigos"
+
+  # "la derrota al perder todas las vidas"  →  el HUD debe mostrar vidas
+  - id: hud-vidas
+    kind: label_match
+    text: vida
+    desc: "el HUD muestra vidas"
+
+  # "cada nivel tiene una meta"  →  la escena de nivel debe tener meta
+  - id: meta-existe
+    kind: node_exists
+    names: [Goal, Meta, Finish, Exit, Victoria, Win]
+    desc: "hay un nodo meta/victoria"
+
+  # "muestra la puntuación acumulada"
+  - id: hud-puntos
+    kind: label_match
+    text: punto
+    desc: "el HUD muestra la puntuación"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"

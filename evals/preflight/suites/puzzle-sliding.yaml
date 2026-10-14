@@ -1,0 +1,51 @@
+# Suite Capa B-1 — puzzle-sliding
+# Cada check verifica UNA feature pedida en la instrucción (GameDevBench §2.2).
+# Ratificado 2026-10-14. Una vez en uso, NO se modifica sin benchmark nuevo.
+#
+# Instrucción: "puzzle deslizante 4x4: el jugador mueve una pieza a la casilla
+# vacía con clic o flechas, el objetivo es ordenar los números para ganar, hay
+# un contador de movimientos que al agotarse pierde la partida, se puede
+# reiniciar el nivel, y el HUD muestra movimientos y tiempo."
+
+task: puzzle-sliding
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+
+  # "el jugador mueve una pieza ... con flechas"  →  el input de flecha existe
+  # y algo responde. Se usa moves sólo si hay un cuerpo físico; si no, basta
+  # con que las acciones estén registradas (implícito en el resto de checks).
+  - id: piezas-existen
+    kind: node_exists
+    names: [Tile, Pieza, Piece, Cell, Casilla, Slide, Number]
+    desc: "hay piezas/casillas"
+
+  # "el HUD muestra movimientos"
+  - id: hud-movimientos
+    kind: label_match
+    text: movim
+    desc: "el HUD muestra movimientos"
+
+  # "y tiempo"
+  - id: hud-tiempo
+    kind: label_match
+    text: tiempo
+    desc: "el HUD muestra tiempo"
+
+  # "el HUD"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+
+  # "se puede reiniciar el nivel"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Reintentar, Reiniciar, Retry, Menu]
+    desc: "hay un mecanismo de reinicio"
+
+  # "el objetivo es ordenar los números para ganar"  →  hay estado de victoria
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victory, Ganar, Victoria, Goal, Completed]
+    desc: "hay un estado/nodo de victoria"

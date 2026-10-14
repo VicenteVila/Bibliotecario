@@ -1,0 +1,83 @@
+# Suite Capa B-1 — platformer-juego
+# Cada check verifica UNA feature pedida en la instrucción (GameDevBench §2.2).
+# Ratificado 2026-10-14. Una vez en uso, NO se modifica sin benchmark nuevo.
+#
+# Instrucción: "juego de plataformas 2D completo: el jugador se mueve con
+# flechas/teclas y salta con espacio, colisiona con plataformas y suelo, hay
+# una meta al final del nivel que da la victoria, caer al vacío causa derrota,
+# tras game over se puede reiniciar, y el jugador recoge monedas que suman
+# puntos con un HUD visible. Incluye gravedad, coyote time básico y cámara
+# que sigue al jugador."
+
+task: platformer-juego
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+
+  # "el jugador se mueve con flechas/teclas"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, player, heroe, héroe]
+    desc: "hay un nodo jugador"
+  - id: jugador-fisica
+    kind: node_is
+    names: [Player, Jugador, player]
+    is: CharacterBody2D
+    desc: "el jugador es CharacterBody2D (física real)"
+  - id: jugador-mueve
+    kind: moves
+    names: [Player, Jugador, player]
+    action: ui_right
+    frames: 45
+    desc: "el jugador se mueve bajo input de flecha"
+
+  # "salta con espacio"
+  - id: jugador-salta
+    kind: jump
+    names: [Player, Jugador, player]
+    frames: 30
+    desc: "el jugador salta bajo ui_accept (espacio)"
+
+  # "colisiona con plataformas y suelo"
+  - id: colisiona-suelo
+    kind: lands
+    names: [Player, Jugador, player]
+    rise: 300
+    frames: 90
+    desc: "el jugador cae y se DETIENE en el suelo (colisión)"
+
+  # "Incluye gravedad"
+  - id: gravedad
+    kind: falls
+    names: [Player, Jugador, player]
+    rise: 300
+    frames: 45
+    desc: "el jugador cae al ser teleportado arriba (gravedad)"
+
+  # "una meta al final del nivel que da la victoria"
+  - id: meta-existe
+    kind: node_exists
+    names: [Goal, Meta, Finish, Exit, Victoria, Win, goal]
+    desc: "hay un nodo meta/victoria"
+
+  # "el jugador recoge monedas"
+  - id: monedas-existen
+    kind: node_exists
+    names: [Coin, Moneda, coin, Oro, Pickable]
+    desc: "hay monedas/objetos recogibles"
+
+  # "suman puntos con un HUD visible"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: hud-puntos
+    kind: label_match
+    text: puntos
+    desc: "el HUD muestra puntos"
+
+  # "cámara que sigue al jugador"
+  - id: camara-sigue
+    kind: camera_follows
+    names: [Player, Jugador, player]
+    desc: "la cámara sigue al jugador"
