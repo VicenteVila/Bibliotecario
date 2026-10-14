@@ -26,11 +26,10 @@ checks:
     frames: 45
     desc: "el jugador se mueve bajo input de flecha"
   - id: colisiona-suelo
-    kind: lands
+    kind: settles
     names: [Player, Jugador, player]
-    rise: 300
     frames: 90
-    desc: "el jugador colisiona y se detiene (obstáculos/suelo)"
+    desc: "el jugador asienta en el suelo (obstáculos/colisiones)"
 
   # "habla con un NPC"
   - id: npc-existe

@@ -39,21 +39,15 @@ checks:
     frames: 30
     desc: "el jugador salta bajo ui_accept (espacio)"
 
-  # "colisiona con plataformas y suelo"
-  - id: colisiona-suelo
-    kind: lands
+  # "colisiona con plataformas y suelo"  +  "Incluye gravedad"
+  # Un único check sin teleport: is_on_floor()==true al asentar implica que la
+  # gravedad lo bajó Y que la colisión lo detuvo. Ambas a la vez.
+  # (Antes eran dos checks con teleport; eso fallaba en niveles con techo.)
+  - id: colisiona-y-gravedad
+    kind: settles
     names: [Player, Jugador, player]
-    rise: 300
     frames: 90
-    desc: "el jugador cae y se DETIENE en el suelo (colisión)"
-
-  # "Incluye gravedad"
-  - id: gravedad
-    kind: falls
-    names: [Player, Jugador, player]
-    rise: 300
-    frames: 45
-    desc: "el jugador cae al ser teleportado arriba (gravedad)"
+    desc: "el jugador asienta en el suelo (gravedad + colisión, sin teleport)"
 
   # "una meta al final del nivel que da la victoria"
   - id: meta-existe

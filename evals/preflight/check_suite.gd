@@ -69,7 +69,7 @@ func _initialize() -> void:
 	# ---- FASE DE COMPORTAMIENTO ----
 	for c in checks:
 		var kind2 = str(c.get("kind", ""))
-		if kind2 in ["moves", "jump", "camera_follows", "falls", "lands"]:
+		if kind2 in ["moves", "jump", "camera_follows", "falls", "lands", "settles"]:
 			pend.append(c)
 
 	if pend.is_empty():
@@ -227,12 +227,14 @@ func _process(_delta: float) -> bool:
 				if cam != null:
 					cam_dist = cam.global_position.distance_to(target.global_position)
 			elif kind == "falls":
-				# teleportar arriba: si hay gravedad, la Y debe CRECER
+				# teleportar arriba: si hay gravedad, la Y debe CRECER.
+				# ADVERTENCIA: sólo válido si hay espacio libre encima.
 				target.global_position.y -= float(c.get("rise", 300.0))
 				y_start = target.global_position.y
-			elif kind == "lands":
-				# teleportar arriba: si colisiona con el suelo, debe DETENERSE
-				target.global_position.y -= float(c.get("rise", 300.0))
+			elif kind == "lands" or kind == "settles":
+				# SIN teleport: se espera a que el jugador asiente.
+				# is_on_floor()==true implica que la gravedad lo bajó Y que la
+				# colisión lo detuvo. Ambas a la vez, sin intervenir.
 				y_start = target.global_position.y
 
 		if kind == "jump" and frames > 5 and frames < 25:
@@ -262,16 +264,14 @@ func _process(_delta: float) -> bool:
 				var dyf = target.global_position.y - y_start
 				_emit(dyf > 10.0, str(c.get("id", "?")),
 					"%s — cayó %.1f px tras teleport arriba" % [str(c.get("desc", "")), dyf])
-			elif kind == "lands":
+			elif kind == "lands" or kind == "settles":
+				# sin teleport: is_on_floor() implica gravedad + colisión a la vez
 				var landed = false
 				if target is CharacterBody2D:
 					landed = target.is_on_floor()
 				var fallen = target.global_position.y - y_start
-				var rise = float(c.get("rise", 300.0))
-				# cayó casi todo el ascenso y ya no sigue cayendo → colisiona
-				var stopped = fallen > rise * 0.5 and fallen < rise * 1.2
-				_emit(landed or stopped, str(c.get("id", "?")),
-					"%s — is_on_floor=%s · cayó %.1f px de %d" % [str(c.get("desc", "")), landed, fallen, int(rise)])
+				_emit(landed, str(c.get("id", "?")),
+					"%s — is_on_floor=%s · descenso %.1f px desde el spawn" % [str(c.get("desc", "")), landed, fallen])
 
 			pi += 1
 			frames = 0

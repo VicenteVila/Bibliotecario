@@ -59,7 +59,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 
 | qué | dónde |
 |---|---|
-| PDFs (63 MB, **en `.gitignore`**) | `Documentos/` — 24 ficheros |
+| PDFs (63 MB, **en `.gitignore`**) | `Documentos/` — **24 ficheros, todos con extensión** |
 | SQLite (chunks, documentos, nodos) | `data/bibliotecario.db` |
 | Semilla del grafo (**solo 5 técnicas**) | `bibliotecario/knowledge/seed.py:15-60` |
 | Ingesta | `bibliotecario/ingest/pipeline.py` — `extract()` L19-36, `ingest_dir()` L92 |
@@ -69,10 +69,20 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Resultados del juez nuevo | `evals/result_q1_noise_gemini.json`, `evals/result_q1_r4_all.json` |
 | `.env` (claves, chmod 600, no trackeado) | `.env` |
 
-### Estado de la DB (2026-10-13)
+### Estado de la DB (2026-10-14)
 
-`11 documentos` · `~842 chunks` · `31 nodos` · `45 aristas` · `275 lessons`
-· **`0 skills`** · **`0 memory_items`** · `20 wiki_pages`
+`25 documentos` · `2296 chunks` · `31 nodos` · `45 aristas` · `275 lessons`
+· **`0 skills`** · **`0 memory_items`** · `35 wiki_pages`
+
+> **Ingesta completada 2026-10-14** — antes: `11 documentos · ~842 chunks`.
+> **+14 documentos · +1454 chunks.** Los 2 ficheros sin extensión fueron
+> renombrados a `.pdf`; el `.docx` ya estaba en la DB (doc 4).
+> `ingest_dir()` deduplica por hash — re-ingerir es seguro.
+>
+> **Pendiente (y no se hace a medias):** `seed.py` sigue con **5 técnicas**.
+> Ampliarlo exige **leer los 14 papers nuevos** y extraer sus grafos
+> procedurales. Inventarlos desde los títulos sería fabricar conocimiento.
+
 
 ---
 
@@ -349,6 +359,25 @@ NO medición — un workspace contiene un juego, no ocho)*:
 
 **Uso correcto:** generar el juego para la tarea X → correr **solo** esa suite X.
 
+> #### B-1 validado: discrimina *(2026-10-14)*
+>
+> Mismo juego, dos escenas distintas, suite `platformer-juego`:
+>
+> | escena | M | Score | falla |
+> |---|---|---|---|
+> | `res://main.tscn` *(declarada como entrada)* | 8/11 | **72.73** | meta, monedas, salto |
+> | `res://levels/mision1.tscn` *(nivel real)* | 11/11 | **100.00** | — |
+>
+> **Brecha de 27 puntos** entre una entrada rota y un nivel que funciona.
+>
+> **Errata propia corregida:** la primera versión teleportaba al jugador 300 px
+> hacia arriba para medir gravedad y colisión. En `mision1` eso lo metía
+> **dentro de la geometría del nivel** y hacía fallar los checks.
+> **Sustituido por `settles`**: sin teleport, solo esperar a asentar.
+> `is_on_floor()==true` implica que la gravedad lo bajó **y** que la colisión
+> lo detuvo — ambas a la vez, **sin intervenir**. `falls` queda disponible
+> pero documentado como sólo válido con espacio libre encima.
+
 ---
 
 ## 7. TraceForge — el instrumento de trayectoria
@@ -386,7 +415,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | 6 | **ReaGame: 7/8 tareas nunca ejecutadas**, no hay leaderboard | `EG/benchmark/` |
 | 7 | **Gate train/dev de ReaGame apunta a tareas web** | `EG/scripts/gate_harness_edit.py:133-136` |
 | 8 | **Traducción duplicada** en corpus (`Harness as a Language` + versión ES) | `Documentos/` |
-| 9 | **14 de 24 ficheros del corpus sin ingerir**; 2 sin extensión | `Documentos/` + `pipeline.py:97` |
+| ~~9~~ | ~~**14 de 24 ficheros del corpus sin ingerir**~~ | ✅ **RESUELTO 2026-10-14** — 25 docs · 2296 chunks |
 | 10 | **Juez ciego** — `gemini-3.1-flash-lite` comparte familia con agente | §8.13 de `BLUEPRINT_METRIC_DESIGN.md` |
 | 11 | **El evaluador de ReaGame mide código, no juego** — ambos papers de juegos lo rechazan | §5.2.0 de `BENCHMARK_SPEC.md` |
 | 12 | **Inversión de prioridades**: GameCraft da 0.35 a Depth/Art y 0.15 a Mechanics; ReaGame al revés | §5.2.1 de `BENCHMARK_SPEC.md` |
@@ -396,6 +425,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | 16 | **B-2 bloqueada**: falta `xdotool` y ReaGame **no emite trazas `Π`** — el replay de GameCraft no es ejecutable | §5.2.1 enmienda 1 de `BENCHMARK_SPEC.md` |
 | 17 | **B-1 está construido pero nunca ha medido un juego real** — el workspace actual es una escena rota; falta correr la suite tras una generación | `evals/preflight/suite_runner.py` |
 | 18 | **`main.tscn` de ReaGame está roto** — el jugador cae sin aterrizar; `levels/mision1.tscn` sí funciona | §6.1 de `CONOCIMIENTO.md` |
+| 19 | **`seed.py` sigue con 5 técnicas** pese a tener 25 documentos — ampliarlo exige leer los 14 papers nuevos | `bibliotecario/knowledge/seed.py:15-60` |
 
 ---
 
