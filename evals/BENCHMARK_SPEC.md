@@ -203,20 +203,113 @@ Umbrales **ya declarados en Hito 0-2. Se mantienen intactos — no se re-bajan.*
 > humana obligatoria (dec. 17). Si `B5` llegara a re-bajarse, sería una violación
 > de §7 del `PROPOSITO.md`.
 
-### 5.2 Capa B — Rendimiento del arnés *(por construir)*
+### 5.2 Capa B — Rendimiento del arnés
+
+#### 5.2.0 REENCUADRE DECLARADO — el evaluador actual mide código, no juego
+
+Leídos `GameCraft-Bench` y `GameDevBench` (los dos papers de benchmark de juegos
+de `c:\EG`), **el evaluador estático de 12 ejes de ReaGame no cumple ninguno de
+los dos estándares**:
+
+> *«source code, project structure, assets, and screenshots may be useful for
+> debugging, but they **do not substitute for observed behavior under player
+> input**.»* — GameCraft §3.3
+
+> *«methods… are, however, **either proxies to correctness or non-deterministic**.
+> GameDevBench instead uses Godot's testing framework which allows us to
+> **directly test game behavior**.»* — GameDevBench §3.2
+
+**Se declara, sin tocar ningún umbral:**
+
+| umbral existente | qué era | qué pasa a ser | se toca |
+|---|---|---|---|
+| **techo 40** (*gates* P0) | scorer de rendimiento | **Capa A-bis — calidad del código** | **NO** |
+| **pesos** (`gameplay 2.0`, `visual 2.0`, resto 1.0/1.5) | pesos de rendimiento | **pesos de A-bis** | **NO** |
+| **scores 100** de ReaGame | «el juego funciona» | **«el código pasa el proxy estático»** | **NO** — solo se renombra lo que miden |
+
+**Y se añade**, por tanto, una scorer **genuina de Capa B** que sí ejecute el
+juego (§5.2.1). **Las dos se reportan por separado. No se agregan.**
+
+> *Mismo régimen que con R4/R5 (dec. 12/17): umbral intacto, papel declarado,
+> valor a la vista. Lo que no se hace es re-bajar ni mezclar.*
+
+#### 5.2.1 La dos scorer de Capa B — por dominio
+
+| dominio | scorer actual | scorer de Capa B a construir | fuente |
+|---|---|---|---|
+| **`game_development`** | estático 12 ejes → **A-bis** | **ejecución**: replay de trazas **o** tests en Godot | GameCraft / GameDevBench |
+| **`web_development`** | estático 10 ejes → **A-bis** | **ejecución**: functional testing en Chrome *(ya parcial: `functional_tester.py`)* | por definir |
+
+##### `game_development` — dos caminos, la literatura exige uno
+
+| | **GameCraft-Bench** | **GameDevBench** |
+|---|---|---|
+| tareas | **140** / 15 familias | **333** / 4 categorías de skill |
+| éxito se decide por | **replay de trazas del agente** + juez multimodal sobre **rúbrica oculta** | **tests unitarios ejecutados en Godot** |
+| scorer | GPT-5.5 multimodal, 0–1 por ítem | **binario** pass@1, sin crédito parcial |
+| gate de build | **BUILD = 0 → nota final = 0** | *starting point* debe fallar · *ground truth* debe pasar |
+| categorías y pesos | **M 0.15 · D 0.35 · V 0.15 · A 0.35** | ninguno |
+| validación de tarea | **oracle** Godot + rúbrica ≤24 ítems | tests ↔ instrucción **bidireccionales** |
+| presupuesto | 7200 s agente / 1800 s verificador | — |
+| mejor agente | **41.46 %** | **53.8 %** |
+
+**Camino elegido: GameCraft.** Motivo: ReaGame **ya es un generador de juegos
+completos**, no un editor de tareas aisladas. GameCraft evalúa exactamente eso —
+*«can agents build playable games end to end»* — mientras GameDevBench evalúa
+**ediciones puntuales** sobre un proyecto existente (SWE-bench aplicado a Godot).
+
+**Especificación del scorer de Capa B (extraída de GameCraft §3.2):**
+
+```
+Score = BUILD × (0.15·M + 0.35·D + 0.15·V + 0.35·A)
+
+BUILD = 0  si  el proyecto no lanza  O  ninguna traza parsea   ← CERO, no techo
+```
+
+| cat. | nombre | pesos | qué mide |
+|---|---|---|---|
+| **M** | Core Mechanics | 0.15 | el bucle irreducible responde a la acción del jugador |
+| **D** | Content Depth | **0.35** | variedad, progresión, estados de juego tardíos |
+| **V** | Functional Visuals | 0.15 | legibilidad y feedback durante el juego |
+| **A** | Art & Presentation | **0.35** | *«sientes auténtico y publicable, no de debug»* |
+
+> **¡Atención a la inversión!** GameCraft prioriza **Depth y Art (0.35 cada uno)**
+> sobre Mechanics y Visuals (0.15): *«a complete game should extend beyond minimal
+> mechanics and functional prototypes»*. El evaluador actual de ReaGame hace
+> **exactamente lo contrario** (`gameplay 2.0` el más pesado). **Esa inversión
+> se declara como hallazgo** — no se corrige por ahora; se deja a la vista.
+
+**Restricciones operativas heredadas** (GameCraft §3.2):
+
+- **Rúbrica oculta `ρ`** — el agente **no ve** el checklist. *(En ReaGame hoy
+  el agente **puede leer su propio evaluador** — eso tiene que cerrarse.)*
+- **Trazas `Π` del agente** — 1–10 demos JSON con eventos de ratón/teclado,
+  ≤20 s cada una, a 30 fps, viewport 1280×720.
+- **Replay determinista** — `xdotool` + `Xvfb` + `ffmpeg`, muestreo a 2 fps.
+- **Sin exploración por el verificador** — *«turning verification into an
+  autonomous exploration problem and making scores depend on the verifier's
+  exploration policy.»* **Prohibido.**
+- **Ítems ≤24**, anclados `0 / 0.5 / 1`, con **tope 0.5** a lo que sea
+  *label-only, decorativo, estático, widgets por defecto o formas programáticas*.
+- **`max`** para requisitos puntuales · **`mean`** para propiedades persistentes.
+- **Congelado:** motor (Godot), contrato de envío, viewport, fps, ventana,
+  juez, plantilla del juez, pesos, fórmula.
+
+##### Métricas generales de Capa B
 
 | métrica | definición | dirección | fuente |
 |---|---|---|---|
-| **`Overall`** | score de `H_T` congelado en `D^eval` | ↑ | Evo-Bench |
-| **`AnytimeVal`** | media del mejor-so-far sobre el presupuesto; si cortas antes, **se arranca el resto** | ↑ | Evo-Bench |
-| **Scores por dominio** | desglose | ↑ | Evo-Bench |
+| **`Overall(d, H)`** | score de `H_T` congelado en `D^eval_d` | ↑ | Evo-Bench |
+| **`AnytimeVal(d)`** | media del mejor-so-far sobre el presupuesto; si cortas antes, **se arranca el resto** | ↑ | Evo-Bench |
 | **`RR(k)`** | prob. de volver a estado que avanza la tarea en ≤ `k` pasos. **Curva en `k ∈ {1,3,5,10}`**, no un número | ↑ | Stop Comparing |
 | **Context Retention** | fracción de archivos/tests/restricciones relevantes presentes en el contexto por paso | ↑ | Stop Comparing |
 | **Control Lag `τ`** | pasos entre anomalía detectada y señal correctora que llega a la política | ↓ | Stop Comparing |
-| **Recursos** | coste USD · tokens · **tiempo secuencial** | ↓ | Stop Comparing |
+| **Recursos** | coste USD · tokens · **tiempo secuencial** | ↓ | Stop Comparing / GameDevBench |
 
 > *«RR(k) as a curve over k ∈ {1,3,5,10}… preferable to a single number because
 > the choice of k trades promptness against eventual recovery.»* — Stop Comparing §5
+
+**Prohibido agregar A-bis y B en una sola nota.** Se reportan las dos.
 
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
@@ -353,10 +446,12 @@ Sin las dos o tres, «mejoró» no significa nada: mejoró *respecto a qué*.
 | 7 | **Presupuesto** (iter/pasos/tiempo) | el loop | pendiente |
 | 8 | **Instrumentar con TraceForge** | `RR(k)`, Context Retention, `τ` | pendiente → §5.4 |
 | 9 | **Cerrar el agujero de arquetipos sin `structure`/`verification`** | el cometido es vacío en 37/61 | pendiente |
+| 10 | **Construir el scorer de Capa B por ejecución** (juegos: replay de trazas) | `Overall(game_development)` | pendiente → §5.2.1 |
+| 11 | **Cerrar la visibilidad del evaluador** — el agente no debe poder leer su rúbrica | rúbrica oculta `ρ` | pendiente → §5.2.1 |
 
 ### 10.1 Hallazgo crítico: **no existe ningún `D^eval` en todo el ecosistema**
 
-Revisados `Bibliotecario`, `CogniTeam`, `ReaWeb` y `ReaGame`:
+Revisados `Bibliotecario`, `CogniTeam`, `ReaWeb`, `ReaGame` **y los cuatro papers**:
 
 | | ¿hay `D^val`/`D^eval`? | ¿todo visible? |
 |---|---|---|
@@ -364,11 +459,19 @@ Revisados `Bibliotecario`, `CogniTeam`, `ReaWeb` y `ReaGame`:
 | CogniTeam | no — `evals/classification.yaml` (123 casos, solo clasificación) | sí |
 | ReaWeb | **no** — 14 tareas fijas en `tasks.yaml`, **inyectadas al prompt** | **sí** |
 | ReaGame | **no** — 8 tareas en `game_tasks.yaml`, **inyectadas al prompt** | **sí** |
+| **Evo-Bench** | ✅ **`D^val` 160 / `D^eval` 448** | — |
+| **Stop Comparing** | ❌ no | — |
+| **GameCraft-Bench** | ❌ **no** — solo **rúbrica oculta `ρ`** | — |
+| **GameDevBench** | ❌ **no** — solo 117 transcripciones *para sonda de contaminación* | — |
 
-**El agente puede leer su propio evaluador, sus reglas y su suite.** La única
-cosa parecida a un *holdout* es el *gate* de aceptación `train`/`dev` de
-ReaGame — **y sus defaults siguen siendo tareas web** (`landing-page`,
-`ecommerce`) de ReaWeb, y **nunca se ha usado** (`harness_edits`: 0 filas).
+**De los cuatro papers, solo Evo-Bench construye el split.** Los dos de juegos
+protegen **qué se juzga dentro de una tarea** (rúbrica oculta / tests ocultos),
+no **cómo se protege el set de evaluación**. **Evo-Bench sigue siendo la única
+autoridad para §4.1.**
+
+**Y en el ecosistema propio:** el agente puede leer su evaluador, sus reglas y
+su suite. La única cosa parecida a un *holdout* es el *gate* `train`/`dev` de
+ReaGame — **defaults web heredados de ReaWeb, y nunca usado** (`harness_edits`: 0).
 
 **Traducción:** el criterio central de Evo-Bench (*«evaluation-suite tasks are
 unavailable»*) **se cumple en cero proyectos**. Crear `D^eval` no es un detalle:
@@ -378,8 +481,8 @@ unavailable»*) **se cumple en cero proyectos**. Crear `D^eval` no es un detalle
 
 - **Umbrales ya declarados y validados en dominio:** ambos arneses usan **techo
   40** por *gates* P0. En ReaGame se validó empíricamente: **80 → 40** cuando el
-  gate detectó un juego sin cablear. **Ese umbral está declarado antes de medir
-  y no se debe tocar.**
+  gate detectó un juego sin cablear. **Se mantiene intacto** — ver el reencuadre
+  de §5.2.0.
 - **La comparabilidad por `task_hash` es frágil:** *ReaGame* demostró que
   quitar los acentos cambia el hash (`4dfaa8fe…` vs `501c8e9b…`) y rompe la
   serie. **Normalizar antes de hashear** — congelado nuevo.
@@ -388,5 +491,49 @@ unavailable»*) **se cumple en cero proyectos**. Crear `D^eval` no es un detalle
 - **Meta-evolución nunca ha disparado:** `harness_edits = 0` en ReaGame;
   en Bibliotecario `skills = 0`, `memory_items = 0`. **El bucle de mejora
   existe y no se ha ejecutado nunca.**
+- **Inversión de prioridades detectada:** GameCraft da **0.35** a *Content Depth*
+  y *Art & Presentation* y solo **0.15** a *Core Mechanics* — *«a complete game
+  should extend beyond minimal mechanics and functional prototypes»*. El
+  evaluador actual de ReaGame hace **lo contrario** (`gameplay 2.0` el más
+  pesado). **Declarado, no corregido** — queda a la vista en §5.2.1.
+- **Los arquetipos por género tienen respaldo parcial:** GameCraft usa 15
+  familias/géneros; GameDevBench dice explícitamente *«there is **no existing
+  taxonomy** of game development tasks»* y categoriza por **skill + editor**.
+  Nuestros 4 arquetipos son géneros: **con respaldo de GameCraft, sin respaldo
+  de GameDevBench.**
 
 ---
+
+## 11. Ratificación
+
+Esta especificación **no vale nada hasta que se ratifique**, y una vez ratificada
+**no se toca** salvo declarando benchmark nuevo.
+
+| item | propuesto | ratificado |
+|---|---|---|
+| §2.1 ETCSOVG invariante · arnés por dominio | sí | ☐ |
+| §3 congelados (incl. **lista de dominios**) | sí | ☐ |
+| §4.0 dominios: `web_development`, `game_development` | sí | ☐ |
+| §4.1 partición `D^val`/`D^eval` (autoridad: Evo-Bench) | sí | ☐ |
+| §4.2 criterio `Sens > 0` | sí | ☐ |
+| §5.1 umbrales A (intactos Hito 0-2) | sí | ☐ |
+| **§5.2.0 reencuadre**: techo 40 y pesos → **Capa A-bis**, sin tocarlos | sí | ☐ |
+| **§5.2.1 scorer de Capa B** = GameCraft (`BUILD × 0.15M+0.35D+0.15V+0.35A`) | sí | ☐ |
+| **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☐ |
+| §5.4 instrumentación TraceForge obligatoria | sí | ☐ |
+| §6 Harness Card obligatoria | sí | ☐ |
+| §8 base semilla `H0` | *(candidatos en §8)* | ☐ |
+| §8 base humana | *(candidatos en §8)* | ☐ |
+| **§7 presupuesto** | *(pendiente — **GameCraft sugiere 7200 s / 1800 s**)* | ☐ |
+| §10.3 `D^eval` por dominio | *(bloqueante nº1)* | ☐ |
+
+### Enmiendas posteriores a la última ratificación
+
+**Ninguna.** Esta es la primera versión del documento. *(Cualquier cambio futuro
+tras ratificar se anota aquí con fecha y motivo — no se reescribe en silencio.)*
+
+---
+
+**Umbrales declarados antes de medir. Umbrales nunca re-bajados.**
+**Resultado negativo se declara. Errata se declara.**
+

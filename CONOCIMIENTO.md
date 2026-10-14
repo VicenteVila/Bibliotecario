@@ -97,7 +97,82 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 |---|---|---|
 | **Stop Comparing** | ✅ leído | Harness Card ETCSOVG · `HV`/`MV`/`RR(k)`/Context Retention/`τ` · dos protocolos válidos |
 | **Evo-Bench** | ✅ leído | `D^val`/`D^eval` · criterio **`Sens(x) > 0`** · presupuesto · loop de evolución · dos bases |
+| **GameCraft-Bench** | ✅ leído | ver §3.1 — **rechaza el evaluador estático**; da el scorer `BUILD × (0.15M+0.35D+0.15V+0.35A)` |
+| **GameDevBench** | ✅ leído | ver §3.2 — tests **ejecutados en Godot**; categoriza por skill+editor, **no por género** |
 | resto | ❌ sin leer | — |
+
+### 3.1 GameCraft-Bench — *«can agents build playable games end to end»*
+
+`c:\EG\GameCraft-Bench, Can agents build playable games end to end in a real game engine.pdf`
+· 25 págs · arXiv:2606.17861v1 · **extracción**: `/tmp/opencode/papers/gamecraft.txt`
+
+| | |
+|---|---|
+| tareas | **140** / **15 familias** (Platformer 19, Strategy 17, Tycoon 16, Open-world 15, Roguelike 14, Visual novel 11, Puzzle 8, Shooter 7…) |
+| motor | **Godot 4.6.2** · Ubuntu 22.04 · Python 3.12 · Harbor |
+| éxito se decide por | **replay de trazas `Π` del agente** + **juez multimodal GPT-5.5** sobre **rúbrica oculta `ρ`** |
+| fórmula | `Score = BUILD × (0.15·M + 0.35·D + 0.15·V + 0.35·A)` |
+| BUILD | **0 si no lanza o ninguna traza parsea → nota final = 0** *(cero, no techo)* |
+| categorías | M Core Mechanics 0.15 · **D Content Depth 0.35** · V Functional Visuals 0.15 · **A Art & Presentation 0.35** |
+| rúbrica | ≤24 ítems, anclados `0 / 0.5 / 1`, **tope 0.5** a lo *label-only / decorativo / widgets por defecto / formas programáticas* |
+| agregación | **`max`** para requisitos puntuales · **`mean`** para propiedades persistentes |
+| replay | `xdotool` + `Xvfb` + `ffmpeg` · 30 fps · 1280×720 · ≤10 demos · ≤20 s · muestreo 2 fps |
+| presupuesto | agente **7200 s** · verificador **1800 s** |
+| validación de tarea | **oracle** Godot que prueba que la spec es implementable y cada ítem alcanzable |
+| mejores | Opus-4.7 high **41.46 %** · GPT-5.5 high 39.49 · Kimi-K2.6 30.65 · DeepSeek-V4-Pro 2.15 |
+| **no mide** | *diversión* subjetiva · 3D · multijugador · audio |
+
+**Tres desiderata** (§2.2): I *Engine Grounding* · II *Artifact Completeness*
+· **III *Interactive Verification*** — *«the artifact must be run, acted upon, and
+observed as an interactive system»*.
+
+**Cita clave** (§3.3): *«source code, project structure, assets, and screenshots
+may be useful for debugging, but they **do not substitute for observed behavior
+under player input**.»*
+
+**Prohibido explícitamente**: **exploración autónoma por el verificador** —
+*«making scores depend on the verifier's exploration policy»*.
+
+### 3.2 GameDevBench — *evaluación por tests ejecutados*
+
+`c:\EG\GameDevBench,Evaluating agentic capabilities through game.pdf`
+· 29 págs · **extracción**: `/tmp/opencode/papers/gamedevbench.txt`
+
+| | |
+|---|---|
+| tareas | **333** = 154 core + 179 variantes · **131 fáciles / 202 duras** |
+| motor | **Godot 4** |
+| éxito se decide por | **tests unitarios GDScript ejecutados en el motor** — `VALIDATION_PASSED` / `VALIDATION_FAILED` |
+| scorer | **binario pass@1**, sin crédito parcial, **sin ejes, sin pesos, sin techo** |
+| categorías | **NO géneros** — 4 *skill* (2D 33.3 %, 3D 26.7 %, UI 20.1 %, Gameplay 19.8 %) + 3 *editor* |
+| validación de tarea | tests ↔ instrucción **bidireccionales** + chequeo de ambigüedad |
+| presupuesto | agente 7200 s *(no explícito)* |
+| mejores | Gemini 3 Pro **53.8 %** · Gemini 3 Flash 45.4 · GPT-5.4 41.1 · Qwen3.5-397B 5.4 |
+| hallazgo | feedback multimodal **+10.9 pp** (GPT-5.4 41.1 → 52.0) · coste **×3.3** |
+| fracasos | nodos mal ubicados **63.4 %** · métodos/props ausentes 36.2 % · física incorrecta 32.1 % |
+
+**Cita clave** (§3.2): *«methods are… **either proxies to correctness or
+non-deterministic**. GameDevBench instead uses Godot's testing framework which
+allows us to **directly test game behavior**.»*
+
+**Cita sobre taxonomía** (§3.1): *«there is **no existing taxonomy** of game
+development tasks performed within a game editor or game engine.»*
+
+**Rechaza explícitamente**: LLM-as-a-Judge para scoring (*«subject to biases»*),
+CLIP (*«proxies to correctness»*).
+
+### 3.3 Los cuatro papers y el `D^eval`
+
+| paper | ¿split `D^val`/`D^eval`? |
+|---|---|
+| **Evo-Bench** | ✅ **160 / 448** — único que lo construye |
+| Stop Comparing | ❌ |
+| **GameCraft-Bench** | ❌ — solo **rúbrica oculta `ρ`** |
+| **GameDevBench** | ❌ — solo 117 transcripciones *para sonda de contaminación* |
+
+**Los de juegos protegen *qué se juzga dentro de una tarea*, no *cómo se
+protege el set*. Evo-Bench sigue siendo la única autoridad para la estructura
+del split.**
 
 ---
 
@@ -218,6 +293,11 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | 8 | **Traducción duplicada** en corpus (`Harness as a Language` + versión ES) | `Documentos/` |
 | 9 | **14 de 24 ficheros del corpus sin ingerir**; 2 sin extensión | `Documentos/` + `pipeline.py:97` |
 | 10 | **Juez ciego** — `gemini-3.1-flash-lite` comparte familia con agente | §8.13 de `BLUEPRINT_METRIC_DESIGN.md` |
+| 11 | **El evaluador de ReaGame mide código, no juego** — ambos papers de juegos lo rechazan | §5.2.0 de `BENCHMARK_SPEC.md` |
+| 12 | **Inversión de prioridades**: GameCraft da 0.35 a Depth/Art y 0.15 a Mechanics; ReaGame al revés | §5.2.1 de `BENCHMARK_SPEC.md` |
+| 13 | **El agente puede leer su propia rúbrica** — GameCraft exige rúbrica **oculta** | §5.2.1 de `BENCHMARK_SPEC.md` |
+| 14 | **Ningún paper de juegos tiene `D^eval`** — solo Evo-Bench construye el split | §10.1 de `BENCHMARK_SPEC.md` |
+| 15 | **Arquetipos por género**: respaldados por GameCraft, **rechazados por GameDevBench** | §10.2 de `BENCHMARK_SPEC.md` |
 
 ---
 
@@ -238,7 +318,10 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | trazar un agente | `TraceForge/` |
 | los resultados de runs | `EW/reaweb-harness/runs/`, `EG/runs/` |
 | las críticas externas | `EW/Mejoras propuestas por QWEN 3.8.txt`, `EW/Opinion repositorio ReaWeb.txt` |
-| los papers de benchmark de juegos (**sin leer**) | `EG/GameCraft-Bench….pdf`, `EG/GameDevBench….pdf` |
+| los papers de benchmark de juegos (**YA LEÍDOS**) | `/tmp/opencode/papers/{gamecraft,gamedevbench}.txt` |
+| los PDFs originales de juegos | `EG/GameCraft-Bench….pdf`, `EG/GameDevBench….pdf` |
+| el reencuadre del evaluador de ReaGame | `evals/BENCHMARK_SPEC.md` §5.2.0 |
+| el scorer de Capa B (GameCraft) | `evals/BENCHMARK_SPEC.md` §5.2.1 |
 
 ---
 
