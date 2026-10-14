@@ -71,17 +71,58 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 
 ### Estado de la DB (2026-10-14)
 
-`25 documentos` · `2296 chunks` · `31 nodos` · `45 aristas` · `275 lessons`
+`25 documentos` · `2296 chunks` · `126 nodos` · `180 aristas` · `275 lessons`
 · **`0 skills`** · **`0 memory_items`** · `35 wiki_pages`
+
+| tipo de nodo | antes | ahora |
+|---|---|---|
+| technique | 5 | **14** |
+| procedure | ~26 | **98** |
+| paper | 5 | **14** |
+| edges | 45 | **180** |
 
 > **Ingesta completada 2026-10-14** — antes: `11 documentos · ~842 chunks`.
 > **+14 documentos · +1454 chunks.** Los 2 ficheros sin extensión fueron
 > renombrados a `.pdf`; el `.docx` ya estaba en la DB (doc 4).
 > `ingest_dir()` deduplica por hash — re-ingerir es seguro.
->
-> **Pendiente (y no se hace a medias):** `seed.py` sigue con **5 técnicas**.
-> Ampliarlo exige **leer los 14 papers nuevos** y extraer sus grafos
-> procedurales. Inventarlos desde los títulos sería fabricar conocimiento.
+
+### 3.4 Las 14 técnicas sembradas y sus papers
+
+**5 originales** (docs 1-5): `PEARL` · `Procedural Graphs` · `Task-CoEvolve`
+· `ReASearch` · `WikiSkill`
+
+**9 añadidas 2026-10-14** — cada procedimiento extraído del texto y verificado
+en el chunk; **ninguno inventado**:
+
+| técnica | paper | doc | aporta |
+|---|---|---|---|
+| **MetaSkill** | Learning Meta-Skills… AI4AI | 13 | meta-skills de test-time · banco congelado · Add/Revise/Keep |
+| **Mixture of Self-Improving Branches** | MoSIB | 14 | ramas paralelas · subconjuntos de desarrollo que evolucionan · router |
+| **HARDE** | HARDE | 15 | módulos trigger/monitor/feedback · probing aislado → optimización guiada |
+| **JAZ** | Harness as a Language | 16 | primitivo `invoke` · delegación tail-recursive · memoria por prompting |
+| **Harness-of-Harness** | HoH | 18 | 3 roles (Planner/Developer/QA) · bucle multi-día |
+| **HarnessDev** | HarnessDev | 19 | Creation + Evolution · development loop de 4 pasos |
+| **Malena** | How Much of a Harness… | 22 | **una sola sesión larga** · sin orquestación externa |
+| **Agent as Its Own Optimizer** | Self-Evolving Harness | 23 | el modelo edita su propio arnés · presupuesto de edición con annealing |
+| **SoL-Pi** | SoL-Pi | 24 | map-reduce de trayectorias · review independiente · gates de coste |
+
+### 3.5 Los 4 papers de MEDICIÓN, no de método *(resultado honesto)*
+
+Cuatro de los 14 **no tienen grafo procedural** — miden, no proponen un bucle.
+Se declaran como `technique: null` en vez de inventarles un método:
+
+| paper | doc | qué aporta en vez de un bucle |
+|---|---|---|
+| **Harness Engineering** | 12 | anatomía a nivel de código de **11 arneses de producción** · 7 dimensiones · «describes and compares, does not benchmark or rank» |
+| **Beyond the Model** | 20 | ablación de **5 componentes** (tool registry, context compression, explicit planning, subagents, lazy skills) con **NanoHarness** como instrumento |
+| **Agent Plasticity** | 21 | la **métrica** `P = ΔS / C` + taxonomía de fallos del bucle (`F_absent` / `F_missed` / `F_used`) |
+| **An Empirical Study of Harness Design** | 25 | ablación controlada de **176 configuraciones** sobre un bucle ReAct fijo |
+
+> **Por qué esto es conocimiento y no un hueco:** `Agent Plasticity` da la
+> métrica exacta que el proyecto necesita para la capa **`O` de ETCSOVG** —
+> *cuánto aprende el arnés por unidad de coste*. **NanoHarness** (doc 20) es un
+> instrumento de ablación reutilizable. **No son técnicas que sembrar; son
+> mediciones que citar.**
 
 
 ---
@@ -425,7 +466,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | 16 | **B-2 bloqueada**: falta `xdotool` y ReaGame **no emite trazas `Π`** — el replay de GameCraft no es ejecutable | §5.2.1 enmienda 1 de `BENCHMARK_SPEC.md` |
 | 17 | **B-1 está construido pero nunca ha medido un juego real** — el workspace actual es una escena rota; falta correr la suite tras una generación | `evals/preflight/suite_runner.py` |
 | 18 | **`main.tscn` de ReaGame está roto** — el jugador cae sin aterrizar; `levels/mision1.tscn` sí funciona | §6.1 de `CONOCIMIENTO.md` |
-| 19 | **`seed.py` sigue con 5 técnicas** pese a tener 25 documentos — ampliarlo exige leer los 14 papers nuevos | `bibliotecario/knowledge/seed.py:15-60` |
+| ~~19~~ | ~~**`seed.py` sigue con 5 técnicas**~~ | ✅ **RESUELTO 2026-10-14** — 14 técnicas · 98 procedimientos · §3.4 |
 
 ---
 
@@ -439,6 +480,8 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | los umbrales | `evals/BLUEPRINT_METRIC_DESIGN.md` §3.1 |
 | qué se erró y se declaró | `evals/BLUEPRINT_METRIC_DESIGN.md` §8.8-§8.13 |
 | un paper del corpus | `Documentos/` |
+| **las 14 técnicas sembradas** | `CONOCIMIENTO.md` §3.4 · código en `bibliotecario/knowledge/seed.py` |
+| **los 4 papers de medición (sin bucle)** | `CONOCIMIENTO.md` §3.5 — *Harness Engineering · Beyond the Model · Agent Plasticity · Empirical Study* |
 | el texto ya extraído de un paper | `sqlite3 data/bibliotecario.db` → tabla `chunks` |
 | los dominios y sus reglas | `Cogniteam/cogniteam_archetypes.yaml` + `Cogniteam/cogniteam_rules/` |
 | el arnés web | `EW/reaweb-harness/` |

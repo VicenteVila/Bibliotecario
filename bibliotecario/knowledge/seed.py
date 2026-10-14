@@ -57,6 +57,105 @@ TECHNIQUES = {
             ("lessons persistence", "refines", "failure-vs-success refiner"),
         ],
     },
+    # --- Ampliación 2026-10-14: los 14 papers del corpus ingerido ---
+    # Cada procedimiento fue extraído del texto del paper y verificado en el
+    # chunk indicado en CONOCIMIENTO.md. NO se inventó ninguno.
+    # Los 4 papers restantes (Harness Engineering, Beyond the Model,
+    # Agent Plasticity, An Empirical Study) son de MEDICIÓN, no de método:
+    # no tienen grafo procedural y se declaran como tale en CONOCIMIENTO.md.
+    "MetaSkill": {
+        "doc": "Learning Meta-Skills for Agent Harness Design",
+        "procedures": [
+            ("build harness", "triggers", "target execution"),
+            ("review execution feedback", "triggers", "update skill bank"),
+            ("add meta-skill", "alternative_to", "revise meta-skill"),
+            ("freeze skill bank", "triggers", "test-time construction"),
+            ("BM25 retrieval", "alternative_to", "full-bank selection"),
+        ],
+    },
+    "Mixture of Self-Improving Branches": {
+        "doc": "Mixture of Self-Improving Branches",
+        "procedures": [
+            ("branch-local proposal", "triggers", "candidate evaluation"),
+            ("coverage vote", "triggers", "development subset pruning"),
+            ("prune development subsets", "triggers", "update proposal guidance"),
+            ("update proposal guidance", "triggers", "next harness proposal"),
+            ("select branch heads", "triggers", "build router"),
+            ("evolving development subsets", "alternative_to", "fixed development set"),
+        ],
+    },
+    "HARDE": {
+        "doc": "HARDE: Optimizing Agent Harnesses",
+        "procedures": [
+            ("trigger module", "triggers", "monitor invocation"),
+            ("isolated module probing", "triggers", "optimization guide"),
+            ("optimization guide", "triggers", "guided optimization"),
+            ("guided optimization", "refines", "iterative harness search"),
+            ("propose one-module revision", "triggers", "evaluate updated harness"),
+            ("guide reuse", "alternative_to", "per-setting probing"),
+        ],
+    },
+    "JAZ": {
+        "doc": "Harness as a Language",
+        "procedures": [
+            ("invoke agent loop", "generalizes", "codeact agent loop"),
+            ("context window warning", "triggers", "tail recursive delegation"),
+            ("tail recursive delegation", "generalizes", "context compaction"),
+            ("construct solver inputs", "triggers", "run solver on task"),
+            ("run solver on task", "triggers", "inspect task results"),
+            ("continual self improvement", "alternative_to", "ace self improvement loop"),
+        ],
+    },
+    "Harness-of-Harness": {
+        "doc": "Harness-of-Harness: Multi-Day",
+        "procedures": [
+            ("project planning", "triggers", "artifact development"),
+            ("artifact development", "triggers", "independent quality assurance"),
+            ("independent quality assurance", "triggers", "project planning"),
+            ("shift-left testing", "refines", "artifact development"),
+        ],
+    },
+    "HarnessDev": {
+        "doc": "HarnessDev: Can LLMs Create",
+        "procedures": [
+            ("harness creation", "triggers", "harness evolution"),
+            ("edit harness", "triggers", "run development cases"),
+            ("run development cases", "triggers", "inspect feedback"),
+            ("inspect feedback", "triggers", "edit harness"),
+            ("probe evaluation", "alternative_to", "full evaluation pair"),
+        ],
+    },
+    "Malena": {
+        "doc": "How Much of a Harness Does a Strong Agent Need",
+        "procedures": [
+            ("coding agent session", "triggers", "autonomous search"),
+            ("single long session", "generalizes", "oneshot iteration"),
+            ("malena session", "alternative_to", "harness search orchestration"),
+            ("malena session", "alternative_to", "multi-agent orchestration"),
+            ("general pipeline", "triggers", "code patch search"),
+        ],
+    },
+    "Agent as Its Own Optimizer": {
+        "doc": "Self-Evolving Harness on Multiple Tasks",
+        "procedures": [
+            ("solver rollout", "triggers", "proposer update"),
+            ("proposer update", "triggers", "engineering check"),
+            ("engineering check", "triggers", "repair session"),
+            ("multi-task pretraining", "triggers", "continual training"),
+            ("edit budget annealing", "refines", "proposer update"),
+        ],
+    },
+    "SoL-Pi": {
+        "doc": "SoL-Pi: Recursively Scaling Auto-Research Loops",
+        "procedures": [
+            ("trajectory map reduce analysis", "triggers", "mechanism proposal"),
+            ("mechanism proposal", "triggers", "candidate implementation"),
+            ("candidate implementation", "triggers", "independent review"),
+            ("failed review", "triggers", "candidate revision"),
+            ("capability and efficiency gates", "triggers", "nondominated candidate retention"),
+            ("cost gate", "triggers", "native compaction"),
+        ],
+    },
 }
 
 
