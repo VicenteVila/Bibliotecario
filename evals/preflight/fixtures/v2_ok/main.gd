@@ -1,12 +1,17 @@
 extends Node2D
 ## Fixture de validación del scorer Capa B-1 **v2**.
 ##
-## Juego sintético que ejercita los 5 `kind`s nuevos:
-##   · hud_value_changes  — recoger la moneda sube el contador del HUD
-##   · state_after_action — pulsar ui_up baja el maná
-##   · wait_accumulates   — un temporizador suma monedas pasivas SIN input
-##   · reaches_state      — alcanzar la meta muestra la etiqueta VICTORIA
-##   · restart_resets     — reiniciar pone el marcador a cero
+## Juego sintético que ejercita los `kind`s nuevos de v2:
+##   · hud_value_changes      — recoger la moneda sube el contador del HUD
+##   · state_after_action     — pulsar ui_up baja el maná
+##   · wait_accumulates       — un temporizador suma monedas pasivas SIN input
+##   · reaches_state          — alcanzar la meta muestra la etiqueta VICTORIA
+##   · restart_resets         — reiniciar pone el marcador a cero
+##   · resource_within_bounds — la carga nunca desborda su cota de 10
+##   · timing_window          — pulsar cuando la nota llega a la línea suma;
+##                              fuera de la ventana, no (los 10 fijos en el
+##                              BROKEN aceptan cualquier pulsación)
+##   · no_runtime_errors      — (runner) el BROKEN lanza un error de script
 ##
 ## `BROKEN = true` deja la ESCENA idéntica (mismos nodos, mismos nombres) pero
 ## sin cablear la lógica: el HUD queda congelado, no hay ingreso pasivo, la
@@ -24,6 +29,7 @@ var passive_label: Label
 var respawn: Timer
 var passive_timer: Timer
 var cam: Camera2D
+var note: Node2D
 
 var score := 0
 var charge := 0.0
@@ -111,6 +117,12 @@ func _ready() -> void:
 	add_child(passive_timer)
 	passive_timer.start()
 
+	# nota de ritmo — cae en bucle hacia la línea (timing_window)
+	note = Node2D.new()
+	note.name = "Note"
+	add_child(note)
+	note.position = Vector2(200, 0)
+
 	_refresh()
 
 func _mk_label(parent: Node, lname: String, pos: Vector2) -> Label:
@@ -149,6 +161,17 @@ func _physics_process(delta: float) -> void:
 		charge += 0.5
 	else:
 		charge = minf(charge + 0.5, 10.0)
+
+	# timing_window (corrección temporal, familia Rhythm): la nota cae en
+	# bucle hacia la línea y sólo el pulso cerca de la línea puntúa.
+	note.position.y += 6.0
+	if note.position.y > 360.0:
+		note.position.y = 0.0
+	if Input.is_action_just_pressed("ui_accept"):
+		var en_ventana := absf(note.position.y - 96.0) <= 36.0
+		if BROKEN or en_ventana:
+			score += 10
+			_refresh()
 
 	if BROKEN and Engine.get_physics_frames() == 10:
 		# hueco B: error de script en caliente para no_runtime_errors.

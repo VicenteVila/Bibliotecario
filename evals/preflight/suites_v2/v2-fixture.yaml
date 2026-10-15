@@ -58,6 +58,20 @@ checks:
     property: charge
     max: 10
     frames: 140
+  # --- C (§5.2.2.b): corrección temporal, familia Rhythm — la ventana del
+  #     juego debe distinguir: dentro de la llegada suma, fuera no ---
+  - id: ritmo-ventana
+    kind: timing_window
+    desc: pulsar cuando la nota llega a la línea suma; fuera de la ventana no
+    names: [Note]
+    axis: y
+    cue_op: ">="
+    cue_at: 96
+    action: ui_accept
+    window: 6
+    outside: 20
+    watch_label: [puntos]
+    frames: 120
   # --- B (§5.2.2.b): kind runner-side — patrón SCRIPT ERROR declarado ---
   - id: sin-errores-de-script
     kind: no_runtime_errors

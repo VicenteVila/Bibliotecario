@@ -26,6 +26,16 @@ extends SceneTree
 ##                            (suite_runner_v2.py) escaneando `SCRIPT ERROR:`.
 ##                            Si llega aquí, se emite FAIL ruidoso (kind desconocido).
 ##
+## C (§5.2.2.b, 2026-10-15 — corrección temporal, familia Rhythm):
+##   timing_window          — la ventana del juego DEBE distinguir el instante:
+##                            vigila la llegada de la nota a la línea (`names` +
+##                            `cue_at` + `cue_op`), pulsa `action` dentro (tick
+##                            siguiente al cruce) y `outside` frames después; el
+##                            `watch_label` debe subir con el interior y NO con el
+##                            exterior. Un juego que acepta cualquier pulsación
+##                            cae en la condición exterior; uno que nunca acierta,
+##                            en la interior.
+##
 ## Límite declarado: `reaches_state` y `restart_resets` verifican el ALAMBRE
 ## (que el final es alcanzable y se muestra, que el reinicio resetea), no que
 ## una IA sepa ganar. El techo de frames sigue vigente.
@@ -64,7 +74,7 @@ const MAX_FRAMES := 6000
 
 const V2_KINDS := ["hud_value_changes", "state_after_action",
 					"wait_accumulates", "reaches_state", "restart_resets",
-					"resource_within_bounds"]
+					"resource_within_bounds", "timing_window"]
 const STATIC_KINDS := ["build", "node_exists", "node_is", "canvas",
 					"label_match", "scene_count", "has_method", "collision"]
 
@@ -258,6 +268,18 @@ func _begin_check(c: Dictionary) -> void:
 				v2_snap["pos"] = target.global_position
 		"resource_within_bounds":
 			v2_snap = {"n": 0, "bad": NAN, "bad_frame": -1, "peak": NAN}
+		"timing_window":
+			v2_snap = {"cue": null, "armed": false, "crossed": false, "T": -1,
+					"v0": NAN, "v_hit": NAN, "v_miss": NAN, "cfg_err": ""}
+			v2_snap["cue"] = _find_by_names(c.get("names", []))
+			v2_snap["v0"] = _label_number(c.get("watch_label", []))
+			var w = int(c.get("window", 6))
+			var o = int(c.get("outside", 20))
+			if o < w + 4:
+				v2_snap["cfg_err"] = ("config: outside (%d) debe ser >= window+4 (%d)"
+					% [o, w + 4])
+			elif v2_snap["cue"] == null:
+				v2_snap["cfg_err"] = "no encontré el nodo de ritmo %s" % str(c.get("names", []))
 
 func _process(_delta: float) -> bool:
 	total_frames += 1
@@ -345,6 +367,41 @@ func _process(_delta: float) -> bool:
 					if v > vmax_b or v < vmin_b:
 						v2_snap["bad"] = v
 						v2_snap["bad_frame"] = frames
+
+		# timing_window: armar → detectar cruce → pulso dentro → pulso fuera
+		if kind == "timing_window":
+			var cue = v2_snap.get("cue", null)
+			if cue != null and str(v2_snap.get("cfg_err", "")) == "":
+				var ax = str(c.get("axis", "y"))
+				var px = cue.global_position.x if ax == "x" else cue.global_position.y
+				var cat = float(c.get("cue_at", 0.0))
+				var op = str(c.get("cue_op", ">="))
+				if not bool(v2_snap.get("armed", false)):
+					# armar sólo cuando la nota aún NO ha cruzado: así se
+					# espera el PRÓXIMO compás aunque el check empiece a mitad
+					if (op == ">=" and px < cat) or (op == "<=" and px > cat):
+						v2_snap["armed"] = true
+				elif not bool(v2_snap.get("crossed", false)):
+					if (op == ">=" and px >= cat) or (op == "<=" and px <= cat):
+						v2_snap["crossed"] = true
+						v2_snap["T"] = frames
+				else:
+					var T = int(v2_snap["T"])
+					var w = int(c.get("window", 6))
+					var o = int(c.get("outside", 20))
+					var act = str(c.get("action", "ui_accept"))
+					if frames == T + 1:
+						Input.action_press(act)
+					elif frames == T + 2:
+						Input.action_release(act)
+					elif frames == T + w + 3:
+						v2_snap["v_hit"] = _label_number(c.get("watch_label", []))
+					elif frames == T + o:
+						Input.action_press(act)
+					elif frames == T + o + 1:
+						Input.action_release(act)
+					elif frames == T + o + 3:
+						v2_snap["v_miss"] = _label_number(c.get("watch_label", []))
 
 		if frames == nframes:
 			_resolve_check(c, kind, nframes)
@@ -455,6 +512,35 @@ func _resolve_check(c: Dictionary, kind: String, nframes: int) -> void:
 			else:
 				_emit(true, id, "%s — %d muestras dentro de [%.3f, %.3f] (pico %.3f)"
 					% [desc, ns, vmin, vmax, float(v2_snap.get("peak", NAN))])
+
+		"timing_window":
+			Input.action_release(str(c.get("action", "ui_accept")))
+			var err = str(v2_snap.get("cfg_err", ""))
+			var wl = str(c.get("watch_label", []))
+			var o = int(c.get("outside", 20))
+			if err != "":
+				_emit(false, id, "%s — %s" % [desc, err])
+			elif not bool(v2_snap.get("crossed", false)):
+				_emit(false, id, "%s — nunca vi la nota cruzar cue_at=%s [%s] en %d frames"
+					% [desc, str(c.get("cue_at", "?")), str(c.get("cue_op", ">=")), nframes])
+			elif is_nan(float(v2_snap.get("v0", NAN))):
+				_emit(false, id, "%s — no pude leer '%s' antes de pulsar" % [desc, wl])
+			elif is_nan(float(v2_snap.get("v_hit", NAN))):
+				_emit(false, id, "%s — no llegué a leer '%s' tras el pulso interior (llegada en frame %d)"
+					% [desc, wl, int(v2_snap.get("T", -1))])
+			elif float(v2_snap["v_hit"]) <= float(v2_snap["v0"]) + 0.001:
+				_emit(false, id, "%s — pulsé EN la ventana (frame %d de la llegada) y '%s' no subió: %.1f → %.1f"
+					% [desc, int(v2_snap.get("T", -1)) + 1, wl,
+					float(v2_snap["v0"]), float(v2_snap["v_hit"])])
+			elif is_nan(float(v2_snap.get("v_miss", NAN))):
+				_emit(false, id, "%s — no llegué a evaluar la pulsación exterior (+%d frames)" % [desc, o])
+			elif float(v2_snap["v_miss"]) > float(v2_snap["v_hit"]) + 0.001:
+				_emit(false, id, "%s — pulsé FUERA de la ventana (+%d frames) y '%s' SUBIÓ: %.1f → %.1f — la ventana no distingue el instante"
+					% [desc, o, wl, float(v2_snap["v_hit"]), float(v2_snap["v_miss"])])
+			else:
+				_emit(true, id, "%s — la ventana distingue: dentro '%s' %.1f → %.1f · fuera +%d sin cambio (%.1f)"
+					% [desc, wl, float(v2_snap["v0"]), float(v2_snap["v_hit"]),
+					o, float(v2_snap["v_miss"])])
 
 		"restart_resets":
 			var ra = str(c.get("restart_action", "ui_accept"))

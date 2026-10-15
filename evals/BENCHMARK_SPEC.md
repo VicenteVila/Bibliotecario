@@ -496,7 +496,8 @@ el evaluador estático con otro nombre:
    moneda sube sola. Los 5 `kind`s de comportamiento **todos** exigen
    `Input.action_press`. Ninguno mide un contador creciendo **sin** intervención.
 3. **Corrección temporal** — el corazón de **Rhythm**: acertar la nota **en el
-   instante** correcto. No existe `kind` que mida sincronía.
+   instante** correcto. No existe `kind` que mida sincronía. *(→ cerrado el
+   2026-10-15 con `timing_window` — ver §5.2.2.b.)*
 4. **Lectura de valor vivo del HUD** — `label_match` comprueba que un `Label`
    **contiene** la palabra `puntos`. No comprueba que el número **cambie** al
    recoger una moneda. Un HUD con `puntos: 0` congelado aprueba.
@@ -550,9 +551,9 @@ versión nueva; después sí. Fuente: los propios textos, con cita corta.
 > se reescribe. Recuento correcto **previo a A/B: 5 cubiertas, 4 parciales,
 > 8 sin cubrir**.
 >
-> Con **A y B cerrados (2026-10-15)** se usarán **21 ramas de dispatch /
-> 20 checks + BUILD** (13 + 5 + A + B) y el recuento de la tabla pasa a
-> **7 cubiertas / 4 parciales / 6 sin cubrir**.
+> Con **A, B y C cerrados (2026-10-15)** se usarán **22 ramas de dispatch /
+> 21 checks + BUILD** (13 + 5 + A + B + C) y el recuento de la tabla pasa a
+> **8 cubiertas / 4 parciales / 5 sin cubrir**.
 
 **Tabla clase de fallo → `kind`(s) de v2:**
 
@@ -574,24 +575,26 @@ versión nueva; después sí. Fuente: los propios textos, con cita corta.
 | Playtesting / fun-factor / UX / legibilidad visual (Survey: *«capturing the fun… is not possible»*; GameCraft Limitations: no mide fun) | — | ❌ **ámbito de B-2** (juez multimodal, bloqueado) — ya declarado |
 | Balanceo y exploración (2022: *balancing*, *game exploration*) | — | ❌ **no aplicable** — son tareas del tester, no de verificación de lo pedido |
 | Timers encadenados en secuencia (GameRule límite 4: *Timer(a) no encadenable*) | `wait_accumulates` sólo acumulación simple | ⚠️ **parcial** → futuro/B-2 |
-| Sincronía rítmica (hallazgo 3 de esta misma sección, familia Rhythm) | — | ❌ **único pendiente (C)** — ninguno de los `kind`s mide *timing*; no lo cubre ningún paper, lo declaró nuestra auditoría. Se cierra o se declara fuera **antes de ratificar v2** |
+| Sincronía rítmica (hallazgo 3 de esta misma sección, familia Rhythm) | `timing_window` | ✅ **cerrado 2026-10-15 (C)** — el motor vigila la llegada de la nota a la línea (`cue_at` + `cue_op`), pulsa dentro (tick siguiente al cruce) y fuera (`+outside` frames): el `watch_label` debe subir con el interior y **no** con el exterior. Validado: ok 9/9; el roto cae con «la ventana no distingue el instante». Sin paper detrás: lo declaró nuestra auditoría |
 
-**Resumen honesto de la tabla (recuento con A/B cerrados, 2026-10-15):** de 17
-clases contrastadas — **7 cubiertas** (las 5 previas + cota de recurso + crash
-en caliente), **4 parciales**, **6 sin cubrir** (2 no-alcance: rendimiento y
-regresión entre versiones; 2 no-aplicables: multijugador y balanceo; 1 ámbito
-B-2: playtesting/UX; y **1 pendiente real: sincronía rítmica (C)**). Los dos
-huecos con paper detrás quedan **cerrados y validados**; el recuento previo del
-resumen (6/5/6) estaba mal — errata declarada arriba.
+**Resumen honesto de la tabla (recuento con A/B/C cerrados, 2026-10-15):** de
+17 clases contrastadas — **8 cubiertas** (las 5 previas + cota de recurso +
+crash en caliente + sincronía rítmica), **4 parciales**, **5 sin cubrir** (2
+no-alcance: rendimiento y regresión entre versiones; 2 no-aplicables:
+multijugador y balanceo; 1 ámbito B-2: playtesting/UX). **Los tres huecos
+quedan cerrados y validados** — los dos con paper detrás (SAGE, Politowski) y
+el propio de la auditoría (Rhythm). El recuento previo del resumen (6/5/6)
+estaba mal — errata declarada arriba.
 
 > **Estado de la decisión del dueño (2026-10-15):** el dueño autorizó
-> **«A y B ahora»** → **(A) `resource_within_bounds` y (B)
-> `no_runtime_errors` cerrados el 2026-10-15** con validación medida (ok
-> **8/8 = 100** vs roto **1/8 = 12.5**, cada `kind` nuevo cayendo por su
-> propia razón; v1 intacto 11.11/11.11 y ReaGame **72.73** sin `git diff`).
-> Queda **(C) ventana de sincronía para Rhythm**, a hacer después de A/B según
-> la misma orden. **La ratificación de v2 (enm. 2) no se emite hasta resolver
-> C** (cerrarla o declararla fuera), para ratificar una sola vez.
+> **«A y B ahora… después C»** → **los tres huecos cerrados el mismo día**:
+> **(A) `resource_within_bounds`**, **(B) `no_runtime_errors`** (runner-side)
+> y **(C) `timing_window`** (ventana de sincronía Rhythm), con validación
+> medida: ok **9/9 = 100** vs roto **1/9 = 11.11** — los 8 checks del roto
+> caen cada uno por su propia razón — y v1 intacto: fixtures **11.11/11.11**,
+> ReaGame **72.73**, `git diff` vacío. **No queda ningún hueco abierto en esta
+> tabla: v2 queda libre para ratificar** — emitir la ratificación (enm. 2) es
+> decisión del dueño, y se hace una sola vez.
 
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
@@ -971,7 +974,7 @@ aquí con fecha y motivo — no se reescribe en silencio.)*
 |---|---|
 | **objeto** | motor B-1 (`check_suite.gd`) — **versión nueva del benchmark**, no enmienda del congelado |
 | **antes (v1)** | 13 `kind`s: 8 estructurales + 5 cinéticos. **31 de 60 tareas** quedaban sin cobertura de comportamiento (§5.2.2). Victoria/derrota/reinicio sólo se comprobaban como `node_exists` sobre un nodo *llamado* Win/Restart. *(Errata declarada 2026-10-15: el reparto correcto es **7 estructurales + 6 cinéticos + `build` como gate** — `settles` y `lands` son dos `kind`s; los **totales 13/18 y las decisiones tomadas no cambian**. Ver §5.2.2.b.)* |
-| **ahora (v2)** | **20 `kind`s** = los 13 de v1 **+ 5 nuevos** (`hud_value_changes` · `state_after_action` · `wait_accumulates` · `reaches_state` · `restart_resets`) **+ 2 cerrados tras el contraste de §5.2.2.b** (`resource_within_bounds`, `no_runtime_errors` — ver ampliación abajo). v2 observa **cambios en el tiempo**, no sólo existencia. |
+| **ahora (v2)** | **21 `kind`s** = los 13 de v1 **+ 5 nuevos** (`hud_value_changes` · `state_after_action` · `wait_accumulates` · `reaches_state` · `restart_resets`) **+ 3 cerrados tras el contraste de §5.2.2.b** (`resource_within_bounds`, `no_runtime_errors`, `timing_window` — ver ampliación abajo). v2 observa **cambios en el tiempo**, no sólo existencia. |
 | **qué NO cambia** | **v1 queda intacto y runnable** (`check_suite.gd` + `suite_runner.py` sin tocar — `git diff` vacío). El motor de v2 es un **archivo nuevo** `check_suite_v2.gd`. Godot sigue siendo **4.7.1**. La fórmula, `BUILD=0` y los pesos son idénticos. |
 | **motivo** | §5.2.2 declaró, tras auditar las 15 familias, que B-1 **no cubría 31 de 60 tareas**: los 5 `kind`s cinéticos sólo aplican a avatares que se mueven por el espacio, y en Card/Idle/Rhythm/VN/Strategy/Tycoon/Simulation/Puzzle la verificación colapsaba al evaluador estático. Se pidió explícitamente al dueño y autorizó **A1**. |
 | **validación medida** *(no supuesta)* | dos fixtures sintéticos idénticos en estructura, uno cableado (`v2_ok`) y uno sin cablear (`v2_broken`): **v1 los puntúa IGUAL (11.11 vs 11.11)** — no distingue. **v2 los separa 83.33 puntos** (ok **100.00** vs roto **16.67**), y los 5 `kind`s nuevos **fallan en el roto cada uno por su razón** (HUD congelado · propiedad sin cambiar · sin acumulación pasiva · sin indicador de final visible · sin reset). |
@@ -987,15 +990,15 @@ aquí con fecha y motivo — no se reescribe en silencio.)*
 > v2 en una misma serie** — son instrumentos distintos, como declaró la enmienda 1
 > para B-1/B-2. Un resultado v1 y un resultado v2 no son comparables.
 
-#### Ampliación pre-ratificación — A y B cerrados en v2 · 2026-10-15
+#### Ampliación pre-ratificación — A, B y C cerrados en v2 · 2026-10-15
 
 | | |
 |---|---|
 | **objeto** | §5.2.2.b — los dos huecos con paper detrás, **antes** de ratificar v2 |
-| **qué se añade** | **(A)** `resource_within_bounds` — cota `min/max` muestreada **por frame de física** en el motor (SAGE *resource overflow*). **(B)** `no_runtime_errors` — **runner-side**: el motor GDScript no puede interceptar sus propios errores en caliente, así que `suite_runner_v2.py` separa estos checks del motor, escanea la salida combinada con el patrón **declarado** `SCRIPT ERROR:|Failed to load script` y sintetiza el resultado citando la primera línea como evidencia; si hay coincidencia la validación entera queda `FAILED` |
-| **validación medida** | fixtures ok/roto: **ok 8/8 = 100.0** · **roto 1/8 = 12.5** — los 7 checks caen cada uno por su razón (incluidos «COTA EXCEDIDA: 497.500 fuera de [-inf, 10]» y «primer error de script: SCRIPT ERROR: Invalid call…»). `v2-compat` **4/4** · **v1 intacto** en fixtures **1/9 = 11.11** en ambos (sigue sin distinguir) · **v1 en ReaGame 72.73** con `git diff` vacío |
-| **qué NO cambia** | v1 congelado (ficheros v1 con `git diff` vacío), Godot 4.7.1, la fórmula, `BUILD=0`, los pesos, `MAX_FRAMES` 6000 y los umbrales. Sólo crece el recuento: **21 ramas / 20 checks + BUILD** |
-| **ratificación** | sigue **propuesta** — falta C (sincronía rítmica) |
+| **qué se añade** | **(A)** `resource_within_bounds` — cota `min/max` muestreada **por frame de física** en el motor (SAGE *resource overflow*). **(B)** `no_runtime_errors` — **runner-side**: el motor GDScript no puede interceptar sus propios errores en caliente, así que `suite_runner_v2.py` separa estos checks del motor, escanea la salida combinada con el patrón **declarado** `SCRIPT ERROR:|Failed to load script` y sintetiza el resultado citando la primera línea como evidencia; si hay coincidencia la validación entera queda `FAILED`. **(C)** `timing_window` — corrección temporal (familia Rhythm): arma en la nota, detecta el cruce de `cue_at`, pulsa **dentro** (tick siguiente) y **fuera** (`+outside`); exige que `watch_label` suba con el interior y **no** con el exterior |
+| **validación medida** | fixtures ok/roto con la suite final de 9 checks: **ok 9/9 = 100.0** · **roto 1/9 = 11.11** — los 8 checks caen cada uno por su razón (HUD congelado · propiedad sin cambiar · sin acumulación · sin final visible · sin reset · «COTA EXCEDIDA: 497.0 fuera de [-inf, 10]» · «pulsé FUERA de la ventana (+20 frames) y 'puntos' SUBIÓ: 10.0 → 20.0 — la ventana no distingue el instante» · «primer error de script: SCRIPT ERROR: Invalid call…»). `v2-compat` **4/4** · **v1 intacto** en fixtures **1/9 = 11.11** en ambos (sigue sin distinguir) · **v1 en ReaGame 72.73** con `git diff` vacío |
+| **qué NO cambia** | v1 congelado (ficheros v1 con `git diff` vacío), Godot 4.7.1, la fórmula, `BUILD=0`, los pesos, `MAX_FRAMES` 6000 y los umbrales. Sólo crece el recuento: **22 ramas / 21 checks + BUILD** |
+| **ratificación** | **sin huecos abiertos** en §5.2.2.b — v2 queda libre para ratificar; emitirla es decisión del dueño (una sola vez) |
 
 #### Observación de instrumento — v1 no es reproducible bajo carga · 2026-10-15
 
