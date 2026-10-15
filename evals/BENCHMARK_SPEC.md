@@ -747,6 +747,15 @@ línea `fallan: build`) — errata de implementación corregida en el script
   Siguiente experimento declarado aparte (no se hace aquí): scaffold de
   `.tscn` mínimo en el harness, o modelo con presupuesto suficiente.
 
+**Serie 3 — scaffold de `.tscn` fijo, declarada ANTES de correrla** *(2026-10-15)*:
+
+| | |
+|---|---|
+| **hipótesis** | el fallo dominante de la baseline (0/28 con `BUILD>0`) es la escritura de `.tscn` por el modelo, no su capacidad de lógica de juego. Si el harness fija la escena, `BUILD` cruza el cero y las mediciones ganan resolución. |
+| **qué cambia el harness** | **el harness escribe** `project.godot` y `main.tscn` (Godot 4 válidos: cabecera `[gd_scene load_steps=2 format=3]`, `[ext_resource]` primero, raíz `Node2D` con script). **El modelo sólo genera `main.gd`**, con `###FILE: main.gd###`, y crea **todo el árbol por código en `_ready()`** — patrón exacto del smoke que ya pasó **10/10**. Criba reducida a GDScript (el crib de `.tscn` ya no aplica). Instrucción explícita declarada: las etiquetas del HUD usan **las palabras en español del propio texto de la tarea** (mismo origen que las agujas de la suite; no se muestra la suite). |
+| **qué NO cambia** | 8 mismas tareas · modelo `openai/gpt-oss-120b` · `max_tokens=7000` · cooldown 70 s · presupuesto 1 gen + 2 repairs · scoring y suites idénticos. Sólo se extrae `main.gd` de la respuesta; si el modelo devuelve además escenas, se ignoran. |
+| **resultado** | `evals/preflight/results/measure_b1_serie3.jsonl` — se anota aquí al cerrar. |
+
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
 Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el
