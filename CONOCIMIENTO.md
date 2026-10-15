@@ -46,7 +46,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | qué | dónde |
 |---|---|
 | **Propósito / navegación** | `PROPOSITO.md` (raíz) |
-| **Regla de medición** | `evals/BENCHMARK_SPEC.md` — **ratificación parcial 2026-10-14: bloque B-1** · §11 |
+| **Regla de medición** | `evals/BENCHMARK_SPEC.md` — **ratificación parcial 2026-10-14: bloque B-1** · **scorer B-1 v2 ratificado 2026-10-15: vigente para medición nueva, v1 congelado como histórico** · §11 |
 | **Mapa de conocimiento** | `CONOCIMIENTO.md` (este) |
 | Umbrales y diseño de métricas | `evals/BLUEPRINT_METRIC_DESIGN.md` — §3.1 umbrales |
 | Decisiones numeradas | `evals/BLUEPRINT_METRIC_DESIGN.md` — §6 dec. 9-18 |
@@ -521,7 +521,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | ~~1~~ | ~~**`D^eval` está bloqueada por TAREAS, no por diseño** — 8 tareas dejan ~2 de eval, sin potencia estadística. Umbral declarado: **≥56 tareas totales** para ≥20 de `D^eval` (ratio Evo-Bench 448/160)~~ | ✅ **RESUELTO 2026-10-14** — suite ampliada a **60 tareas** (8+52) en `evals/game_tasks_expanded.yaml`, umbral ≥56 cumplido; Puzzle=3 y Shooter=3 declarados en déficit; §4.4 de `BENCHMARK_SPEC.md` |
 | ~~2~~ | ~~**`Sens(x)` no se puede calcular** — no hay score por pregunta (`r4_ok` es booleano agregado)~~ | ✅ **PARCIALMENTE RESUELTO 2026-10-14** — era cierto solo para el brazo **R4/Q1**. **Para juegos no aplica**: B-1 sí emite puntuación numérica **por tarea** (`res.score`, float, JSON). Lo que sigue faltando para `Sens(x)` son los **K arneses auxiliares** (coste), §10.2.1 de `BENCHMARK_SPEC.md` |
 | 22 | **El split fiel a Evo-Bench está bloqueado por COSTE** — exige `Sens(x)`, que a su vez exige K arneses auxiliares evaluados sobre las 60 tareas; generarlos consume claves a `target_h: 3`. Un split aleatorio **no** es Evo-Bench y se declara placeholder | §10.2.1 de `BENCHMARK_SPEC.md` |
-| ~~23~~ | ~~**B-1 no cubre 31 de las 60 tareas** — sus 5 `kind`s de comportamiento sólo aplican a avatares cinéticos; en Card/Idle/Rhythm/VN/Strategy/Tycoon/Simulation/Puzzle la verificación **colapsa a `label_match` + `node_exists`** (= evaluador estático). Además victoria/derrota/reinicio **jamás se activan** en ninguna de las 60: sólo se comprueba que exista un nodo *llamado* Win/Restart~~ | ✅ **CERRADO 2026-10-14 (enmienda 2)** — el dueño autorizó **A1**; los 5 `kind`s nuevos (`hud_value_changes`, `state_after_action`, `wait_accumulates`, `reaches_state`, `restart_resets`) están en **`check_suite_v2.gd`** (v1 intacto) y **validados**: separan un fixture cableado de uno roto por **83.33 pts** donde v1 los puntúa igual. v2 = benchmark nuevo, pendiente de ratificación propia para medición real · §5.2.2 y §11 enm. 2 |
+| ~~23~~ | ~~**B-1 no cubre 31 de las 60 tareas** — sus 5 `kind`s de comportamiento sólo aplican a avatares cinéticos; en Card/Idle/Rhythm/VN/Strategy/Tycoon/Simulation/Puzzle la verificación **colapsa a `label_match` + `node_exists`** (= evaluador estático). Además victoria/derrota/reinicio **jamás se activan** en ninguna de las 60: sólo se comprueba que exista un nodo *llamado* Win/Restart~~ | ✅ **CERRADO 2026-10-14 (enmienda 2)** — el dueño autorizó **A1**; los 5 `kind`s nuevos (`hud_value_changes`, `state_after_action`, `wait_accumulates`, `reaches_state`, `restart_resets`) están en **`check_suite_v2.gd`** (v1 intacto) y **validados**: separan un fixture cableado de uno roto por **83.33 pts** donde v1 los puntúa igual. v2 = benchmark nuevo **ratificado 2026-10-15** (dueño: «Ratifica v2») — vigente para medición nueva, v1 congelado como histórico · §5.2.2 y §11 enm. 2 |
 | 3 | **37/61 arquetipos sin `structure`/`verification`** → compuerta vacía | `cogniteam_archetypes.yaml` / `yaml_loader.py:612` |
 | 4 | **Meta-evolución nunca ha disparado**: `skills=0`, `memory_items=0`, `harness_edits=0` | DBs de Bibliotecario y ReaGame |
 | 5 | **`task_hash` frágil a acentos** → rompe series comparables | `EG/.agent/harness_snapshot.py:98-103` |
@@ -576,7 +576,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | el binario de Godot del arnés | `EG/.tools/godot` — **4.7.1.stable** |
 | **la suite ampliada de juegos (60 tareas)** | `evals/game_tasks_expanded.yaml` · §4.4 de `BENCHMARK_SPEC.md` |
 | **por qué B-1 no cubre 31 de esas 60** | `evals/BENCHMARK_SPEC.md` §5.2.2 — auditoría de cobertura por familia |
-| **contraste de v2 con la literatura (5 papers de dominio)** | `evals/BENCHMARK_SPEC.md` §5.2.2.b — 17 clases: **8 cubiertas · 4 parciales · 5 sin cubrir** — los **3 huecos cerrados y validados 2026-10-15** (A cota de recurso · B error de runtime · C sincronía rítmica); **v2 sin huecos abiertos, libre para ratificar** (decisión del dueño); recuento previo 6/5/6 estaba mal (errata declarada) |
+| **contraste de v2 con la literatura (5 papers de dominio)** | `evals/BENCHMARK_SPEC.md` §5.2.2.b — 17 clases: **8 cubiertas · 4 parciales · 5 sin cubrir** — los **3 huecos cerrados y validados 2026-10-15** (A cota de recurso · B error de runtime · C sincronía rítmica); **v2 ratificado 2026-10-15** (dueño: «Ratifica v2»), vigente para medición nueva; recuento previo 6/5/6 estaba mal (errata declarada) |
 | **el scorer B-1 v2 (18 kind's, cierra esa brecha)** | `evals/preflight/check_suite_v2.gd` + `suite_runner_v2.py` · validado en `fixtures/v2_{ok,broken}/` · §11 enm. 2 |
 
 ---

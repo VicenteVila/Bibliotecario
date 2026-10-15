@@ -6,11 +6,14 @@
 >
 > Fundamento: `Documentos/Stop Comparing LLM Agents Without Disclosing the Harness.pdf`
 > y `Documentos/EVO-BENCH CAN LANGUAGE MODELS IMPROVE AGENT HARNESS.pdf`.
-> **Estado: RATIFICACIÓN PARCIAL — 2026-10-14.**
+> **Estado: RATIFICACIÓN PARCIAL — 2026-10-14 · + scorer B-1 v2 — 2026-10-15.**
 > Ratificado: **bloque B-1** (§5.2.0, §5.2.1 fase B-1, fórmula, `BUILD=0`,
 > prohibición, regla B-2, congelados B-1) **y §8.1 base humana
-> `game_development`** (intervalo medido `72.73`–`100.00`).
-> **Sin ratificar: todo lo demás**, incluida la **fase B-2**. Ver §11.
+> `game_development`** (intervalo medido `72.73`–`100.00`); y **scorer B-1 v2**
+> (enm. 2 + huecos A/B/C de §5.2.2.b) el **2026-10-15** por decisión del
+> dueño — **instrumento B-1 vigente para mediciones nuevas**; v1 queda
+> congelado como histórico. **Sin ratificar: todo lo demás**, incluida la
+> **fase B-2**. Ver §11.
 
 ---
 
@@ -593,8 +596,9 @@ estaba mal — errata declarada arriba.
 > medida: ok **9/9 = 100** vs roto **1/9 = 11.11** — los 8 checks del roto
 > caen cada uno por su propia razón — y v1 intacto: fixtures **11.11/11.11**,
 > ReaGame **72.73**, `git diff` vacío. **No queda ningún hueco abierto en esta
-> tabla: v2 queda libre para ratificar** — emitir la ratificación (enm. 2) es
-> decisión del dueño, y se hace una sola vez.
+> tabla → **RATIFICADO 2026-10-15** (el dueño: «Ratifica v2»)** — v2 es el
+> instrumento B-1 vigente para mediciones nuevas. La ratificación se emite
+> una sola vez; cualquier cambio posterior es enmienda nueva con fecha.
 
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
@@ -942,6 +946,7 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☑ **2026-10-14** |
 | **§5.2.1 regla**: B-2 no se ratifica hasta que B-1 funcione end-to-end | sí | ☑ **2026-10-14** |
 | **§5.2.1 congelados B-1**: Godot 4.7.1, conjunto de tests, comando de ejecución | sí | ☑ **2026-10-14** — *v1 intacto; v2 añadido como benchmark nuevo (enm. 2)* |
+| **§11 enm. 2 — scorer B-1 v2** (`check_suite_v2.gd` · `suite_runner_v2.py` · 21 `kind`s + gate · huecos A/B/C cerrados · validación **9/9 vs 1/9**) | sí | ☑ **2026-10-15** — *decisión del dueño: «Ratifica v2»* |
 | §5.4 instrumentación TraceForge obligatoria | sí | ☐ *sin ratificar* |
 | §6 Harness Card obligatoria | sí | ☐ *sin ratificar* |
 | §8 base semilla `H0` | *(candidatos en §8)* | ☐ *pendiente de valor* |
@@ -952,8 +957,10 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 
 ### Enmiendas posteriores a la última ratificación
 
-**Ninguna todavía.** *(Cualquier cambio futuro tras ratificar se anota
-aquí con fecha y motivo — no se reescribe en silencio.)*
+**Última ratificación: 2026-10-15 — scorer B-1 v2 (enm. 2 + ampliación
+A/B/C). Tras ella: ninguna enmienda todavía.** Las enmiendas 1 y 2 figuran
+abajo como registro previo a esa ratificación. *(Cualquier cambio futuro tras
+ratificar se anota aquí con fecha y motivo — no se reescribe en silencio.)*
 
 #### Enmienda 1 — *previa a la ratificación* · 2026-10-14
 
@@ -982,7 +989,7 @@ aquí con fecha y motivo — no se reescribe en silencio.)*
 | **arreglo de fondo** | al construir v2 aparecieron dos fallos reales del diseño v1, corregidos y declarados: (1) `frames` contaba iteraciones de `_process`, que en headless **desincronizan** de los ticks de física — el juego sólo avanza en física, así que v2 ata el progreso del check a `Engine.get_physics_frames()`; (2) el target se resolvía en `_initialize`, antes de que `_ready()` creara los nodos por script — v2 lo resuelve en `frames==1`, robusto tanto a nodos en `.tscn` como creados por script. |
 | **límite declarado** | `MAX_FRAMES` sube de 900 a **6000** como **válvula de seguridad contra colgadas** (no es presupuesto científico; el presupuesto real va en el `frames:` de cada check). |
 | **artefactos** | `evals/preflight/check_suite_v2.gd` · `suite_runner_v2.py` · `suites_v2/v2-fixture.yaml` · `suites_v2/v2-compat.yaml` · `fixtures/v2_ok/` · `fixtures/v2_broken/` |
-| **ratificación** | **propuesta** — v2 es un benchmark nuevo; requiere decisión del dueño para usarlo en medición real. v1 sigue siendo el vigente hasta entonces. |
+| **ratificación** | ☑ **RATIFICADO 2026-10-15** — decisión del dueño («Ratifica v2») tras el contraste §5.2.2.b **sin huecos abiertos** y la validación completa (ok **9/9** vs roto **1/9**, compat **4/4**, v1 intacto **11.11/11.11** y ReaGame **72.73** con `git diff` vacío). **v2 es el instrumento B-1 vigente para mediciones nuevas; v1 queda congelado como histórico** — nunca se mezclan (regla de arriba). Cualquier cambio posterior → enmienda nueva con fecha. |
 
 > **Regla derivada de la enmienda 2:** `M_B1` **v1** mide cinemática + existencia
 > (suelo). `M_B1` **v2** añade observación de cambios (HUD vivo, acumulación
@@ -998,7 +1005,7 @@ aquí con fecha y motivo — no se reescribe en silencio.)*
 | **qué se añade** | **(A)** `resource_within_bounds` — cota `min/max` muestreada **por frame de física** en el motor (SAGE *resource overflow*). **(B)** `no_runtime_errors` — **runner-side**: el motor GDScript no puede interceptar sus propios errores en caliente, así que `suite_runner_v2.py` separa estos checks del motor, escanea la salida combinada con el patrón **declarado** `SCRIPT ERROR:|Failed to load script` y sintetiza el resultado citando la primera línea como evidencia; si hay coincidencia la validación entera queda `FAILED`. **(C)** `timing_window` — corrección temporal (familia Rhythm): arma en la nota, detecta el cruce de `cue_at`, pulsa **dentro** (tick siguiente) y **fuera** (`+outside`); exige que `watch_label` suba con el interior y **no** con el exterior |
 | **validación medida** | fixtures ok/roto con la suite final de 9 checks: **ok 9/9 = 100.0** · **roto 1/9 = 11.11** — los 8 checks caen cada uno por su razón (HUD congelado · propiedad sin cambiar · sin acumulación · sin final visible · sin reset · «COTA EXCEDIDA: 497.0 fuera de [-inf, 10]» · «pulsé FUERA de la ventana (+20 frames) y 'puntos' SUBIÓ: 10.0 → 20.0 — la ventana no distingue el instante» · «primer error de script: SCRIPT ERROR: Invalid call…»). `v2-compat` **4/4** · **v1 intacto** en fixtures **1/9 = 11.11** en ambos (sigue sin distinguir) · **v1 en ReaGame 72.73** con `git diff` vacío |
 | **qué NO cambia** | v1 congelado (ficheros v1 con `git diff` vacío), Godot 4.7.1, la fórmula, `BUILD=0`, los pesos, `MAX_FRAMES` 6000 y los umbrales. Sólo crece el recuento: **22 ramas / 21 checks + BUILD** |
-| **ratificación** | **sin huecos abiertos** en §5.2.2.b — v2 queda libre para ratificar; emitirla es decisión del dueño (una sola vez) |
+| **ratificación** | ☑ **RATIFICADO 2026-10-15** — el dueño emitió «Ratifica v2» tras cerrar C: sin huecos abiertos en §5.2.2.b; v2 vigente para medición nueva (una sola vez; cambios posteriores → enmienda) |
 
 #### Observación de instrumento — v1 no es reproducible bajo carga · 2026-10-15
 
