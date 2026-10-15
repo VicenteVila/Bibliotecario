@@ -1,0 +1,42 @@
+# Suite Capa B-1 v2 — simulation-parque-tematico (familia: Simulation)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego de simulación de parque temático en Godot donde colocas atracciones, puestos de comida y bancos, y los visitantes caminan por los caminos disfrutando o quejándose según la calidad del recorrido. El HUD muestra dinero, visitantes dentro, satisfacción general y valor de la entrada, y cada atracción consume mantenimiento continuo. Victoria al alcanzar la puntuación de prestigio del parque marcada en el panel antes de que se acabe la temporada, derrota si la satisfacción o la caja llegan a cero, y desde la pantalla final puedes reiniciar el parque. Incluye colas visibles en las atracciones y la posibilidad de subir el precio de la entrada cuando la demanda lo permita."
+
+task: simulation-parque-tematico
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: hud-dinero
+    kind: label_match
+    text: dinero
+    desc: "el HUD muestra dinero"
+  - id: hud-visitante
+    kind: label_match
+    text: visitante
+    desc: "el HUD muestra visitantes dentro"
+  - id: hud-satisfacc
+    kind: label_match
+    text: satisfacc
+    desc: "el HUD muestra satisfacción general"
+  - id: hud-entrada
+    kind: label_match
+    text: entrada
+    desc: "el HUD muestra valor de la entrada"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

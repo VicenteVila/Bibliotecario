@@ -1,0 +1,62 @@
+# Suite Capa B-1 v2 — openworld-moto-desierto (familia: Open World)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego de mundo abierto de conducción en un desierto enorme: el jugador maneja una moto todoterreno recogiendo 15 cromos esparcidos por dunas, cañones y un oasis. Un HUD visible muestra cromos, velocidad y daño del vehículo. Al recoger todos los cromos gana la partida; si el daño acumulado por choques fuertes llega al máximo, hay derrota y se puede reiniciar. Incluye un ciclo de día y noche simple, saltos por rampas y una cámara aérea que sigue a la moto."
+
+task: openworld-moto-desierto
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character, Coche, Moto, Bike, Vehiculo, Vehículo, Vehicle, Kart]
+    desc: "el avatar del jugador existe como nodo"
+  - id: cuerpo-colision
+    kind: collision
+    names: [Moto, Bike, Kart, Vehiculo, Vehículo, Vehicle]
+    desc: "la moto es cuerpo físico"
+  - id: hud-cromo
+    kind: label_match
+    text: cromo
+    desc: "el HUD muestra cromos"
+  - id: hud-velocidad
+    kind: label_match
+    text: velocidad
+    desc: "el HUD muestra velocidad"
+  - id: hud-daño
+    kind: label_match
+    text: daño
+    desc: "el HUD muestra daño del vehículo"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: cota-cromo
+    kind: resource_within_bounds
+    label: [cromo]
+    max: 15
+    frames: 150
+    desc: "el HUD de cromos no desborda 15"
+  - id: moves
+    kind: moves
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character, Coche, Moto, Bike, Vehiculo, Vehículo, Vehicle, Kart]
+    frames: 45
+    desc: "el jugador se mueve con ui_right"
+  - id: camera_follows
+    kind: camera_follows
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character, Coche, Moto, Bike, Vehiculo, Vehículo, Vehicle, Kart]
+    frames: 90
+    desc: "la cámara sigue al jugador"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

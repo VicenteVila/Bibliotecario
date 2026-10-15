@@ -1,0 +1,80 @@
+# Suite Capa B-1 v2 — platformer-torre-rebote (familia: Platformer)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego de plataformas 2D vertical en Godot donde el jugador escala una torre apoyándose en paredes: al tocar un muro puede saltar de nuevo contra él para rebotar hacia arriba, y el movimiento aéreo permite cambiar de dirección con precisión. Hay plataformas móviles, pinchos y coleccionables repartidos en cada altura, con cámara que asciende siguiendo al jugador y HUD visible con vidas, altura máxima alcanzada y monedas. Victoria al llegar a la cima señalizada con una bandera antes de que se agote el tiempo, derrota al caer sobre los pinchos o quedarse sin vidas, y tras game over se puede reiniciar. Incluye un indicador de salto en pared y plataformas que se desmoronan al pisarlas."
+
+task: platformer-torre-rebote
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    desc: "el avatar del jugador existe como nodo"
+  - id: avatar-cuerpo-fisico
+    kind: node_is
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    is: CharacterBody2D
+    desc: "el jugador es un cuerpo físico 2D (CharacterBody2D)"
+  - id: meta-existe
+    kind: node_exists
+    names: [Meta, Goal, Bandera, Flag, Cima, Finish]
+    desc: "hay un nodo de meta/final físico"
+  - id: cuerpo-colision
+    kind: collision
+    names: [Pincho, Spike, Spikes]
+    desc: "los pinchos son cuerpo físico"
+  - id: hud-vida
+    kind: label_match
+    text: vida
+    desc: "el HUD muestra vidas"
+  - id: hud-altura
+    kind: label_match
+    text: altura
+    desc: "el HUD muestra altura máxima alcanzada"
+  - id: hud-moneda
+    kind: label_match
+    text: moneda
+    desc: "el HUD muestra monedas"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: moves
+    kind: moves
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 45
+    desc: "el jugador se mueve con ui_right"
+  - id: jump
+    kind: jump
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 30
+    desc: "el jugador salta con ui_accept"
+  - id: falls
+    kind: falls
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 90
+    desc: "el jugador cae tras teleport arriba"
+  - id: camera_follows
+    kind: camera_follows
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 90
+    desc: "la cámara sigue al jugador"
+  - id: settles
+    kind: settles
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 90
+    desc: "el jugador se asienta en el suelo"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

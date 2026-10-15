@@ -571,13 +571,14 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | el scorer de Capa B **B-1** (tests en Godot) | `evals/BENCHMARK_SPEC.md` §5.2.1 |
 | el scorer de Capa B **B-2** (replay, bloqueado) | `evals/BENCHMARK_SPEC.md` §5.2.1 + enmienda 1 |
 | el scorer B-1 (tests de comportamiento) | **`evals/preflight/suite_runner.py`** + `suites/*.yaml` + `check_suite.gd` |
+| **las 52 suites v2 de las tareas reales** | `evals/preflight/suites_v2/<id>.yaml` — escritas 2026-10-15 desde el texto **antes de cualquier generación**, congeladas al escribirse; lint `evals/preflight/lint_suites_v2.py` (52/52, 551 checks); método y exclusiones → §5.2.2.c |
 | **la base humana de juegos** (72.73–100.00) | `evals/BENCHMARK_SPEC.md` §8.1 · hallazgo en §6.1 |
 | el preflight de comportamiento (5/5) | `evals/preflight/test_behaviour.gd` · hallazgo en §6.1 |
 | el binario de Godot del arnés | `EG/.tools/godot` — **4.7.1.stable** |
 | **la suite ampliada de juegos (60 tareas)** | `evals/game_tasks_expanded.yaml` · §4.4 de `BENCHMARK_SPEC.md` |
 | **por qué B-1 no cubre 31 de esas 60** | `evals/BENCHMARK_SPEC.md` §5.2.2 — auditoría de cobertura por familia |
 | **contraste de v2 con la literatura (5 papers de dominio)** | `evals/BENCHMARK_SPEC.md` §5.2.2.b — 17 clases: **8 cubiertas · 4 parciales · 5 sin cubrir** — los **3 huecos cerrados y validados 2026-10-15** (A cota de recurso · B error de runtime · C sincronía rítmica); **v2 ratificado 2026-10-15** (dueño: «Ratifica v2»), vigente para medición nueva; recuento previo 6/5/6 estaba mal (errata declarada) |
-| **el scorer B-1 v2 (18 kind's, cierra esa brecha)** | `evals/preflight/check_suite_v2.gd` + `suite_runner_v2.py` · validado en `fixtures/v2_{ok,broken}/` · §11 enm. 2 |
+| **el scorer B-1 v2 (21 checks + BUILD, cierra esa brecha)** | `evals/preflight/check_suite_v2.gd` + `suite_runner_v2.py` · validado en `fixtures/v2_{ok,broken}/` · suites de las 52 tareas en `suites_v2/` · §11 enm. 2 · §5.2.2.c |
 
 ---
 

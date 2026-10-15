@@ -1,0 +1,48 @@
+# Suite Capa B-1 v2 — card-memory-precision (familia: Card game)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego de cartas de memoria en Godot con tablero de 4x4 cartas boca abajo que el jugador voltea de dos en dos buscando parejas iguales. El HUD muestra el tiempo transcurrido, las parejas encontradas, el número de intentos y un multiplicador de combo que crece al acertar seguidas y se rompe al fallar. Las cartas se voltean con una animación breve y las parejas correctas desaparecen con un efecto brillante. La victoria se logra completar las 8 parejas antes de que se agote el tiempo del nivel, y la derrota llega cuando el cronómetro llega a cero o se supera el límite de intentos. Al mostrarse la pantalla final con la puntuación hay un botón para reiniciar el tablero con las cartas barajadas de nuevo."
+
+task: card-memory-precision
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: hud-tiempo
+    kind: label_match
+    text: tiempo
+    desc: "el HUD muestra tiempo transcurrido"
+  - id: hud-pareja
+    kind: label_match
+    text: pareja
+    desc: "el HUD muestra parejas encontradas"
+  - id: hud-intento
+    kind: label_match
+    text: intento
+    desc: "el HUD muestra intentos"
+  - id: hud-combo
+    kind: label_match
+    text: combo
+    desc: "el HUD muestra multiplicador de combo"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: cota-pareja
+    kind: resource_within_bounds
+    label: [pareja]
+    max: 8
+    frames: 150
+    desc: "el HUD de parejas encontradas no desborda 8"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

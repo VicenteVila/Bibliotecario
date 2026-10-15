@@ -1,0 +1,62 @@
+# Suite Capa B-1 v2 — openworld-sobrevivencia-bosque (familia: Open World)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego de mundo abierto de supervivencia ligera en un bosque extenso: el jugador recoge madera, piedra y bayas durante 3 días de juego para mantener el hambre y la salud, y construye un refugio con una hoguera grande. Un HUD visible muestra salud, hambre, recursos y el día actual. Sobrevivir los 3 días con la hoguera encendida da la victoria; si el hambre o la salud llegan a cero antes de tiempo, hay derrota y se puede reiniciar. De noche aparecen criaturas hostiles, mientras que de día puede explorar con más seguridad."
+
+task: openworld-sobrevivencia-bosque
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    desc: "el avatar del jugador existe como nodo"
+  - id: avatar-cuerpo-fisico
+    kind: node_is
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    is: CharacterBody2D
+    desc: "el jugador es un cuerpo físico 2D (CharacterBody2D)"
+  - id: hud-salud
+    kind: label_match
+    text: salud
+    desc: "el HUD muestra salud"
+  - id: hud-hambre
+    kind: label_match
+    text: hambre
+    desc: "el HUD muestra hambre"
+  - id: hud-recurso
+    kind: label_match
+    text: recurso
+    desc: "el HUD muestra recursos"
+  - id: hud-día
+    kind: label_match
+    text: día
+    desc: "el HUD muestra día actual"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: cota-dia
+    kind: resource_within_bounds
+    label: [dia, día]
+    max: 3
+    frames: 150
+    desc: "el HUD de día actual no desborda 3"
+  - id: moves
+    kind: moves
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 45
+    desc: "el jugador se mueve con ui_right"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

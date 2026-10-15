@@ -1,0 +1,71 @@
+# Suite Capa B-1 v2 — platformer-gancho-tirolesa (familia: Platformer)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego de plataformas 2D en Godot con un gancho de agarre: el jugador lanza un gancho a puntos de anclaje fijos en el escenario, se impulsa oscilando como en una tirolesa y puede soltar en el momento justo para alcanzar islas lejanas. El HUD muestra tiempo restante, diamantes recogidos y un medidor de cargas de gancho, y los enemigos se superan saltando encima o enganchándolos con el gancho. Victoria al llegar a la meta flotante antes de que termine el cronómetro, derrota al caer al vacío o al agotarse el tiempo, y tras el final puedes reiniciar el nivel. Incluye cinemática de impulso al soltar, plataformas que se mueven en bucle y una ruta alternativa que premia el uso experto del gancho."
+
+task: platformer-gancho-tirolesa
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    desc: "el avatar del jugador existe como nodo"
+  - id: avatar-cuerpo-fisico
+    kind: node_is
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    is: CharacterBody2D
+    desc: "el jugador es un cuerpo físico 2D (CharacterBody2D)"
+  - id: meta-existe
+    kind: node_exists
+    names: [Meta, Goal, Finish, Isla]
+    desc: "hay un nodo de meta/final físico"
+  - id: hud-tiempo
+    kind: label_match
+    text: tiempo
+    desc: "el HUD muestra tiempo restante"
+  - id: hud-diamante
+    kind: label_match
+    text: diamante
+    desc: "el HUD muestra diamantes recogidos"
+  - id: hud-carga
+    kind: label_match
+    text: carga
+    desc: "el HUD muestra cargas de gancho"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: moves
+    kind: moves
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 45
+    desc: "el jugador se mueve con ui_right"
+  - id: jump
+    kind: jump
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 30
+    desc: "el jugador salta con ui_accept"
+  - id: falls
+    kind: falls
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 90
+    desc: "el jugador cae tras teleport arriba"
+  - id: settles
+    kind: settles
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 90
+    desc: "el jugador se asienta en el suelo"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

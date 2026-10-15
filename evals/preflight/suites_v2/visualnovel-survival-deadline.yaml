@@ -1,0 +1,48 @@
+# Suite Capa B-1 v2 — visualnovel-survival-deadline (familia: Visual novel)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea una novela visual de supervivencia con límite de tiempo en Godot: el jugador está atrapado en una casa durante una tormenta y dispone de 12 acciones antes de que llegue el final de la noche. Cada acción (esconderse, buscar herramientas, calmar a alguien, forzar una puerta) consume horas que se ven descontadas en el HUD, que también muestra la salud, los objetos en el inventario y el estado de pánico. Las decisiones encadenan escenas con consecuencias visibles, como puertas que se abren o personajes que se marchan. La victoria se produce al salir de la casa con el contador de horas aún positivo, y la derrota cuando la salud llegue a cero o las horas se agotan encerrado. Cuando aparece el resumen del final, el jugador puede reiniciar la noche desde el principio."
+
+task: visualnovel-survival-deadline
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: hud-hora
+    kind: label_match
+    text: hora
+    desc: "el HUD muestra horas restantes"
+  - id: hud-salud
+    kind: label_match
+    text: salud
+    desc: "el HUD muestra salud"
+  - id: hud-inventario
+    kind: label_match
+    text: inventario
+    desc: "el HUD muestra objetos del inventario"
+  - id: hud-pánic
+    kind: label_match
+    text: pánic
+    desc: "el HUD muestra estado de pánico"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: cota-hora
+    kind: resource_within_bounds
+    label: [hora]
+    max: 12
+    frames: 150
+    desc: "el HUD de horas restantes no desborda 12"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

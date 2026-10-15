@@ -1,0 +1,78 @@
+# Suite Capa B-1 v2 — openworld-exploration-isla (familia: Open World)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego de mundo abierto en una isla: el jugador explora libremente un archipiélago con playas, selva y montañas, descubriendo 8 puntos de interés que se marcan en un minimapa. Un HUD visible muestra descubrimientos, tiempo jugado y vida. Al descubrir todos los puntos de interés el jugador gana la partida; si la vida llega a cero por caídas o criaturas hostiles, pierde. Tras cualquier final se puede reiniciar la partida desde cero. Incluye salto, nado básico entre islas cercanas y una cámara que sigue al jugador."
+
+task: openworld-exploration-isla
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    desc: "el avatar del jugador existe como nodo"
+  - id: avatar-cuerpo-fisico
+    kind: node_is
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    is: CharacterBody2D
+    desc: "el jugador es un cuerpo físico 2D (CharacterBody2D)"
+  - id: hud-descubr
+    kind: label_match
+    text: descubr
+    desc: "el HUD muestra descubrimientos"
+  - id: hud-tiempo
+    kind: label_match
+    text: tiempo
+    desc: "el HUD muestra tiempo jugado"
+  - id: hud-vida
+    kind: label_match
+    text: vida
+    desc: "el HUD muestra vida"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: cota-descubr
+    kind: resource_within_bounds
+    label: [descubr]
+    max: 8
+    frames: 150
+    desc: "el HUD de descubrimientos no desborda 8"
+  - id: moves
+    kind: moves
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 45
+    desc: "el jugador se mueve con ui_right"
+  - id: jump
+    kind: jump
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 30
+    desc: "el jugador salta con ui_accept"
+  - id: falls
+    kind: falls
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 90
+    desc: "el jugador cae tras teleport arriba"
+  - id: camera_follows
+    kind: camera_follows
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 90
+    desc: "la cámara sigue al jugador"
+  - id: settles
+    kind: settles
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 90
+    desc: "el jugador se asienta en el suelo"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

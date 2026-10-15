@@ -600,6 +600,78 @@ estaba mal — errata declarada arriba.
 > instrumento B-1 vigente para mediciones nuevas. La ratificación se emite
 > una sola vez; cualquier cambio posterior es enmienda nueva con fecha.
 
+###### 5.2.2.c Suites de las 52 tareas reales — escritas desde el texto, ANTES de cualquier generación *(2026-10-15)*
+
+**Método.** Las 8 tareas originales ya tienen suites v1 congeladas que el
+runner v2 corre tal cual (`v2-compat.yaml` lo prueba: 4/4). Las **52 tareas
+nuevas** (`evals/game_tasks_expanded.yaml`) reciben sus suites en
+`evals/preflight/suites_v2/<id>.yaml`, **generadas desde el texto de cada
+instrucción copiado verbatim** (el generador lee el propio YAML: cero
+transcripción manual) y **antes de existir cualquier generación** — así el
+instrumento no puede contaminarse con lo que un agente haya construido. Se
+congelan **al escribirse**: cualquier cambio posterior es benchmark nuevo o
+enmienda con fecha. El lint commiteado (`evals/preflight/lint_suites_v2.py`)
+valida kinds, campos por kind, presupuesto de frames y cobertura; resultado:
+**52/52 suites, 551 checks, LINT PASSED** (6–17 checks por suite; presupuesto
+por suite ≤ ~600 frames de física, muy por debajo del techo `MAX_FRAMES` 6000).
+
+**Principio de inclusión (GameDevBench §2.2):** un check por cada feature que
+el texto declara **explícitamente**; nada inventado; nada adivinado de los
+internos del juego. Reparto:
+
+* **Universales (52):** `build`, `hud-visible` (canvas), `victoria-existe` y
+  `reinicio-existe` (`node_exists` sobre nombres de final declarados en la
+  instrucción «tras cualquier final se puede reiniciar») y
+  `sin-errores-de-script` (runner-side, al final).
+* **`label_match` (179):** un stem **español del propio texto** por cada ítem
+  que la instrucción lista en «el HUD muestra …»; una aguja por check.
+  Supuesto operacional heredado de v1: el valor del HUD es **legible en
+  texto** (retratos/íconos sin número quedan fuera de medida). Donde la aguja
+  lleva acento (`día`, `maná`, `símbol`, `balón`, `héroe`, `pánic`, `daño`,
+  `ejércit`) se usa la grafía del texto; las cotas admiten lista de variantes
+  (`[dia, día]`).
+* **`resource_within_bounds` (28):** sólo cuando la tarea declara un **«N de
+  M»** con su etiqueta en el HUD (llaves de 3, cromos de 15, población de 20,
+  vida de 30, piso 10, oleadas de 8…). Cotas máximas; umbrales de victoria
+  («5000 monedas», «al menos 12 de 15 tiros») **no** son cotas.
+* **Cinéticas (46):** sólo donde el texto declara la mecánica — `moves` (22),
+  `jump` (4), `falls` (4), `settles` (4), `camera_follows` (3) — con los
+  nombres del avatar en `names` para que el motor resuelva el target.
+  `node_is CharacterBody2D` (13) sólo en avatares 2D con interacción física
+  declarada (caídas, pinchos, balón, esquiva); `collision` (3) verifica que
+  el nodo nombrado (pinchos, moto, balón) **es** `CollisionObject2D`.
+* **`wait_accumulates` (3):** sólo economía **pasiva desde t=0** (parque,
+  zoológico, taberna — «los parroquianos llegan solos»); la idle que exige
+  comprar la primera máquina no acumula sin input.
+
+**Exclusiones con motivo (el instrumento existe; lo que no se puede escribir
+sin adivinar es lo que se excluye):** `timing_window` — las tareas no
+declaran coordenadas de cue (`cue_at`/`axis`); `reaches_state` — la victoria
+es inalcanzable con input guionizado en presupuesto (hallazgo 4); 
+`restart_resets` — exige reinicio **en caliente** con tecla no declarada
+(las tareas sólo piden presencia «tras cualquier final» → `node_exists`);
+`hud_value_changes` / `state_after_action` — los pares acción→efecto y su
+tecla no están declarados en ningún texto.
+
+**Ajustes de aplicación (4, declarados al escribir):** (1) basketball **sin**
+cota de `puntos` — el texto no declara valor por tiro; (2) puzzle-cajas
+**sin** cota de `nivel` — el texto dice «al menos 15», cota mínima, no
+máxima; (3) strategy-defensa **con** `oleada≤15` y tycoon-colonia **con**
+`día≤5` — mismo patrón «N de M» ya aceptado en card-lane y ow-sobreviv;
+(4) horror-maze **sin** `node_is` — el texto declara «primera persona», con
+lo que una lectura 3D es legítima y el tipo de avatar queda no declarado.
+
+**Supuestos declarados:** corpus 2D (§5.2.2.b: las 60 tareas son
+single-player 2D); input por defecto de Godot (flechas = `ui_*`,
+`ui_accept` = espacio) salvo que el texto declare otra tecla; agujas en
+español porque las tareas están en español.
+
+**Recuento por kind (las 52 reales):** `label_match` 179 · `node_exists`
+132 · `build` 52 · `canvas` 52 · `no_runtime_errors` 52 ·
+`resource_within_bounds` 28 · `moves` 22 · `node_is` 13 · `falls` 4 ·
+`jump` 4 · `settles` 4 · `camera_follows` 3 · `collision` 3 ·
+`wait_accumulates` 3. Las 52 suites **se congelan con este lint verde**.
+
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
 Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el

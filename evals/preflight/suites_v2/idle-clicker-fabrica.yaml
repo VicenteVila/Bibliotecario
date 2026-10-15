@@ -1,0 +1,38 @@
+# Suite Capa B-1 v2 — idle-clicker-fabrica (familia: Idle)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego idle de fábrica en Godot donde haces clic en una gran lingote de oro para ganar monedas, compras máquinas que producen monedas automáticamente y el precio de cada máquina sube con cada compra. Hay un HUD visible con monedas, ingresos por segundo y el contador de clics. Ganas la partida al alcanzar una meta de riqueza total mostrada en pantalla, pierdes si no llegas a esa meta antes de que se agote el temporizador de la sesión, y tras cualquier final puedes reiniciar desde cero. Incluye efectos de número flotante al hacer clic y una tabla de productores con cifras que crecen en tiempo real."
+
+task: idle-clicker-fabrica
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: hud-moneda
+    kind: label_match
+    text: moneda
+    desc: "el HUD muestra monedas"
+  - id: hud-ingreso
+    kind: label_match
+    text: ingreso
+    desc: "el HUD muestra ingresos por segundo"
+  - id: hud-clic
+    kind: label_match
+    text: clic
+    desc: "el HUD muestra contador de clics"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

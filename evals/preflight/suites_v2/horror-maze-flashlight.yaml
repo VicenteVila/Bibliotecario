@@ -1,0 +1,53 @@
+# Suite Capa B-1 v2 — horror-maze-flashlight (familia: Horror)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego de terror en primera persona en Godot donde el jugador huye de un laberinto infinito buscando tres llaves mientras una criatura lo persigue. El jugador se mueve con las teclas, gira la cámara con el ratón y usa una linterna con batería limitada; el HUD muestra la batería restante, las llaves recogidas de 3 y un medidor de cercanía de la criatura que late cuando está cerca. Si la criatura lo alcanza la pantalla se tiñe de rojo y se pierde, y encontrar las tres llaves abre la salida que da la victoria. Tras cada final aparece una pantalla oscura con la opción de reiniciar la partida en un laberinto nuevo."
+
+task: horror-maze-flashlight
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    desc: "el avatar del jugador existe como nodo"
+  - id: hud-bater
+    kind: label_match
+    text: bater
+    desc: "el HUD muestra batería restante"
+  - id: hud-llave
+    kind: label_match
+    text: llave
+    desc: "el HUD muestra llaves recogidas"
+  - id: hud-cercan
+    kind: label_match
+    text: cercan
+    desc: "el HUD muestra medidor de cercanía"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: cota-llave
+    kind: resource_within_bounds
+    label: [llave]
+    max: 3
+    frames: 150
+    desc: "el HUD de llaves recogidas no desborda 3"
+  - id: moves
+    kind: moves
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character]
+    frames: 45
+    desc: "el jugador se mueve con ui_right"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"

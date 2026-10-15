@@ -1,0 +1,57 @@
+# Suite Capa B-1 v2 — racing-time-trial (familia: Racing)
+# Escrita 2026-10-15 desde el texto de la tarea — ANTES de cualquier generación.
+# Congelada al escribirse (§5.2.2.c). Cada check verifica UNA feature pedida
+# explícitamente en la instrucción; nada inventado (GameDevBench §2.2).
+#
+# Instrucción: "Crea un juego de contrarreloj 2D: el jugador corre por una pista con obstáculos y debe cruzar cinco checkpoints antes de que se agote el tiempo. El HUD muestra el tiempo restante, la velocidad actual y cuántos checkpoints ha alcanzado. Cruzar todos los checkpoints y llegar a la meta da la victoria; si el temporizador llega a cero antes, es derrota. Tras cualquier resultado se puede reiniciar la prueba desde cero."
+
+task: racing-time-trial
+checks:
+  - id: build
+    kind: build
+    desc: "el proyecto carga en Godot headless"
+  - id: jugador-existe
+    kind: node_exists
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character, Coche, Moto, Bike, Vehiculo, Vehículo, Vehicle, Kart]
+    desc: "el avatar del jugador existe como nodo"
+  - id: meta-existe
+    kind: node_exists
+    names: [Meta, Goal, Finish, Linea, Línea]
+    desc: "hay un nodo de meta/final físico"
+  - id: hud-tiempo
+    kind: label_match
+    text: tiempo
+    desc: "el HUD muestra tiempo restante"
+  - id: hud-velocidad
+    kind: label_match
+    text: velocidad
+    desc: "el HUD muestra velocidad actual"
+  - id: hud-checkpoint
+    kind: label_match
+    text: checkpoint
+    desc: "el HUD muestra checkpoints alcanzados"
+  - id: hud-visible
+    kind: canvas
+    desc: "hay un HUD (CanvasLayer)"
+  - id: victoria-existe
+    kind: node_exists
+    names: [Win, Victoria, Victory, Ganan, GameOver]
+    desc: "hay un estado/nodo de victoria"
+  - id: reinicio-existe
+    kind: node_exists
+    names: [Restart, Reset, Retry, Reintentar, Reiniciar, Revancha, Menu, Nueva]
+    desc: "hay un mecanismo de reinicio"
+  - id: cota-checkpoint
+    kind: resource_within_bounds
+    label: [checkpoint]
+    max: 5
+    frames: 150
+    desc: "el HUD de checkpoints alcanzados no desborda 5"
+  - id: moves
+    kind: moves
+    names: [Player, Jugador, Personaje, Heroe, héroe, Character, Coche, Moto, Bike, Vehiculo, Vehículo, Vehicle, Kart]
+    frames: 45
+    desc: "el jugador se mueve con ui_right"
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: "la partida no lanza errores de script en caliente"
