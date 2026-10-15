@@ -756,6 +756,41 @@ línea `fallan: build`) — errata de implementación corregida en el script
 | **qué NO cambia** | 8 mismas tareas · modelo `openai/gpt-oss-120b` · `max_tokens=7000` · cooldown 70 s · presupuesto 1 gen + 2 repairs · scoring y suites idénticos. Sólo se extrae `main.gd` de la respuesta; si el modelo devuelve además escenas, se ignoran. |
 | **resultado** | `evals/preflight/results/measure_b1_serie3.jsonl` — se anota aquí al cerrar. |
 
+**Resultados de la serie 3 — 2026-10-15** *(hipótesis del scaffold: CONFIRMADA)*:
+
+| tarea | scores (generaciones reales) | media | máx |
+|---|---|---|---|
+| `card-memory-precision` | [10.0, 80.0, 80.0] | 56.67 | 80.00 |
+| `idle-clicker-fabrica` | [75.0] | 75.00 | 75.00 |
+| `platformer-torre-rebote` | [52.94] | 52.94 | 52.94 |
+| `visualnovel-mystery-accusation` | [25.0] | 25.00 | 25.00 |
+| `rhythm-note-highway` | [12.5] | 12.50 | 12.50 |
+| `shooter-shmup-lateral-jefe` | [10.0] | 10.00 | 10.00 |
+| `strategy-defensa-torres` | [10.0] | 10.00 | 10.00 |
+| `horror-maze-flashlight` | [9.09] | 9.09 | 9.09 |
+| **GLOBAL (media de medias)** | | **31.40** | |
+
+- **BUILD>0 en 10/10 generaciones reales** (baseline: 0/28). La causa del
+  cero era la escritura de `.tscn`, no la lógica del juego: con la escena
+  fija por el harness, el modelo produce juegos que arrancan y corren.
+- **Bucle de reparación probado donde el tier lo permitió** (card): evidencia
+  del motor devuelta al modelo → **10.0 → 80.0** en una ronda. Los otros 7
+  tareas no pudieron usar sus reparaciones: **429 `agotada/sobrecargada` del
+  tier libre** abortó las llamadas posteriores (sólo 10 llamadas de las 24
+  del presupuesto; 7 registros `respuesta_vacia` preservados pero excluidos
+  de las medias — no son generaciones).
+- **Observación de instrumento, candidata a enmienda futura (suites intactas):**
+  `victoria-existe`/`reinicio-existe` fallan en 7/8 juegos porque los
+  generadores crean el botón con **texto** `Reiniciar` / etiqueta `¡Victoria!`
+  pero **no asignan el nombre de nodo** (`restart_btn.name` nunca se pone) y
+  `node_exists` compara **nombres**. El smoke pasó porque su prompt pedía
+  nombres explícitos. Decidir en enmienda si `node_exists` acepta también
+  textos de Label/Button — **no se toca ahora**.
+- **Sintaxis GDScript: 1/8 primeros intentos sin `SCRIPT ERROR`** — el crib
+  reducido no basta; los `Score` de 9-25 con error de script muestran que un
+  `_ready()` parcial arranca la escena pero no el HUD completo.
+- Tokens serie 3: **56 197** en 10 llamadas. Presupuesto: respetado (≤24).
+
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
 Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el

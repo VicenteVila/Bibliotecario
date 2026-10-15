@@ -59,6 +59,39 @@ Sin explicaciones fuera de los bloques. El juego debe PARSEAR con
 godot --headless --check-only sin ningún SCRIPT ERROR.
 """
 
+SCAFFOLD = {
+    "project.godot": """[application]
+config/name="Juego"
+run/main_scene="res://main.tscn"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+
+[display]
+window/size/viewport_width=800
+window/size/viewport_height=600
+""",
+    "main.tscn": """[gd_scene load_steps=2 format=3]
+
+[ext_resource path="res://main.gd" type="Script" id=1]
+
+[node name="Main" type="Node2D"]
+script = ExtResource(1)
+""",
+}
+
+PROMPT_SERIE3 = (
+    "Eres un generador de juegos Godot 4. El proyecto YA trae project.godot y\n"
+    "main.tscn fijos (raíz Node2D con script). Genera SOLO el fichero main.gd.\n"
+    "Crea TODOS los nodos por código en _ready() (CanvasLayer + Labels para el HUD,\n"
+    "pantallas de victoria/derrota/reinicio si la tarea las pide, Timer, etc.).\n"
+    "Las etiquetas del HUD usan literalmente las palabras en español del texto de la tarea.\n\n"
+    + CRIB + "\n"
+    "Devuelve SOLO: ###FILE: main.gd###\n<contenido>\nsin nada más.\n"
+    "Debe PARSEAR con godot --headless --check-only sin SCRIPT ERROR.\n\n"
+    "INSTRUCCIÓN DE LA TAREA:\n"
+)
+
 PROMPT_BASE = (
     "Eres un generador de juegos Godot 4. Genera el juego completo descrito.\n\n"
     + CRIB + "\n" + FORMATO + "\nINSTRUCCIÓN DE LA TAREA:\n"
@@ -125,21 +158,30 @@ def llamar(generate, prompt: str) -> str:
     return ""
 
 
-def medir_tarea(task_id: str) -> None:
+def medir_tarea(task_id: str, serie3: bool = False) -> None:
     sys.path.insert(0, str(ROOT))
     from bibliotecario.core.llm import generate, usage_totals
 
     texto = cargar_texto_tarea(task_id)
     ws = WS_BASE / task_id
+    if serie3 and ws.exists():
+        import shutil
+        shutil.rmtree(ws)
     ws.mkdir(parents=True, exist_ok=True)
+    if serie3:
+        for rel, contenido in SCAFFOLD.items():
+            (ws / rel).write_text(contenido, encoding="utf-8")
     registros = []
 
     for intento in range(1, MAX_REPAIRS + 2):  # 1 gen + máx 2 reparaciones
         print(f"\n=== {task_id} · llamada {intento} ===")
         if intento == 1:
-            prompt = PROMPT_BASE + texto
+            prompt = (PROMPT_SERIE3 if serie3 else PROMPT_BASE) + texto
         else:
-            actual = leer_workspace(ws)
+            if serie3:
+                actual = {"main.gd": (ws / "main.gd").read_text(encoding="utf-8")}
+            else:
+                actual = leer_workspace(ws)
             bloque = "".join(f"###FILE: {n}###\n{c}\n" for n, c in sorted(actual.items()))
             evidencia = registros[-1]["suite"]
             ev_lineas = []
@@ -147,16 +189,26 @@ def medir_tarea(task_id: str) -> None:
                 ev_lineas.append("checks fallando: " + evidencia["fallan"])
             ev_lineas.extend(evidencia.get("script_errors") or evidencia.get("fails") or ["sin datos"])
             ev_lineas = ev_lineas[:4]
-            prompt = (
-                PROMPT_BASE + texto +
-                "\nPROYECTO ACTUAL (falla la suite, corrígelo COMPLETO):\n" + bloque +
-                "\nEVIDENCIA DEL MOTOR:\n" + "\n".join(ev_lineas) +
-                "\nReescribe los tres ficheros corregidos completos en ###FILE###.\n"
-            )
+            if serie3:
+                prompt = (
+                    PROMPT_SERIE3 + texto +
+                    "\nmain.gd ACTUAL (falla la suite, corrígelo):\n" + bloque +
+                    "\nEVIDENCIA DEL MOTOR:\n" + "\n".join(ev_lineas) +
+                    "\nReescribe SOLO main.gd corregido en ###FILE: main.gd###.\n"
+                )
+            else:
+                prompt = (
+                    PROMPT_BASE + texto +
+                    "\nPROYECTO ACTUAL (falla la suite, corrígelo COMPLETO):\n" + bloque +
+                    "\nEVIDENCIA DEL MOTOR:\n" + "\n".join(ev_lineas) +
+                    "\nReescribe los tres ficheros corregidos completos en ###FILE###.\n"
+                )
         t0 = time.time()
         respuesta = llamar(generate, prompt)
         dt = time.time() - t0
         ficheros = extraer_ficheros(respuesta) if respuesta else {}
+        if serie3:
+            ficheros = {"main.gd": ficheros["main.gd"]} if "main.gd" in ficheros else {}
         reg = {"task": task_id, "intento": intento, "llm_s": round(dt, 1),
                "ficheros": sorted(ficheros), "respuesta_vacia": not bool(ficheros)}
         print(f"   {dt:.0f}s · ficheros: {sorted(ficheros)}")
@@ -166,7 +218,10 @@ def medir_tarea(task_id: str) -> None:
             registros.append(reg)
             RESULTS.open("a", encoding="utf-8").write(json.dumps(reg, ensure_ascii=False) + "\n")
             break
-        escribir_workspace(ws, ficheros)
+        if serie3:
+            (ws / "main.gd").write_text(ficheros["main.gd"], encoding="utf-8")
+        else:
+            escribir_workspace(ws, ficheros)
         suite = correr_suite(task_id, ws)
         reg["suite"] = suite
         registros.append(reg)
@@ -192,6 +247,8 @@ def agregar() -> None:
             tokens["calls"] += r["usage"].get("calls", 0)
             tokens["total_tokens"] += r["usage"].get("total_tokens", 0)
             continue
+        if r.get("respuesta_vacia"):
+            continue  # llamada abortada (413/429): no es una generación
         tid = r["task"]
         por_tarea.setdefault(tid, []).append(r["suite"]["score"])
         if r["intento"] == 1:
@@ -217,6 +274,7 @@ def main() -> int:
     ap.add_argument("--task")
     ap.add_argument("--aggregate", action="store_true")
     ap.add_argument("--out", default="/tmp/opencode/measure_b1_results.jsonl")
+    ap.add_argument("--serie3", action="store_true")
     args = ap.parse_args()
     global RESULTS
     RESULTS = Path(args.out)
@@ -225,7 +283,7 @@ def main() -> int:
         return 0
     if not args.task:
         ap.error("falta --task o --aggregate")
-    medir_tarea(args.task)
+    medir_tarea(args.task, serie3=args.serie3)
     return 0
 
 
