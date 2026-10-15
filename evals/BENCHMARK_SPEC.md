@@ -711,6 +711,42 @@ línea `fallan: build`) — errata de implementación corregida en el script
 
 **Serie 2b — ajuste de presupuesto declarado tras la primera tarea de la serie 2** *(2026-10-15)*: `card-memory-precision` (serie 2) devolvió **ficheros incompletos** (`main.gd` truncado: `completion_tokens` = 6000 exactos = tope de `max_tokens`) y los reintentos cayeron en **413 por ventana TPM deslizante** (dos llamadas en el mismo minuto superan el límite de 8000 aunque cada una por sí sola quepa). La serie 2 parcial se preserva en `measure_b1_s2_results.jsonl`. La **serie 2b** repite las 8 tareas con dos y solo dos cambios, ya declarados: **`max_tokens` 6000 → 7000** (request por llamada ≈ 800+7000 < 8000) y **cooldown de 70 s tras CADA llamada LLM** (limpia la ventana deslizante). Todo lo demás idéntico. Resultados en `measure_b1_s2b_results.jsonl`.
 
+**Resultados — BASELINE fijado el 2026-10-15** *(los números se registran aquí después de correr; no se toca nada de lo declarado arriba)*:
+
+| serie | crib | llamadas | generaciones | con BUILD>0 | media global |
+|---|---|---|---|---|---|
+| 1 (parcial, 2/8 tareas) | GDScript | 6 | 6 | **0** | 0.00 |
+| 2 (parcial, 1/8 tarea) | GDScript + `.tscn` v1 | 1 | 2 | **0** | 0.00 |
+| **2b (8/8 tareas)** | GDScript + `.tscn` v1 | 18 | 20 | **0** | **0.00** |
+
+- **Global serie 2b por tarea (Score, media/máx):** las 8 tareas = `0.00/0.00`
+  (`card-memory-precision` [0,0,0] · `platformer-torre-rebote` [0,0] ·
+  `idle-clicker-fabrica` [0] · `rhythm-note-highway` [0,0,0] ·
+  `horror-maze-flashlight` [0,0] · `strategy-defensa-torres` [0,0,0] ·
+  `shooter-shmup-lateral-jefe` [0,0,0] · `visualnovel-mystery-accusation` [0,0,0]).
+- **0 de 28 generaciones** de las tres series cargaron la escena (`BUILD=0` en
+  todas). **Causa dominante medida: el `.tscn`**, no el GDScript: cabecera
+  `[gd_scene …]` ausente, `[ext_resource]` al final, subrecursos inline de
+  Godot 3, `extents=`/`margin_*`/`size=`, referencia a `icon.png` inexistente.
+  El GDScript del crib sí hizo efecto: 3/8 tareas sin ningún `SCRIPT ERROR` en
+  el 1er intento de la serie 2b.
+- **Límites del tier libre confirmados en caliente:** truncado a `max_tokens`
+  (6000 y 7000) en proyectos grandes; **413 estructural** en reparaciones de
+  proyectos grandes (`prompt + max_tokens > 8000`): `horror` y `platformer`
+  no pudieron usar sus 2 reparaciones; 12 reparaciones usadas de 16 posibles
+  (presupuesto respetado: 18 llamadas de 24 máximas). Tokens serie 2b:
+  **121 569**.
+- **Errata de implementación declarada** (no afecta a los `Score` registrados):
+  el corte temprano por "PASSED" de la serie 2b miraba `fails` del runner en
+  vez de `fallan` — `idle-clicker-fabrica` usó 1 de sus 3 llamadas y la lista
+  "sintaxis limpia 1er intento" del agregador usa `fails` como proxy (lectura
+  correcta: 3/8 sin `SCRIPT ERROR`, 0/8 con `BUILD`).
+- **Qué demuestra la medición:** el **instrumento** ya está validado en juego
+  real (smoke 2026-10-15: juego reparado = **10/10**); lo que la baseline
+  mide es que **este generador en este tier no produce un juego cargable**.
+  Siguiente experimento declarado aparte (no se hace aquí): scaffold de
+  `.tscn` mínimo en el harness, o modelo con presupuesto suficiente.
+
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
 Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el
