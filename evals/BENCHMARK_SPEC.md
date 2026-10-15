@@ -672,6 +672,22 @@ español porque las tareas están en español.
 `jump` 4 · `settles` 4 · `camera_follows` 3 · `collision` 3 ·
 `wait_accumulates` 3. Las 52 suites **se congelan con este lint verde**.
 
+###### 5.2.2.d Protocolo de la PRIMERA medición B-1 v2 — declaración previa *(2026-10-15)*
+
+**Decisión del dueño:** «Medición pequeña declarada». Se declara **ANTES de
+correrla** cualquier llamada; los resultados se anotan después, nunca al revés.
+
+| | |
+|---|---|
+| **qué se mide** | capa **generador + suite**: generación one-shot de juego completo y su puntuación B-1 v2. **NO** es medición de arnés de agente completo (sin turnos, sin memoria, sin meta-evolución) — eso queda para HITO3. |
+| **muestra** | **8 de las 52 tareas**, una por familia elegida por **cobertura de kinds**, no por dificultad esperada: `card-memory-precision` (Card: HUD + cota + victoria/reinicio) · `platformer-torre-rebote` (Platformer: avatar + salto + caída + asiento + cámara + colisión) · `idle-clicker-fabrica` (Idle: acumulación pasiva + cota) · `rhythm-note-highway` (Rhythm) · `horror-maze-flashlight` (Horror) · `strategy-defensa-torres` (Strategy: economía + cota) · `shooter-shmup-lateral-jefe` (Shooter: única del género) · `visualnovel-mystery-accusation` (Visual novel). Entre las 8 están los 14 `kind`s reales. |
+| **generador** | **una sola llamada** por generación: texto verbatim de la tarea + **crib Godot 4** (abajo) + convención de formato `###FILE: path###`; el generador **NO ve la suite** ni las agujas. Modelo **`openai/gpt-oss-120b`** (Groq, tier libre), `max_tokens=6000` (declarado: adaptado al **TPM 8000** del tier — con 12000 los repairs grandes rebotan con HTTP 413). |
+| **reparación** | hasta **2 rondas** por generación: si la suite falla, se reenvía el proyecto actual + la primera línea de evidencia (`[FAIL]` / `SCRIPT ERROR`). Respuesta vacía o 413 → espera de **65 s** (ventana TPM) y **un** reintento; si vuelve vacía, la generación se registra como fallida con su error. Presupuesto máximo: **8 × (1+2) = 24 llamadas LLM**. |
+| **scoring** | por **generación**: `Score` del runner (`BUILD × M`, fórmula intacta). Por **tarea**: media de sus generaciones (primario) + máximo (secundario). **Global: media de medias.** Además se reportan: tasa de sintaxis limpia en 1er intento, reparaciones usadas y tokens consumidos. |
+| **umbrales** | **sin umbral de aprobación**: esta corrida **fija BASELINE**. Los umbrales de aceptación (R5 ≥10/15, R4 ≥8/15, B5 100%, `BUILD=0→0`) **no se tocan** y no se aplican a esta serie. |
+| **crib Godot 4** *(conocimiento de harness, no agujas)* | sin backticks; `@onready`/`@export` (nunca los keywords de Godot 3); enums de alineación = constantes globales `HORIZONTAL_ALIGNMENT_*` / `VERTICAL_ALIGNMENT_*`; señales con `nodo.senal.connect(_metodo)`; sin `yield` (usar `await`); `position` (no `rect_position`); `Label.autowrap_mode` (no el bool `autowrap`); sin funciones nombradas anidadas (usar `var f = func():` o inlinear el `await`); cada `Area2D` necesita `CollisionShape2D` para recibir input. |
+| **artefacto** | script one-off `/tmp/opencode/gen/measure_b1.py` + resultados `measure_b1_results.jsonl` (números clave se copian a CONOCIMIENTO al cerrar) |
+
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
 Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el
