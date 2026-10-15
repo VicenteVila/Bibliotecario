@@ -61,6 +61,7 @@ var action := ""
 var total_frames := 0
 var last_phys := -1
 var main_scene_path := "res://main.tscn"
+var statics_pending := false
 
 ## Techo de seguridad contra colgadas (NO es presupuesto científico).
 ## v1 usaba 900 frames globales; con 5 kind's v2 (150-320 frames cada uno) eso
@@ -102,6 +103,16 @@ func _initialize() -> void:
 			main_scene_path = ps
 	print("   escena principal: %s" % main_scene_path)
 
+	# Enmienda 2026-10-15 (bugfix, sin cambio de kinds ni umbrales): los
+	# checks estáticos NO se ejecutan aquí. En _initialize, add_child(scene)
+	# todavía no ha corrido _ready() del juego — los fixtures estructurales
+	# (.tscn) lo ocultaban; los juegos generados por código crean todo en
+	# _ready y los estáticos veían un árbol vacío. Se corren en el primer
+	# frame de física (misma convención que _resolve_target en frames==1).
+	statics_pending = true
+
+## Los checks estáticos + montaje del pipeline de comportamiento.
+func _run_statics() -> void:
 	for c in checks:
 		var kind = str(c.get("kind", ""))
 		if kind in STATIC_KINDS:
@@ -116,11 +127,6 @@ func _initialize() -> void:
 			# fallback ruidoso: un kind desconocido FALLA con su nombre en vez
 			# de colarse en silencio (p. ej. no_runtime_errors, que es del runner)
 			_emit(false, str(c.get("id", "?")), "kind no soportado por el motor: " + kind2)
-
-	if pend.is_empty():
-		_finish()
-		return
-	_begin_behaviour()
 
 func _run_static(c: Dictionary) -> void:
 	var kind = str(c.get("kind", ""))
@@ -299,6 +305,16 @@ func _process(_delta: float) -> bool:
 		return false
 	last_phys = phys
 	frames += 1
+
+	# Enmienda 2026-10-15: los estáticos corren aquí, en el primer frame de
+	# física — _ready() del juego ya ejecutó (ver comentario en _initialize).
+	if statics_pending:
+		statics_pending = false
+		_run_statics()
+		if pend.is_empty():
+			_finish()
+			return true
+		_begin_behaviour()
 
 	if not pend.is_empty() and pi < pend.size():
 		var c: Dictionary = pend[pi]

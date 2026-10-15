@@ -1030,9 +1030,11 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 ### Enmiendas posteriores a la última ratificación
 
 **Última ratificación: 2026-10-15 — scorer B-1 v2 (enm. 2 + ampliación
-A/B/C). Tras ella: ninguna enmienda todavía.** Las enmiendas 1 y 2 figuran
-abajo como registro previo a esa ratificación. *(Cualquier cambio futuro tras
-ratificar se anota aquí con fecha y motivo — no se reescribe en silencio.)*
+A/B/C). Tras ella: enmienda 3 (2026-10-15) — bugfix de timing de los checks
+estáticos tras el primer smoke end-to-end, sin cambio de kinds ni umbrales.**
+Las enmiendas 1 y 2 figuran abajo como registro previo a esa ratificación.
+*(Cualquier cambio futuro tras ratificar se anota aquí con fecha y motivo —
+no se reescribe en silencio.)*
 
 #### Enmienda 1 — *previa a la ratificación* · 2026-10-14
 
@@ -1106,6 +1108,17 @@ reproducible sin controlar la carga de la máquina; el baseline sigue siendo
 > estado de carga de la máquina; las comparaciones serias de v1 usan la misma
 > condición. V2 ya no depende de esto para su progreso (ligado a física), y su
 > fixture de validación hoy corre estable.
+
+#### Enmienda 3 — *bugfix tras el primer smoke B-1 end-to-end: los estáticos corrían antes de `_ready()`* · 2026-10-15
+
+| | |
+|---|---|
+| **objeto** | motor B-1 v2 (`check_suite_v2.gd`) — **bugfix de timing; sin cambio de kinds, sin cambio de umbrales, sin tocar suites congeladas** |
+| **antes** | los `kind`s estáticos (`node_exists`, `canvas`, `label_match`, …) se ejecutaban en `_initialize()`, el mismo frame del `instantiate()`. Con fixtures **estructurales** (nodos declarados en `.tscn`) eso basta; con juegos **generados por código** —que crean su árbol en `_ready()`— los estáticos veían una escena vacía y emitían **falsos FAIL** (sin CanvasLayer · ningún Label · Victoria/Restart no encontrados). La fase de comportamiento ya estaba blindada (`frames==1`, arreglo de fondo de la enm. 2); los estáticos no. |
+| **ahora** | los estáticos se ejecutan en el **primer frame de física** — misma convención `frames==1` ya ratificada para `_resolve_target`—, con `_ready()` corrido. |
+| **motivo (medido, no supuesto)** | **smoke B-1 end-to-end 2026-10-15**: primera generación real (`card-memory-precision` · `openai/gpt-oss-120b`) cuyo `_ready()` crea HUD (`CanvasLayer` + Labels `Tiempo:`/`Parejas: 0/8`/`Intentos:`/`Combo:`) y pantallas `Victoria`/`GameOver`/`Restart`. Con el motor previo ese juego —ya sin errores de script— marcaba **1/10** (sólo build + cota + sin_errores, los tres que no dependen del árbol creado en `_ready`); tras el fix, **el mismo juego = 10/10 PASSED**. Regresión de fixtures: `v2-fixture` **9/9** · `v2-compat` **4/4** (ambas PASSED). |
+| **qué NO cambia** | kinds, umbrales, fórmula, `BUILD=0`, pesos, `MAX_FRAMES`, suites congeladas y v1 intacto. La enmienda **no re-baja ningún umbral**: corrige un falso negativo del instrumento que habría castigado juegos correctos. |
+| **artefacto** | `evals/preflight/check_suite_v2.gd` — `statics_pending` + `_run_statics()` invocados desde `_process` en el primer tick de física |
 
 ---
 

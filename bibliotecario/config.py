@@ -12,7 +12,12 @@ _DEFAULT_DATA_DIR = Path(
     or Path(__file__).resolve().parent.parent / "data"
 )
 _LLM_MODEL = "gemini-3.6-flash"
-_GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+# Reparado 2026-10-15: llama-3.3-70b-versatile fue dado de baja en Groq (404
+# model_not_found) y la key antigua daba 403 (Cloudflare 1010 por UA). Con la
+# key rotada, el lineup vivo de Groq ya no incluye llama-3.3; el elegido tras
+# probar la API es openai/gpt-oss-120b (120B, buen código, UA del cliente
+# aceptado). Sigue siendo sobreescribible por GROQ_MODEL.
+_GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 # NVIDIA: nemotron-3-super-120b es el que mejor sostiene los prompts largos del loop
 # (calidad + 1.8s). El 30b "lightning" degrada a basura con contexto largo; por eso
 # el respaldo es gpt-oss-20b (otra familia) y no un modelo de la misma serie.
