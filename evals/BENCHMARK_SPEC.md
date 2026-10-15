@@ -709,6 +709,8 @@ línea `fallan: build`) — errata de implementación corregida en el script
 | **qué hace la serie 2** | **repite las MISMAS 8 tareas** con el mismo presupuesto y scoring, en fichero de resultados aparte; la serie 1 permanece en `measure_b1_results.jsonl` como dato declarado. |
 | **qué NO cambia** | umbrales, fórmula, suites congeladas, motor, modelo ni `max_tokens`. |
 
+**Serie 2b — ajuste de presupuesto declarado tras la primera tarea de la serie 2** *(2026-10-15)*: `card-memory-precision` (serie 2) devolvió **ficheros incompletos** (`main.gd` truncado: `completion_tokens` = 6000 exactos = tope de `max_tokens`) y los reintentos cayeron en **413 por ventana TPM deslizante** (dos llamadas en el mismo minuto superan el límite de 8000 aunque cada una por sí sola quepa). La serie 2 parcial se preserva en `measure_b1_s2_results.jsonl`. La **serie 2b** repite las 8 tareas con dos y solo dos cambios, ya declarados: **`max_tokens` 6000 → 7000** (request por llamada ≈ 800+7000 < 8000) y **cooldown de 70 s tras CADA llamada LLM** (limpia la ventana deslizante). Todo lo demás idéntico. Resultados en `measure_b1_s2b_results.jsonl`.
+
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
 Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el
