@@ -2,9 +2,24 @@
 """
 Orquestador del scorer Capa B-1 **v2** (2026-10-14 — §5.2.2 y §11).
 
-v2 = v1 + 5 kind's nuevos (hud_value_changes, state_after_action,
-wait_accumulates, reaches_state, restart_resets). v1 sigue runnable con
+v2 = v1 + kind's nuevos (hud_value_changes, state_after_action,
+wait_accumulates, reaches_state, restart_resets, resource_within_bounds) +
+el kind runner-side `no_runtime_errors`. v1 sigue runnable con
 suite_runner.py. Este runner NO modifica a v1.
+
+`no_runtime_errors` (§5.2.2.b, hueco B — 2026-10-15)
+-----------------------------------------------------
+El motor GDScript no puede interceptar sus propios errores en caliente, así
+que ESTE runner lo sintetiza: separa esos checks antes de escribir
+`_checks.json`, ejecuta el motor y escanea la salida combinada con el patrón
+DECLARADO:
+
+    SCRIPT ERROR:        → error de script en caliente (runtime o parse)
+    Failed to load script → carga de guion fallida
+
+Si hay coincidencia → el check FALLA con la primera línea como evidencia.
+Nada más se interpreta (un `ERROR:` genérico de motor no cuenta: sería
+falso positivo de audio/driver en headless).
 
 Qué hace
 --------
@@ -51,6 +66,10 @@ GODOT_CANDIDATES = [
 ]
 DEFAULT_WORKSPACE = Path("/mnt/c/EG/workspace/current")
 
+# Patrón DECLARADO para no_runtime_errors (ver docstring). Invariante:
+# cambiar esto es cambiar un instrumento medido → declarar benchmark nuevo.
+RUNTIME_ERROR_RE = re.compile(r"SCRIPT ERROR:|Failed to load script")
+
 
 @dataclass
 class TaskResult:
@@ -95,9 +114,13 @@ def run_task(godot: Path, workspace: Path, suite: dict, timeout: int = 180) -> T
             else:
                 shutil.copy2(item, dst)
 
-        # 2. configuración de checks
+        # 2. configuración de checks — `no_runtime_errors` NO va al motor:
+        #    es runner-side (se sintetiza abajo escaneando la salida)
+        all_checks = list(suite["checks"])
+        runtime_checks = [c for c in all_checks if c.get("kind") == "no_runtime_errors"]
+        engine_checks = [c for c in all_checks if c.get("kind") != "no_runtime_errors"]
         (tmp / "_checks.json").write_text(
-            json.dumps({"task": task_id, "checks": suite["checks"]}, ensure_ascii=False),
+            json.dumps({"task": task_id, "checks": engine_checks}, ensure_ascii=False),
             encoding="utf-8",
         )
 
@@ -128,6 +151,24 @@ def run_task(godot: Path, workspace: Path, suite: dict, timeout: int = 180) -> T
             res.validation = "PASSED"
         if re.search(r"\[FAIL\] (\S+)", proc.stdout):
             res.failed = re.findall(r"\[FAIL\] (\S+)", proc.stdout)
+
+        # kind runner-side: escaneo declarado de errores de script + fusión M
+        if runtime_checks:
+            err_lines = [ln.strip() for ln in res.log.splitlines()
+                         if RUNTIME_ERROR_RE.search(ln)]
+            for c in runtime_checks:
+                cid = str(c.get("id", "?"))
+                if err_lines:
+                    res.failed.append(cid)
+                    print(f"   [FAIL] {cid} — primer error de script: {err_lines[0][:110]}")
+                else:
+                    res.m_pass += 1
+                res.m_total += 1
+            if err_lines:
+                res.validation = "FAILED"
+            elif res.m_total > 0 and res.m_pass == res.m_total:
+                res.validation = "PASSED"
+
         if "BUILD = 0" in proc.stdout:
             res.build_ok = False
             res.score = 0.0

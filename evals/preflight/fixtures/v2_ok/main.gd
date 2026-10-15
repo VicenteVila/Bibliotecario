@@ -26,6 +26,7 @@ var passive_timer: Timer
 var cam: Camera2D
 
 var score := 0
+var charge := 0.0
 var mana := 10
 var passive := 0
 
@@ -142,6 +143,18 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("restart"):
 		_do_restart()
+
+	# resource_within_bounds (cota tipo SAGE resource overflow): carga tope 10
+	if BROKEN:
+		charge += 0.5
+	else:
+		charge = minf(charge + 0.5, 10.0)
+
+	if BROKEN and Engine.get_physics_frames() == 10:
+		# hueco B: error de script en caliente para no_runtime_errors.
+		# Va al final: aborta sólo este frame, el juego sigue.
+		var _nulo = null
+		_nulo.metodo_inexistente()
 
 func _on_coin(body: Node) -> void:
 	if body != player:

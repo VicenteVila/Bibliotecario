@@ -19,6 +19,13 @@ extends SceneTree
 ##   reaches_state      — un indicador de final SE HACE VISIBLE al conducir
 ##   restart_resets     — reiniciar RESETea el estado observado
 ##
+## A/B (§5.2.2.b, 2026-10-15 — huecos con paper detrás, v2 aún sin ratificar):
+##   resource_within_bounds — un valor NO desborda su cota (SAGE: *resource
+##                            overflow*). Se muestrea cada frame de física.
+##   no_runtime_errors      — NO es de este motor: lo sintetiza el runner
+##                            (suite_runner_v2.py) escaneando `SCRIPT ERROR:`.
+##                            Si llega aquí, se emite FAIL ruidoso (kind desconocido).
+##
 ## Límite declarado: `reaches_state` y `restart_resets` verifican el ALAMBRE
 ## (que el final es alcanzable y se muestra, que el reinicio resetea), no que
 ## una IA sepa ganar. El techo de frames sigue vigente.
@@ -56,7 +63,10 @@ var v2_restart_mid := {} # muestra intermedia para restart_resets
 const MAX_FRAMES := 6000
 
 const V2_KINDS := ["hud_value_changes", "state_after_action",
-					"wait_accumulates", "reaches_state", "restart_resets"]
+					"wait_accumulates", "reaches_state", "restart_resets",
+					"resource_within_bounds"]
+const STATIC_KINDS := ["build", "node_exists", "node_is", "canvas",
+					"label_match", "scene_count", "has_method", "collision"]
 
 func _initialize() -> void:
 	var f = FileAccess.open("res://_checks.json", FileAccess.READ)
@@ -84,8 +94,7 @@ func _initialize() -> void:
 
 	for c in checks:
 		var kind = str(c.get("kind", ""))
-		if kind in ["build", "node_exists", "node_is", "canvas",
-					"label_match", "scene_count", "has_method", "collision"]:
+		if kind in STATIC_KINDS:
 			_run_static(c)
 
 	for c in checks:
@@ -93,6 +102,10 @@ func _initialize() -> void:
 		if kind2 in ["moves", "jump", "camera_follows", "falls", "lands", "settles"] \
 				or kind2 in V2_KINDS:
 			pend.append(c)
+		elif kind2 != "" and not (kind2 in STATIC_KINDS):
+			# fallback ruidoso: un kind desconocido FALLA con su nombre en vez
+			# de colarse en silencio (p. ej. no_runtime_errors, que es del runner)
+			_emit(false, str(c.get("id", "?")), "kind no soportado por el motor: " + kind2)
 
 	if pend.is_empty():
 		_finish()
@@ -216,7 +229,7 @@ func _resolve_target() -> bool:
 			_emit(false, str(pend[i].get("id", "?")), "sin nodo bajo prueba")
 		_finish()
 		return false
-	if target != null and player == null and target is Node2D:
+	if target != null and player == null and target is Node2D and _looks_like_player(target):
 		player = target
 	var cf = _find_by_type("Camera2D")
 	if cf != null:
@@ -243,6 +256,8 @@ func _begin_check(c: Dictionary) -> void:
 			v2_snap["label"] = _label_number(c.get("watch_label", []))
 			if target != null and target is Node2D:
 				v2_snap["pos"] = target.global_position
+		"resource_within_bounds":
+			v2_snap = {"n": 0, "bad": NAN, "bad_frame": -1, "peak": NAN}
 
 func _process(_delta: float) -> bool:
 	total_frames += 1
@@ -315,6 +330,21 @@ func _process(_delta: float) -> bool:
 			var dy = y0 - target.global_position.y
 			if dy > jump_best:
 				jump_best = dy
+
+		# resource_within_bounds: se muestrea CADA frame de física (sin input)
+		if kind == "resource_within_bounds":
+			var v = _read_bound_value(c)
+			if not is_nan(v):
+				v2_snap["n"] = int(v2_snap.get("n", 0)) + 1
+				var pk = float(v2_snap.get("peak", NAN))
+				if is_nan(pk) or v > pk:
+					v2_snap["peak"] = v
+				if is_nan(float(v2_snap.get("bad", NAN))):
+					var vmax_b = float(c.get("max", INF))
+					var vmin_b = float(c.get("min", -INF))
+					if v > vmax_b or v < vmin_b:
+						v2_snap["bad"] = v
+						v2_snap["bad_frame"] = frames
 
 		if frames == nframes:
 			_resolve_check(c, kind, nframes)
@@ -411,6 +441,21 @@ func _resolve_check(c: Dictionary, kind: String, nframes: int) -> void:
 				_emit(true, id, "%s — indicador final visible: '%s' (inicial: %s)"
 					% [desc, found, ("'" + was + "'" if was != "" else "nada")])
 
+		"resource_within_bounds":
+			var vmax = float(c.get("max", INF))
+			var vmin = float(c.get("min", -INF))
+			var ns = int(v2_snap.get("n", 0))
+			var bad = float(v2_snap.get("bad", NAN))
+			if ns == 0:
+				_emit(false, id, "%s — no pude leer el valor observado en %d frames"
+					% [desc, nframes])
+			elif not is_nan(bad):
+				_emit(false, id, "%s — COTA EXCEDIDA: %.3f fuera de [%.3f, %.3f] en el frame %d (%d muestras)"
+					% [desc, bad, vmin, vmax, int(v2_snap.get("bad_frame", -1)), ns])
+			else:
+				_emit(true, id, "%s — %d muestras dentro de [%.3f, %.3f] (pico %.3f)"
+					% [desc, ns, vmin, vmax, float(v2_snap.get("peak", NAN))])
+
 		"restart_resets":
 			var ra = str(c.get("restart_action", "ui_accept"))
 			Input.action_release(ra)
@@ -490,6 +535,15 @@ func _read_prop(c: Dictionary):
 	if not prop in n:
 		return null
 	return n.get(prop)
+
+func _read_bound_value(c: Dictionary) -> float:
+	"""Valor numérico observado: propiedad de un nodo, o número de un Label."""
+	if str(c.get("property", "")) != "":
+		var v = _read_prop(c)
+		if v is float or v is int:
+			return float(v)
+		return NAN
+	return _label_number(c.get("label", c.get("watch_label", [])))
 
 func _visible_indicator(c: Dictionary) -> String:
 	"""Devuelve el texto de un indicador de final VISIBLE, o "" si no hay ninguno."""

@@ -527,7 +527,7 @@ Aunque se añadiera un `kind` que conduzca a un final, **el techo lo impide**.
 > v1 los puntúa igual. **La brecha queda cerrada para las 60 tareas** — pero v2
 > es un benchmark nuevo y su uso en medición real requiere ratificación propia.
 
-###### 5.2.2.b Contraste con la literatura — los 18 `kind`s de v2 frente a las clases de fallo de los 5 papers *(2026-10-15 — se hace ANTES de ratificar v2)*
+###### 5.2.2.b Contraste con la literatura — los 20 `kind`s de v2 (más el gate `build`) frente a las clases de fallo de los 5 papers *(2026-10-15 — se hace ANTES de ratificar v2)*
 
 **Método:** se extraen las clases **enumerables** de fallo/oráculo de los cinco
 papers del corpus de dominio (`data/corpora/game_development.db`) y se contrastan
@@ -539,9 +539,20 @@ versión nueva; después sí. Fuente: los propios textos, con cita corta.
 > «13 `kind`s = 8 estructurales + 5 cinéticos». En el código v1 hay **14 ramas
 > de dispatch** (8 estructurales incluyendo `build` + 6 cinéticas — `settles` y
 > `lands` son dos `kind`s que comparten rama). Los **totales usados para decidir
-> (13 y 18) siguen siendo válidos**: son los *checks* sin contar el gate
-> `build` (7 estructurales + 6 cinéticas = 13; + 5 nuevos = 18). Se usarán
-> **19 ramas / 18 checks + BUILD** de aquí en adelante.
+> (13 y 18) siguen siendo válidos como histórico**: son los *checks* sin
+> contar el gate `build` (7 estructurales + 6 cinéticas = 13; + 5 nuevos = 18).
+>
+> **Segunda errata de recuento (declarada 2026-10-15):** el resumen que seguía
+> a esta tabla decía *«6 cubiertas, 5 parciales, 6 sin cubrir»*, pero la
+> propia tabla daba **5 / 4 / 8** — el resumen reclasificó dos clases ❌ sin
+> que su desglose de los 6 cuadre (ni *balanceo* ni la sincronía rítmica
+> aparecen en él). El mensaje de commit de `7e34393` heredó esas cifras y no
+> se reescribe. Recuento correcto **previo a A/B: 5 cubiertas, 4 parciales,
+> 8 sin cubrir**.
+>
+> Con **A y B cerrados (2026-10-15)** se usarán **21 ramas de dispatch /
+> 20 checks + BUILD** (13 + 5 + A + B) y el recuento de la tabla pasa a
+> **7 cubiertas / 4 parciales / 6 sin cubrir**.
 
 **Tabla clase de fallo → `kind`(s) de v2:**
 
@@ -554,29 +565,33 @@ versión nueva; después sí. Fuente: los propios textos, con cita corta.
 | Sin feedback en HUD/UI (GameCraft: *missing UI feedback*) | `hud_value_changes` · `label_match` | ✅ cubierto |
 | Transición de estado rota (GameCraft: *broken state transitions*) | `state_after_action` | ⚠️ **parcial** — un paso declarado; no secuencias encadenadas |
 | Transición ilegal al jugar (SAGE: *illegal state transition*) | `state_after_action` · `restart_resets` | ⚠️ **parcial** — verificamos las transiciones **declaradas en la tarea**; SAGE **explora** para hallar no declaradas (descubrimiento ≠ verificación) |
-| **Desbordamiento de recurso** (SAGE: *resource overflow*) | — | ❌ **hueco** — los kinds miden **delta**, no **cota**; nada verifica «el maná no pasa de 10» |
+| **Desbordamiento de recurso** (SAGE: *resource overflow*) | `resource_within_bounds` | ✅ **cerrado 2026-10-15 (A)** — muestrea una propiedad numérica cada frame de física y comprueba `min/max` (cota, no delta); evidencia cita valor, cota y frame. Validado: fixture ok 8/8, roto cae con «COTA EXCEDIDA» |
 | Lógica de juego inconsistente (SAGE: *inconsistent game logic*) | `label_match` · `state_after_action` | ⚠️ **parcial** — sólo reglas declaradas en la tarea; reglas generales → invariantes tipo GameRule → futuro |
-| Crash en caliente / excepción de runtime (2022: *crash and stuck behaviour*) | `build` (sólo el arranque) | ❌ **hueco** — a mitad de partida sólo hay señal indirecta (el estado no avanza); **el error no se detecta ni se atribuye** |
+| Crash en caliente / excepción de runtime (2022: *crash and stuck behaviour*) | `no_runtime_errors` | ✅ **cerrado 2026-10-15 (B)** — **runner-side** (el motor no intercepta sus propios errores): separa estos checks del motor y escanea la salida con el patrón declarado `SCRIPT ERROR:|Failed to load script`; el primer error citado como evidencia. Validado: el fixture roto cae con su propia línea de error |
 | Rendimiento/fps (Survey CASE-5 *performance testing*; Riot) | — | ❌ **fuera de medida** — `MAX_FRAMES` 6000 es válvula anti-colgadas, **no** métrica de rendimiento → no-alcance declarado o métrica nueva (decisión) |
 | Regresión entre versiones (**SAGE**, paper central) | — | ❌ **fuera de B-1** — B-1 mide una versión; comparar versiones = serie temporal (ámbito `D^eval`/`Sens`) → no-alcance de B-1 |
 | Multijugador / red (Survey MEDIA-2: *multiplayer/network testing*) | — | ❌ **no aplicable** — las 60 tareas son single-player 2D |
 | Playtesting / fun-factor / UX / legibilidad visual (Survey: *«capturing the fun… is not possible»*; GameCraft Limitations: no mide fun) | — | ❌ **ámbito de B-2** (juez multimodal, bloqueado) — ya declarado |
 | Balanceo y exploración (2022: *balancing*, *game exploration*) | — | ❌ **no aplicable** — son tareas del tester, no de verificación de lo pedido |
 | Timers encadenados en secuencia (GameRule límite 4: *Timer(a) no encadenable*) | `wait_accumulates` sólo acumulación simple | ⚠️ **parcial** → futuro/B-2 |
-| Sincronía rítmica (hallazgo 3 de esta misma sección, familia Rhythm) | — | ❌ **sigue abierto** — ninguno de los 5 kinds nuevos mide *timing*; no lo cubre ningún paper, lo declaró nuestra auditoría |
+| Sincronía rítmica (hallazgo 3 de esta misma sección, familia Rhythm) | — | ❌ **único pendiente (C)** — ninguno de los `kind`s mide *timing*; no lo cubre ningún paper, lo declaró nuestra auditoría. Se cierra o se declara fuera **antes de ratificar v2** |
 
-**Resumen honesto de la tabla:** de 17 clases contrastadas — **6 cubiertas**,
-**5 parciales**, **6 sin cubrir** (de los cuales 2 son no-alcance declarado, 1 es
-no-aplicable, 1 es ámbito B-2, y **2 son huecos reales y candidatos a cerrar en
-v2 ahora**: cota de recurso y error de runtime — más la sincronía rítmica,
-hueco propio sin paper detrás).
+**Resumen honesto de la tabla (recuento con A/B cerrados, 2026-10-15):** de 17
+clases contrastadas — **7 cubiertas** (las 5 previas + cota de recurso + crash
+en caliente), **4 parciales**, **6 sin cubrir** (2 no-alcance: rendimiento y
+regresión entre versiones; 2 no-aplicables: multijugador y balanceo; 1 ámbito
+B-2: playtesting/UX; y **1 pendiente real: sincronía rítmica (C)**). Los dos
+huecos con paper detrás quedan **cerrados y validados**; el recuento previo del
+resumen (6/5/6) estaba mal — errata declarada arriba.
 
-> **Decisión pendiente del dueño (no se hace unilateralmente):** cerrar en v2 —
-> (A) `resource_within_bounds` (cota de recurso, oráculo SAGE), (B)
-> `no_runtime_errors` (detección de error de script en caliente), (C) ventana
-> de sincronía para Rhythm — o declararlos explícitamente fuera de v2.
-> **La ratificación de v2 (enm. 2) no se emite hasta resolver esto**, para
-> ratificar una sola vez.
+> **Estado de la decisión del dueño (2026-10-15):** el dueño autorizó
+> **«A y B ahora»** → **(A) `resource_within_bounds` y (B)
+> `no_runtime_errors` cerrados el 2026-10-15** con validación medida (ok
+> **8/8 = 100** vs roto **1/8 = 12.5**, cada `kind` nuevo cayendo por su
+> propia razón; v1 intacto 11.11/11.11 y ReaGame **72.73** sin `git diff`).
+> Queda **(C) ventana de sincronía para Rhythm**, a hacer después de A/B según
+> la misma orden. **La ratificación de v2 (enm. 2) no se emite hasta resolver
+> C** (cerrarla o declararla fuera), para ratificar una sola vez.
 
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
@@ -956,7 +971,7 @@ aquí con fecha y motivo — no se reescribe en silencio.)*
 |---|---|
 | **objeto** | motor B-1 (`check_suite.gd`) — **versión nueva del benchmark**, no enmienda del congelado |
 | **antes (v1)** | 13 `kind`s: 8 estructurales + 5 cinéticos. **31 de 60 tareas** quedaban sin cobertura de comportamiento (§5.2.2). Victoria/derrota/reinicio sólo se comprobaban como `node_exists` sobre un nodo *llamado* Win/Restart. *(Errata declarada 2026-10-15: el reparto correcto es **7 estructurales + 6 cinéticos + `build` como gate** — `settles` y `lands` son dos `kind`s; los **totales 13/18 y las decisiones tomadas no cambian**. Ver §5.2.2.b.)* |
-| **ahora (v2)** | **18 `kind`s** = los 13 de v1 **+ 5 nuevos**: `hud_value_changes` · `state_after_action` · `wait_accumulates` · `reaches_state` · `restart_resets`. v2 observa **cambios en el tiempo**, no sólo existencia. |
+| **ahora (v2)** | **20 `kind`s** = los 13 de v1 **+ 5 nuevos** (`hud_value_changes` · `state_after_action` · `wait_accumulates` · `reaches_state` · `restart_resets`) **+ 2 cerrados tras el contraste de §5.2.2.b** (`resource_within_bounds`, `no_runtime_errors` — ver ampliación abajo). v2 observa **cambios en el tiempo**, no sólo existencia. |
 | **qué NO cambia** | **v1 queda intacto y runnable** (`check_suite.gd` + `suite_runner.py` sin tocar — `git diff` vacío). El motor de v2 es un **archivo nuevo** `check_suite_v2.gd`. Godot sigue siendo **4.7.1**. La fórmula, `BUILD=0` y los pesos son idénticos. |
 | **motivo** | §5.2.2 declaró, tras auditar las 15 familias, que B-1 **no cubría 31 de 60 tareas**: los 5 `kind`s cinéticos sólo aplican a avatares que se mueven por el espacio, y en Card/Idle/Rhythm/VN/Strategy/Tycoon/Simulation/Puzzle la verificación colapsaba al evaluador estático. Se pidió explícitamente al dueño y autorizó **A1**. |
 | **validación medida** *(no supuesta)* | dos fixtures sintéticos idénticos en estructura, uno cableado (`v2_ok`) y uno sin cablear (`v2_broken`): **v1 los puntúa IGUAL (11.11 vs 11.11)** — no distingue. **v2 los separa 83.33 puntos** (ok **100.00** vs roto **16.67**), y los 5 `kind`s nuevos **fallan en el roto cada uno por su razón** (HUD congelado · propiedad sin cambiar · sin acumulación pasiva · sin indicador de final visible · sin reset). |
@@ -971,6 +986,44 @@ aquí con fecha y motivo — no se reescribe en silencio.)*
 > pasiva, final alcanzable, reinicio efectivo). **Nunca se mezclan números v1 y
 > v2 en una misma serie** — son instrumentos distintos, como declaró la enmienda 1
 > para B-1/B-2. Un resultado v1 y un resultado v2 no son comparables.
+
+#### Ampliación pre-ratificación — A y B cerrados en v2 · 2026-10-15
+
+| | |
+|---|---|
+| **objeto** | §5.2.2.b — los dos huecos con paper detrás, **antes** de ratificar v2 |
+| **qué se añade** | **(A)** `resource_within_bounds` — cota `min/max` muestreada **por frame de física** en el motor (SAGE *resource overflow*). **(B)** `no_runtime_errors` — **runner-side**: el motor GDScript no puede interceptar sus propios errores en caliente, así que `suite_runner_v2.py` separa estos checks del motor, escanea la salida combinada con el patrón **declarado** `SCRIPT ERROR:|Failed to load script` y sintetiza el resultado citando la primera línea como evidencia; si hay coincidencia la validación entera queda `FAILED` |
+| **validación medida** | fixtures ok/roto: **ok 8/8 = 100.0** · **roto 1/8 = 12.5** — los 7 checks caen cada uno por su razón (incluidos «COTA EXCEDIDA: 497.500 fuera de [-inf, 10]» y «primer error de script: SCRIPT ERROR: Invalid call…»). `v2-compat` **4/4** · **v1 intacto** en fixtures **1/9 = 11.11** en ambos (sigue sin distinguir) · **v1 en ReaGame 72.73** con `git diff` vacío |
+| **qué NO cambia** | v1 congelado (ficheros v1 con `git diff` vacío), Godot 4.7.1, la fórmula, `BUILD=0`, los pesos, `MAX_FRAMES` 6000 y los umbrales. Sólo crece el recuento: **21 ramas / 20 checks + BUILD** |
+| **ratificación** | sigue **propuesta** — falta C (sincronía rítmica) |
+
+#### Observación de instrumento — v1 no es reproducible bajo carga · 2026-10-15
+
+**Hecho medido, sin tocar nada congelado:** hoy se corrió `platformer-juego`
+(v1) sobre ReaGame **19 veces**: **14 dieron 8/11 = 72.73** (el baseline
+ratificado) y **5 dieron 9/11 = 81.82**. En un experimento controlado, con 8
+bucles de CPU pesando la máquina dio **9/11 las 2/2**, y en reposo **8/11 las
+12/12** siguientes. El check que voltea es **`jugador-salta`** (los otros 10
+son estables; `meta-existe` y `monedas-existen` fallan siempre: es el
+`main.tscn` roto del bloqueante 18).
+
+**Causa raíz (ya declarada en la enm. 2):** v1 ata `frames` a iteraciones de
+`_process`, que en headless corren sin techo y se desincronizan de los ticks
+de física — la ventana de 30 frames del check de salto no siempre abarca el
+arco del salto. Es exactamente el defecto que el arreglo de fondo de v2 (ata
+el progreso a `Engine.get_physics_frames()`) corrigió.
+
+**Qué NO cambia:** v1 no se modifica (`git diff` vacío), no se re-baja ningún
+umbral, y **ambos valores caen dentro del intervalo ratificado §8.1
+[72.73, 100.00]**. Se declara para que nadie trate un 8/11 y un 9/11 de v1
+como comparables entre sí ni entre sesiones: **un solo número de v1 no es
+reproducible sin controlar la carga de la máquina; el baseline sigue siendo
+72.73 (medido en reposo)**.
+
+> **Regla derivada de la observación:** toda medición v1 se declara con el
+> estado de carga de la máquina; las comparaciones serias de v1 usan la misma
+> condición. V2 ya no depende de esto para su progreso (ligado a física), y su
+> fixture de validación hoy corre estable.
 
 ---
 

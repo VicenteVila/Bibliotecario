@@ -49,3 +49,16 @@ checks:
     restart_action: restart
     frames: 300
     desc: "reiniciar pone el marcador observado a cero"
+
+  # --- A (§5.2.2.b): cota de recurso — oráculo SAGE "resource overflow" ---
+  - id: carga-sin-desborde
+    kind: resource_within_bounds
+    desc: la carga nunca desborda su cota de 10
+    names: [Main]
+    property: charge
+    max: 10
+    frames: 140
+  # --- B (§5.2.2.b): kind runner-side — patrón SCRIPT ERROR declarado ---
+  - id: sin-errores-de-script
+    kind: no_runtime_errors
+    desc: la partida no lanza errores de script en caliente
