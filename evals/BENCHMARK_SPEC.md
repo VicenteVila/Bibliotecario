@@ -527,6 +527,57 @@ Aunque se añadiera un `kind` que conduzca a un final, **el techo lo impide**.
 > v1 los puntúa igual. **La brecha queda cerrada para las 60 tareas** — pero v2
 > es un benchmark nuevo y su uso en medición real requiere ratificación propia.
 
+###### 5.2.2.b Contraste con la literatura — los 18 `kind`s de v2 frente a las clases de fallo de los 5 papers *(2026-10-15 — se hace ANTES de ratificar v2)*
+
+**Método:** se extraen las clases **enumerables** de fallo/oráculo de los cinco
+papers del corpus de dominio (`data/corpora/game_development.db`) y se contrastan
+uno a uno con los `kind`s de `check_suite_v2.gd`. Se declara **antes** de
+ratificar v2: si la literatura revela un hueco, cerrarlo en v2 todavía no cuesta
+versión nueva; después sí. Fuente: los propios textos, con cita corta.
+
+> **Errata de recuento (declarada):** la §5.2.2 y la enm. 2 dijeron
+> «13 `kind`s = 8 estructurales + 5 cinéticos». En el código v1 hay **14 ramas
+> de dispatch** (8 estructurales incluyendo `build` + 6 cinéticas — `settles` y
+> `lands` son dos `kind`s que comparten rama). Los **totales usados para decidir
+> (13 y 18) siguen siendo válidos**: son los *checks* sin contar el gate
+> `build` (7 estructurales + 6 cinéticas = 13; + 5 nuevos = 18). Se usarán
+> **19 ramas / 18 checks + BUILD** de aquí en adelante.
+
+**Tabla clase de fallo → `kind`(s) de v2:**
+
+| clase de fallo / oráculo (fuente) | `kind`(s) de v2 | estado |
+|---|---|---|
+| Proyecto no arranca / escena no carga (GameCraft: *unlaunchable*) | `build` | ✅ cubierto |
+| Controles sin respuesta (GameCraft: *unresponsive controls*) | `state_after_action` | ✅ si la tarea declara el efecto de la acción |
+| Colisiones incorrectas (GameCraft: *incorrect collisions*; 2022: *collision issues*) | `collision` · `settles`/`lands` | ✅ cubierto |
+| Objetivo inalcanzable / soft-lock (GameCraft: *unreachable objectives*; ICARUS *soft lock*) | `reaches_state` | ✅ alambre — alcanzable con input guionizado, no que una IA sepa ganar |
+| Sin feedback en HUD/UI (GameCraft: *missing UI feedback*) | `hud_value_changes` · `label_match` | ✅ cubierto |
+| Transición de estado rota (GameCraft: *broken state transitions*) | `state_after_action` | ⚠️ **parcial** — un paso declarado; no secuencias encadenadas |
+| Transición ilegal al jugar (SAGE: *illegal state transition*) | `state_after_action` · `restart_resets` | ⚠️ **parcial** — verificamos las transiciones **declaradas en la tarea**; SAGE **explora** para hallar no declaradas (descubrimiento ≠ verificación) |
+| **Desbordamiento de recurso** (SAGE: *resource overflow*) | — | ❌ **hueco** — los kinds miden **delta**, no **cota**; nada verifica «el maná no pasa de 10» |
+| Lógica de juego inconsistente (SAGE: *inconsistent game logic*) | `label_match` · `state_after_action` | ⚠️ **parcial** — sólo reglas declaradas en la tarea; reglas generales → invariantes tipo GameRule → futuro |
+| Crash en caliente / excepción de runtime (2022: *crash and stuck behaviour*) | `build` (sólo el arranque) | ❌ **hueco** — a mitad de partida sólo hay señal indirecta (el estado no avanza); **el error no se detecta ni se atribuye** |
+| Rendimiento/fps (Survey CASE-5 *performance testing*; Riot) | — | ❌ **fuera de medida** — `MAX_FRAMES` 6000 es válvula anti-colgadas, **no** métrica de rendimiento → no-alcance declarado o métrica nueva (decisión) |
+| Regresión entre versiones (**SAGE**, paper central) | — | ❌ **fuera de B-1** — B-1 mide una versión; comparar versiones = serie temporal (ámbito `D^eval`/`Sens`) → no-alcance de B-1 |
+| Multijugador / red (Survey MEDIA-2: *multiplayer/network testing*) | — | ❌ **no aplicable** — las 60 tareas son single-player 2D |
+| Playtesting / fun-factor / UX / legibilidad visual (Survey: *«capturing the fun… is not possible»*; GameCraft Limitations: no mide fun) | — | ❌ **ámbito de B-2** (juez multimodal, bloqueado) — ya declarado |
+| Balanceo y exploración (2022: *balancing*, *game exploration*) | — | ❌ **no aplicable** — son tareas del tester, no de verificación de lo pedido |
+| Timers encadenados en secuencia (GameRule límite 4: *Timer(a) no encadenable*) | `wait_accumulates` sólo acumulación simple | ⚠️ **parcial** → futuro/B-2 |
+| Sincronía rítmica (hallazgo 3 de esta misma sección, familia Rhythm) | — | ❌ **sigue abierto** — ninguno de los 5 kinds nuevos mide *timing*; no lo cubre ningún paper, lo declaró nuestra auditoría |
+
+**Resumen honesto de la tabla:** de 17 clases contrastadas — **6 cubiertas**,
+**5 parciales**, **6 sin cubrir** (de los cuales 2 son no-alcance declarado, 1 es
+no-aplicable, 1 es ámbito B-2, y **2 son huecos reales y candidatos a cerrar en
+v2 ahora**: cota de recurso y error de runtime — más la sincronía rítmica,
+hueco propio sin paper detrás).
+
+> **Decisión pendiente del dueño (no se hace unilateralmente):** cerrar en v2 —
+> (A) `resource_within_bounds` (cota de recurso, oráculo SAGE), (B)
+> `no_runtime_errors` (detección de error de script en caliente), (C) ventana
+> de sincronía para Rhythm — o declararlos explícitamente fuera de v2.
+> **La ratificación de v2 (enm. 2) no se emite hasta resolver esto**, para
+> ratificar una sola vez.
+
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
 Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el
@@ -904,7 +955,7 @@ aquí con fecha y motivo — no se reescribe en silencio.)*
 | | |
 |---|---|
 | **objeto** | motor B-1 (`check_suite.gd`) — **versión nueva del benchmark**, no enmienda del congelado |
-| **antes (v1)** | 13 `kind`s: 8 estructurales + 5 cinéticos. **31 de 60 tareas** quedaban sin cobertura de comportamiento (§5.2.2). Victoria/derrota/reinicio sólo se comprobaban como `node_exists` sobre un nodo *llamado* Win/Restart. |
+| **antes (v1)** | 13 `kind`s: 8 estructurales + 5 cinéticos. **31 de 60 tareas** quedaban sin cobertura de comportamiento (§5.2.2). Victoria/derrota/reinicio sólo se comprobaban como `node_exists` sobre un nodo *llamado* Win/Restart. *(Errata declarada 2026-10-15: el reparto correcto es **7 estructurales + 6 cinéticos + `build` como gate** — `settles` y `lands` son dos `kind`s; los **totales 13/18 y las decisiones tomadas no cambian**. Ver §5.2.2.b.)* |
 | **ahora (v2)** | **18 `kind`s** = los 13 de v1 **+ 5 nuevos**: `hud_value_changes` · `state_after_action` · `wait_accumulates` · `reaches_state` · `restart_resets`. v2 observa **cambios en el tiempo**, no sólo existencia. |
 | **qué NO cambia** | **v1 queda intacto y runnable** (`check_suite.gd` + `suite_runner.py` sin tocar — `git diff` vacío). El motor de v2 es un **archivo nuevo** `check_suite_v2.gd`. Godot sigue siendo **4.7.1**. La fórmula, `BUILD=0` y los pesos son idénticos. |
 | **motivo** | §5.2.2 declaró, tras auditar las 15 familias, que B-1 **no cubría 31 de 60 tareas**: los 5 `kind`s cinéticos sólo aplican a avatares que se mueven por el espacio, y en Card/Idle/Rhythm/VN/Strategy/Tycoon/Simulation/Puzzle la verificación colapsaba al evaluador estático. Se pidió explícitamente al dueño y autorizó **A1**. |

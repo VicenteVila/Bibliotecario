@@ -576,6 +576,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | el binario de Godot del arnés | `EG/.tools/godot` — **4.7.1.stable** |
 | **la suite ampliada de juegos (60 tareas)** | `evals/game_tasks_expanded.yaml` · §4.4 de `BENCHMARK_SPEC.md` |
 | **por qué B-1 no cubre 31 de esas 60** | `evals/BENCHMARK_SPEC.md` §5.2.2 — auditoría de cobertura por familia |
+| **contraste de v2 con la literatura (5 papers de dominio)** | `evals/BENCHMARK_SPEC.md` §5.2.2.b — 17 clases: 6 cubiertas · 5 parciales · 6 sin cubrir (2 huecos reales candidatos a cerrar) |
 | **el scorer B-1 v2 (18 kind's, cierra esa brecha)** | `evals/preflight/check_suite_v2.gd` + `suite_runner_v2.py` · validado en `fixtures/v2_{ok,broken}/` · §11 enm. 2 |
 
 ---
