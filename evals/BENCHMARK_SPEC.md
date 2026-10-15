@@ -688,6 +688,27 @@ correrla** cualquier llamada; los resultados se anotan después, nunca al revés
 | **crib Godot 4** *(conocimiento de harness, no agujas)* | sin backticks; `@onready`/`@export` (nunca los keywords de Godot 3); enums de alineación = constantes globales `HORIZONTAL_ALIGNMENT_*` / `VERTICAL_ALIGNMENT_*`; señales con `nodo.senal.connect(_metodo)`; sin `yield` (usar `await`); `position` (no `rect_position`); `Label.autowrap_mode` (no el bool `autowrap`); sin funciones nombradas anidadas (usar `var f = func():` o inlinear el `await`); cada `Area2D` necesita `CollisionShape2D` para recibir input. |
 | **artefacto** | script one-off `/tmp/opencode/gen/measure_b1.py` + resultados `measure_b1_results.jsonl` (números clave se copian a CONOCIMIENTO al cerrar) |
 
+**Ampliación del crib y serie 2 — 2026-10-15 (declarada tras el resultado parcial de la serie 1, que se PRESERVA):**
+
+**Serie 1, resultado parcial visto antes de ampliar** (no se borra ni se
+repite en silencio): 2 de las 8 tareas corridas — `card-memory-precision`
+**0.0/0.0/0.0** y `platformer-torre-rebote` **0.0/0.0/0.0**, ambas **BUILD=0**.
+Causa común medida: el generador escribe los `.tscn` en **sintaxis Godot 3**
+(`margin_*`, `size=` en Control, `extents=`, subrecursos inline
+`RectangleShape2D { … }`, y en card además `[ext_resource]` al final del
+fichero). El crib declarado cubría GDScript, **no** el formato `.tscn`. La
+evidencia de reparación de la serie 1 sólo contenía el `SCRIPT ERROR` (no la
+línea `fallan: build`) — errata de implementación corregida en el script
+*antes* de la serie 2.
+
+**Ampliación (mismo día, resultados parciales a la vista y declarados):**
+
+| | |
+|---|---|
+| **qué añade el crib v2** | formato `.tscn` Godot 4: `[ext_resource]` **antes** del primer `[node]`; recursos embebidos en bloque `[sub_resource type="X" id="N"]` con propiedades en líneas siguientes (**nunca** inline `X { … }`); `RectangleShape2D.size=` (**no** `extents=`); Control con anchors/offsets (**no** `margin_*` ni `size=` en Button); Camera2D sin `current=`; `project.godot` con `viewport_width/viewport_height` |
+| **qué hace la serie 2** | **repite las MISMAS 8 tareas** con el mismo presupuesto y scoring, en fichero de resultados aparte; la serie 1 permanece en `measure_b1_results.jsonl` como dato declarado. |
+| **qué NO cambia** | umbrales, fórmula, suites congeladas, motor, modelo ni `max_tokens`. |
+
 ### 5.3 Estadísticas de descomposición — si hay rejilla `M × H`
 
 Con modelo fijo, `MV = 0` por construcción. Si en algún momento se varía el
