@@ -72,6 +72,14 @@ def data_dir() -> Path:
 
 
 def db_path() -> Path:
+    # Corpus por dominio: si BIBLIOTECARIO_DB apunta a otra DB se usa esa
+    # (p. ej. data/corpora/game_development.db durante la ingesta de dominio).
+    # Sin la variable, la ruta por defecto es exactamente la de siempre.
+    override = os.environ.get("BIBLIOTECARIO_DB")
+    if override:
+        p = Path(override)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        return p
     return data_dir() / "bibliotecario.db"
 
 

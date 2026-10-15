@@ -86,6 +86,43 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 > renombrados a `.pdf`; el `.docx` ya estaba en la DB (doc 4).
 > `ingest_dir()` deduplica por hash — re-ingerir es seguro.
 
+### Corpus por dominio — regla *(2026-10-15)*
+
+> **El corpus se parte igual que el benchmark**: meta-conocimiento de arneses
+> en `data/bibliotecario.db` (25 docs, **intacta**), conocimiento de dominio en
+> una DB aparte por dominio. Lo que de un paper cambie una decisión del
+> benchmark **no se queda implícito en el corpus**: se declara y cita en el
+> spec, con enmienda y fecha.
+>
+> Frontera por **consumidor**, no por tema: «¿cómo se construye/evalúa un
+> arnés?» → corpus general · «¿qué debe cumplir un juego / cómo se testea?» →
+> corpus de dominio. **La fuente canónica ya lo hace así**
+> (`cogniteam_rules/<dominio>/`). Motivos: meter papers de dominio en la DB
+> general alteraría `result_retrieval.json` y las calibraciones de A-bis
+> (mediciones sobre ese corpus de 25), y contaminaría criterios de un dominio
+> como si fueran principios generales.
+
+| qué | dónde |
+|---|---|
+| PDFs de dominio | `Documentos/<dominio>/` — hoy solo `game_development/` (**4 PDF**) |
+| DB de dominio | `data/corpora/game_development.db` — `4 docs · 236 chunks` · `metadata.domain` |
+| Cambio de DB | env **`BIBLIOTECARIO_DB`** (`config.db_path()`) — sin ella, la general en su ruta de siempre |
+| Ingesta de dominio | `BIBLIOTECARIO_DB=data/corpora/game_development.db python3 -m bibliotecario.cli ingest-dir Documentos/<dominio>` |
+| Descartados (con motivo) | `Documentos/descartados/` |
+
+> **Los arquetipos no son carpetas**: la frontera es el **dominio** (14 en
+> CogniTeam; los 61 arquetipos viven dentro de cada uno). Un paper rara vez
+> sirve a un solo arquetipo → se tagea en `metadata` si acaso, sin fragmentar
+> en 61 DBs. Carpetas vacías = andamio prematuro: la carpeta de un dominio
+> nace con su primer PDF.
+
+> **Descarte declarado — SAGE (2026) · 2026-10-15**: el PDF recibido es
+> *«SAGE: Scalable Agentic 3D Scene Generation for Embodied AI»* (NVIDIA),
+> generación de escenas 3D para IA encarnada — **no** es el paper de
+> testing/harness que se pidió, y ninguna de las 60 tareas exige 3D.
+> **No ingerido**; archivo movido a `Documentos/descartados/` (no borrado).
+> Si aparece el SAGE de testing, se ingerirá en `game_development/`.
+
 ### 3.4 Las 14 técnicas sembradas y sus papers
 
 **5 originales** (docs 1-5): `PEARL` · `Procedural Graphs` · `Task-CoEvolve`
@@ -517,6 +554,8 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | los umbrales | `evals/BLUEPRINT_METRIC_DESIGN.md` §3.1 |
 | qué se erró y se declaró | `evals/BLUEPRINT_METRIC_DESIGN.md` §8.8-§8.13 |
 | un paper del corpus | `Documentos/` |
+| papers de **dominio** (juegos) | `Documentos/game_development/` · DB `data/corpora/game_development.db` |
+| el PDF descartado y el motivo | `Documentos/descartados/` · `CONOCIMIENTO.md` §2 «Corpus por dominio» |
 | **las 14 técnicas sembradas** | `CONOCIMIENTO.md` §3.4 · código en `bibliotecario/knowledge/seed.py` |
 | **los 4 papers de medición (sin bucle)** | `CONOCIMIENTO.md` §3.5 — *Harness Engineering · Beyond the Model · Agent Plasticity · Empirical Study* |
 | el texto ya extraído de un paper | `sqlite3 data/bibliotecario.db` → tabla `chunks` |
