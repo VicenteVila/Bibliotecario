@@ -38,6 +38,12 @@ def _cargar(path: Path):
 def _instancia(technique: str) -> dict:
     """Llama a la ruta real `instantiate_agent_template`, con el LLM estancado.
 
+    Hito 3, Fase 1: `instantiate` ya no entra por `build_blueprint` directo,
+    sino por `build_blueprint_p4` → `loop.run_blueprint` (4 turnos de loop +
+    blueprint). Para que D siga costando 0 tokens se estanca la **entrada**
+    del loop; dentro, `build_blueprint` se ejecuta de verdad con `generate`
+    estancado.
+
     `build_blueprint` llama a `generate()` para escribir el **blueprint**, que va
     a `BLUEPRINT.md`. El `agent_template.py` que D mide se construye solo con
     `bp["procedures"]`, `technique` y `goal` — todos salidos de
@@ -45,19 +51,25 @@ def _instancia(technique: str) -> dict:
     por tanto **byte-idéntico con o sin LLM**, así que se estanca para no gastar
     lo que no aporta nada al resultado.
     """
+    from bibliotecario.agent import loop as LOOP
     from bibliotecario.agent import tools as T
     from bibliotecario.knowledge import pearl
 
     # `generate` escribe el blueprint (va a BLUEPRINT.md) y
     # `PEARL.retrieve_evidence` solo rellena `chain`, el texto del prompt.
     # Ninguno de los dos toca `bp["procedures"]`, de donde sale el archivo.
-    original_g, original_r = T.generate, pearl.retrieve_evidence
+    original_g = T.generate
+    original_r = pearl.retrieve_evidence
+    original_rb = LOOP.run_blueprint
     T.generate = lambda *a, **k: "(sin LLM: D no mide el texto del blueprint)"
     pearl.retrieve_evidence = lambda *a, **k: []
+    LOOP.run_blueprint = lambda t, g, **k: T.build_blueprint(t, g)
     try:
         return T.instantiate_agent_template(technique, GOAL)
     finally:
-        T.generate, pearl.retrieve_evidence = original_g, original_r
+        T.generate = original_g
+        pearl.retrieve_evidence = original_r
+        LOOP.run_blueprint = original_rb
 
 
 def medir(technique: str) -> dict:

@@ -6,6 +6,7 @@ from bibliotecario.agent.attribution import critic_and_demote
 from bibliotecario.agent.tools import (
     answer_multi_hop,
     build_blueprint,
+    build_blueprint_p4,
     get_paper,
     get_status,
     instantiate_agent_template,
@@ -101,8 +102,11 @@ def blueprint_p4(technique: str, goal: str) -> dict:
     ahora mira números y ficheros. **No hay reescritura** — `verify_and_mark`
     devuelve el informe sin tocar el texto, que es lo que midió P3 que
     empeoraba el blueprint (§5.8.3). Así E vs C mide P4, y solo P4.
+
+    La composición vive en `tools.build_blueprint_p4` (única definición): la
+    usan el brazo E y, desde el Hito 3, la ruta del arnés (H1).
     """
-    return verify_and_mark(LOOP.run_blueprint(technique, goal))
+    return build_blueprint_p4(technique, goal)
 
 
 def study(doc_id: int, force: bool = False) -> dict:

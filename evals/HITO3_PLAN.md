@@ -159,10 +159,55 @@ El responsable fija o cambia H1-H4. **Nada se mide antes.**
 **Hecho:** H1-H4 ratificados tal cual + **camino 1** elegido (§7).
 
 ### Fase 1 — Cerrar el hueco A *(el más barato)*
-Pasar `instantiate_agent_template` por la ruta verificada y re-generar los
-5 arneses. Coste: ~5 llamadas de blueprint.
-**Si H1 no se cumple al primer intento, se declara la errata y se repara — no
-se re-baja el umbral.**
+
+**Declaración previa — escrita ANTES de generar nada (2026-10-16):**
+
+- **Ruta elegida:** `verify_and_mark(LOOP.run_blueprint(...))` — la misma
+  composición que `api.blueprint_p4` (brazo E: P1' + P2 + P4, **sin
+  reescritura**), implementada en `tools.build_blueprint_p4`. Motivos
+  medidos, uno por candidata descartada:
+  1. `blueprint_verified` (D = loop + `verify_and_repair`): la reescritura
+     midió **empeorar** el blueprint (§5.8.3) y D queda en R4 **7/15 < 8**
+     con el juez calibrado (§8.13). Descartada.
+  2. `blueprint_route5` (crítico + degradar puntero): descartada en §8.4.1
+     (B8 7,40 → 2,87 · R4 4/15). Descartada.
+  3. `blueprint_loop` (G): cumple ambas reglas con el juez calibrado
+     (**R4 8/15 · R5 13/15**, §8.12/§8.13), pero no pasa por ningún paso de
+     verificación de atribución: es la misma receta de texto que p4
+     (`verify_and_mark` no toca el texto), con **menos** verificación.
+  4. **Elegida: p4.** Verifica sin reescribir (P3 en modo informe), su texto
+     es el mismo que el de G (único con las dos reglas medidas bajo el juez
+     calibrado), y satisface literalmente el criterio de H1 («pasa por la
+     ruta verificada»). Coste: 0 `generate()` extra sobre el loop.
+- **n = 5** arneses (una instancia por cada una de las 5 técnicas sembradas,
+  regenerando `data/agents/<slug>`), como dice esta fase. Coste real
+  estimado: **~25 `generate()`** (5 arneses × [4 turnos de loop + 1
+  blueprint]) + **5 juicios**. *La estimación original «~5 llamadas» era por
+  arnés; se corrige aquí, antes de correr.*
+- **H1 operativo — ambigüedad resuelta ANTES de medir.** El texto de H1 dice
+  «100% de los arneses generados pasan R4 ≥ 8/15 y R5 ≥ 10/15», pero con
+  n = 5 la escala /15 no es evaluable (Hito 2 juzga 15 por brazo; por eso
+  «≥ 8/15» y «≥ 10/15» son los nombres con que se citan las reglas en todo
+  el documento). **Lectura declarada:** vinculante = **100% de los 5
+  arneses pasan `r4_ok` Y `r5_ok`** con el juez — es la cláusula con
+  justificación propia en la ficha (misma razón que la dec. 17). Los
+  recuentos x/5 se reportan al lado, y si se quisiera la escala /15 de
+  verdad, se haría con n = 15 como serie nueva y declarada. Si el 100% no
+  se alcanza al primer intento: **se declara la errata y se repara, sin
+  tocar el umbral** (previsto en esta propia fase).
+- **Juez:** `gemini-3.1-flash-lite` @ Google, `temperature=0`, mismo prompt
+  que §8.10 (`evals/eval_q1_r4r5.py`), vía `Q1_BASE_URL`/`Q1_API_KEY`
+  (mecanismo de la dec. 18). Instrumento con 0% de flips medido (§8.12).
+- **Runner y ficheros:** generación en `evals/run_fase1.py` →
+  `evals/result_fase1_h1.json` (filas `arm="H1"`) → juicio con
+  `evals/eval_q1_r4r5.py --arm=H1 --file=evals/result_fase1_h1.json`.
+- **Generación:** sin pin de proveedor — la rotación por defecto (Groq →
+  NVIDIA → Gemini) y las temperaturas por defecto, exactamente como
+  `api.blueprint_p4`; la generación de todos los brazos del Hito 2 corrió
+  sin pin declarado. Si un proveedor cae, se registra en la fila.
+
+Pasos: `instantiate_agent_template` pasa por `tools.build_blueprint_p4` y se
+regeneran los 5 arneses con `evals/run_fase1.py`. Después se juzga H1.
 
 ### Fase 2 — Cerrar el hueco B *(el que define el hito)*
 Que `run()` ejecute la técnica. Aquí hay que decidir **qué es un arnés en

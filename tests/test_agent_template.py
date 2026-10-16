@@ -18,12 +18,17 @@ PROCS = ["paso uno", "paso dos"]
 def _generar(tmp_path, monkeypatch, score: float):
     """Genera el agente con un `deep_sweep` controlado y lo carga."""
     from bibliotecario.agent import tools as T
+    from bibliotecario.agent import loop as LOOP
 
     monkeypatch.setattr(T, "data_dir", lambda: tmp_path)
-    monkeypatch.setattr(T, "build_blueprint",
-                        lambda t, g, extra_source="": {"technique": t, "goal": g,
-                                                       "procedures": PROCS,
-                                                       "blueprint": "bp"})
+    # Hito 3, Fase 1: la plantilla pasa por `build_blueprint_p4`, que entra
+    # por `loop.run_blueprint` (4 turnos de loop + blueprint). Se corta ahí
+    # la entrada — sin LLM en tests — con el mismo bp stub que antes daba
+    # `build_blueprint`.
+    monkeypatch.setattr(LOOP, "run_blueprint",
+                        lambda t, g, **k: {"technique": t, "goal": g,
+                                           "procedures": PROCS,
+                                           "blueprint": "bp"})
     # deep_sweep se importa dentro de run(), asi que se parchea en su modulo
     from bibliotecario.agent import tools
     monkeypatch.setattr(tools, "deep_sweep",

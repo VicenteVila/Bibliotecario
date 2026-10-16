@@ -406,9 +406,36 @@ def verify_and_mark(bp: dict) -> dict:
     return {**bp, "verificado": not v, "violaciones": v, "reescrituras": 0}
 
 
+def build_blueprint_p4(technique: str, goal: str) -> dict:
+    """P1' + P2 + P4 sin reescritura — la composición del brazo E (§5.9).
+
+    El loop reúne la evidencia, `build_blueprint` escribe con las reglas
+    actuales (R1-R8) y `verify_and_mark` devuelve el informe de atribución
+    **sin tocar el texto**: cero `generate()` extra y el blueprint queda
+    byte-idéntico al del mismo loop sin P4.
+
+    Ruta del arnés (Hito 3, Fase 1, declarada 2026-10-16): es la única
+    candidata que verifica sin reescribir. `verify_and_repair` midió
+    empeorar (§5.8.3, D: R4 7/15) y `critic_and_demote` está descartada
+    (§8.4.1: B8 7,40 → 2,87 · R4 4/15). Sobre el texto de G — único brazo
+    con R4 (8/15) y R5 (13/15) medidas con el juez calibrado (§8.12/§8.13)
+    — añade la comprobación que G no hacía.
+    """
+    from bibliotecario.agent import loop as LOOP
+
+    return verify_and_mark(LOOP.run_blueprint(technique, goal))
+
+
 def instantiate_agent_template(technique: str, goal: str) -> dict:
-    """Genera plantilla mínima de agente instanciable desde el blueprint (decisión 1)."""
-    bp = build_blueprint(technique, goal)
+    """Genera plantilla mínima de agente instanciable desde el blueprint (decisión 1).
+
+    Hito 3, Fase 1 (declarado 2026-10-16): pasa por `build_blueprint_p4`,
+    la ruta verificada (hueco A del plan), y no por `build_blueprint` crudo.
+    Un arnés generado por el camino crudo podía salir con peor integridad que
+    los blueprints ya medidos del Hito 2: eran dos recetas distintas para la
+    misma promesa (H1 ratificada).
+    """
+    bp = build_blueprint_p4(technique, goal)
     slug = "".join(c if c.isalnum() else "-" for c in technique.lower())[:40].strip("-")
     outdir = data_dir() / "agents" / slug
     outdir.mkdir(parents=True, exist_ok=True)
@@ -451,7 +478,9 @@ def run(context: dict) -> dict:
 '''
     (outdir / "agent_template.py").write_text(code, encoding="utf-8")
     (outdir / "BLUEPRINT.md").write_text(f"# {technique}\n\nObjetivo: {goal}\n\n{bp['blueprint']}\n", encoding="utf-8")
-    return {"dir": str(outdir), "files": ["agent_template.py", "BLUEPRINT.md"], "procedures": bp["procedures"]}
+    return {"dir": str(outdir), "files": ["agent_template.py", "BLUEPRINT.md"],
+            "procedures": bp["procedures"], "blueprint": bp.get("blueprint", ""),
+            "violaciones": bp.get("violaciones"), "verificado": bp.get("verificado")}
 
 
 def register_skill(name: str, skill_md: str, purpose_md: str = "") -> dict:
