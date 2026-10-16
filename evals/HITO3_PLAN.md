@@ -1,8 +1,12 @@
 # Hito 3 — arneses válidos: diseño y evaluación
 
-**Estado: PLAN — umbrales propuestos, NO ratificados.**
-**Nada de este plan se mide hasta que el responsable fije los umbrales.**
-Esa es la misma regla que abrió el Hito 1 y el Hito 2.
+**Estado: RATIFICADO 2026-10-16 — Fase 0 cerrada.**
+**Decisión del dueño:** «Ratificar H1-H4 tal cual» · «Camino 1».
+H1-H4 quedan fijos tal como se proponen; **nada se mide hasta ahora y a
+partir de ahora no se re-bajan.** Camino de la §7 = **1** (diseñar sobre las
+5 técnicas ya sembradas; los papers de arneses quedan para un experimento
+aparte con línea base propia). Esta es la misma regla que abrió el Hito 1 y
+el Hito 2.
 
 ---
 
@@ -111,9 +115,8 @@ de QA ciego, **no para fundamentar cómo se evalúa**.
 
 ## 4. Umbrales propuestos — **fijarlos ANTES de medir**
 
-> Los cuatro siguientes son **propuesta**. El responsable los ratifica, los
-> cambia o los rechaza **antes** de que se escriba una sola línea de medición.
-> Si se miden tal cual, **no se re-bajan después**.
+> **☑ RATIFICADOS 2026-10-16 (dueño: «Ratificar H1-H4 tal cual»).** Los cuatro
+> son ya umbrales vigentes: se miden tal cual y **no se re-bajan después**.
 
 ### H1 — La ruta del arnés no es peor que la del blueprint
 
@@ -151,8 +154,9 @@ de QA ciego, **no para fundamentar cómo se evalúa**.
 
 ## 5. Las cuatro fases
 
-### Fase 0 — Ratificar *(sin tokens)*
+### Fase 0 — Ratificar *(sin tokens)* ✅ **CERRADA 2026-10-16**
 El responsable fija o cambia H1-H4. **Nada se mide antes.**
+**Hecho:** H1-H4 ratificados tal cual + **camino 1** elegido (§7).
 
 ### Fase 1 — Cerrar el hueco A *(el más barato)*
 Pasar `instantiate_agent_template` por la ruta verificada y re-generar los
@@ -221,6 +225,11 @@ Hay dos caminos, y **hay que elegir uno antes de empezar la Fase 2**:
 **Mi lectura:** el camino 1 cierra el hito sin romper nada y se puede medir
 ya. El camino 2 es más fiel al espíritu pero es un hito dentro del hito. Lo
 dejo **para decidir en la Fase 0**, junto con la ratificación de H1-H4.
+
+**☑ Decidido en la Fase 0 (2026-10-16): CAMINO 1** — diseñar sobre las 5
+técnicas ya sembradas, con los brazos B-H intactos. El camino 2 no se
+descarta: si se abre, va como experimento aparte con su propia declaración y
+línea base (misma regla que la §6 aplica a sembrar papers).
 
 ---
 
