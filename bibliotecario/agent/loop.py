@@ -552,6 +552,16 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
     best, flat, answer = "", 0, ""
     failed, succeeded = [], []
     last_call = ""
+    # Estado REAL para los PFs (Fase 3, Hito 3). Antes apply_pfs recibía un
+    # dict fabricado — last_action.status="ok" y task.type="research"
+    # escritos a mano — así que ningún PF built-in podía casar (hallazgo 4).
+    # Ahora sale del recorrido: status "error" en cada record_error, "ok"
+    # tras una tool ejecutada; sin campos de task que no sabemos (la
+    # complejidad no se inventa; DecomposePF no dispara si no la hay).
+    last_status, errores = "ok", 0
+    last_tool = ""
+    pf_fires: list[dict] = []
+    pf_states: list[dict] = []  # estados que llegaron a apply_pfs (H3: variación)
 
     turn = -1  # si el bucle no llega a iterar, el finally sigue sabiendo los turnos
 
@@ -564,6 +574,7 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
             transcript.append(f"T{turn}: {out[:500]}")
             if not out:
                 harness.record_error("loop")
+                last_status, errores = "error", errores + 1
                 flat += 1
                 history.append("turno vacío (fallo LLM)")
                 continue
@@ -572,6 +583,7 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
                 if _toolish(out):
                     # Parecía una llamada pero inválida (tool inexistente o JSON roto): feedback, no respuesta.
                     harness.record_error("loop")
+                    last_status, errores = "error", errores + 1
                     flat += 1
                     msg = ("llamada inválida: emite EXACTAMENTE "
                            '{"tool": nombre, "args": {...}} con un tool del catálogo (no sueltes args sin "tool")')
@@ -590,6 +602,7 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
                 break
             if name == "":
                 harness.record_error("loop")
+                last_status, errores = "error", errores + 1
                 flat += 1
                 msg = ('llamada malformada: falta la clave "tool". Formato: '
                        '{"tool": nombre, "args": {...}}')
@@ -600,23 +613,41 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
             v = harness.validate_call(name, args, tool_schemas())
             if not v.valid:
                 harness.record_error("loop")
+                last_status, errores = "error", errores + 1
                 flat += 1
                 history.append(f"{name} inválida: {v.error}")
                 failed.append(f"{name} inválida: {v.error}")
                 continue
-            for pf in harness.apply_pfs({"last_action": {"status": "ok"}, "task": {"type": "research"},
-                                         "attempt_count": turn, "max_attempts": max_turns}):
+            # PFs con estado real del recorrido (dec. Fase 3): lo que casaba
+            # antes era un "ok" escrito a mano; ahora casan Retry/Fallback/
+            # Validate cuando el bucle ha fallado de verdad, y no antes.
+            # Lleva además tool anterior, estancación y evidencia: son
+            # variables reales del bucle y hacen que el estado de una run
+            # no sea el de otra (H3: estado constante = decoración).
+            state_pf = {"last_action": {"status": last_status, "tool": last_tool},
+                        "attempt_count": turn, "max_attempts": max_turns,
+                        "error_count": errores, "stagnation": flat,
+                        "evidence_count": len(evidence),
+                        # la pregunta es estado real (la conoce el bucle), no
+                        # un campo inventado: sin ella dos runs limpias con el
+                        # mismo patrón de turnos tendrían estados idénticos.
+                        "question": question[:200]}
+            pf_states.append(state_pf)
+            for pf in harness.apply_pfs(state_pf):
+                pf_fires.append(pf)
                 history.append(f"[PF {pf['pf']}] {pf.get('message', '')}")
             try:
                 result = TOOLS[name]["fn"](**v.canonicalized["arguments"])
                 result_s = json.dumps(result, ensure_ascii=False, default=str)[:3000]
             except TypeError as e:
                 harness.record_error("loop")
+                last_status, errores = "error", errores + 1
                 history.append(f"{name} args incorrectos: {e}")
                 failed.append(f"{name} args: {e}")
                 flat += 1
                 continue
             harness.record_action("loop", {"tool": name, "args": args})
+            last_status, last_tool = "ok", name
             history.extend(harness.regulate("loop"))
             history.append(f"{name} → {result_s[:220]}")
             evidence.append(f"{name}({','.join(f'{k}={v}' for k, v in args.items())}): {result_s[:220]}")
@@ -642,13 +673,15 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
     finally:
         # Siempre, aunque el bucle lance: 87 runs de 1121 se quedaron con
         # finished_at NULL porque la excepcion se escapaba sin cerrarlas.
-        harness.finish_run(run_id, None, {"turns": turn + 1, "tools": len(evidence)})
+        harness.finish_run(run_id, None, {"turns": turn + 1, "tools": len(evidence),
+                                          "pf_fires": len(pf_fires)})
 
     if not isolated:
         REF.save_lesson("qa", what_worked="\n".join(succeeded[-5:]),
                         what_failed="\n".join(failed[-5:]),
                         key_insights=_trajectory_fingerprint(turn, evidence, answer))
-    return {"answer": answer, "turns": turn + 1, "evidence": evidence, "run_id": run_id}
+    return {"answer": answer, "turns": turn + 1, "evidence": evidence,
+            "run_id": run_id, "pf_fires": pf_fires, "pf_states": pf_states}
 
 
 def run_blueprint(technique: str, goal: str, max_turns: int = 4,

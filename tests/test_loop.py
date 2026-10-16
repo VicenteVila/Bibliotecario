@@ -407,3 +407,44 @@ def test_run_blueprint_sin_evidence_del_loop_sigue_escribiendo(monkeypatch):
         lambda technique, goal, extra_source="": {"blueprint": "ok", "procedures": []},
     )
     assert LOOP.run_blueprint("Task-CoEvolve", "objetivo")["blueprint"] == "ok"
+
+
+def test_pfs_disparan_con_estado_real(tmp_path, monkeypatch):
+    """Fase 3 (Hito 3): apply_pfs recibía un estado fabricado.
+
+    Regresión del hallazgo 4: `last_action.status` estaba escrito a mano como
+    "ok", así que RetryPF (que exige error|failure|failed) y FallbackPF (que
+    exige timeout|exhausted|error|rate_limit) no podían casar nunca. Ahora el
+    estado sale del recorrido: un error real dispara retry, y una run limpia
+    no dispara nada.
+    """
+    db = tmp_path / "pfs.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    # T1: tool inválida (error real). T2: tool válida. T3: cierre.
+    script = [
+        '```json\n{"tool": "no_existe", "args": {}}\n```',
+        '```json\n{"tool": "get_status", "args": {}}\n```',
+        "Respuesta final [1:0].",
+    ]
+    monkeypatch.setattr(LOOP, "generate", lambda *a, **k: script.pop(0) if script else "Fin.")
+    from bibliotecario.harness import runtime as RT
+    RT.reset_harness()
+    import bibliotecario.harness.pfs as PFS
+    monkeypatch.setattr(PFS, "_registry", None)
+
+    r = LOOP.run("q", max_turns=5)
+    nombres = [f["pf"] for f in r["pf_fires"]]
+    assert "retry_on_failure" in nombres, (
+        f"un error real debe disparar retry: {r['pf_fires']}"
+    )
+    # la run limpia (sin errores) no dispara nada
+    script2 = [
+        '```json\n{"tool": "get_status", "args": {}}\n```',
+        "Respuesta final [1:0].",
+    ]
+    monkeypatch.setattr(LOOP, "generate", lambda *a, **k: script2.pop(0) if script2 else "Fin.")
+    RT.reset_harness()
+    monkeypatch.setattr(PFS, "_registry", None)
+    r2 = LOOP.run("q", max_turns=5)
+    assert r2["pf_fires"] == [], f"run limpia no debe disparar PFs: {r2['pf_fires']}"

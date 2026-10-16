@@ -2,7 +2,9 @@
 
 **Estado: RATIFICADO 2026-10-16 — Fase 0 ✅ cerrada · Fase 1 ✅ ejecutada
 (hueco A cerrado; H1 medida: NO CUMPLE, ver resultado) · Fase 2 ✅ ejecutada
-(hueco B cerrado; H2 medida: CUMPLE, ver resultado).**
+(hueco B cerrado; H2 medida: CUMPLE, ver resultado) · Fase 3 ✅ ejecutada
+(hueco C cerrado — estado real a `apply_pfs`; H3 medida: NO CUMPLE, 0 fires
+en 10 runs limpios, ver resultado y lectura).****
 **Decisión del dueño:** «Ratificar H1-H4 tal cual» · «Camino 1».
 H1-H4 quedan fijos tal como se proponen; **nada se mide hasta ahora y a
 partir de ahora no se re-bajan.** Camino de la §7 = **1** (diseñar sobre las
@@ -353,6 +355,55 @@ Arreglar el estado que llega a `apply_pfs` en `loop.py:607-608` para que los
 PFs puedan casar, y medir H3.
 **Declaración:** si al arreglarlo los PFs disparan *demasiado*, **se ajusta el
 umbral H3 antes de publicar, con su propia decisión** — no se esconde el dato.
+
+**Reparación aplicada (2026-10-16, antes de medir H3):** el estado que llega
+a `apply_pfs` deja de ser un dict escrito a mano (`last_action.status="ok"`,
+`task.type="research"`) y pasa a salir del recorrido real del bucle:
+
+- `last_action.status`: `"error"` en cada `record_error`, `"ok"` tras una
+  tool ejecutada; `last_action.tool`: la última tool que corrió.
+- `error_count`: contador real de errores de la run; `attempt_count` /
+  `max_attempts`: turno y techo reales; `stagnation`: el `flat` del bucle;
+  `evidence_count`: evidencia acumulada; `question`: los primeros 200
+  caracteres (estado real: la run los conoce).
+- **No se inventa `task.complexity`** — DecomposePF no dispara si no la hay.
+  Los campos fabricados desaparecen; lo que queda es solo lo que el bucle
+  sabe.
+- Los fires quedan en el resultado (`pf_fires`, `pf_states`) y en los
+  metadatos de la run (`harness_runs.metadata.pf_fires`).
+
+**H3 medición declarada antes de correrla (2026-10-16):** `evals/run_fase3_h3.py`
+corre **10 runs reales** de `loop.run(question, isolated=True)` sobre
+`golden_qa.jsonl` (questions 1-10, sin juez: H3 no mide calidad) y cuenta
+fires y variación de estado. Criterio intacto del §5: **≥ 1 PF fire por cada
+10 runs** y **0 runs cuyo estado sea idéntico al de alguna de las 10
+anteriores** (fingerprint del `pf_states` completo de la run). Coste estimado:
+~10 runs × ~4 turnos = ~40 llamadas al LLM en rotación free tier.
+
+**Resultado (2026-10-16, umbral leído antes de la corrida): H3 NO CUMPLE —
+0 fires en 10 runs · 0 estados repetidos.**
+
+| criterio | umbral | medido | verdicto |
+|---|---|---|---|
+| ≥1 PF fire / 10 runs | ≥1 | **0** (0 de 10 runs con fire) | NO CUMPLE |
+| 0 runs con estado idéntico a los 10 anteriores | 0 | **0** (10 fingerprints distintos) | CUMPLE |
+
+**Lectura honesta (descripción, no re-mide):** el cableado ya funciona — el
+estado que llega a `apply_pfs` es real (la variación entre runs lo prueba) y
+el test de regresión (`test_pfs_disparan_con_estado_real`) demuestra que un
+error real dispara `retry_on_failure`. Pero los tres PFs built-in que pueden
+casar en la ruta del loop (Retry, Fallback, Validate) **solo casan ante
+`last_action.status` en `error|failure|failed|timeout|exhausted|rate_limit`**,
+y en estas 10 runs el bucle no falló ni una vez: `generate()` devolvió
+siempre y las tools no lanzaron `TypeError`. Sin fallo no hay fire — los PFs
+built-in son reactivos, no proféticos. DecomposePF no cuenta: exige
+`task.complexity`, que no se inventa (dec. de la reparación).
+
+**El umbral no se toca** (regla de Fase 0). La decisión de si H3 se relee
+(«fires cuando hay fallos»), se reformula («el PF dispara en runs con fallo
+inducido») o se mantierra tal cual es **del dueño**, con su enmienda y fecha.
+Lo medido queda en `result_fase3_h3.json` (filas `arm="H3"`, con
+`pf_states` por run).
 
 ### Fase 4 — Construir el hueco D *(la evaluación)*
 Nuevo `evals/run_harness_ab.py` al estilo de `run_blueprint_ab.py`:
