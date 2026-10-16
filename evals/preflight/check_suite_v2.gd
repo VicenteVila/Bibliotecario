@@ -145,12 +145,20 @@ func _run_static(c: Dictionary) -> void:
 
 		"node_exists":
 			var n = _find_by_names(c.get("names", []))
-			if n == null:
-				_emit(false, id, desc + " — no encontrado. nombres: %s" % str(c.get("names", [])))
-			else:
+			if n != null:
 				if player == null and _looks_like_player(n):
 					player = n
 				_emit(true, id, desc + " — " + n.name)
+			else:
+				# Enmienda 4 (2026-10-15): si ningún NOMBRE coincide, se admite
+				# el TEXTO de un Label o Button. Las pantallas finales suelen
+				# declararse con texto ("Reiniciar", "¡Victoria!") sin asignar
+				# nombre de nodo, y ninguna tarea pide nombres concretos.
+				var txt = _find_ui_text(c.get("names", []))
+				if txt != "":
+					_emit(true, id, desc + " — texto: '%s'" % txt)
+				else:
+					_emit(false, id, desc + " — no encontrado. nombres: %s" % str(c.get("names", [])))
 
 		"node_is":
 			var n2 = _find_by_names(c.get("names", []))
@@ -701,6 +709,28 @@ func _find_by_type(t: String) -> Node:
 	if scene == null:
 		return null
 	return _find_by_type_r(scene, t)
+
+## Enmienda 4 — fallback de node_exists por TEXTO de UI (sólo Label y Button,
+## sin requisito de visibilidad: la pantalla de victoria suele estar oculta
+## hasta ganar). Sólo se consulta cuando ningún nombre de nodo coincidió.
+func _find_ui_text(names) -> String:
+	if scene == null:
+		return ""
+	if names is String:
+		names = [names]
+	return _find_ui_text_r(scene, names)
+
+func _find_ui_text_r(n: Node, names: Array) -> String:
+	if (n is Label or n is Button) and str(n.text) != "":
+		var t: String = n.text.to_lower()
+		for nm in names:
+			if str(nm).to_lower() in t:
+				return n.text
+	for c in n.get_children():
+		var r: String = _find_ui_text_r(c, names)
+		if r != "":
+			return r
+	return ""
 
 func _find_by_type_r(n: Node, t: String) -> Node:
 	if n.get_class() == t:

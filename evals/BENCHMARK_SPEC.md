@@ -786,6 +786,9 @@ línea `fallan: build`) — errata de implementación corregida en el script
   `node_exists` compara **nombres**. El smoke pasó porque su prompt pedía
   nombres explícitos. Decidir en enmienda si `node_exists` acepta también
   textos de Label/Button — **no se toca ahora**.
+  **(Hecho el mismo día: enmienda 4 de §11 — `node_exists` acepta texto de
+  Label/Button; fixtures intactas; serie 3 no re-escalada, workspaces de
+  `/tmp` perdidos en un borrado total declarado en la enmienda.)**
 - **Sintaxis GDScript: 1/8 primeros intentos sin `SCRIPT ERROR`** — el crib
   reducido no basta; los `Score` de 9-25 con error de script muestran que un
   `_ready()` parcial arranca la escena pero no el HUD completo.
@@ -1149,9 +1152,10 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 ### Enmiendas posteriores a la última ratificación
 
 **Última ratificación: 2026-10-15 — scorer B-1 v2 (enm. 2 + ampliación
-A/B/C). Tras ella: enmienda 3 (2026-10-15) — bugfix de timing de los checks
-estáticos tras el primer smoke end-to-end, sin cambio de kinds ni umbrales.**
-Las enmiendas 1 y 2 figuran abajo como registro previo a esa ratificación.
+A/B/C). Tras ella: enmienda 3 (2026-10-15, bugfix de timing de los checks
+estáticos tras el primer smoke) y enmienda 4 (2026-10-15, `node_exists`
+admite texto de UI) — ambas sin cambio de kinds ni umbrales.** Las enmiendas
+1 y 2 figuran abajo como registro previo a esa ratificación.
 *(Cualquier cambio futuro tras ratificar se anota aquí con fecha y motivo —
 no se reescribe en silencio.)*
 
@@ -1238,6 +1242,18 @@ reproducible sin controlar la carga de la máquina; el baseline sigue siendo
 | **motivo (medido, no supuesto)** | **smoke B-1 end-to-end 2026-10-15**: primera generación real (`card-memory-precision` · `openai/gpt-oss-120b`) cuyo `_ready()` crea HUD (`CanvasLayer` + Labels `Tiempo:`/`Parejas: 0/8`/`Intentos:`/`Combo:`) y pantallas `Victoria`/`GameOver`/`Restart`. Con el motor previo ese juego —ya sin errores de script— marcaba **1/10** (sólo build + cota + sin_errores, los tres que no dependen del árbol creado en `_ready`); tras el fix, **el mismo juego = 10/10 PASSED**. Regresión de fixtures: `v2-fixture` **9/9** · `v2-compat` **4/4** (ambas PASSED). |
 | **qué NO cambia** | kinds, umbrales, fórmula, `BUILD=0`, pesos, `MAX_FRAMES`, suites congeladas y v1 intacto. La enmienda **no re-baja ningún umbral**: corrige un falso negativo del instrumento que habría castigado juegos correctos. |
 | **artefacto** | `evals/preflight/check_suite_v2.gd` — `statics_pending` + `_run_statics()` invocados desde `_process` en el primer tick de física |
+
+#### Enmienda 4 — *`node_exists` admite también el texto de UI (Label/Button)* · 2026-10-15
+
+| | |
+|---|---|
+| **objeto** | `check_suite_v2.gd` — rama `node_exists` (fallback por texto). **Sin cambio de kinds, sin cambio de umbrales, sin tocar suites congeladas.** |
+| **antes** | `node_exists` sólo comparaba **nombres de nodo** (igualdad/contención, case-insensitive). Los generadores crean las pantallas finales con **texto** y sin asignar `name` (p. ej. `restart_btn.text = "Reiniciar"`) — en la serie 3, `victoria-existe`/`reinicio-existe` fallaron en **7 de 8** juegos que sí presentaban esos elementos (hallazgo 25). Ninguna tarea del corpus pide nombres concretos de nodo. |
+| **ahora** | si **ningún nombre** coincide, se busca además el **texto** de `Label` y `Button` en todo el árbol (case-insensitive; **sin** requisito de visibilidad: la pantalla de victoria suele estar `visible=false` hasta ganar). La evidencia declara por dónde pasó: `texto: '¡Victoria!'`. Sólo `node_exists`: `node_is`, `collision`, `has_method` y los destinos de los checks de movimiento siguen **sólo por nombre**, y `player` sólo se asigna por nombre. |
+| **motivo (medido)** | grep directo sobre generados de la serie 3: texto `Reiniciar`/`¡Victoria!` presente, nombre de nodo sin asignar → falso fail sistemático que castigaba juegos que cumplían la tarea pedida. |
+| **validación medida** | fixtures de ratificación **intactas**: `v2-fixture` ok **9/9** · roto **1/9** · `v2-compat` **4/4** (idénticos a §11 enm. 2). Micro-juego sintético con **sólo texto** y ningún nombre relevante: `victoria` **PASS** (`texto: '¡Victoria!'`) · `reinicio` **PASS** (`texto: 'Reiniciar'`) · `avatar` ausente sigue **FAIL** — el fallback no inventa nodos inexistentes. |
+| **qué NO cambia** | recuento de kinds (**21 + BUILD**), umbrales, fórmula, `BUILD=0`, suites (los YAML no se tocan), v1 intacto. **Los scores de la serie 3 no se re-escalaron**: los workspaces se perdieron con un borrado total de `/tmp` (declarado aquí); las cifras de §5.2.2.d siguen siendo las medidas con la enmienda 3. |
+| **artefacto** | `evals/preflight/check_suite_v2.gd` — rama `node_exists` + `_find_ui_text()` |
 
 ---
 
