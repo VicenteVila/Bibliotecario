@@ -1,0 +1,129 @@
+{
+  "criterio": "H2 (HITO3_PLAN §5)",
+  "goal": "validar mi agente antes de cada release",
+  "umbral": ">=3 pasos herramienta/validacion y >=1 sin deep_sweep",
+  "n": 5,
+  "cumple_n": 5,
+  "h2": true,
+  "filas": [
+    {
+      "arm": "H2",
+      "technique": "PEARL",
+      "ok": true,
+      "archivo": "/mnt/c/Bibliotecario/data/agents/pearl/agent_template.py",
+      "pasos_trace": 5,
+      "pasos_herramienta_o_validacion": 5,
+      "pasos_sin_deep_sweep": 4,
+      "errores": 0,
+      "tools": [
+        "deep_sweep",
+        "search_papers",
+        "retrieve_evidence",
+        "get_subgraph"
+      ],
+      "validacion": {
+        "step": "validacion_blueprint",
+        "tool": "cobertura",
+        "status": "partial",
+        "detalle": "0/4 presentes; falta: LLM-guided path retrieval, contextual subgraph extraction, dual-view subgraph contrast"
+      },
+      "umbral": ">=3 herramienta/validacion y >=1 sin deep_sweep",
+      "cumple": true
+    },
+    {
+      "arm": "H2",
+      "technique": "Procedural Graphs",
+      "ok": true,
+      "archivo": "/mnt/c/Bibliotecario/data/agents/procedural-graphs/agent_template.py",
+      "pasos_trace": 3,
+      "pasos_herramienta_o_validacion": 3,
+      "pasos_sin_deep_sweep": 2,
+      "errores": 0,
+      "tools": [
+        "deep_sweep",
+        "search_papers"
+      ],
+      "validacion": {
+        "step": "validacion_blueprint",
+        "tool": "cobertura",
+        "status": "done",
+        "detalle": "2/2 procedimientos presentes en el blueprint"
+      },
+      "umbral": ">=3 herramienta/validacion y >=1 sin deep_sweep",
+      "cumple": true
+    },
+    {
+      "arm": "H2",
+      "technique": "ReASearch",
+      "ok": true,
+      "archivo": "/mnt/c/Bibliotecario/data/agents/reasearch/agent_template.py",
+      "pasos_trace": 6,
+      "pasos_herramienta_o_validacion": 6,
+      "pasos_sin_deep_sweep": 4,
+      "errores": 0,
+      "tools": [
+        "deep_sweep",
+        "search_papers",
+        "retrieve_evidence",
+        "get_subgraph",
+        "deep_sweep"
+      ],
+      "validacion": {
+        "step": "validacion_blueprint",
+        "tool": "cobertura",
+        "status": "partial",
+        "detalle": "1/5 presentes; falta: failure-vs-success refiner, lessons persistence, state re-emission"
+      },
+      "umbral": ">=3 herramienta/validacion y >=1 sin deep_sweep",
+      "cumple": true
+    },
+    {
+      "arm": "H2",
+      "technique": "Task-CoEvolve",
+      "ok": true,
+      "archivo": "/mnt/c/Bibliotecario/data/agents/task-coevolve/agent_template.py",
+      "pasos_trace": 5,
+      "pasos_herramienta_o_validacion": 5,
+      "pasos_sin_deep_sweep": 4,
+      "errores": 0,
+      "tools": [
+        "deep_sweep",
+        "search_papers",
+        "retrieve_evidence",
+        "get_subgraph"
+      ],
+      "validacion": {
+        "step": "validacion_blueprint",
+        "tool": "cobertura",
+        "status": "partial",
+        "detalle": "1/4 presentes; falta: Hájek full-set estimation, S-max final selection, variance-weighted task selection"
+      },
+      "umbral": ">=3 herramienta/validacion y >=1 sin deep_sweep",
+      "cumple": true
+    },
+    {
+      "arm": "H2",
+      "technique": "WikiSkill",
+      "ok": true,
+      "archivo": "/mnt/c/Bibliotecario/data/agents/wikiskill/agent_template.py",
+      "pasos_trace": 5,
+      "pasos_herramienta_o_validacion": 5,
+      "pasos_sin_deep_sweep": 4,
+      "errores": 0,
+      "tools": [
+        "deep_sweep",
+        "search_papers",
+        "retrieve_evidence",
+        "get_subgraph"
+      ],
+      "validacion": {
+        "step": "validacion_blueprint",
+        "tool": "cobertura",
+        "status": "partial",
+        "detalle": "1/4 presentes; falta: skill transfer, skill-wiki co-evolution, stratified trace sampling"
+      },
+      "umbral": ">=3 herramienta/validacion y >=1 sin deep_sweep",
+      "cumple": true
+    }
+  ]
+}

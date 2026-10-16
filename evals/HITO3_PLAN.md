@@ -1,7 +1,8 @@
 # Hito 3 — arneses válidos: diseño y evaluación
 
 **Estado: RATIFICADO 2026-10-16 — Fase 0 ✅ cerrada · Fase 1 ✅ ejecutada
-(hueco A cerrado; H1 medida: NO CUMPLE, ver resultado).**
+(hueco A cerrado; H1 medida: NO CUMPLE, ver resultado) · Fase 2 ✅ ejecutada
+(hueco B cerrado; H2 medida: CUMPLE, ver resultado).**
 **Decisión del dueño:** «Ratificar H1-H4 tal cual» · «Camino 1».
 H1-H4 quedan fijos tal como se proponen; **nada se mide hasta ahora y a
 partir de ahora no se re-bajan.** Camino de la §7 = **1** (diseñar sobre las
@@ -327,6 +328,25 @@ suelta ni un programa de precondiciones a mano.
 **H2 operativo** (medición gratuita, sin tokens): `evals/run_fase2_h2.py`
 ejecuta cada arnés y cuenta pasos con herramienta-del-loop o validación, y
 pasos sin `deep_sweep`. Umbral intacto: **≥ 3** y **≥ 1**.
+
+**Resultado (2026-10-16, umbral leído antes de la corrida): H2 CUMPLE —
+5/5 arneses.**
+
+| técnica | pasos herramienta/validación | sin `deep_sweep` | errores | verdicto |
+|---|---|---|---|---|
+| PEARL | 5 | 4 | 0 | CUMPLE |
+| Procedural Graphs | 3 | 2 | 0 | CUMPLE |
+| ReASearch | 6 | 4 | 0 | CUMPLE |
+| Task-CoEvolve | 5 | 4 | 0 | CUMPLE |
+| WikiSkill | 5 | 4 | 0 | CUMPLE |
+
+Cada arnés usa la rotación entera de tools que le toca por número de
+procedimientos y cierra con el paso de validación de cobertura. El menor de
+los cinco es Procedural Graphs (3 = 2 procedimientos + validación), justo en
+el umbral — no se redondea hacia arriba: su grafo solo tiene 2 nodos.
+Medición en `result_fase2_h2.json` (`arm="H2"`), regeneración de plantillas
+sin LLM con `run_fase2_h2.py --regen` (procedimientos del grafo + blueprint
+juzgado de la Fase 1, reparado si lo hubo, tal cual se juzgó).
 
 ### Fase 3 — Cerrar el hueco C *(bug real, no deuda)*
 Arreglar el estado que llega a `apply_pfs` en `loop.py:607-608` para que los
