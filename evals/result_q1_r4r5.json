@@ -1530,5 +1530,123 @@
       "Mitigación: Usar un conjunto de validación separado y estático para pre-release, distinto del usado en entrenamiento; rotar o renovar periódicamente Dval para evitar fuga de información."
     ],
     "verdict": "El blueprint contiene varias afirmaciones no respaldadas por la fuente, violando la regla R5."
+  },
+  {
+    "arm": "H1",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint es riguroso, cita correctamente las fuentes y declara explícitamente los parámetros obtenidos de las tablas del paper cuando no estaban en el texto principal."
+  },
+  {
+    "arm": "H1",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint atribuye al paper la existencia de un 'failure-vs-success refiner', 'tool-driven optimization loop' y 'state re-emission' como componentes definidos, cuando la fuente no menciona estos té"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint detalla un 'Orden de Ejecución' y una 'Validación del Blueprint' (métricas, umbrales, riesgos) que no están presentes en la fuente, la cual se limita a describir el funcionamiento del sis"
+    ],
+    "verdict": "El blueprint inventa módulos, terminología técnica y protocolos de implementación que no aparecen en el texto fuente, excediendo la información proporcionada."
+  },
+  {
+    "arm": "H1",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el LLM utilizado es 'p. ej., GPT-4', cuando la fuente no especifica el modelo concreto de LLM utilizado."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint establece umbrales específicos como 'Hits@10 >= 0.70' para la aprobación del release, mientras que la fuente no proporciona valores numéricos de umbrales de rendimiento, solo menciona que"
+    ],
+    "verdict": "El blueprint atribuye al paper detalles técnicos no especificados (modelo de LLM) y define umbrales de aceptación arbitrarios que no existen en la fuente."
+  },
+  {
+    "arm": "H1",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint describe módulos como 'failure-vs-success refiner', 'lessons persistence' y 'graph mutation' como componentes del sistema, cuando la fuente solo menciona la estructura de tripletes y la g"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint establece un criterio de paso del 95% de éxito y umbrales estadísticos (p < 0.05) que no aparecen en la fuente."
+    ],
+    "verdict": "El blueprint inventa componentes funcionales y criterios de validación cuantitativos que no están presentes en el texto fuente."
+  },
+  {
+    "arm": "H1",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el paper menciona 'stratified trace sampling' en las cadenas del grafo, pero dicho término no aparece en la fuente."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint establece una 'Validación pre-release' que requiere ejecutar una iteración completa antes de cada release, un procedimiento operativo que el paper no especifica."
+    ],
+    "verdict": "El blueprint incluye procedimientos operativos no descritos en la fuente y atribuye erróneamente terminología técnica al documento original."
+  },
+  {
+    "arm": "H1R",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el conjunto de validación debe ser 'estratificado' para evitar el sobreajuste, detalle que la fuente no especifica."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución, pero incluye recomendaciones operativas no presentes en la fuente que exceden la descripción del framework."
+  },
+  {
+    "arm": "H1R",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el modelo PEARL puede ser utilizado como un validador de consistencia para agentes externos, una funcionalidad que el paper no menciona ni especifica."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución de la arquitectura, pero extrapola una aplicación práctica (validación de agentes) que no está presente en la fuente."
+  },
+  {
+    "arm": "H1R",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El paper no menciona un 'failure-vs-success refiner', 'lessons persistence' ni 'graph mutation' como componentes del framework; estos son inventados por el blueprint."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el grafo se actualiza mediante 'mutación' y 'lecciones persistidas', detalles que el paper no especifica."
+    ],
+    "verdict": "El blueprint inventa componentes funcionales y mecanismos de aprendizaje que no existen en la fuente, atribuyendo capacidades de evolución estructural al framework que el texto original no describe."
+  },
+  {
+    "arm": "H1R",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 3: Refinador de Contraste Éxito-Fallo (el texto fuente no menciona este módulo ni esta funcionalidad específica)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
+    ],
+    "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución."
   }
 ]

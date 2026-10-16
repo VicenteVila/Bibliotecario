@@ -1,6 +1,7 @@
 # Hito 3 — arneses válidos: diseño y evaluación
 
-**Estado: RATIFICADO 2026-10-16 — Fase 0 cerrada.**
+**Estado: RATIFICADO 2026-10-16 — Fase 0 ✅ cerrada · Fase 1 ✅ ejecutada
+(hueco A cerrado; H1 medida: NO CUMPLE, ver resultado).**
 **Decisión del dueño:** «Ratificar H1-H4 tal cual» · «Camino 1».
 H1-H4 quedan fijos tal como se proponen; **nada se mide hasta ahora y a
 partir de ahora no se re-bajan.** Camino de la §7 = **1** (diseñar sobre las
@@ -158,7 +159,10 @@ de QA ciego, **no para fundamentar cómo se evalúa**.
 El responsable fija o cambia H1-H4. **Nada se mide antes.**
 **Hecho:** H1-H4 ratificados tal cual + **camino 1** elegido (§7).
 
-### Fase 1 — Cerrar el hueco A *(el más barato)*
+### Fase 1 — Cerrar el hueco A *(el más barato)* ✅ **EJECUTADA 2026-10-16**
+**Hueco A cerrado** (`instantiate` ya no usa `build_blueprint` crudo).
+**H1: NO CUMPLE** — primer intento R4 1/5 · R5 1/5; reparación R1 → **R4 3/5
+· R5 1/5**; umbral 100% intacto y cerrado como no cumplido (hallazgo 26).
 
 **Declaración previa — escrita ANTES de generar nada (2026-10-16):**
 
@@ -208,6 +212,85 @@ El responsable fija o cambia H1-H4. **Nada se mide antes.**
 
 Pasos: `instantiate_agent_template` pasa por `tools.build_blueprint_p4` y se
 regeneran los 5 arneses con `evals/run_fase1.py`. Después se juzga H1.
+
+#### Resultado del primer intento — **H1 NO CUMPLE** *(medido 2026-10-16)*
+
+Generación: 5/5 arneses con blueprint completo (25 `generate()`, rotación por
+defecto). Juicio con el instrumento declarado (`gemini-3.1-flash-lite` @
+Google, temp 0); el juez devolvió 503 de demanda durante rato y se esperó —
+**sin cambiar de instrumento**.
+
+| arnés | R4 | R5 | veredicto del juez (resumen) |
+|---|---|---|---|
+| Task-CoEvolve | ✅ | ✅ | cita correctamente y declara los parámetros de las tablas |
+| PEARL | ✗ | ✗ | atribuye «GPT-4» como LLM; rellena «Hits@10 ≥ 0,70» |
+| Procedural Graphs | ✗ | ✗ | inventa módulos («failure-vs-success refiner»…) y criterios (95%, p < 0,05) |
+| ReASearch | ✗ | ✗ | inventa módulos y protocolos («tool-driven optimization loop»…) |
+| WikiSkill | ✗ | ✗ | inventa «stratified trace sampling» y una validación pre-release |
+
+**R4 1/5 · R5 1/5 — umbral 100%: NO CUMPLE.** El resultado del primer intento
+queda grabado en `result_q1_r4r5.json` (filas `arm="H1"`); no se reescribe.
+
+**Diagnóstico — leído ANTES de declarar la reparación:**
+
+- Los cuatro fallos comparten modo: **componentes y umbrales inventados
+  presentados como del paper** (R4 fabrica + R5 rellena).
+- `verify_and_mark` no lo ve: P3 solo compara las citas **con puntero** contra
+  su chunk; una fabricación sin puntero no tiene nada que comprobar. ReASearch
+  salió `verificado=True` (0 violaciones) y el juez lo suspende igual.
+- Defecto mecánico aparte, anotado sin maquillar: **3 de 5 arneses tienen
+  0 de sus punteros resueltos** (punteros inventados). El juez no los suspendió
+  por eso — Task-CoEvolve pasó con 0/10 resolución —, así que H1 mide lo que
+  promete (atribución, no resolución); la resolución queda como hallazgo.
+
+#### Reparación declarada — **antes de ejecutarla** (2026-10-16)
+
+- **R1 — qué se hace.** Para **cada arnés suspendido**, una sola vuelta con
+  evidencia: el mismo juez devuelve sus `r4_fabricaciones` y `r5_rellenados`
+  concretos; un `generate()` recibe esas frases **y la fuente** y debe
+  corregir **solo lo señalado** — quitar, apuntar al chunk correcto de la
+  fuente o marcar «(propuesta del blueprint)» (R6) —, **sin reescribir el
+  resto**: a diferencia de P3 (§5.8.3), aquí no se pide «el documento completo
+  ya corregido» (eso destruyó bibliografía y silencios en 3 de 3). Después,
+  re-juzgar los reparados con el mismo instrumento (filas `arm="H1R"` en
+  `result_fase1_h1r.json`).
+- **R2 — tope.** **1 vuelta por arnés.** Si tras ella queda algún
+  `r4_ok=false` o `r5_ok=false`, H1 queda **definitivamente NO CUMPLE** para
+  esta fase: no hay segunda tirada de dados.
+- **R3 — umbral intacto, primer intento intacto.** El 1/5 y el 1/5 no se
+  reescriben. El estado final se reporta como «1 pasó sin reparar + X de 4
+  reparados», no como un resultado limpio.
+- **R4 — coste aparte.** ~4 `generate()` de reparación + 4 re-juicios, con su
+  propia fila de coste.
+
+#### Resultado de la reparación R1 — **H1 queda definitivamente NO CUMPLE** *(2026-10-16)*
+
+| arnés | 1er intento (H1) | tras R1 (H1R) | estado final |
+|---|---|---|---|
+| Task-CoEvolve | R4 ✓ · R5 ✓ | no se toca | **✓ ✓** |
+| PEARL | R4 ✗ · R5 ✗ | R4 ✓ · R5 ✗ | ✓ ✗ |
+| WikiSkill | R4 ✗ · R5 ✗ | R4 ✓ · R5 ✗ | ✓ ✗ |
+| Procedural Graphs | R4 ✗ · R5 ✗ | R4 ✗ · R5 ✗ | ✗ ✗ |
+| ReASearch | R4 ✗ · R5 ✗ | R4 ✗ · R5 ✗ | ✗ ✗ |
+
+**Estado final: R4 3/5 · R5 1/5 — umbral 100% NO CUMPLE, cerrado (tope R2:
+una sola vuelta).** El umbral no se toca y el primer intento sigue grabado en
+`result_q1_r4r5.json` (filas `H1`); las reparaciones, en `H1R` +
+`result_fase1_h1r.json`.
+
+**Lecturas para la Fase 2** (descripciones, no re-miden H1):
+
+- La reparación con las frases concretas del juez **arregla R4 a veces** —
+  PEARL y WikiSkill quedaron con 0 fabricaciones tras una vuelta: el juez sirve
+  de crítico accionable, que es lo que P3 intentó y no logró.
+- **R5 no se movió** (1/5 → 1/5): el modo «extrapolar aplicación práctica /
+  protocolo operativo» sobrevive a la corrección dirigida. Mismo patrón que en
+  el Hito 2: los silencios cuestan más que las fabricaciones puntuales.
+- Procedural Graphs y ReASearch **reinciden** en los mismos componentes
+  inventados («failure-vs-success refiner»): una vuelta no basta cuando el
+  blueprint confabula la misma familia de vocabulario.
+- **Coste total de la fase:** ~29 `generate()` (25 + 4 de reparación) + 9
+  juicios (5 + 4) + reintentos ante 503 del juez (espera, sin output).
 
 ### Fase 2 — Cerrar el hueco B *(el que define el hito)*
 Que `run()` ejecute la técnica. Aquí hay que decidir **qué es un arnés en
