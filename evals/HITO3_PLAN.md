@@ -3,8 +3,9 @@
 **Estado: RATIFICADO 2026-10-16 — Fase 0 ✅ cerrada · Fase 1 ✅ ejecutada
 (hueco A cerrado; H1 medida: NO CUMPLE, ver resultado) · Fase 2 ✅ ejecutada
 (hueco B cerrado; H2 medida: CUMPLE, ver resultado) · Fase 3 ✅ ejecutada
-(hueco C cerrado — estado real a `apply_pfs`; H3 medida: NO CUMPLE, 0 fires
-en 10 runs limpios, ver resultado y lectura).****
+(hueco C cerrado — estado real a `apply_pfs`; H3 medida con **enmienda 1**
+del dueño: A 10/10 · B 5/5+5/5 → **CUMPLE**, umbral original 0/10
+archivado) · Fase 4 pendiente (hueco D, H4).****
 **Decisión del dueño:** «Ratificar H1-H4 tal cual» · «Camino 1».
 H1-H4 quedan fijos tal como se proponen; **nada se mide hasta ahora y a
 partir de ahora no se re-bajan.** Camino de la §7 = **1** (diseñar sobre las
@@ -145,6 +146,7 @@ de QA ciego, **no para fundamentar cómo se evalúa**.
 | criterio | al menos un PF built-in se ejecuta en la ruta productiva, con estado que llega del loop real |
 | umbral propuesto | **≥ 1 PF fire por cada 10 runs** medidas; y **0** runs donde el estado de entrada sea idéntico al de las anteriores 10 |
 | por qué medirlo así | si el estado es constante, el harness es decoración; contando fires se ve sin leer código |
+| estado | **releído por enmienda 1 del dueño (2026-10-16)** — el umbral original medía la frecuencia de fallos del modelo, no el cableado; ver Fase 3: A (0 fires en runs limpias) 10/10 · B (fires en runs error+reintento) 5/5+5/5 → **CUMPLE**; original 0/10 archivado |
 
 ### H4 — Existe evaluación de arneses como variable
 
@@ -404,6 +406,44 @@ built-in son reactivos, no proféticos. DecomposePF no cuenta: exige
 inducido») o se mantierra tal cual es **del dueño**, con su enmienda y fecha.
 Lo medido queda en `result_fase3_h3.json` (filas `arm="H3"`, con
 `pf_states` por run).
+
+#### Enmienda 1 de H3 — 2026-10-16 — *decisión del dueño: «Sí, estoy de acuerdo»*
+
+El umbral «≥1 PF fire por cada 10 runs» medía **la frecuencia de fallos del
+modelo**, no el cableado del harness: un bucle que no falla nunca da 0 fires
+con los PFs perfectamente cableados. H3 se relee para medir lo que su
+criterio quería — *«los PFs disparan de verdad con estado que llega del loop
+real»* — separando las dos propiedades que el umbral único mezclaba:
+
+- **A · no decoración** *(ya medida, no se re-mide)*: **0 fires en runs sin
+  fallo real.** Medido el 2026-10-16 en `result_fase3_h3.json`: 10/10 runs
+  limpios con 0 fires → **CUMPLE**. Los PFs no disparan de forma decorativa.
+- **B · reactividad** *(a medir con esta enmienda)*: en runs donde el bucle
+  entra en **error real** y el modelo **reintenta con otra llamada de tool**,
+  **≥1 PF fire en el 100% de esas runs**. La condición «y reintenta» no es
+  trampa: `apply_pfs` se invoca al empezar una llamada válida, después del
+  estado anterior — un run que tras el error contesta en prosa y cierra no
+  vuelve a pasar por ahí, y no hay fire que esperar.
+
+**Medición de B declarada antes de correrla:** 10 runs **guionizadas** (LLM
+simulado, 0 tokens — misma técnica que la dimensión D y los tests del loop;
+el harness, los PFs y el estado son los reales, solo se controla la entrada):
+5 limpias (herramienta válida → cierre) esperando **0 fires**, y 5 con un
+error real (tool inexistente o JSON roto) seguido de un reintento válido
+esperando **≥1 fire cada una**. Resultado en `result_fase3_h3_enmienda.json`
+(arm `H3E`). El umbral original queda archivado con su resultado (0/10);
+no se borra ni se reescribe el historial.
+
+**Resultado de B (2026-10-16): CUMPLE — 5/5 limpias con 0 fires · 5/5
+error+reintento con 2 fires (`retry_on_failure` + `fallback_on_exhaustion`).**
+
+**H3 queda CUMPLE por la enmienda 1** (A ya medida + B medida). El registro
+completo: umbral original 0/10 (archivado) → enmienda → A 10/10 → B 5/5+5/5.
+La lección operativa: los PFs built-in son reactivos a fallo real y no
+disparan de forma decorativa; `decompose_complex_task` sigue sin disparar en
+ninguna run porque exige `task.complexity`, que el loop no conoce y no se
+inventa — si algún día se quiere que dispare, hay que darle esa señal de
+forma honesta, no fabricarla.
 
 ### Fase 4 — Construir el hueco D *(la evaluación)*
 Nuevo `evals/run_harness_ab.py` al estilo de `run_blueprint_ab.py`:

@@ -1,0 +1,231 @@
+{
+  "criterio": "H3 enmienda 1, parte B (HITO3_PLAN § Fase 3)",
+  "umbral": ">=1 fire en 100% de runs error+reintento; 0 fires en limpias",
+  "n_limpia": 5,
+  "n_error": 5,
+  "limpias_ok": 5,
+  "errores_ok": 5,
+  "h3e": true,
+  "filas": [
+    {
+      "arm": "H3E",
+      "tipo": "limpia",
+      "run": 0,
+      "ok": true,
+      "turns": 2,
+      "pf_n": 0,
+      "pf_fires": [],
+      "esperado": 0,
+      "cumple": true
+    },
+    {
+      "arm": "H3E",
+      "tipo": "limpia",
+      "run": 1,
+      "ok": true,
+      "turns": 2,
+      "pf_n": 0,
+      "pf_fires": [],
+      "esperado": 0,
+      "cumple": true
+    },
+    {
+      "arm": "H3E",
+      "tipo": "limpia",
+      "run": 2,
+      "ok": true,
+      "turns": 2,
+      "pf_n": 0,
+      "pf_fires": [],
+      "esperado": 0,
+      "cumple": true
+    },
+    {
+      "arm": "H3E",
+      "tipo": "limpia",
+      "run": 3,
+      "ok": true,
+      "turns": 2,
+      "pf_n": 0,
+      "pf_fires": [],
+      "esperado": 0,
+      "cumple": true
+    },
+    {
+      "arm": "H3E",
+      "tipo": "limpia",
+      "run": 4,
+      "ok": true,
+      "turns": 2,
+      "pf_n": 0,
+      "pf_fires": [],
+      "esperado": 0,
+      "cumple": true
+    },
+    {
+      "arm": "H3E",
+      "tipo": "error_reintento",
+      "run": 0,
+      "ok": true,
+      "turns": 3,
+      "pf_n": 2,
+      "pf_fires": [
+        {
+          "pf": "fallback_on_exhaustion",
+          "action": "fallback",
+          "message": "Gemini no disponible: respuesta extractiva",
+          "modifications": {
+            "mode": "extractive",
+            "model": "gemini-fallback"
+          }
+        },
+        {
+          "pf": "retry_on_failure",
+          "action": "retry",
+          "message": "Intento 1/4: reintentando",
+          "modifications": {
+            "temperature": 0.2
+          }
+        }
+      ],
+      "pf_nombres": [
+        "fallback_on_exhaustion",
+        "retry_on_failure"
+      ],
+      "esperado": ">=1",
+      "cumple": true
+    },
+    {
+      "arm": "H3E",
+      "tipo": "error_reintento",
+      "run": 1,
+      "ok": true,
+      "turns": 3,
+      "pf_n": 2,
+      "pf_fires": [
+        {
+          "pf": "fallback_on_exhaustion",
+          "action": "fallback",
+          "message": "Gemini no disponible: respuesta extractiva",
+          "modifications": {
+            "mode": "extractive",
+            "model": "gemini-fallback"
+          }
+        },
+        {
+          "pf": "retry_on_failure",
+          "action": "retry",
+          "message": "Intento 1/4: reintentando",
+          "modifications": {
+            "temperature": 0.2
+          }
+        }
+      ],
+      "pf_nombres": [
+        "fallback_on_exhaustion",
+        "retry_on_failure"
+      ],
+      "esperado": ">=1",
+      "cumple": true
+    },
+    {
+      "arm": "H3E",
+      "tipo": "error_reintento",
+      "run": 2,
+      "ok": true,
+      "turns": 3,
+      "pf_n": 2,
+      "pf_fires": [
+        {
+          "pf": "fallback_on_exhaustion",
+          "action": "fallback",
+          "message": "Gemini no disponible: respuesta extractiva",
+          "modifications": {
+            "mode": "extractive",
+            "model": "gemini-fallback"
+          }
+        },
+        {
+          "pf": "retry_on_failure",
+          "action": "retry",
+          "message": "Intento 1/4: reintentando",
+          "modifications": {
+            "temperature": 0.2
+          }
+        }
+      ],
+      "pf_nombres": [
+        "fallback_on_exhaustion",
+        "retry_on_failure"
+      ],
+      "esperado": ">=1",
+      "cumple": true
+    },
+    {
+      "arm": "H3E",
+      "tipo": "error_reintento",
+      "run": 3,
+      "ok": true,
+      "turns": 3,
+      "pf_n": 2,
+      "pf_fires": [
+        {
+          "pf": "fallback_on_exhaustion",
+          "action": "fallback",
+          "message": "Gemini no disponible: respuesta extractiva",
+          "modifications": {
+            "mode": "extractive",
+            "model": "gemini-fallback"
+          }
+        },
+        {
+          "pf": "retry_on_failure",
+          "action": "retry",
+          "message": "Intento 1/4: reintentando",
+          "modifications": {
+            "temperature": 0.2
+          }
+        }
+      ],
+      "pf_nombres": [
+        "fallback_on_exhaustion",
+        "retry_on_failure"
+      ],
+      "esperado": ">=1",
+      "cumple": true
+    },
+    {
+      "arm": "H3E",
+      "tipo": "error_reintento",
+      "run": 4,
+      "ok": true,
+      "turns": 3,
+      "pf_n": 2,
+      "pf_fires": [
+        {
+          "pf": "fallback_on_exhaustion",
+          "action": "fallback",
+          "message": "Gemini no disponible: respuesta extractiva",
+          "modifications": {
+            "mode": "extractive",
+            "model": "gemini-fallback"
+          }
+        },
+        {
+          "pf": "retry_on_failure",
+          "action": "retry",
+          "message": "Intento 1/4: reintentando",
+          "modifications": {
+            "temperature": 0.2
+          }
+        }
+      ],
+      "pf_nombres": [
+        "fallback_on_exhaustion",
+        "retry_on_failure"
+      ],
+      "esperado": ">=1",
+      "cumple": true
+    }
+  ]
+}
