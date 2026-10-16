@@ -293,16 +293,40 @@ una sola vuelta).** El umbral no se toca y el primer intento sigue grabado en
   juicios (5 + 4) + reintentos ante 503 del juez (espera, sin output).
 
 ### Fase 2 — Cerrar el hueco B *(el que define el hito)*
-Que `run()` ejecute la técnica. Aquí hay que decidir **qué es un arnés en
-este proyecto**, y esa decisión es la que abre el hito:
 
-- ¿el arnés es una **secuencia de herramientas del loop ReASearch**?
-- ¿es un **programa con precondiciones** que el harness ya sabe ejecutar?
-- ¿es la **composición de las 4 capas** (`harness/layers.py`) parametrizada
-  por la técnica?
+**Decisión del dueño (2026-10-16, question tool): «Composición de las 4
+capas».** Un arnés en este proyecto = la composición de `harness/layers.py`
+(`RuntimeHarness`) **parametrizada por la técnica**: no una lista de tools
+suelta ni un programa de precondiciones a mano.
 
-**Esta elección no se delega a un LLM en caliente.** Se decide aquí, se escribe
-y se mide contra ella.
+**Forma concreta del `run()` generado — declarada antes de escribirla
+(2026-10-16):**
+
+- Por **cada procedimiento** de la técnica (los `STEPS` del grafo, ya
+  deterministas): una llamada **real** a una herramienta del loop, en
+  rotación `deep_sweep → search_papers → retrieve_evidence → get_subgraph`
+  — todas locales, **sin LLM dentro de `run()`**. La llamada pasa por
+  `EnvironmentContractLayer.calibrate` (schemas), `validate_call`
+  (`ActionRealizationLayer`), `record_action` + `regulate`
+  (`TrajectoryRegulationLayer`); los errores incrementan `record_error` y no
+  tumban la traza.
+- **Paso final de validación contra el blueprint**: cobertura de los
+  procedimientos en `BLUEPRINT.md` (presentes / totales, con los que faltan
+  a la vista). Es un check real, no decorativo.
+- El estado `done/empty/error` sigue anclado al umbral **0.30** del gate de
+  la 2ª enmienda de dec. 13 sobre las tools que traen `score`; las tools sin
+  campo `score` se declaran con su recuento de items y el detalle dice que
+  el gate numérico no aplica a ellas.
+- **PFs: no en esta fase.** H3 es la Fase 3 y se arregla en `loop.py`
+  (estado real a `apply_pfs`); la plantilla no se adelanta a su propio
+  camino hacia H3.
+- **Regeneración de las 5 plantillas SIN LLM**: `instantiate` acepta un `bp`
+  opcional ya construido (procedimientos del grafo + `BLUEPRINT.md` de la
+  Fase 1, texto intacto); la medición D y los tests siguen en verde.
+
+**H2 operativo** (medición gratuita, sin tokens): `evals/run_fase2_h2.py`
+ejecuta cada arnés y cuenta pasos con herramienta-del-loop o validación, y
+pasos sin `deep_sweep`. Umbral intacto: **≥ 3** y **≥ 1**.
 
 ### Fase 3 — Cerrar el hueco C *(bug real, no deuda)*
 Arreglar el estado que llega a `apply_pfs` en `loop.py:607-608` para que los

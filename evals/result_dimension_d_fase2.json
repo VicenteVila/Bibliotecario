@@ -1,0 +1,66 @@
+{
+  "criterio": "dec.13",
+  "goal": "validar mi agente antes de cada release",
+  "n": 5,
+  "d1": 5,
+  "d2": 5,
+  "d3": 5,
+  "cierra": true,
+  "filas": [
+    {
+      "technique": "PEARL",
+      "archivo": "/mnt/c/Bibliotecario/data/agents/pearl/agent_template.py",
+      "d1": true,
+      "d1_error": "",
+      "d2": true,
+      "d2_literal": 0,
+      "d3": 4,
+      "pasos": 5,
+      "responde_al_contexto": true
+    },
+    {
+      "technique": "Procedural Graphs",
+      "archivo": "/mnt/c/Bibliotecario/data/agents/procedural-graphs/agent_template.py",
+      "d1": true,
+      "d1_error": "",
+      "d2": true,
+      "d2_literal": 0,
+      "d3": 1,
+      "pasos": 3,
+      "responde_al_contexto": true
+    },
+    {
+      "technique": "ReASearch",
+      "archivo": "/mnt/c/Bibliotecario/data/agents/reasearch/agent_template.py",
+      "d1": true,
+      "d1_error": "",
+      "d2": true,
+      "d2_literal": 0,
+      "d3": 5,
+      "pasos": 6,
+      "responde_al_contexto": true
+    },
+    {
+      "technique": "Task-CoEvolve",
+      "archivo": "/mnt/c/Bibliotecario/data/agents/task-coevolve/agent_template.py",
+      "d1": true,
+      "d1_error": "",
+      "d2": true,
+      "d2_literal": 0,
+      "d3": 4,
+      "pasos": 5,
+      "responde_al_contexto": true
+    },
+    {
+      "technique": "WikiSkill",
+      "archivo": "/mnt/c/Bibliotecario/data/agents/wikiskill/agent_template.py",
+      "d1": true,
+      "d1_error": "",
+      "d2": true,
+      "d2_literal": 0,
+      "d3": 4,
+      "pasos": 5,
+      "responde_al_contexto": true
+    }
+  ]
+}

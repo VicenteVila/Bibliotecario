@@ -426,55 +426,156 @@ def build_blueprint_p4(technique: str, goal: str) -> dict:
     return verify_and_mark(LOOP.run_blueprint(technique, goal))
 
 
-def instantiate_agent_template(technique: str, goal: str) -> dict:
-    """Genera plantilla mínima de agente instanciable desde el blueprint (decisión 1).
+def instantiate_agent_template(technique: str, goal: str, bp: dict | None = None) -> dict:
+    """Genera plantilla de agente instanciable desde el blueprint (decisión 1).
 
     Hito 3, Fase 1 (declarado 2026-10-16): pasa por `build_blueprint_p4`,
     la ruta verificada (hueco A del plan), y no por `build_blueprint` crudo.
     Un arnés generado por el camino crudo podía salir con peor integridad que
     los blueprints ya medidos del Hito 2: eran dos recetas distintas para la
     misma promesa (H1 ratificada).
+
+    Hito 3, Fase 2 (decidido 2026-10-16): el `run()` generado es la
+    **composición de las 4 capas** del harness parametrizada por la técnica —
+    una llamada real por procedimiento en rotación sobre las herramientas
+    locales del loop, validada contra los schemas calibrados, registrada en la
+    trayectoria y regulada, más un paso final de cobertura contra el blueprint.
+    Sin LLM dentro de `run()`.
+
+    `bp` opcional: reutiliza un blueprint ya construido (regeneración de
+    plantillas sin tocar el LLM). Sin él se genera por la ruta verificada.
     """
-    bp = build_blueprint_p4(technique, goal)
+    bp = bp or build_blueprint_p4(technique, goal)
     slug = "".join(c if c.isalnum() else "-" for c in technique.lower())[:40].strip("-")
     outdir = data_dir() / "agents" / slug
     outdir.mkdir(parents=True, exist_ok=True)
     # D (§2.D, dec. 13): el estado se CALCULA en runtime, no se escribe aquí.
     # Antes el literal "todo" estaba en este fichero, así que el resultado se
     # sabía antes de correrlo — 0 de 20 pasos se ejecutaron jamás (§8.6).
-    code = f'''"""Agente {technique} — plantilla generada por Bibliotecario.
+    code = f'''"""Agente {technique} — plantilla generada por Bibliotecario (Hito 3, Fase 2).
 Objetivo: {goal}
 Procedimientos: {", ".join(bp["procedures"][:8])}
 
-Cada paso consulta el corpus con su nombre de procedimiento y guarda el estado
-con score >= 0.30, `empty` si no llega, `error` si falla. Ningún estado está
-escrito en este fichero (dec. 13, D2, 2ª enmienda).
-"""
+Arnés = composición de las 4 capas del harness (RuntimeHarness),
+parametrizada por la técnica (Fase 2, 2026-10-16): cada procedimiento es una
+llamada real a una herramienta del loop — rotación deep_sweep →
+search_papers → retrieve_evidence → get_subgraph — validada contra los
+schemas calibrados, registrada en la trayectoria y regulada por el harness;
+el paso final valida la cobertura de procedimientos contra el blueprint. El
+estado done/empty sigue el gate 0.30 (2ª enmienda de dec. 13) en las tools
+que traen score; las que no lo traen se declaran por recuento de items.
+Sin LLM dentro de run(). Ningún estado está escrito en este fichero
+(dec. 13, D2, 2ª enmienda)."""
+from pathlib import Path
+
 STEPS = {bp["procedures"][:8]!r}
+_ROTACION = ("deep_sweep", "search_papers", "retrieve_evidence", "get_subgraph")
+
+
+def _args(nombre: str, paso: str, objetivo: str) -> dict:
+    q = f"{{paso}} {{objetivo}}".strip()
+    if nombre == "deep_sweep":
+        return {{"question": q, "per_doc": 3}}
+    if nombre == "search_papers":
+        return {{"query": q, "top_k": 6}}
+    if nombre == "retrieve_evidence":
+        return {{"query": q, "top_m": 5}}
+    return {{"query": q, "depth": 2}}
+
+
+def _mejores_scores(res) -> list:
+    out = []
+
+    def walk(x):
+        if isinstance(x, dict):
+            for k, v in x.items():
+                if k == "score" and isinstance(v, (int, float)):
+                    out.append(float(v))
+                else:
+                    walk(v)
+        elif isinstance(x, list):
+            for v in x:
+                walk(v)
+
+    walk(res)
+    return out
+
+
+def _n_items(res) -> int:
+    if isinstance(res, dict):
+        for k in ("hits", "docs", "paths", "nodes", "chunks"):
+            v = res.get(k)
+            if isinstance(v, list):
+                return len(v)
+        return 1 if res else 0
+    return 1 if res else 0
+
+
+def _estado(res) -> tuple:
+    scores = _mejores_scores(res)
+    n = _n_items(res)
+    if scores:
+        mejor = max(scores)
+        if mejor >= 0.30:
+            return "done", f"{{n}} items, mejor score {{mejor:.3f}}"
+        return "empty", f"{{n}} items, mejor score {{mejor:.3f}} < 0.30"
+    if n:
+        return "done", f"{{n}} items (tool sin campo score: el gate 0.30 no aplica)"
+    return "empty", "0 items"
 
 
 def run(context: dict) -> dict:
     objetivo = str((context or {{}}).get("objetivo", "") or "")
+    from bibliotecario.agent.tools import TOOLS, tool_schemas
+    from bibliotecario.harness.runtime import get_harness
+
+    h = get_harness()
+    schemas = h.calibrate(tool_schemas())
+    rid = h.start_run({{"technique": "{technique}", "goal": "{goal}",
+                       "origen": "agent_template"}})
     trace = []
-    for step in STEPS:
-        consulta = f"{{step}} {{objetivo}}".strip()
+    for i, paso in enumerate(STEPS):
+        nombre = _ROTACION[i % len(_ROTACION)]
+        v = h.validate_call(nombre, _args(nombre, paso, objetivo), schemas)
+        if not v.valid:
+            h.record_error(rid)
+            trace.append({{"step": paso, "tool": nombre, "status": "error",
+                          "detalle": v.error or "validacion fallo"}})
+            continue
         try:
-            from bibliotecario.agent.tools import deep_sweep
-            docs = (deep_sweep(consulta) or {{}}).get("docs", [])
-            mejor = max((c["score"] for d in docs for c in d["chunks"]), default=0.0)
-            # Umbral 0.30 fijado en la 2ª enmienda de dec. 13: deep_sweep
-            # devuelve docs para cualquier cadena, asi que "hay docs" no
-            # discrimina. Hueco medido: sin sentido <=0.154, real >=0.546.
-            if docs and mejor >= 0.30:
-                status = "done"
-                detalle = f"{{len(docs)}} docs, mejor score {{mejor:.3f}}"
-            else:
-                status = "empty"
-                detalle = f"{{len(docs)}} docs, mejor score {{mejor:.3f}} < 0.30"
-        except Exception as exc:  # noqa: BLE001 — un paso que falla no tumba el trace
+            res = TOOLS[nombre]["fn"](**v.canonicalized["arguments"])
+            status, detalle = _estado(res)
+        except Exception as exc:  # noqa: BLE001 — un paso que falla no tumba la traza
+            h.record_error(rid)
             status, detalle = "error", f"{{type(exc).__name__}}: {{exc}}"
-        trace.append({{"step": step, "status": status, "detalle": detalle}})
-    return {{"technique": "{technique}", "goal": "{goal}", "trace": trace}}
+        h.record_action(rid, {{"step": i, "tool": nombre, "status": status}})
+        trace.append({{"step": paso, "tool": nombre, "status": status,
+                      "detalle": detalle}})
+        for aviso in h.regulate(rid):
+            trace.append({{"step": f"regulacion-{{i}}", "tool": "harness",
+                          "status": "aviso", "detalle": aviso}})
+    # Validación contra el blueprint (Fase 2): cobertura de procedimientos.
+    bp_path = Path(__file__).resolve().parent / "BLUEPRINT.md"
+    texto = bp_path.read_text(encoding="utf-8").lower() if bp_path.exists() else ""
+    if not texto:
+        status, detalle = "error", "sin BLUEPRINT.md al lado de la plantilla"
+        faltan = list(STEPS)
+    else:
+        faltan = [s for s in STEPS if s.lower()[:24] not in texto]
+        if not faltan:
+            status = "done"
+            detalle = (f"{{len(STEPS)}}/{{len(STEPS)}} procedimientos "
+                       f"presentes en el blueprint")
+        else:
+            status = "partial"
+            detalle = (f"{{len(STEPS) - len(faltan)}}/{{len(STEPS)}} presentes; "
+                       f"falta: {{', '.join(faltan[:3])}}")
+    trace.append({{"step": "validacion_blueprint", "tool": "cobertura",
+                  "status": status, "detalle": detalle}})
+    h.finish_run(rid, score=None, metadata={{"pasos": len(trace),
+                     "hechos": sum(1 for t in trace if t["status"] == "done")}})
+    return {{"technique": "{technique}", "goal": "{goal}", "run_id": rid,
+             "trace": trace}}
 '''
     (outdir / "agent_template.py").write_text(code, encoding="utf-8")
     (outdir / "BLUEPRINT.md").write_text(f"# {technique}\n\nObjetivo: {goal}\n\n{bp['blueprint']}\n", encoding="utf-8")

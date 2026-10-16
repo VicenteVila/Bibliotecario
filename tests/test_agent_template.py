@@ -13,10 +13,32 @@ import py_compile
 from pathlib import Path
 
 PROCS = ["paso uno", "paso dos"]
+PASOS_TOOL = ("deep_sweep", "search_papers", "retrieve_evidence", "get_subgraph")
+
+
+def _herramientas_controladas(monkeypatch, fn):
+    """Sustituye las 4 tools de rotación de la plantilla (Fase 2) por `fn`.
+
+    La plantilla nueva llama a `TOOLS[nombre]["fn"]` (la referencia vive en el
+    dict TOOLS, no en el atributo del módulo), así que hay que parchear el
+    dict. El schema se copia del original: `validate_call` necesita que la
+    herramienta siga "existiendo" para la capa de validación.
+    """
+    from bibliotecario.agent import tools as T
+
+    for name in ("deep_sweep", "search_papers", "retrieve_evidence", "get_subgraph"):
+        entry = dict(T.TOOLS[name])
+        entry["fn"] = fn
+        monkeypatch.setitem(T.TOOLS, name, entry)
+
+
+def _resultado(score: float):
+    return {"hits": [{"score": score, "doc_id": 0, "chunk": 0,
+                      "title": "x", "text": "t"}]}
 
 
 def _generar(tmp_path, monkeypatch, score: float):
-    """Genera el agente con un `deep_sweep` controlado y lo carga."""
+    """Genera el agente con herramientas controladas y lo carga."""
     from bibliotecario.agent import tools as T
     from bibliotecario.agent import loop as LOOP
 
@@ -29,11 +51,9 @@ def _generar(tmp_path, monkeypatch, score: float):
                         lambda t, g, **k: {"technique": t, "goal": g,
                                            "procedures": PROCS,
                                            "blueprint": "bp"})
-    # deep_sweep se importa dentro de run(), asi que se parchea en su modulo
-    from bibliotecario.agent import tools
-    monkeypatch.setattr(tools, "deep_sweep",
-                        lambda q, **k: {"docs": [{"title": "x", "chunks": [
-                            {"chunk": 0, "score": score, "text": "t"}]}]})
+    # Fase 2: la plantilla rota entre 4 herramientas del loop; todas se
+    # controlan con el mismo score, que es lo que miden los tests D.
+    _herramientas_controladas(monkeypatch, lambda **k: _resultado(score))
 
     res = T.instantiate_agent_template("TecnicaDePrueba", "objetivo")
     src = Path(res["dir"]) / "agent_template.py"
@@ -60,51 +80,53 @@ def test_d2_el_estado_no_esta_escrito_en_el_fichero(tmp_path, monkeypatch):
     )
 
 
+def _pasos_tool(trace):
+    return [s for s in trace if s["tool"] in PASOS_TOOL]
+
+
 def test_d3_alcanza_done_con_evidencia(tmp_path, monkeypatch):
     _src, mod = _generar(tmp_path, monkeypatch, score=0.9)
     trace = mod.run({"objetivo": "x"})["trace"]
-    assert len(trace) == len(PROCS)
-    assert all(s["status"] == "done" for s in trace), trace
+    assert len(_pasos_tool(trace)) == len(PROCS)
+    assert all(s["status"] == "done" for s in _pasos_tool(trace)), trace
+    # la plantilla nueva añade el paso de validación contra el blueprint
+    assert any(s["step"] == "validacion_blueprint" for s in trace)
 
 
 def test_d3_el_umbral_030_separa(tmp_path, monkeypatch):
-    """Sin score suficiente no hay 'done' — deep_sweep devuelve docs para
-    cualquier cadena, asi que 'hay documentos' no discrimina (2a enmienda)."""
+    """Sin score suficiente no hay 'done' — las tools de retrieval devuelven
+    resultados para cualquier cadena, asi que 'hay documentos' no discrimina
+    (2a enmienda)."""
     _src, mod = _generar(tmp_path, monkeypatch, score=0.05)
     trace = mod.run({"objetivo": "x"})["trace"]
-    assert all(s["status"] == "empty" for s in trace), trace
+    assert all(s["status"] == "empty" for s in _pasos_tool(trace)), trace
     # y lo dice con el numero delante
     assert "0.05" in trace[0]["detalle"]
 
 
 def test_d3_un_paso_que_falla_no_tumba_la_traza(tmp_path, monkeypatch):
-    from bibliotecario.agent import tools
-
     src, mod = _generar(tmp_path, monkeypatch, score=0.9)
 
-    def _revienta(q, **k):
+    def _revienta(**k):
         raise RuntimeError("boom")
 
-    monkeypatch.setattr(tools, "deep_sweep", _revienta)
+    _herramientas_controladas(monkeypatch, _revienta)
     trace = mod.run({"objetivo": "x"})["trace"]
-    assert [s["status"] for s in trace] == ["error", "error"]
-    assert len(trace) == len(PROCS)
+    assert [s["status"] for s in _pasos_tool(trace)] == ["error", "error"]
+    assert any(s["step"] == "validacion_blueprint" for s in trace)
     assert src.exists()
 
 
 def test_d2_responde_al_contexto(tmp_path, monkeypatch):
-    from bibliotecario.agent import tools
-
     _src, mod = _generar(tmp_path, monkeypatch, score=0.9)
 
-    def _por_consulta(q, **k):
-        score = 0.9 if "alpha" in q else 0.05
-        return {"docs": [{"title": "x", "chunks": [
-            {"chunk": 0, "score": score, "text": "t"}]}]}
+    def _por_consulta(question=None, query=None, **k):
+        texto = f"{question or ''} {query or ''}"
+        return _resultado(0.9 if "alpha" in texto else 0.05)
 
-    monkeypatch.setattr(tools, "deep_sweep", _por_consulta)
+    _herramientas_controladas(monkeypatch, _por_consulta)
     a = mod.run({"objetivo": "alpha"})["trace"]
     b = mod.run({"objetivo": "beta"})["trace"]
-    assert [s["status"] for s in a] != [s["status"] for s in b], (
+    assert [s["status"] for s in _pasos_tool(a)] != [s["status"] for s in _pasos_tool(b)], (
         "run() ignora su entrada: salida identica con contextos distintos"
     )
