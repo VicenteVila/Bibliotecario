@@ -1,0 +1,28 @@
+[
+  {
+    "fase": "captura",
+    "script": "default",
+    "display": ":0",
+    "workspace": "/mnt/c/EG/workspace/current",
+    "motor_secs": 4.9,
+    "motor_exit": 0,
+    "ok": true,
+    "errores_schema": [],
+    "eventos": 8,
+    "duracion_ms": 3833,
+    "demo": "evals/preflight/results/b2_etapa1/cap2/demo_pi.json"
+  },
+  {
+    "fase": "captura",
+    "script": "default",
+    "display": "localhost:99",
+    "workspace": "/mnt/c/EG/workspace/current",
+    "motor_secs": 4.9,
+    "motor_exit": 0,
+    "ok": true,
+    "errores_schema": [],
+    "eventos": 8,
+    "duracion_ms": 3833,
+    "demo": "evals/preflight/results/b2_etapa1/cap2/demo_pi.json"
+  }
+]

@@ -114,4 +114,48 @@ copias temporales). Commit messages en español ASCII sin acentos.
 
 ## §5 Cierre
 
-(pendiente de la corrida oficial)
+**CUMPLE 2026-10-17.** Declaración (`fac658e`) e implementación (`71b2ef7`)
+ANTES de medir; §2-§3 ratificados por el dueño; corrida oficial única.
+Coste: **0 tokens LLM** (sin juez, sin API). Resultados T1-T5:
+
+- **T1 SÍ** — captura produce `_pi.json` válido: **8 eventos / 3833 ms /
+  `errores_schema=[]`** (umbral ≥3), tanto en `:0` como en Xvfb.
+- **T2 SÍ** — dos capturas → documentos **byte-idénticos**
+  (`json.dumps(sort_keys=True)`), t_ms derivados de tick (1000, 2500,
+  2666…); además las capturas de Xvfb coinciden con las de `:0`
+  (determinismo cross-display).
+- **T3 SÍ (Xvfb, ruta primaria)** — replay `exit=0`, **14 frames ≥10**,
+  **0 negros**, luminancia media **78.31**, `ffmpeg_exit=0` (mp4 7.0 s),
+  **0 fallos xdotool**, ventana **0,0 × 1280x720**. Frame 7 inspeccionado
+  visualmente: el juego real (HUD «Puntos: 0», jugador rojo sobre
+  plataforma verde).
+- **T4 SÍ** — hash md5 del workspace de ReaGame antes/después idéntico:
+  `255883e3ed6168cf533df7f9879e6636` (651 archivos). ReaGame solo lectura
+  + copias temporales (patrón B-1).
+- **T5 SÍ** — suite **350 passed** (338 + 12 `test_pi_pipeline`) y ruff
+  gate limpio sobre `bibliotecario/`, runners/evals activos, preflight
+  nuevo y `tests/`.
+
+**Desviaciones medidas durante la corrida (riesgo (a) agotado por orden):**
+
+1. **WSLg monta `/tmp/.X11-unix` como tmpfs `ro`** → Xvfb no puede crear
+   su socket unix (`chmod` → EROFS; `-nolisten tcp` lo mataba). Arreglo
+   runtime: Xvfb con `-listen tcp -ac` y display `localhost:99`
+   (puerto 6099); `_arrancar_xvfb` sondea unix primero y TCP después (y
+   salta displays ocupados). xdotool/godot/ffmpeg funcionan por TCP.
+2. **Fallback `:0` (WSLg) agotado**: con ventana en 364,266 el x11grab
+   1280×720 devolvió **11/11 frames negros** (lum 0.02) — capturado como
+   evidencia en el report (entrada `ok=false`). Arreglo: `--position 0,0`
+   en ambas invocaciones del motor + ruta Xvfb.
+3. Sin WM: `windowraise` + `windowfocus --sync` bastaron (0 fallos).
+4. Lección operativa: `pkill -f "Xvfb :99"` mata el propio shell
+   (self-match con el patrón).
+
+**Evidencia:** `evals/preflight/results/b2_etapa1/` — `cap1|cap2/
+demo_pi.json`, `report_b2.json` (lista acumulada: 2 capturas `:0`, 2
+capturas Xvfb, replay `:0` fallido, replay Xvfb **ok**), `replay.mp4` +
+`frames/` (gitignorados: binario), `.gitignore` local. Commits: plan
+`fac658e` → impl `71b2ef7` → ajuste runtime + cierre (este).
+
+**No ratificado en este hito** (para el Hito 16, decisión del dueño):
+scorer B-2, rúbrica `ρ`, juez multimodal, pesos y fórmula.

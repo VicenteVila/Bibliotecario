@@ -1,0 +1,62 @@
+{
+  "events": [
+    {
+      "action": "ui_right",
+      "keysym": "Right",
+      "phase": "down",
+      "t_ms": 1000,
+      "type": "key"
+    },
+    {
+      "action": "ui_right",
+      "keysym": "Right",
+      "phase": "up",
+      "t_ms": 2500,
+      "type": "key"
+    },
+    {
+      "action": "ui_accept",
+      "keysym": "space",
+      "phase": "down",
+      "t_ms": 2500,
+      "type": "key"
+    },
+    {
+      "action": "ui_accept",
+      "keysym": "space",
+      "phase": "up",
+      "t_ms": 2666,
+      "type": "key"
+    },
+    {
+      "action": "ui_right",
+      "keysym": "Right",
+      "phase": "down",
+      "t_ms": 2666,
+      "type": "key"
+    },
+    {
+      "action": "ui_right",
+      "keysym": "Right",
+      "phase": "up",
+      "t_ms": 3666,
+      "type": "key"
+    },
+    {
+      "action": "ui_accept",
+      "keysym": "space",
+      "phase": "down",
+      "t_ms": 3666,
+      "type": "key"
+    },
+    {
+      "action": "ui_accept",
+      "keysym": "space",
+      "phase": "up",
+      "t_ms": 3833,
+      "type": "key"
+    }
+  ],
+  "fps": 60,
+  "version": 1
+}
