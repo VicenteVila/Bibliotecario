@@ -5,7 +5,8 @@
 (hueco B cerrado; H2 medida: CUMPLE, ver resultado) · Fase 3 ✅ ejecutada
 (hueco C cerrado — estado real a `apply_pfs`; H3 medida con **enmienda 1**
 del dueño: A 10/10 · B 5/5+5/5 → **CUMPLE**, umbral original 0/10
-archivado) · Fase 4 pendiente (hueco D, H4).****
+archivado) · Fase 4 ✅ ejecutada (hueco D cerrado; H4 medida: **NO CUMPLE**
+por el umbral (4) — 18/18 runs, placebo OK, separación NO, ver resultado).****
 **Decisión del dueño:** «Ratificar H1-H4 tal cual» · «Camino 1».
 H1-H4 quedan fijos tal como se proponen; **nada se mide hasta ahora y a
 partir de ahora no se re-bajan.** Camino de la §7 = **1** (diseñar sobre las
@@ -155,6 +156,7 @@ de QA ciego, **no para fundamentar cómo se evalúa**.
 | criterio | un script A/B que compare ≥ 2 configuraciones de arnés sobre el mismo golden set, con el mismo juez |
 | umbral propuesto | corre de punta a punta, devuelve **n, media e IC 95%** por brazo, y **separa** dos arneses con diferencia real. Validado con un **placebo**: dos brazos idénticos **no** deben dar diferencia significativa |
 | por qué el placebo | ya se aprendió en el Hito 1 que sin control negativo una run ruidosa parece un descubrimiento |
+| estado | **medido 2026-10-16** — umbrales (1)(2)(3) CUMPLE, umbral (4) **NO CUMPLE** (0 dentro del IC de Welch LOW−FULL, en vez de fuera) → **H4 NO CUMPLE**; ver §5 Fase 4. Umbral intacto, no re-bajado |
 
 ---
 
@@ -452,6 +454,112 @@ Nuevo `evals/run_harness_ab.py` al estilo de `run_blueprint_ab.py`:
 - `n`, media, IC 95% por brazo
 - **placebo** de dos brazos idénticos como control negativo
 - umbrales declarados antes de la corrida
+
+**Declaración previa (2026-10-16, escrita ANTES de escribir el script y de
+medir nada):**
+
+- **Instrumento:** `evals/run_harness_ab.py`. Reutiliza `run_one` de
+  `eval_end2end.py` (mismo juez pineado `evals/judge.py`, `JUDGE_MODEL` por
+  defecto `openai/gpt-oss-20b` @ nvidia — familia distinta del agente — y
+  misma clasificación de errores de infraestructura) y el golden set
+  `golden_qa.jsonl`.
+- **Configuraciones de arnés (3 brazos):**
+  - **A · FULL** — `max_turns=4`, catálogo completo: la configuración de
+    referencia.
+  - **B · LOW** — idéntica salvo `max_turns=1`: presupuesto de turnos al
+    mínimo, la run no puede hacer retrieval multipaso y responder. El
+    presupuesto de turnos es una variable real de despliegue del arnés
+    (coste/calidad) y la primera que se evalúa porque se espera diferencia
+    real a priori; las de catálogo de tools vienen después, con el
+    instrumento ya validado.
+  - **A' · PLACEBO** — copia exacta de A, corrida aparte.
+- **Golden set:** 6 preguntas de `golden_qa.jsonl`, estratificadas 2 fácil /
+  2 media / 2 difícil con la regla determinista «las primeras dos de cada
+  dificultad en orden de archivo»: `pearl-1`, `proc-1`, `pearl-2`, `proc-2`,
+  `pearl-3`, `proc-3`.
+- **Temperatura:** `0.0` en los tres brazos (misma decisión que el A/B del
+  Hito 2: la varianza que quede es del proveedor, no del muestreo). Sin
+  pinear proveedor: rotación por defecto, idéntica en los tres brazos.
+- **Métrica:** juez 1-5 por fila; media e IC 95% por brazo
+  (`media ± t·s/√n`, t de Student, df = n−1); diferencia de brazos con IC de
+  Welch.
+- **Umbrales H4:**
+  1. corre de punta a punta: 18 runs (3×6) sin crash; fila con fallo de
+     infra se excluye de la media y se cuenta aparte; si un brazo pierde
+     **>2 de 6** filas → NO CUMPLE (no hay dato comparable);
+  2. devuelve `n`, media e IC 95% por brazo;
+  3. **placebo**: A vs A' → **0 dentro** del IC 95% de la diferencia;
+  4. **separación**: LOW vs FULL → **0 fuera** del IC 95% de la diferencia.
+- **Coste estimado:** 6×4 + 6×1 + 6×4 = **54 llamadas de agente + 18
+  juicios** ≈ 72 llamadas en rotación free tier.
+
+**Errata declarada (2026-10-16, tras escribir el script):** el nombre del
+instrumento en la declaración previa es `evals/run_harness_ab.py`; el script
+final se llamó **`evals/run_fase4_h4.py`** (nombre de archivo, para seguir la
+convención `run_faseN_hN.py` de las fases 1-3). **Nada más cambió**: brazos,
+golden set, temperatura, juez, métrica y umbrales son exactamente los
+declarados arriba. El nombre se corrige aquí, no se reescribe la declaración.
+
+#### Resultado — **H4 NO CUMPLE** *(medido 2026-10-16, umbral leído antes de la corrida)*
+
+Corrida completa: **18/18 runs**, 0 filas de infraestructura. Juez
+`openai/gpt-oss-20b` @ nvidia, temperatura 0.0. Dos filas de `A_placebo`
+(`pearl-3`, `proc-3`) devolvieron `juez=None` (HTTP 504 del juez, 3
+reintentos agotados); el instrumento las cuenta como **0**, siguiendo la
+misma regla que `aggregate` de `eval_end2end` — se declara aquí porque esas
+dos filas hunden la media del placebo y ensanchan su IC.
+
+| brazo | turns | n | media juez | IC 95% |
+|---|---|---|---|---|
+| A · FULL | 4 | 6 | **2.833** | [0.691, 4.976] |
+| B · LOW | 1 | 6 | **4.833** | [4.405, 5.262] |
+| A' · PLACEBO | 4 | 6 | **1.333** | [−0.621, 3.288] |
+
+| comparación | diff | IC 95% (Welch) | lectura |
+|---|---|---|---|
+| LOW − FULL | 2.0 | [−0.185, 4.185] | 0 **dentro** del IC → **NO SEPARA** |
+| FULL − PLAC | 1.5 | [−1.051, 4.051] | 0 **dentro** del IC → placebo OK |
+
+| criterio | umbral | medido | verdicto |
+|---|---|---|---|
+| (1) 18 runs sin crash, ≤2 infra/brazo | 18/18, 0 infra | 18/18, 0 infra | **CUMPLE** |
+| (2) n, media e IC 95% por brazo | los tres brazos | los tres brazos | **CUMPLE** |
+| (3) placebo: 0 dentro del IC de FULL−PLAC | 0 dentro | 0 dentro [−1.051, 4.051] | **CUMPLE** |
+| (4) separación: 0 fuera del IC de LOW−FULL | 0 fuera | 0 **dentro** [−0.185, 4.185] | **NO CUMPLE** |
+
+**H4 queda NO CUMPLE por el umbral (4).** El umbral no se re-baja; el
+resultado queda registrado como está.
+
+**Tres señales a dejar escritas (no son excusa del veredicto, son el dato):**
+
+1. **La dirección está invertida.** Se esperaba FULL ≥ LOW (más turnos =
+   retrieval multipaso = mejor); midió LOW (4.833) > FULL (2.833). Las 6
+   respuestas de LOW traen cita y contenido; 3 de 6 de FULL salieron como
+   `[doc:?]` vacío (juez 1). No se post-hoc-e hipótesis aquí; se anota para
+   la siguiente tirada.
+2. **El placebo pasó por IC ancho, no por igualdad.** A y A' tienen la
+   misma configuración (`max_turns=4`) y midieron 2.833 vs 1.333 — una
+   diferencia de 1.5 puntos. El umbral (3) se cumple porque el IC de Welch
+   es tan ancho que contiene 0, no porque los brazos hayan coincidido.
+   Con n=6 y este ruido, el control negativo no valida la sensibilidad del
+   instrumento: solo demuestra que no acusa una diferencia que no puede
+   resolver.
+3. **n=6 con juez ruidoso no tiene potencia.** La diferencia de medias
+   LOW−FULL es 2.0 puntos — enorme en la escala 1-5 — y aun así el IC de
+   Welch cruza 0. El umbral (4) como está escrito exige significación con
+   este n; cualquier re-corrida que quiera declarar H4 CUMPLE necesita
+   **más n o un diseño más estable**, con su propia declaración previa y sin
+   tocar este umbral. Esa decisión es del dueño.
+
+**Registro completo:** `evals/result_fase4_h4.json` (`arm="H4"`,
+`h4: false`, umbrales `u1=true u2=true u3=true u4=false`). Log de la
+corrida en `/tmp/opencode/h4_run.log` (reintentos 503/413 de la rotación
+free tier; ningún cambio de instrumento).
+
+**Estado del hueco D:** el hueco está **cerrado como infraestructura** —
+existe un script A/B con placebo, umbrales pre-declarados y resultado
+publicado. H4 como hipótesis queda **NO CUMPLE**: el instrumento hoy no
+separa dos configuraciones de arnés con n=6.
 
 ---
 
