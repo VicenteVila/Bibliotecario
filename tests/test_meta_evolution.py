@@ -11,8 +11,6 @@ from __future__ import annotations
 
 import json
 
-import pytest
-
 from bibliotecario.agent import loop as LOOP
 from bibliotecario.core import storage
 from bibliotecario.harness import pfs as PFS

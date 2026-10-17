@@ -39,8 +39,8 @@ def _resultado(score: float):
 
 def _generar(tmp_path, monkeypatch, score: float):
     """Genera el agente con herramientas controladas y lo carga."""
-    from bibliotecario.agent import tools as T
     from bibliotecario.agent import loop as LOOP
+    from bibliotecario.agent import tools as T
 
     monkeypatch.setattr(T, "data_dir", lambda: tmp_path)
     # Hito 3, Fase 1: la plantilla pasa por `build_blueprint_p4`, que entra

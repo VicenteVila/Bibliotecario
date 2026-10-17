@@ -293,3 +293,93 @@ def test_normalize_pointers_cuenta_los_arreglados():
     out, n = normalize_pointers("a [doc:1:chunk:2] b [doc3:4]")
     assert n == 2
     assert out == "a [doc:1:2] b [doc:3:4]"
+
+
+# --- Hito 6: reparación que no degenere (HITO6 §1) ----------------------------
+#
+# El intento 2 logró R4+R5 pagando con el documento: PG a 488 chars y
+# ReASearch a 440 (razonamiento suelto del modelo) pasaron el juez. Estos
+# tests defienden lo que el runner de H13 exige ANTES de aceptar cualquier
+# borrador: lo determinista primero (sin LLM, sin reescribir prosa) y la
+# validación V1/V2 que rechaza la degradación.
+
+def test_check_attributions_incluye_pos_para_demotear():
+    """Hito 6: `pos` es lo que permite demotear in-place desde el informe."""
+    bp = "Según el paper, usa AdaptiveHarnessEngine para orquestar. [doc:1:0]"
+    v = A.check_attributions(bp, {(1, 0): CHUNK})
+    assert v and v[0]["pos"] == bp.index("[doc:1:0]")
+
+
+def test_mech_repair_normaliza_y_rescata_cita():
+    """[doc:1:chunk:0] es invisible para todo el sistema (§7.1): normalizarlo
+    la hace resoluble sin tocar la frase — el puntero NO se quita."""
+    bp = "Aplica variance-weighted task selection. [doc:1:chunk:0]"
+    out, stats = A.mech_repair(bp, {(1, 0): CHUNK})
+    assert "[doc:1:0]" in out
+    assert stats["normalizados"] == 1
+    assert stats["punteros_quitados"] == 0
+    assert "variance-weighted task selection" in out
+
+
+def test_mech_repair_quita_puntero_roto_y_marca_huerfana():
+    bp = ("Según el paper, usa variance-weighted task selection. [doc:1:9]\n"
+          "El AdaptiveHarnessEngine orquesta los pasos.")
+    out, stats = A.mech_repair(bp, {(1, 0): CHUNK})
+    assert "[doc:1:9]" not in out
+    assert stats["punteros_quitados"] == 1
+    assert "variance-weighted task selection" in out     # prosa intacta
+    assert ("El AdaptiveHarnessEngine orquesta los pasos. "
+            "(propuesta del blueprint)") in out          # marca R6 en su línea
+    assert stats["huerfanas_marcadas"] == 1
+    assert A.check_orphan_claims(out) == []
+
+
+def test_mech_repair_marca_termino_ausente():
+    bp = "Según el paper, usa AdaptiveHarnessEngine. [doc:1:0]"
+    out, stats = A.mech_repair(bp, {(1, 0): CHUNK})
+    assert stats["marcados_termino"] == 1
+    assert "[doc:1:0]" not in out
+    assert "usa AdaptiveHarnessEngine. " in out   # prosa intacta
+    assert "(propuesta del blueprint)" in out
+
+
+def test_mech_repair_no_toca_lo_correcto():
+    """Passthrough: con todo correcto, byte a byte idéntico."""
+    bp = "Aplica variance-weighted task selection. [doc:1:0]\n\n## Validación"
+    out, stats = A.mech_repair(bp, {(1, 0): CHUNK})
+    assert out == bp
+    assert stats == {"normalizados": 0, "violaciones": 0,
+                     "punteros_quitados": 0, "marcados_termino": 0,
+                     "huerfanas_marcadas": 0}
+
+
+def test_validate_structure_v1_caza_el_stub():
+    """El caso real de H12: 440 chars sobre una base de 5196."""
+    fallos = A.validate_structure("B" * 5196, "B" * 440)
+    assert fallos and fallos[0].startswith("V1")
+    assert "440" in fallos[0] and "2598" in fallos[0]
+
+
+def test_validate_structure_v1_vacio_y_emergencia():
+    assert A.validate_structure("x", "") == ["V1: la salida está vacía"]
+    fallos = A.validate_structure("x" * 100, "(" + ")" * 99)
+    assert any("emergencia" in f for f in fallos)
+
+
+def test_validate_structure_v2_renombrar_encabezado_es_fallo():
+    """Igualdad literal (mismo criterio que G2): renombrar = falla."""
+    base = "## Bibliografía\n" + "x" * 500
+    draft = "## Bibliografía renovada\n" + "x" * 500
+    fallos = A.validate_structure(base, draft)
+    assert any(f.startswith("V2") and "Bibliografía" in f for f in fallos)
+
+
+def test_validate_structure_acepta_al_bueno():
+    base = "## Título\n" + "x" * 1000
+    draft = "## Título\n" + "x" * 1200
+    assert A.validate_structure(base, draft) == []
+
+
+def test_encabezados_misma_definicion_que_g2():
+    """Solo `## ` con espacio: `#` y `###` fuera, como en G2 desde HITO5."""
+    assert A.encabezados("# Uno\n## Dos\n### Tres\n## Cuatro") == ["Dos", "Cuatro"]

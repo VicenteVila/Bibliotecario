@@ -82,7 +82,10 @@ def check_attributions(blueprint: str, chunks: dict[int, str]) -> list[dict]:
         cited = chunks.get((doc_id, chunk_idx))
         if cited is None:
             # B8: el puntero no resuelve. Es un fallo distinto y ya medido.
+            # `pos` lo añadió el Hito 6: es lo que permite demotear in-place
+            # sin volver a buscar la frase (HITO6 §1.A).
             violations.append({"tipo": "puntero_roto", "chunk": f"{doc_id}:{chunk_idx}",
+                               "pos": m.start(),
                                "frase": sentence[:200], "termino": None})
             continue
         cited_flat = cited.lower()
@@ -90,6 +93,7 @@ def check_attributions(blueprint: str, chunks: dict[int, str]) -> list[dict]:
             if term.lower() not in cited_flat:
                 violations.append({"tipo": "termino_ausente",
                                    "chunk": f"{doc_id}:{chunk_idx}",
+                                   "pos": m.start(),
                                    "frase": sentence[:200], "termino": term})
     return violations
 
@@ -329,3 +333,82 @@ def critic_and_demote(blueprint: str, chunks: dict[tuple[int, int], str],
     return {"blueprint": fixed, "violaciones": violations, "fallos": res["fallos"],
             "marcas": marks, "reescrito": False,
             "degradadas": sum(marks.values())}
+
+
+# ----------------------------------------------------------- HITO6 (§1.A / §1.B)
+#
+# El intento 2 (HITO5) logró R4+R5 en 5/5 pagando con el documento: PG salió
+# con 488 chars (base 3988) y ReASearch con 440 (un borrador de razonamiento
+# del propio modelo), y el juez los aprobó — detecta fabricación, no
+# integridad. Aquí lo determinista se aplica PRIMERO (lo que no necesita LLM
+# no se le da al LLM) y todo borrador se VALIDA antes de aceptarse.
+
+MIN_FRACCION = 0.5  # HITO6 §2 (V1): salida válida >= 50% de la longitud base.
+
+
+def encabezados(blueprint: str) -> list[str]:
+    """Encabezados `## ` en orden — misma definición literal que G2 (HITO5/6)."""
+    return re.findall(r"^##\s+(.+)$", blueprint or "", re.MULTILINE)
+
+
+def mech_repair(blueprint: str,
+                chunks: dict[tuple[int, int], str]) -> tuple[str, dict]:
+    """Reparación determinista previa: 0 tokens, sin LLM, sin reescribir prosa.
+
+    1. `normalize_pointers` (§7.1): solo corchetes mal formados.
+    2. `demote_unsupported`: puntero a chunk inexistente se quita; término
+       ausente se marca «(propuesta del blueprint)». La frase no se toca.
+    3. `check_orphan_claims`: cada huérfana recibe la marca R6 al final de su
+       propia línea.
+
+    Los chunks deben venir cargados ya sobre el texto normalizado (el runner
+    normaliza antes de cargar); aquí normalizar de nuevo es idempotente.
+    """
+    from bibliotecario.knowledge import study as S
+
+    blueprint, n_norm = S.normalize_pointers(blueprint)
+    viols = check_attributions(blueprint, chunks)
+    blueprint, marks = demote_unsupported(blueprint, viols)
+    orph = check_orphan_claims(blueprint)
+    lines = blueprint.splitlines(keepends=True)
+    marcadas = 0
+    for o in orph:
+        i = o["linea"] - 1
+        if not 0 <= i < len(lines):
+            continue
+        line = lines[i]
+        nl = re.search(r"\r?\n$", line)
+        lines[i] = (line[:nl.start()] + _DEMOTED + line[nl.start():]
+                    if nl else line + _DEMOTED)
+        marcadas += 1
+    return "".join(lines), {
+        "normalizados": n_norm,
+        "violaciones": len(viols),
+        "punteros_quitados": marks["puntero_roto"],
+        "marcados_termino": marks["no_sostenida"],
+        "huerfanas_marcadas": marcadas,
+    }
+
+
+def validate_structure(base_bp: str, draft_bp: str) -> list[str]:
+    """Validación de salida de una reparación (HITO6 §1.B): V1 + V2.
+
+    Devuelve los fallos concretos (lista vacía = aceptado); el runner añade
+    V3 (citas resueltas >= base), que necesita puntuar contra el corpus.
+    V1 es un endurecimiento de C1 declarado en HITO6 §2: no relaja nada.
+    """
+    fallos: list[str] = []
+    draft = (draft_bp or "").strip()
+    if not draft:
+        return ["V1: la salida está vacía"]
+    if draft.startswith("("):
+        fallos.append("V1: no es un blueprint, es una respuesta de emergencia")
+    min_len = int(len((base_bp or "").strip()) * MIN_FRACCION)
+    if len(draft) < min_len:
+        fallos.append(f"V1: {len(draft)} chars < 50% de la base ({min_len})")
+    faltan = [h for h in encabezados(base_bp)
+              if h not in set(encabezados(draft_bp))]
+    if faltan:
+        fallos.append("V2: faltan encabezados de la base: "
+                      + ", ".join(f"«{h}»" for h in faltan[:8]))
+    return fallos
