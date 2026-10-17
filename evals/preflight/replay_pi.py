@@ -24,6 +24,7 @@ import os
 import re
 import shutil
 import signal
+import socket
 import subprocess
 import sys
 import tempfile
@@ -79,22 +80,41 @@ def _xdotool() -> tuple[list[str], dict[str, str]]:
         "`sudo apt install xdotool` o extrae los .deb como en HITO15 §0.")
 
 
+def _tcp_listo(puerto: int) -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(0.3)
+        try:
+            s.connect(("127.0.0.1", puerto))
+        except OSError:
+            return False
+    return True
+
+
 def _arrancar_xvfb() -> tuple[int, str, subprocess.Popen | None]:
-    """Devuelve (display_num, display_str, proc|None). proc None = system."""
+    """Devuelve (display_num, display_str, proc|None). proc None = system.
+
+    WSLg monta /tmp/.X11-unix como tmpfs ro → el socket unix es imposible;
+    se arranca con `-listen tcp` y se usa `localhost:N` (puerto 6000+N).
+    Si el socket unix aparece (entornos normales), se prefiere `:N`.
+    """
     for n in (99, 98, 97):
         sock = Path(f"/tmp/.X11-unix/X{n}")
-        if not sock.exists():
-            break
+        if sock.exists() or _tcp_listo(6000 + n):
+            continue
+        break
     else:
         n = 96
     disp = f":{n}"
     proc = subprocess.Popen(
-        ["Xvfb", disp, "-screen", "0", f"{ANCHO}x{ALTO}x24", "-nolisten",
-         "tcp"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        ["Xvfb", disp, "-screen", "0", f"{ANCHO}x{ALTO}x24", "-ac",
+         "-listen", "tcp"], stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL)
     t0 = time.time()
     while time.time() - t0 < XVFB_TIMEOUT_S:
         if Path(f"/tmp/.X11-unix/X{n}").exists():
             return n, disp, proc
+        if _tcp_listo(6000 + n):
+            return n, f"localhost:{n}", proc
         if proc.poll() is not None:
             break
         time.sleep(0.1)
@@ -190,7 +210,7 @@ def fase_captura(script: str, workspace: Path, out: Path,
     try:
         env = _env_display(disp_str)
         cmd = [_godot(), "--path", str(tmp), "--resolution",
-               f"{ANCHO}x{ALTO}"]
+               f"{ANCHO}x{ALTO}", "--position", "0,0"]
         t0 = time.time()
         proc = subprocess.Popen(cmd, env=env, stdout=subprocess.PIPE,
                                 stderr=subprocess.STDOUT, text=True)
@@ -263,7 +283,8 @@ def fase_replay(pi_file: Path, workspace: Path, out: Path,
     ffmpeg = None
     try:
         motor = subprocess.Popen([_godot(), "--path", str(tmp),
-                                  "--resolution", f"{ANCHO}x{ALTO}"],
+                                  "--resolution", f"{ANCHO}x{ALTO}",
+                                  "--position", "0,0"],
                                  env=_env_display(disp_str),
                                  stdout=subprocess.DEVNULL,
                                  stderr=subprocess.DEVNULL)
