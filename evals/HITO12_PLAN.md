@@ -102,6 +102,35 @@ por blueprint, 0 llamadas LLM.
 5. NO CUMPLE / rechazo de enmienda se cierran igual; intento 10 exigiría
    declaración nueva.
 
-## §5 Cierre
+## §5 Cierre — 2026-10-17 · ENMIENDA RECHAZADA EN E12 (el intento 9 no corrió)
 
-(pendiente de la corrida oficial)
+- **Resultado**: fase E12 con la ventana enmendada → **0/4 obligatorios
+  aprueban** (PEARL R4 · PG R4 · TCE R4+R5 · Wiki R4+R5; diagnóstico
+  ReASearch R4+R5 como siempre) → **§1.D: ENMIENDA RECHAZADA, abort
+  ANTES de cualquier fila H19** — 0 filas `H19`, 0 localizadores, coste
+  **5 juicios**. Riesgo (1) pre-declarado, sin maquillaje.
+- **Forense determinista de los 5 juicios (0 llamadas nuevas): TODAS las
+  quejas nuevas de los 4 obligatorios son FALSAS contra la fuente
+  COMPLETA** de su técnica:
+  - PEARL R4 cita «converges faster… highest validation performance» →
+    **2× y 2× en la fuente (85K)**.
+  - PG R4 «graph mutation» → «mutation» **11×** en la fuente (132K).
+  - TCE R4 λ=0,025 / ℓ=0,125 → **0.025 y 0.125 exactos**; R5 «Tabla D/E» →
+    **Table D 2×, Table E 4×, 7% 24×, 20% 30×** (fuente 63K).
+  - Wiki R4 gating → **gating 16×, rbest 10×**; R5 bibliografía →
+    **qwen 98×, gemma 18×, vllm, gepa** (fuente 99K).
+  ReASearch (diagnóstico) sí mezcla quejas verdaderas (`pre-release` **0×**
+  en 139K) y falsas (`re-emission` **1×**).
+- **Lección (hallazgo 10, salto cualitativo)**: los veredictos R4/R5 son
+  **función de la ventana** — ventana tiny (0,86%-10,4%): inverificable en
+  ReASearch y 4/5 estables; ventana rica-por-recuperación (aún solo
+  ~7-13%): **0/4 con falsos positivos** en los cuatro. Ninguna ventana
+  corta probada es estable: el juez no puede responder «¿está esto en la
+  fuente?» sobre un sliver. La recuperación híbrida NO sirvió para esto.
+- **Opciones declaradas al dueño** (§5, decisión): **A** cerrar H1 con
+  hallazgo 26/10 en su estado actual (NO CUMPLE permanente, 8 corridas +
+  1 enmienda rechazada); **B** enmienda 2 = **fuente completa por
+  técnica** (63-139K chars por llamada, coste de tokens ×10-15 declarado,
+  con recalibración E13 de los mismos 4 — forense respalda que sus quejas
+  desaparecerían con fuente completa); **C** verificación mecánica
+  determinista de citas (R1/B8) sin juez para el núcleo de R4.
