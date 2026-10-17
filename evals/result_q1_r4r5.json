@@ -2652,5 +2652,214 @@
     "technique": "WikiSkill",
     "run": 5,
     "secs": 15.5
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple rigurosamente con las normas de citación, diferenciando claramente entre la arquitectura descrita en la fuente y las propuestas de implementación del usuario.",
+    "arm": "H18",
+    "technique": "PEARL",
+    "run": 0,
+    "secs": 1.4
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple estrictamente con el rigor de citación, declarando explícitamente los silencios de la fuente cuando los módulos propuestos no tienen respaldo en el texto.",
+    "arm": "H18",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "secs": 1.2
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 3: Refinador de Contraste Éxito-Fallo (el texto fuente no menciona este módulo ni esta funcionalidad específica)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
+    ],
+    "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 0,
+    "secs": 1.4
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint atribuye a la fuente la propuesta de un 'Módulo 4: Bucle de Optimización Dirigida por Herramientas' y un 'Módulo 5: Re-emisión de Estado', conceptos que no aparecen en el texto proporcion"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint define una 'Métrica de éxito' y un 'Umbral de aceptación' para la validación del sistema, detalles que la fuente no menciona ni especifica."
+    ],
+    "verdict": "El blueprint inventa módulos funcionales y métricas de validación que no están presentes en el texto fuente, incurriendo en fabricaciones y rellenado de información inexistente.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 1,
+    "secs": 1.3
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 5: Re-emisión de estado (el texto fuente no menciona 'state re-emission' ni la necesidad de re-emitir el estado para evitar desfases)."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Módulo 5: El blueprint inventa un mecanismo técnico de 're-emisión de estado' que no aparece en la fuente."
+    ],
+    "verdict": "El blueprint atribuye al paper conceptos técnicos inexistentes en la fuente, específicamente en el Módulo 5, y extrapola funcionalidades de implementación no descritas.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 2,
+    "secs": 11.0
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone que el Módulo 5 realice una re-emisión de estado para evitar desfases, lo cual no se menciona en la fuente como una funcionalidad del sistema ReASearch."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone un 'Mecanismo de verificación' y 'Umbral de aceptación' para validaciones pre-release, detalles que la fuente no especifica."
+    ],
+    "verdict": "El blueprint atribuye al sistema funcionalidades de gestión de estado y validación de releases que no están presentes en el texto fuente.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 3,
+    "secs": 12.1
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone que el Módulo 5 debe realizar una 're-emisión de estado' para evitar desfases, cuando la fuente indica explícitamente que 'per-turn re-rendering is not a configuration knob' y que"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint establece un 'Umbral de aceptación' de cero releases con incidencias, detalle que no aparece en la fuente."
+    ],
+    "verdict": "El blueprint atribuye capacidades de re-emisión de estado al sistema que la fuente explícitamente describe como no configurables y añade métricas de validación no presentes en el texto.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 4,
+    "secs": 1.3
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el advisory de estancamiento debe 'obligar al agente a considerar herramientas diagnósticas', mientras que la fuente solo indica que el advisory se inserta en el prompt porque "
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone mitigaciones técnicas específicas como 'vincular estrictamente cada nodo del árbol a un hash de estado' o 'pre-registrar un catálogo de herramientas válidas', detalles técnicos qu"
+    ],
+    "verdict": "El blueprint atribuye al paper intenciones prescriptivas no declaradas y rellena vacíos técnicos con soluciones de implementación que la fuente no contempla.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 5,
+    "secs": 30.1
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone aplicar la estructura de árbol de búsqueda y el detector de estancamiento específicamente para la 'Validación Pre-Release del Agente', un contexto de uso que la fuente no menciona"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el advisory de estancamiento debe funcionar como un 'bloqueo suave que requiera acción explícita', detalle que la fuente no especifica."
+    ],
+    "verdict": "El blueprint extrapola el uso de las técnicas descritas en el paper hacia un marco de trabajo de 'validación pre-release' y mecanismos de control de flujo que no están presentes en la fuente.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 6,
+    "secs": 23.1
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone que el advisory de estancamiento actúe como un 'bloqueo suave que requiera acción explícita', cuando la fuente solo menciona que se inserta en el prompt para ayudar al agente a de"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone implementar un monitor para 'validación pre-release del agente', un contexto de uso que la fuente no menciona ni especifica."
+    ],
+    "verdict": "El blueprint atribuye al paper funcionalidades de control de flujo (bloqueos) y propósitos de uso (validación pre-release) que no están presentes en la fuente.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 7,
+    "secs": 1.2
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone aplicar la estructura de árbol y el advisory 'antes de cada release' o para 'validación pre-release', cuando la fuente describe el mecanismo como parte del funcionamiento interno "
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone mitigar el riesgo de ignorar el advisory mediante la invocación obligatoria de una herramienta diagnóstica, cuando la fuente indica explícitamente que el problema es que el agente"
+    ],
+    "verdict": "El blueprint atribuye al paper un propósito de validación de software (pre-release) que no existe en la fuente y asume capacidades de control sobre el agente que la fuente presenta como desafíos no resueltos.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 8,
+    "secs": 1.6
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone una 'validación pre-release del agente' y un 'catálogo de herramientas' (tests de unidad, simulaciones, chequeos de drift) que no se mencionan en la fuente."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el sistema debe realizar una 'validación pre-release', detalle que la fuente no especifica ni contempla."
+    ],
+    "verdict": "El blueprint atribuye al paper objetivos de validación de software (pre-release) y mecanismos de control de calidad que no están presentes en el texto fuente.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 9,
+    "secs": 2.0
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone que la estructura de árbol permita identificar patrones 'antes de cada release', cuando la fuente describe la técnica como un mecanismo de lectura de historial de búsqueda durante"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que la técnica de 'Structured search-tree review' debe ser utilizada para 'validación pre-release del agente', un propósito que la fuente no menciona ni especifica."
+    ],
+    "verdict": "El blueprint atribuye al paper un propósito de validación pre-release que no existe en la fuente y rellena el contexto operativo con una finalidad ajena al texto original.",
+    "arm": "H18",
+    "technique": "ReASearch",
+    "run": 10,
+    "secs": 1.6
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint es riguroso, cita correctamente las fuentes y declara explícitamente los parámetros obtenidos de las tablas del paper cuando no estaban en el texto principal.",
+    "arm": "H18",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "secs": 1.1
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint refleja con precisión la arquitectura y el flujo de trabajo descritos en la fuente sin incurrir en fabricaciones ni omisiones de información relevante.",
+    "arm": "H18",
+    "technique": "WikiSkill",
+    "run": 0,
+    "secs": 1.2
   }
 ]

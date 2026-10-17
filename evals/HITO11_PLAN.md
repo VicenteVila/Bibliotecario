@@ -105,6 +105,40 @@ umbrales ni el instrumento.
 4. Corrida oficial única con la env del juez.
 5. NO CUMPLE se cierra igual; un intento 9 exigiría declaración nueva.
 
-## §5 Cierre
+## §5 Cierre — 2026-10-17 · NO CUMPLE (evidencia)
 
-(pendiente de la corrida oficial)
+- **Resultado**: H5' **4/5** · G1 **5/5** · G2 **5/5** · **C1' SÍ** (0
+  arneses en fallo; V1 sobrevivió las 10 rondas) → **NO CUMPLE** solo por
+  ReASearch. Coste **15 juicios + 16 localizadores = 31** de ≤52; 0
+  generaciones. Suite al cierre: **328**.
+- **La máscara quirúrgica cumplió su promesa de presión**: ediciones de
+  **12-158 chars** (contra 213-416 de línea completa en H17); ReASearch
+  termina en **2828 chars con suelo V1 en 2598** — nunca cayó, ningún
+  `ok=False`, C1' restaurado a SÍ. WikiSkill **aprueba r0 con su base nueva
+ **(aprobado H17)** (riesgo (e) no encendido); PEARL/PG/TCE r0 intactos.
+- **Riesgo (b) ENCENDIDO y medido**: cola de ReASearch **>10 moles** — 11
+  juicios (run0..run10) con quejas **todas distintas**, sin repetir, hasta
+  agotar las 10 rondas. `NO APRUEBA tras 10 reparaciones`.
+- **Forense de decisión (hallazgo 10 cuantificado)**: la ventana de fuente
+  que ve el juez para verificar ReASearch es de **1.195 chars de una fuente
+  de 138.667 = 0,86%** (chunk 0 + un párrafo del 65). Y es sistemático en
+  las 5 técnicas — `PEARL 6,1% · PG 0,9% · ReASearch 0,9% · TCE 10,4% ·
+  Wiki 7,9%` — porque `_source_for` selecciona chunks con `LIKE` sobre las
+  etiquetas de procedimiento **en español** contra el texto de los papers
+  **en inglés** (casi nunca matchea). El juez declara «el texto fuente no
+  menciona…» contra ≤10% de la fuente: **la cola bottomless de ReASearch es
+  exactamente lo que un juez que no ve la fuente produce** (toda claim no
+  verificable se vuelve la siguiente fabricación; al borrarla aparece la
+  siguiente). Dos lecturas posibles, no adjudicadas aún: (i) juez ciego y
+  el doc es en gran parte fiel → arreglar la ventana hace finita la cola y
+  H1 se alcanza; (ii) doc genuinamente fabricado → la ventana corregida
+  confirmaría que H1 es inalcanzable por edición. **Ambas se discriminan con
+  la misma enmienda.**
+- **§2 riesgo (b) activado → decisión del dueño**: enmienda de
+  verificación (ventana = chunk 0 + los chunks que el propio blueprint
+  cita con `[doc:X:Y]`, con recalibración obligatoria: los 4 aprobados
+  actuales deben seguir aprobando con la ventana nueva) **o** cierre de H1
+  con hallazgo 26 documentado. Ninguna corrección de código por mi cuenta.
+- Ruido de red sin efecto: reintentos `gemini2/gemini3 esperando` y
+  `groq devolvio vacio` en juicios y localizadores (rotación §8.12; env y
+  modelo intactos; ningún juicio falló).

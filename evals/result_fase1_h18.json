@@ -1,0 +1,851 @@
+[
+ {
+  "arm": "H18",
+  "technique": "PEARL",
+  "round": 0,
+  "ok": true,
+  "secs": 0.0,
+  "blueprint": "# Blueprint de implementación de **PEARL** para validar el agente antes de cada release  \n\n---  \n\n## 1. Módulos esenciales (cada uno con su propia cita)\n\n| Nº | Módulo | Descripción | Fuente |\n|----|--------|-------------|--------|\n| 1 | **Extracción de subgrafo contextual** | «PEARL first constructs union‑based contextual subgraphs to capture richer structural evidence.» [doc:id:chunk5] — el módulo genera, para cada consulta, un subgrafo que une los vecindarios de las entidades involucradas, proporcionando evidencia estructural más completa. | [doc:id:chunk5] |\n| 2 | **Recuperación de caminos guiada por LLM** | «an LLM‑guided path retrieval module ranks candidate paths and retains the most informative logical evidence.» [doc:id:chunk5] — un LLM evalúa y ordena los caminos relacionales candidatos, conservando solo los más informativos. | [doc:id:chunk5] |\n| 3 | **Contraste dual‑view del subgrafo** | «To alleviate the accompanying noise, a dual‑view subgraph contrastive objective is introduced to preserve invariant structural semantics.» [doc:id:chunk5] — se entrena al modelo con un objetivo contrastivo que mantiene la semántica estructural pese al ruido introducido por la extracción de subgrafos. | [doc:id:chunk5] |\n| 4 | **Alineación camino‑entidad mediante BGNN** | «PEARL explicitly aligns paths with contextual entity nodes and the global subgraph representation through a Bipartite Graph Neural Network (BGNN).» [doc:id:chunk5] — un BGNN conecta cada camino con los nodos de entidad del subgrafo y con la representación global, permitiendo razonamiento condicionado al contexto. | [doc:id:chunk5] |\n| 5 | **Integración al pipeline de validación del agente** | el paper no especifica la integración de PEARL como paso de inferencia que verifica la consistencia de las predicciones del agente antes de cada release. (propuesta del blueprint) | (propuesta del blueprint) |\n| 6 | **Monitoreo y reporte de métricas** | el paper no especifica el registro de métricas de convergencia, Hits@10 y consumo de GPU para comparar cada release contra el histórico. (propuesta del blueprint) | (propuesta del blueprint) |\n\n> **Nota:** Los módulos 5 y 6 son adaptaciones propias del proceso de release; la fuente solo describe la arquitectura subyacente (citas 1‑4).  \n\n---  \n\n## 2. Orden de ejecución y dependencias  \n\n1. **Extracción de subgrafo contextual** → salida: `G_context`.  \n   [doc:id:chunk5]  \n\n2. **Recuperación de caminos guiada por LLM** (usa `G_context` como entrada) → salida: conjunto `P_informative`.  \n   [doc:id:chunk5]  \n\n3. **Contraste dual‑view** (aplica sobre `G_context` para reforzar la representación) → salida: embeddings `H_subgraph`.  \n   [doc:id:chunk5]  \n\n4. **Alineación camino‑entidad (BGNN)** (consume `P_informative` y `H_subgraph`) → salida: vector de razonamiento `z`.  \n   [doc:id:chunk5]  \n\n5. **Inferencia PEARL** (usa `z` para predecir enlaces faltantes) → salida: scores de plausibilidad.  \n   [doc:id:chunk5]  \n\n6. **Validación del agente** (compara los scores con los requisitos de release) → decisión *accept/reject*.  \n   (propuesta del blueprint)  \n\n---  \n\n## 3. Proceso de validación antes de cada release  \n\n1. **Construcción del conjunto de pruebas**: se seleccionan triples de prueba que incluyan entidades nunca vistas durante el entrenamiento del agente.  \n   (propuesta del blueprint)  \n\n2. **Ejecución del pipeline PEARL** (pasos 1‑5).  \n   [doc:id:chunk5]  \n\n3. **Cálculo de métricas**:  \n   - Hits@10, MRR (basado en la salida de PEARL). (propuesta del blueprint)  \n   - Tiempo de pre‑procesamiento (subgrafo + recuperación de caminos). (propuesta del blueprint)  \n   - Consumo de GPU. (propuesta del blueprint)  \n   - Se citan los valores de referencia del paper:  \n     - «PEARL converges faster than most baselines and ultimately attains the highest validation performance.» [doc:id:chunk33] — se usa como referencia el desempeño de Hits@10 reportado en el artículo para aprobar el release. (propuesta del blueprint)  \n     - «The preprocessing time, reported as subgraph extraction time in the table, includes both contextual subgraph construction and LLM‑guided path retrieval.» [doc:id:chunk33] — se registra el tiempo de pre‑procesamiento y se compara con el rango reportado. (propuesta del blueprint)  \n\n4. **Regla de aceptación**: el release pasa si todas las métricas superan los umbrales establecidos basados en los resultados del paper.  \n   (propuesta del blueprint)  \n\n5. **Reporte automático**: generación de un informe que incluye: métricas, consumo de recursos, y un resumen de los caminos más influyentes (extraídos por el LLM).  \n   (propuesta del blueprint)  \n\n---  \n\n## 4. Riesgos y mitigaciones  \n\n| Riesgo | Descripción | Mitigación (propuesta) |\n|--------|-------------|------------------------|\n| **Sobrecarga de LLM en recuperación de caminos** | El LLM puede introducir latencia significativa en el pre‑procesamiento. | «The preprocessing time … includes both contextual subgraph construction and LLM‑guided path retrieval.» [doc:id:chunk33] — limitar el número máximo de caminos evaluados y cachear resultados para consultas recurrentes. (propuesta del blueprint) |\n| **Ruido en subgrafos contextuales** | Subgrafos demasiado grandes pueden degradar la señal útil. | Utilizar el objetivo de contraste dual‑view para filtrar ruido («dual‑view subgraph contrastive objective… preserve invariant structural semantics.») [doc:id:chunk5] (propuesta del blueprint) |\n| **Desalineación entre rutas y contexto** | Caminos idénticos pueden interpretarse de forma distinta según el entorno estructural. | Emplear el BGNN que alinea explícitamente caminos y nodos de entidad («explicitly aligns paths with contextual entity nodes…») [doc:id:chunk5] (propuesta del blueprint) |\n| **Drift de métricas entre releases** | Cambios menores en el agente pueden producir variaciones inesperadas en Hits@10. | Mantener un historial de métricas y aplicar control estadístico (p. ej., pruebas de hipótesis) antes de aprobar. (propuesta del blueprint) |\n| **Dependencia de hardware** | Requerimientos de GPU pueden superar la capacidad disponible. | «PEARL requires the lowest GPU memory on FB15k-237 V1…» [doc:id:chunk33] — aprovechar la eficiencia de memoria reportada y ajustar batch size según disponibilidad. (propuesta del blueprint) |\n\n---  \n\n## 5. Checklist de implementación  \n\n- [ ] Implementar extracción de subgrafo contextual (módulo 1).  \n- [ ] Integrar LLM (API o modelo local) para ranking de caminos (módulo 2).  \n- [ ] Añadir objetivo de contraste dual‑view en la fase de entrenamiento.  \n- [ ] Construir BGNN para alineación camino‑entidad (módulo 4).  \n- [ ] Definir umbrales de aceptación basados en Hits@10 y tiempo de pre‑procesamiento (referencia del paper). (propuesta del blueprint)  \n- [ ] Automatizar generación de informe de validación. (propuesta del blueprint)  \n- [ ] Configurar alertas de riesgo (latencia LLM, uso de GPU). (propuesta del blueprint)  \n\n---  \n\n## 6. Bibliografía  \n\n- Yunchi Yang, Longlong Li, Cunquan Qu. *PEARL: Path‑Entity Aligned Relational Learning with Contextual Subgraphs for Inductive Knowledge Graph Completion*. 2026.   \n\n---  \n\n*Este blueprint respeta estrictamente las reglas de citación establecidas, anclando cada afirmación a fragmentos literales del artículo y marcando las propuestas propias con la etiqueta **(propuesta del blueprint)** en su propia línea.*",
+  "doc_id": 1,
+  "dir": "/mnt/c/Bibliotecario/data/agents/pearl",
+  "loc": {},
+  "checks": {
+   "citas": 0,
+   "citas_resueltas": 0,
+   "comillados": 10,
+   "comillados_literales": 1,
+   "anclas": 0,
+   "b5_con_cita": 6,
+   "b5_total": 10,
+   "b5_sin_cita": [
+    1,
+    3,
+    4,
+    10
+   ],
+   "b5_exentas": 1,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 0,
+   "cumplimiento_b9": 0.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 0,
+    "entradas": 0,
+    "resueltas": 0,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "1. Módulos esenciales (cada uno con su propia cita)",
+   "2. Orden de ejecución y dependencias  ",
+   "3. Proceso de validación antes de cada release  ",
+   "4. Riesgos y mitigaciones  ",
+   "5. Checklist de implementación  ",
+   "6. Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "Procedural Graphs",
+  "round": 0,
+  "ok": true,
+  "secs": 0.0,
+  "blueprint": "## Blueprint de Implementación: Validación de Agente con Procedural Graphs Antes de Cada Release\n\n### Módulos y Dependencias\n\n**Módulo 1: Extracción de Tripletes de Procedimiento**  \nEl marco de Procedural Graph organiza el conocimiento procedimental en tripletes de la forma (procedimiento, relación, procedimiento) para responder a preguntas de qué hacer, de manera análoga a cómo un grafo de conocimiento organiza conocimiento factual en tripletes (entidad, relación, entidad) [doc:0:0].  \nEl proceso específico de extracción automatizada a partir de trayectorias de ejecución no está detallado en el paper; el paper no especifica el algoritmo exacto de extracción.  \n(propuesta del blueprint)\n\n*Dependencia*: Ninguna (módulo inicial).  \n(propuesta del blueprint)\n\n**Módulo 2: Refiner de Éxito vs. Fracaso**  \nComponente para analizar trayectorias de ejecución exitosas y fallidas con el fin de clasificar patrones procedimentales. El paper no menciona un \"failure-vs-success refiner\" ni especifica un componente dedicado a la diferenciación explícita de fallos versus éxitos.  \n(propuesta del blueprint)\n\n*Dependencia*: Módulo 1 (Extracción de Tripletes de Procedimiento).  \n(propuesta del blueprint)\n\n**Módulo 3: Persistencia de Lecciones**  \nMecanismo para almacenar de forma persistente las reglas y lecciones aprendidas sobre secuencias procedimentales. El paper no menciona la \"lessons persistence\" ni define un almacén de lecciones persistidas dentro del framework.  \n(propuesta del blueprint)\n\n*Dependencia*: Módulo 2 (Refiner de Éxito vs. Fracaso).  \n(propuesta del blueprint)\n\n**Módulo 4: Mutación del Grafo**  \nProceso de actualización estructural del grafo (adición, modificación o eliminación de nodos y aristas). El paper no menciona la \"graph mutation\" ni especifica un mecanismo de actualización del grafo mediante mutación o lecciones persistidas.  \n(propuesta del blueprint)\n\n*Dependencia*: Módulo 3 (Persistencia de Lecciones).  \n(propuesta del blueprint)\n\n**Módulo 5: Localización del Nodo Activo y Generación de Guía**  \nEn cada paso de decisión, el framework localiza el nodo activo del agente en el grafo procedimental, y un modelo de guía traduce el subgrafo circundante en guía situacional a nivel de paso que sesga",
+  "doc_id": 2,
+  "dir": "/mnt/c/Bibliotecario/data/agents/procedural-graphs",
+  "loc": {},
+  "checks": {
+   "citas": 1,
+   "citas_resueltas": 0,
+   "comillados": 2,
+   "comillados_literales": 0,
+   "anclas": 0,
+   "b5_con_cita": 1,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    2,
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 3,
+   "b6_completo": false,
+   "b6_motivo": "prosa_cortada",
+   "anclas_en_fuente": 0,
+   "cumplimiento_b9": 0.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 0,
+    "entradas": 0,
+    "resueltas": 0,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación: Validación de Agente con Procedural Graphs Antes de Cada Release"
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 0,
+  "ok": true,
+  "secs": 0.0,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, obligando al agente a considerar herramientas diagnósticas antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n«failure‑vs‑success refiner» (propuesta del blueprint) — (propuesta del blueprint): integrar un módulo que contraste explícitamente las trayectorias de éxito y fracaso en el árbol de búsqueda para extraer lecciones persistentes sobre qué configuraciones, prompts o flujos de trabajo llevaron a resultados válidos o inválidos, alimentando la decisión de release.\n\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n«tool‑driven optimization loop» (propuesta del blueprint) — (propuesta del blueprint): establecer un bucle donde el agente, guiado por el árbol de búsqueda y los advisories, invoque automáticamente herramientas de validación (tests, simulaciones, chequeos de consistencia) solo cuando el árbol indique una necesidad diagnóstica, evitando invocaciones ciegas y enfocando el esfuerzo en zonas de incertidumbre detectadas por ReASearch.\n\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n«state re‑emission» (propuesta del blueprint) — (propuesta del blueprint): asegurar que, tras cada invocación de herramienta o ajuste basado en el árbol de búsqueda, el estado actual del agente (prompts, programas, flujos de ML) sea re‑emitido en el contexto para que la próxima iteración de ReASearch trabaje con información actualizada y coherente, evitando desfases entre el árbol de búsqueda y la realidad del agente.\n\n### Orden de Ejecución (propuesta del blueprint)  \n1. Al iniciar validación pre‑release, cargar historial de ejecuciones recientes como historial plano.  \n2. Construir árbol de búsqueda estructurado (Módulo 1).  \n3. Evaluar señales de estancamiento (Módulo 2); si se detectan, insertar advisory en prompt.  \n4. Ejecutar refinador éxito‑fracaso para extraer lecciones (Módulo 3).  \n5. Basado en árbol y lecciones, decidir si invocar herramientas de validación (Módulo 4).  \n6. Tras invocación, re‑emitir estado actualizado (Módulo 5).  \n7. Repetir hasta que el árbol indique suficiente confianza o se agoten iteraciones de seguridad.  \n8. Solo proceder al release si el árbol muestra convergencia hacia éxito y no hay advisories activos de estancamiento no atendidos.\n\n### Validación del Blueprint (propuesta del blueprint)  \n- **Métrica de éxito**: reducción en releases fallidos debido a problemas no detectados en validación previa (medido por incidencias post‑release atribuibles a fallos de razonamiento o omisión de diagnósticos).  \n- **Mecanismo de verificación**: auditoría de árboles de búsqueda y advisories generados en validaciones pre‑release exitosas vs. fallidas.  \n- **Umbral de aceptación**: cero releases con incidencias vinculadas a fallos de razonamiento que ReASearch debería haber detectado (estancamiento no advertido, contraste éxito‑fracaso ignorado, invocación de herramientas omitida cuando el árbol lo indicaba).\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: Diseñar el advisory como bloqueo suave que requiera acción explícita (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {},
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 5,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 3,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 1,
+  "ok": true,
+  "secs": 1.5,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, obligando al agente a considerar herramientas diagnósticas antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n«tool‑driven optimization loop» (propuesta del blueprint) — (propuesta del blueprint): establecer un bucle donde el agente, guiado por el árbol de búsqueda y los advisories, invoque automáticamente herramientas de validación (tests, simulaciones, chequeos de consistencia) solo cuando el árbol indique una necesidad diagnóstica, evitando invocaciones ciegas y enfocando el esfuerzo en zonas de incertidumbre detectadas por ReASearch.\n\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n«state re‑emission» (propuesta del blueprint) — (propuesta del blueprint): asegurar que, tras cada invocación de herramienta o ajuste basado en el árbol de búsqueda, el estado actual del agente (prompts, programas, flujos de ML) sea re‑emitido en el contexto para que la próxima iteración de ReASearch trabaje con información actualizada y coherente, evitando desfases entre el árbol de búsqueda y la realidad del agente.\n\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n- **Métrica de éxito**: reducción en releases fallidos debido a problemas no detectados en validación previa (medido por incidencias post‑release atribuibles a fallos de razonamiento o omisión de diagnósticos).  \n- **Mecanismo de verificación**: auditoría de árboles de búsqueda y advisories generados en validaciones pre‑release exitosas vs. fallidas.  \n- **Umbral de aceptación**: cero releases con incidencias vinculadas a fallos de razonamiento que ReASearch debería haber detectado (estancamiento no advertido, contraste éxito‑fracaso ignorado, invocación de herramientas omitida cuando el árbol lo indicaba).\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: Diseñar el advisory como bloqueo suave que requiera acción explícita (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 0,
+   "no_localizadas": [],
+   "invalidas": [],
+   "encabezados": [
+    9,
+    18
+   ],
+   "lineas": [],
+   "lineas_encabezado": [
+    9,
+    18
+   ],
+   "salida": "1 -> 9 | ### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n2 -> 18 | ### Orden de Ejecución (propuesta del blueprint)",
+   "mascaradas": 0,
+   "secciones": 2,
+   "lineas_vaciadas": 11,
+   "omitidas": 0,
+   "intento_final": 1
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 4,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 2,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 2,
+  "ok": true,
+  "secs": 2.3,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, obligando al agente a considerar herramientas diagnósticas antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n«state re‑emission» (propuesta del blueprint) — (propuesta del blueprint): asegurar que, tras cada invocación de herramienta o ajuste basado en el árbol de búsqueda, el estado actual del agente (prompts, programas, flujos de ML) sea re‑emitido en el contexto para que la próxima iteración de ReASearch trabaje con información actualizada y coherente, evitando desfases entre el árbol de búsqueda y la realidad del agente.\n\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*  \n- **Mecanismo de verificación**: auditoría de árboles de búsqueda y advisories generados en validaciones pre‑release exitosas vs. fallidas.  \n- **Umbral de aceptación**: cero releases con incidencias vinculadas a fallos de razonamiento que ReASearch debería haber detectado (estancamiento no advertido, contraste éxito‑fracaso ignorado, invocación de herramientas omitida cuando el árbol lo indicaba).\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: Diseñar el advisory como bloqueo suave que requiera acción explícita (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 1,
+   "no_localizadas": [],
+   "invalidas": [],
+   "encabezados": [
+    11
+   ],
+   "lineas": [
+    20
+   ],
+   "lineas_encabezado": [
+    11
+   ],
+   "salida": "1 -> 11 | ### Módulo 4: Bucle de Optimización Dirigida por Herramientas\n2 -> 20 | - **Métrica de éxito**: reducción en releases fallidos debido a problemas no detectados en validación previa (medido por incidencias post‑release atribuibles a fallos de razonamiento o omisión de diagnósticos).",
+   "mascaradas": 1,
+   "secciones": 1,
+   "lineas_vaciadas": 2,
+   "omitidas": 0,
+   "intento_final": 1
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 3,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 1,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 3,
+  "ok": true,
+  "secs": 11.8,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, obligando al agente a considerar herramientas diagnósticas antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n*[contenido retirado: no consta en la fuente]* invocación de herramienta o ajuste basado en el árbol de búsqueda, el estado actual del agente (prompts, programas, flujos de ML) sea re‑emitido en el contexto para que la próxima iteración de ReASearch trabaje con información actualizada y coherente, evitando desfases entre el árbol de búsqueda y la realidad del agente.\n\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*  \n- **Mecanismo de verificación**: auditoría de árboles de búsqueda y advisories generados en validaciones pre‑release exitosas vs. fallidas.  \n- **Umbral de aceptación**: cero releases con incidencias vinculadas a fallos de razonamiento que ReASearch debería haber detectado (estancamiento no advertido, contraste éxito‑fracaso ignorado, invocación de herramientas omitida cuando el árbol lo indicaba).\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: Diseñar el advisory como bloqueo suave que requiera acción explícita (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 1,
+   "no_localizadas": [],
+   "invalidas": [
+    "frase 2: sin entrada en la salida"
+   ],
+   "encabezados": [],
+   "lineas": [
+    14
+   ],
+   "lineas_encabezado": [],
+   "salida": "1 -> 14 | «state re‑emission» (propuesta del blueprint) — (propuesta del blueprint): asegurar que, tras cada",
+   "mascaradas": 1,
+   "secciones": 0,
+   "lineas_vaciadas": 0,
+   "omitidas": 0,
+   "intento_final": 2
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 2,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 4,
+  "ok": true,
+  "secs": 8.5,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, obligando al agente a considerar herramientas diagnósticas antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n*[contenido retirado: no consta en la fuente]* invocación de herramienta o ajuste basado en el árbol de búsqueda, el estado actual del agente (prompts, programas, flujos de ML) sea re‑emitido en el contexto para que la próxima iteración de ReASearch trabaje con información actualizada y coherente, evitando desfases entre el árbol de búsqueda y la realidad del agente.\n\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*  \n- *[contenido retirado: no consta en la fuente]*.  \n- **Umbral de aceptación**: cero releases con incidencias vinculadas a fallos de razonamiento que ReASearch debería haber detectado (estancamiento no advertido, contraste éxito‑fracaso ignorado, invocación de herramientas omitida cuando el árbol lo indicaba).\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: Diseñar el advisory como bloqueo suave que requiera acción explícita (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 2,
+   "no_localizadas": [],
+   "invalidas": [],
+   "encabezados": [],
+   "lineas": [
+    14,
+    20
+   ],
+   "lineas_encabezado": [],
+   "salida": "1 -> 14 | sea re‑emitido en el contexto para que la próxima iteración de ReASearch trabaje con información actualizada y coherente, evitando desfases  \n2 -> 20 | **Mecanismo de verificación**: auditoría de árboles de búsqueda y advisories generados en validaciones pre‑release exitosas vs. fallidas",
+   "mascaradas": 1,
+   "secciones": 0,
+   "lineas_vaciadas": 0,
+   "omitidas": 1,
+   "intento_final": 2
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 2,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 5,
+  "ok": true,
+  "secs": 2.1,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, obligando al agente a considerar herramientas diagnósticas antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n*[contenido retirado: no consta en la fuente]*\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*  \n- *[contenido retirado: no consta en la fuente]*.  \n*[contenido retirado: no consta en la fuente]*\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: Diseñar el advisory como bloqueo suave que requiera acción explícita (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 1,
+   "no_localizadas": [],
+   "invalidas": [],
+   "encabezados": [
+    13
+   ],
+   "lineas": [
+    21
+   ],
+   "lineas_encabezado": [
+    13
+   ],
+   "salida": "1 -> 13 | ### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente\n2 -> 21 | - **Umbral de aceptación**: cero releases con incidencias vinculadas a fallos de razonamiento que ReASearch debería haber detectado (estancamiento no advertido, contraste éxito‑fracaso ignorado, invocación de herramientas omitida cuando el árbol lo indicaba).",
+   "mascaradas": 1,
+   "secciones": 1,
+   "lineas_vaciadas": 2,
+   "omitidas": 0,
+   "intento_final": 1
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 2,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 6,
+  "ok": true,
+  "secs": 44.6,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, *[contenido retirado: no consta en la fuente]* antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n*[contenido retirado: no consta en la fuente]*\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*  \n- *[contenido retirado: no consta en la fuente]*.  \n*[contenido retirado: no consta en la fuente]*\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: Diseñar el advisory como bloqueo suave que requiera acción explícita (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 1,
+   "no_localizadas": [],
+   "invalidas": [
+    "frase 2: eco demasiado corto"
+   ],
+   "encabezados": [],
+   "lineas": [
+    7
+   ],
+   "lineas_encabezado": [],
+   "salida": "[1] -> 7 | obligando al agente a considerar herramientas diagnósticas\n[2] -> 28 | Vincular",
+   "mascaradas": 1,
+   "secciones": 0,
+   "lineas_vaciadas": 0,
+   "omitidas": 0,
+   "intento_final": 2
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 2,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 7,
+  "ok": true,
+  "secs": 25.5,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n*[contenido retirado: no consta en la fuente]*\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, *[contenido retirado: no consta en la fuente]* antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n*[contenido retirado: no consta en la fuente]*\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*  \n- *[contenido retirado: no consta en la fuente]*.  \n*[contenido retirado: no consta en la fuente]*\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: Diseñar el advisory como bloqueo suave que requiera acción explícita (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 0,
+   "no_localizadas": [],
+   "invalidas": [
+    "frase 2: el eco no aparece en la línea 26"
+   ],
+   "encabezados": [
+    1
+   ],
+   "lineas": [],
+   "lineas_encabezado": [
+    1
+   ],
+   "salida": "1 -> 1 | ## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente  \n2 -> 26 | Mitigación: Diseñar el advisory como bloqueo suave que requiera acción explícita (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.",
+   "mascaradas": 0,
+   "secciones": 1,
+   "lineas_vaciadas": 1,
+   "omitidas": 0,
+   "intento_final": 2
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 2,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 8,
+  "ok": true,
+  "secs": 10.0,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n*[contenido retirado: no consta en la fuente]*\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, *[contenido retirado: no consta en la fuente]* antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n*[contenido retirado: no consta en la fuente]*\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*  \n- *[contenido retirado: no consta en la fuente]*.  \n*[contenido retirado: no consta en la fuente]*\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: *[contenido retirado: no consta en la fuente]* (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 1,
+   "no_localizadas": [],
+   "invalidas": [],
+   "encabezados": [
+    1
+   ],
+   "lineas": [
+    26
+   ],
+   "lineas_encabezado": [
+    1
+   ],
+   "salida": "1 -> 26 | Diseñar el advisory como bloqueo suave que requiera acción explícita\n2 -> 1 | ## Blueprint de Implementación de",
+   "mascaradas": 1,
+   "secciones": 0,
+   "lineas_vaciadas": 0,
+   "omitidas": 1,
+   "intento_final": 2
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 2,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 9,
+  "ok": true,
+  "secs": 123.5,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n*[contenido retirado: no consta en la fuente]*\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): *[contenido retirado: no consta en la fuente]* que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, *[contenido retirado: no consta en la fuente]* antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n*[contenido retirado: no consta en la fuente]*\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*  \n- *[contenido retirado: no consta en la fuente]*.  \n*[contenido retirado: no consta en la fuente]*\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: *[contenido retirado: no consta en la fuente]* (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 1,
+   "no_localizadas": [],
+   "invalidas": [
+    "frase 2: eco demasiado corto"
+   ],
+   "encabezados": [],
+   "lineas": [
+    4
+   ],
+   "lineas_encabezado": [],
+   "salida": "1 -> 4 | convertir el historial plano de ejecuciones del agente en un árbol de búsqueda estructurado\n2 -> 26 | **Mitigación",
+   "mascaradas": 1,
+   "secciones": 0,
+   "lineas_vaciadas": 0,
+   "omitidas": 0,
+   "intento_final": 2
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 2,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "ReASearch",
+  "round": 10,
+  "ok": true,
+  "secs": 23.8,
+  "blueprint": "## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n*[contenido retirado: no consta en la fuente]*\n### Módulo 1: Estructura de Árbol de Búsqueda para Historial de Ejecuciones  \n«Structured search-tree review. review search tree turns flat history into branch concentration, family distribution, and plateau signals, so the agent reads search history as structure rather than as TSV rows.» [doc:4:65] — (propuesta del blueprint): *[contenido retirado: no consta en la fuente]* que permita identificar patrones de éxito/fallo, concentración de ramas y señales de estancamiento antes de cada release.\n\n### Módulo 2: Detector de Estancamiento con Advisory Automático  \n«Unconditional stagnation advice. After 3+ and 7+ flat evaluations, a stagnation advisory is inserted directly into the prompt.» [doc:4:65] — (propuesta del blueprint): implementar un monitor que detecte 3 o más evaluaciones planas (sin mejora) y 7+ para disparar un advisory automático en el prompt, *[contenido retirado: no consta en la fuente]* antes de proseguir con el release.\n\n### Módulo 3: Refinador de Contraste Éxito‑Fallo  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 4: Bucle de Optimización Dirigida por Herramientas  \n*[contenido retirado: no consta en la fuente]*\n### Módulo 5: Re‑emisión de Estado para Retroalimentación Coherente  \n*[contenido retirado: no consta en la fuente]*\n### Orden de Ejecución (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n### Validación del Blueprint (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*  \n- *[contenido retirado: no consta en la fuente]*.  \n*[contenido retirado: no consta en la fuente]*\n\n### Riesgos y Mitigaciones  \n- **Riesgo**: Sobrecarga de prompt por advisories y estructura de árbol.  \n  **Mitigación**: Limitar profundidad del árbol y usar resúmenes jerárquicos; solo mostrar ramas relevantes al contexto actual (basado en family distribution).  \n- **Riesgo**: El agente ignore el advisory de estancamiento por sobreconfianza.  \n  **Mitigación**: *[contenido retirado: no consta en la fuente]* (ej. invocar una herramienta diagnóstica) antes de continuar, no como mera sugerencia.  \n- **Riesgo**: Árbol de búsqueda se vuelva obsoleto si el estado del agente cambia durante la validación.  \n  **Mitigación**: Vincular estrictamente cada nodo del árbol a un hash de estado; re‑emisión de estado (Módulo 5) debe invalidar nodos basados en estados antiguos.  \n- **Riesgo**: Falta de herramientas diagnósticas adecuadas para invocar.  \n  **Mitigación**: *[contenido retirado: no consta en la fuente]*\n\n## Bibliografía  \nThe Optimizer Is the Agent: Reasoning‑Driven Search across Prompts, Programs, and ML Workflows [doc:4] — no consta en la fuente (autores y año no visibles en los chunks proporcionados)",
+  "doc_id": 4,
+  "dir": "/mnt/c/Bibliotecario/data/agents/reasearch",
+  "loc": {
+   "frases": 2,
+   "validas": 1,
+   "no_localizadas": [],
+   "invalidas": [],
+   "encabezados": [
+    1
+   ],
+   "lineas": [
+    30
+   ],
+   "lineas_encabezado": [
+    1
+   ],
+   "salida": "1 -> 1 | ## Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente\n2 -> 30 | Pre‑registrar un catálogo de herramientas válidas (tests de unidad, simulaciones de entorno, chequeos de drift) y validar que el árbol solo invoque de ese catálogo.",
+   "mascaradas": 1,
+   "secciones": 0,
+   "lineas_vaciadas": 0,
+   "omitidas": 1,
+   "intento_final": 1
+  },
+  "checks": {
+   "citas": 2,
+   "citas_resueltas": 2,
+   "comillados": 2,
+   "comillados_literales": 2,
+   "anclas": 2,
+   "b5_con_cita": 2,
+   "b5_total": 5,
+   "b5_sin_cita": [
+    3,
+    4,
+    5
+   ],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 2,
+   "cumplimiento_b9": 1.0,
+   "frases_largas_copiadas": 0,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 1,
+    "por_titulo": 0
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de ReASearch para Validación Pre‑Release del Agente",
+   "Bibliografía  "
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "Task-CoEvolve",
+  "round": 0,
+  "ok": true,
+  "secs": 0.0,
+  "blueprint": "## Blueprint de Implementación: Técnica Task-CoEvolve para Validación Pre-Release del Agente\n\n### Módulos y Dependencias\n\n**Módulo 1: Inicialización del Historial**  \n- **Dependencia**: Ninguna (inicio del proceso)  \n- **Acción**: Evaluar dos harnesses iniciales (p. ej., harness base y primera variante) sobre el conjunto completo de tareas de validación *T*.  \n- **Cita**: «evaluate two starting harnesses on the full task set T . These runs are not an extra cost of our method: harness optimization needs them in any case, because the meta-agent writes its first candidate on top of them. We reuse their outcomes as the initial history, so that every task already has a success rate ¯pt when the first subset is drawn.» [doc:0:13] — Se reutilizan las evaluaciones iniciales para construir el historial de éxito por tarea antes de comenzar la selección adaptativa.  \n- **Salida**: Historial inicial con ¯pt (tasa media de éxito) y nt (número de evaluaciones) para cada tarea *t* ∈ *T*.\n\n**Módulo 2: Selección de Tareas por Varianza Ponderada**  \n- **Dependencia**: Módulo 1 (historial inicial)  \n- **Acción**: En cada iteración *k*, calcular el peso de muestreo *w_t* para cada tarea *t* usando:  \n  *w_t* = max( *p̄_t*(1 − *p̄_t*), ℓ_t ) + λ/√*n_t*  \n  donde ℓ_t = 0.125 si *n_t* = 0 (tarea nunca resuelta), else 0; λ = 0.025.  \n  Seleccionar un subconjunto *S_k* ⊂ *T* de tamaño *m* = ⌈ρ|T|⌉ mediante muestreo probabilístico proporcional a *w_t*.  \n- **Cita**: «We define the sampling weight for task t as follows: wt = max( p̄t(1 − p̄t), ℓt ) + λ/√nt . (2) The first term represents the Bernoulli variance, which is largest at p̄t = 0.5 and becomes zero when the task is always solved or always failed. The floor ℓt equals a small positive constant ℓfor tasks that have never been solved and 0 otherwise, because a task nobody has solved may still become solvable as the harness improves. The second term, λ/√nt, gives a larger weight to tasks with fewer [...]» [doc:0:14] — El peso combina varianza de Bernoulli (informatividad) y bonificación por incertidumbre (pocas evaluaciones).  \n- **Salida**: Subconjunto de validación *S_k* para la iteración *k*.\n\n**Módulo 3: Estimación del Score Full-Set mediante Hájek (Diferencia Anclada)**  \n- **Dependencia**: Módulo 2 (subconjunto *S_k*) y Módulo 1 (historial *p̄_t*, *n_t*)  \n- **Acción**: Para cada candidato de harness *h* evaluado en *S_k*, estimar su score en el conjunto completo *T* usando:  \n  *Ŝ(h)* = (1/|T|) Σ_{t∈T} *p̄_t* + (1/|T|) Σ_{t∈S_k} [ *x_t(h)* − *p̄_t* ] / *π_t*  \n  donde *x_t(h)* ∈ {0,1} es el resultado en tarea *t* para *h*, y *π_t* = *w_t* / Σ_{t'∈T} *w_{t'}* es la probabilidad de muestreo de *t*.  \n  (Nota: El paper usa una forma anclada para evitar varianza alta cuando *π_t* es pequeño; la ecuación (4) es la versión establecida).  \n- **Cita**: «Anchored difference estimation when they sit near the middle. Otherwise a consistently solved task with a tiny πt is occasionally sampled and its term xt(h)/πt dominates Equation (3). We therefore weight not the outcome but its deviation from an anchor p̄t, the historical success rate of task t: Ŝ(h) = 1/N Σ_{t∈T} p̄t + 1/N Σ_{t∈S_k} [x_t(h) − p̄t]/πt . (4) The anchor is fixed before sampling, so it cancels in expectation.» [doc:0:15] — Se usa la desviación respecto al historial como estimador no sesgado y estable.  \n- **Salida**: Score estimado *Ŝ(h)* para cada candidato *h*, comparable entre iteraciones pese a subconjuntos diferentes.\n\n**Módulo 4: Selección Final por S-máximo**  \n- **Dependencia**: Módulo 3 (scores estimados *Ŝ(h)* para todos los candidatos en todas las iteraciones)  \n- **Acción**: Tras completar todas las iteraciones de optimización (p. ej., 10 iteraciones), seleccionar el harness *h* con el mayor *Ŝ(h)*. En caso de empate exacto, elegir el de iteración más temprana.  \n- **Cita**: «Phase 3: Final Selection. After optimization, we select the candidate with the highest estimated full-set score Ŝ(h) as the final harness, breaking exact ties in favor of the earliest iteration.» [doc:0:13] — Selección determinista basada en el mejor desempeño estimado en el conjunto completo, con desempate por antigüedad.  \n- **Salida**: Harness final validado y listo para release.\n\n### Orden de Ejecución\n1. Módulo 1 → 2. Módulo 2 → 3. Módulo 3 → 4. Módulo 4  \n*(Iterativo: los módulos 2 y 3 se repiten en cada iteración de optimización del harness)*\n\n### Validación del Blueprint\n- **Consistencia con la fuente**: Cada paso está anclado a citas literales del paper, sin añadir lógica no especificada.  \n- **Viabilidad**: Usa solo los componentes descritos (varianza de Bernoulli, Hájek anclado, S-máximo).  \n- **Objetivo cumplido**: Permite validar el agente antes de cada release mediante optimización eficiente del harness con costo reducido de evaluación, manteniendo comparabilidad entre iteraciones.\n\n### Riesgos y Mitigaciones\n| Riesgo | Descripción | Mitigación (basada en fuente) |\n|--------|-------------|-------------------------------|\n| Sobreajuste al subconjunto | Si se reusa el mismo subconjunto, el harness se optimiza solo para esas tareas. | La selección varianza-ponderada cambia *S_k* cada iteración según el historial, evitando sobreajuste. [doc:0:12] — «Reusing a fixed subset invites overfitting [...] Resampling it every iteration avoids this» |\n| Scores no comparables entre iteraciones | Dificultad variable de *S_k* hace que las medias crudas no sean comparables. | La estimación full-set mediante diferencia anclada (ecuación 4) corrige por probabilidades de muestreo, haciendo scores comparables. [doc:0:12] — «the raw subset mean then depends on the difficulty of the sampled tasks, so scores from different iterations are no longer comparable» → [doc:0:15] — solución con anclaje y ponderación por 1/π_t |\n| Varianza alta en estimación | Tareas con *π_t* muy pequeño pueden generar estimadores inestables. | El anclaje usando *p̄_t* y la forma de diferencia *x_t(h) − p̄_t* reduce la varianza. [doc:0:15] — «We therefore weight not the outcome but its deviation from an anchor p̄t» |\n| Parámetros no especificados (ρ, número de iteraciones) | El paper no fija ρ ni el número de iteraciones para todos los casos. | Usar valores empíricos de la tabla D (ρ = 7% o 20%) y seguir el setup experimental (10 iteraciones en Tabla E). [doc:0:14] — Table D muestra ρ = 7%, 20%; [doc:0:13] — «ten iterations» en Tabla E |\n\n### Bibliografía\n- Miyai, A., Aizawa, K., & Yamasaki, T. (2026). Task-CoEvolve: Efficient Harness Optimization via Adaptive Validation Task Selection. The University of Tokyo. [doc:0]  \n\n*(Nota: Todos los chunks provienen del mismo documento [doc:0], por lo que se lista una única entrada con el año y afiliación tal como aparecen en el fuente.)*",
+  "doc_id": 3,
+  "dir": "/mnt/c/Bibliotecario/data/agents/task-coevolve",
+  "loc": {},
+  "checks": {
+   "citas": 10,
+   "citas_resueltas": 0,
+   "comillados": 7,
+   "comillados_literales": 2,
+   "anclas": 4,
+   "b5_con_cita": 4,
+   "b5_total": 20,
+   "b5_sin_cita": [
+    1,
+    2,
+    3,
+    5,
+    6,
+    7,
+    8,
+    10,
+    11,
+    12,
+    13,
+    15,
+    16,
+    17,
+    18,
+    20
+   ],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 0,
+   "cumplimiento_b9": 0.4,
+   "frases_largas_copiadas": 0,
+   "atribucion": 1,
+   "declara_silencios": 1,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 0,
+    "por_titulo": 1
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación: Técnica Task-CoEvolve para Validación Pre-Release del Agente"
+  ]
+ },
+ {
+  "arm": "H18",
+  "technique": "WikiSkill",
+  "round": 0,
+  "ok": true,
+  "secs": 0.0,
+  "blueprint": "## Blueprint de Implementación de WikiSkill para Validación Pre-Release\n\n### Módulos y Dependencias\n\n**Módulo 1: Inference Agent**  \n«During the training rollouts, the Inference Agent is restricted from accessing the Wiki Layer, as our ablation study (§5.1) shows that allowing wiki access during training negatively affects skill development.» [doc:0:13] — El agente ejecuta tareas usando solo las habilidades activas (`skills/`) sin acceso a la wiki durante el entrenamiento para evitar sesgos en el desarrollo de habilidades.  \nDependencia: Acceso a entorno de ejecución y herramientas `U` para generar trazas inmutables en `raw/`.\n\n**Módulo 2: Wiki Maintainer**  \n«The Wiki Maintainer (§3.2.2) analyzes these raw traces alongside the existing wiki/ layer to diagnose failures and extract successful strategies, updating the persistent pattern catalog and evolution logs.» [doc:0:13] — Analiza las trazas de ejecución (`raw/`) y la wiki existente (`wiki/`) para identificar patrones de éxito y fracaso, actualizando el catálogo de patrones y los logs de evolución.  \nDependencia: Acceso de lectura a `raw/` y `wiki/`, y escritura en `wiki/` (logs y patrones).\n\n**Módulo 3: Skill Proposer**  \n«The Skill Proposer (§3.2.3) then reviews the updated wiki and reads execution traces from the latest iteration to generate or modify candidate skills in skills/.» [doc:0:13] — Revisa la wiki actualizada y las trazas de entrenamiento para proponer actualizaciones de habilidades (nuevas o parches) en `skills/`.  \nDependencia: Acceso de lectura a `wiki/` y `raw/` (trazas del último entrenamiento), y escritura en `skills/`.\n\n**Módulo 4: Gating and Rollback**  \n«Once a proposal 𝑃𝑘is generated, it is applied to the workspace to yield a candidate skill set 𝑆′\n𝑘=Apply(𝑆𝑘−1, 𝑃𝑘). The system evaluates 𝑆′\n𝑘on the validation split Dval, obtaining validation traces Tval,𝑘 and score R(Tval,𝑘).» [doc:0:16] — Aplica la propuesta de habilidad al conjunto actual, evalúa en el conjunto de validación (`Dval`) y acepta solo si mejora el puntaje histórico (`R(Tval,𝑘) > Rbest`).  \nDependencia: Acceso a `skills/` (para aplicar propuesta), entorno de validación, y registro de `Rbest` (umbral de desempeño histórico).\n\n### Orden de Ejecución (Iterativo)\n1. **Inference Agent** ejecuta rollouts en el conjunto de entrenamiento → genera trazas inmutables en `raw/`.  \n2. **Wiki Maintainer** analiza `raw/` + `wiki/` → actualiza `wiki/` (patrones y logs).  \n3. **Skill Proposer** lee `wiki/` (actualizada) + `raw/` (último entrenamiento) → propone cambios en `skills/`.  \n4. **Gating and Rollback** aplica propuesta → evalúa en `Dval` → acepta si `R(Tval,𝑘) > Rbest` (actualiza `Rbest` y `Sₖ`) o revierte si no mejora.  \n5. Repetir para la siguiente iteración (`k+1`).\n\n### Validación\n- **Validación interna**: En cada iteración, el módulo de *Gating and Rollback* valida la propuesta de habilidad exclusivamente en el conjunto de validación (`Dval`) usando la métrica `R(Tval,𝑘)`.  \n- **Criterio de aceptación**: La propuesta se acepta solo si `R(Tval,𝑘) > Rbest`, donde `Rbest` es el mejor puntaje histórico en validación (inicializado antes del primer ciclo).  \n- **Rollback automático**: Si la propuesta no mejora `Rbest`, el conjunto de habilidades se revierte a `Sₖ₋�` y `Rbest` permanece sin cambios.  \n*[contenido retirado: no consta en la fuente]*\n\n### Riesgos\n*[contenido retirado: no consta en la fuente]* [doc:0:9]\n- **Latencia en la retroalimentación**: (propuesta del blueprint)  \n*[contenido retirado: no consta en la fuente]*\n*[contenido retirado: no consta en la fuente]*\n\n## Bibliografía\nTang, Liyan; Rashtchian, Cyrus; Ferng, Chun-Sung; Tomkins, Andrew; Juan, Da-Cheng; Vu, Tu. WikiSkill: Compiling Agent Experience into Persistent Knowledge for Skill Evolution. 2026. [doc:0]  \nQwen Team. Qwen-3.5-4B/9B-Instruct. 2026a. [doc:0]  \nQwen Team. Qwen-3.6-27B. 2026b. [doc:0]  \nGemma Team. Gemma-4-31B-It. 2026. [doc:0]  \nGoogle DeepMind. Gemini-3.5-Flash. 2026. [doc:0]  \nKwon, et al. vLLM framework. 2023. [doc:0]  \nAgrawal, et al. GEPA. 2026. [doc:0]  \nYang, et al. Specialized skill-evolution pipelines outperform general prompt optimization. 2026. [doc:0]  \n\n---  \n*[contenido retirado: no consta en la fuente]*",
+  "doc_id": 5,
+  "dir": "/mnt/c/Bibliotecario/data/agents/wikiskill",
+  "loc": {},
+  "checks": {
+   "citas": 5,
+   "citas_resueltas": 0,
+   "comillados": 4,
+   "comillados_literales": 2,
+   "anclas": 4,
+   "b5_con_cita": 4,
+   "b5_total": 4,
+   "b5_sin_cita": [],
+   "b5_exentas": 0,
+   "b6_completo": true,
+   "b6_motivo": "",
+   "anclas_en_fuente": 0,
+   "cumplimiento_b9": 0.8,
+   "frases_largas_copiadas": 1,
+   "atribucion": 0,
+   "declara_silencios": 0,
+   "biblio": {
+    "seccion": 1,
+    "entradas": 1,
+    "resueltas": 0,
+    "por_titulo": 1
+   }
+  },
+  "encabezados": [
+   "Blueprint de Implementación de WikiSkill para Validación Pre-Release",
+   "Bibliografía"
+  ]
+ }
+]
