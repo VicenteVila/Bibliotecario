@@ -250,14 +250,19 @@ def fase_captura(script: str, workspace: Path, out: Path,
 
 
 def fase_replay(pi_file: Path, workspace: Path, out: Path,
-                display: str) -> dict:
+                display: str, dur_ms: int | None = None) -> dict:
     doc = json.loads(pi_file.read_text(encoding="utf-8"))
     errs = pi_schema.validar_pi(doc)
     plan = pi_schema.pi_a_xdotool(doc)
-    dur = pi_schema.duracion_ms(doc) / 1000.0
+    # HITO16 §1.5: con Π vacío (demo idle de control) la duración del propio
+    # trazo es 0 y la grabación no alcanzaría los ≥10 frames; se fuerza un
+    # suelo con --dur-ms sin tocar el formato congelado.
+    efectiva = max(pi_schema.duracion_ms(doc), int(dur_ms or 0))
+    dur = efectiva / 1000.0
     argv_x, env_x_base = _xdotool()
     rep: dict = {"fase": "replay", "pi": str(pi_file), "eventos": len(plan),
                  "duracion_ms": pi_schema.duracion_ms(doc),
+                 "duracion_grab_ms": efectiva,
                  "errores_schema": errs}
     if errs:
         rep["ok"] = False
@@ -397,6 +402,8 @@ def main() -> int:
     ap.add_argument("--display", choices=["xfvb", "system"],
                     default="xfvb")
     ap.add_argument("--workspace", default=str(DEFAULT_WORKSPACE))
+    ap.add_argument("--dur-ms", type=int, default=None,
+                    help="suelo de duración de grabación en ms (Π vacío)")
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -421,7 +428,8 @@ def main() -> int:
         if not pi_file.exists():
             raise SystemExit(f"Π inexistente: {pi_file}")
         print(f"[B2] replay {pi_file} ...", flush=True)
-        r = fase_replay(pi_file, workspace, out, args.display)
+        r = fase_replay(pi_file, workspace, out, args.display,
+                        dur_ms=args.dur_ms)
         informes.append(r)
         print(f"  -> ok={r.get('ok')} frames={r.get('frames')} "
               f"negros={r.get('frames_negros')} "

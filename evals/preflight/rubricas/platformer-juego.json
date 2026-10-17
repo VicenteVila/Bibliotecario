@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "tarea": "platformer-juego",
+  "fuente": "benchmark/game_tasks.yaml (ReaGame) — instrucción congelada de la tarea",
+  "oculta": true,
+  "nota": "RUBRICA OCULTA B-2 — el agente no la ve (hallazgo 13). Vive en evals/, jamas se copia al workspace.",
+  "pesos": {"D": 0.35, "V": 0.15, "A": 0.35},
+  "items": [
+    {
+      "id": "B2-D-01",
+      "categoria": "D",
+      "texto": "El jugador se mueve horizontalmente por la escena durante el replay",
+      "anclajes": {
+        "0": "No se observa ningun desplazamiento horizontal del avatar en ningun frame",
+        "0.5": "Se observa desplazamiento, pero minimo o dudoso (1-2 px entre frames)",
+        "1": "El avatar claramente desplaza varios pixeles a lo largo del replay"
+      },
+      "aplica": "max",
+      "tope": 1.0,
+      "presencia": true
+    },
+    {
+      "id": "B2-D-02",
+      "categoria": "D",
+      "texto": "El jugador salta: desplazamiento vertical ascendente con posterior caida",
+      "anclajes": {
+        "0": "Ningun salto visible en todo el replay",
+        "0.5": "Movimiento vertical presente pero sin arco de salto claro",
+        "1": "Al menos un salto con arco completo visible (sube y vuelve a caer)"
+      },
+      "aplica": "max",
+      "tope": 1.0,
+      "presencia": true
+    },
+    {
+      "id": "B2-D-03",
+      "categoria": "D",
+      "texto": "El jugador colisiona y se apoya en plataformas/suelo (no atraviesa)",
+      "anclajes": {
+        "0": "El avatar atraviesa la geometria o flota en el aire",
+        "0.5": "Contacto esporadico o dudoso",
+        "1": "Contacto estable y fisicamente coherente con suelo/plataforma"
+      },
+      "aplica": "mean",
+      "tope": 1.0,
+      "presencia": true
+    },
+    {
+      "id": "B2-D-04",
+      "categoria": "D",
+      "texto": "La camara o el escenario acompañan al jugador (el mundo no es un cuadro fijo sin relacion con la accion)",
+      "anclajes": {
+        "0": "Nada acompaña al jugador; escenario puramente estatico e indiferente",
+        "0.5": "Relacion parcial o ambigu",
+        "1": "La camara sigue al jugador o el escenario avanza con la accion"
+      },
+      "aplica": "mean",
+      "tope": 1.0,
+      "presencia": true
+    },
+    {
+      "id": "B2-D-05",
+      "categoria": "D",
+      "texto": "Hay una meta/objetivo de nivel visible o representado en escena",
+      "anclajes": {
+        "0": "No se observa objetivo ni meta alguna",
+        "0.5": "Elemento ambiguo que podria ser meta (bandera/puerta no clara)",
+        "1": "Meta/objetivo claramente representado en la escena"
+      },
+      "aplica": "max",
+      "tope": 1.0,
+      "presencia": false
+    },
+    {
+      "id": "B2-D-06",
+      "categoria": "D",
+      "texto": "Hay objetos coleccionables (monedas u otros) en la escena",
+      "anclajes": {
+        "0": "Ningun objeto coleccionable visible",
+        "0.5": "Objetos presentes pero ambiguos o sin legibilidad de coleccion",
+        "1": "Monedas/objetos claramente coleccionables visibles"
+      },
+      "aplica": "max",
+      "tope": 1.0,
+      "presencia": false
+    },
+    {
+      "id": "B2-V-01",
+      "categoria": "V",
+      "texto": "HUD visible con texto o numeros (puntos, vidas, estado)",
+      "anclajes": {
+        "0": "Sin HUD visible en ningun frame",
+        "0.5": "HUD presente pero minimo o parcialmente oculto",
+        "1": "HUD completo y legible en pantalla"
+      },
+      "aplica": "mean",
+      "tope": 0.5,
+      "presencia": true
+    },
+    {
+      "id": "B2-V-02",
+      "categoria": "V",
+      "texto": "El avatar esta claramente identificable como entidad jugable",
+      "anclajes": {
+        "0": "No se distingue jugador alguno",
+        "0.5": "Presente pero poco distinguible del fondo",
+        "1": "Jugador nitido y distinguible"
+      },
+      "aplica": "mean",
+      "tope": 1.0,
+      "presencia": true
+    },
+    {
+      "id": "B2-V-03",
+      "categoria": "V",
+      "texto": "La escena muestra geometria de plataformas/suelo visible",
+      "anclajes": {
+        "0": "Sin suelo ni plataformas visibles",
+        "0.5": "Geometria parcial o apenas visible",
+        "1": "Suelo y plataformas claramente visibles"
+      },
+      "aplica": "mean",
+      "tope": 1.0,
+      "presencia": true
+    },
+    {
+      "id": "B2-V-04",
+      "categoria": "V",
+      "texto": "La accion principal no queda tapada por UI ni elementos superpuestos",
+      "anclajes": {
+        "0": "La UI tapa la accion constantemente",
+        "0.5": "Solapamientos parciales que estorban a veces",
+        "1": "Accion siempre visible, sin estorbos"
+      },
+      "aplica": "mean",
+      "tope": 1.0,
+      "presencia": false
+    },
+    {
+      "id": "B2-V-05",
+      "categoria": "V",
+      "texto": "Hay formas, sprites o actores renderizados en pantalla (no un lienzo vacio)",
+      "anclajes": {
+        "0": "Lienzo sin contenido de juego renderizado",
+        "0.5": "Contenido minimo o residual",
+        "1": "Escena con contenido de juego renderizado de forma consistente"
+      },
+      "aplica": "mean",
+      "tope": 0.5,
+      "presencia": true
+    },
+    {
+      "id": "B2-A-01",
+      "categoria": "A",
+      "texto": "Coherencia cromatica entre fondo, plataformas, avatar y HUD",
+      "anclajes": {
+        "0": "Paletas chocantes o ilegibles entre si",
+        "0.5": "Coherencia parcial",
+        "1": "Paleta integrada y legible"
+      },
+      "aplica": "mean",
+      "tope": 1.0,
+      "presencia": false
+    },
+    {
+      "id": "B2-A-02",
+      "categoria": "A",
+      "texto": "La escena esta compuesta intencionalmente (fondo + plataformas + actores, no un vacio)",
+      "anclajes": {
+        "0": "Sin composicion de escena perceptible",
+        "0.5": "Composicion basica o esqueletica",
+        "1": "Escena con capas y elementos compuestos"
+      },
+      "aplica": "mean",
+      "tope": 0.5,
+      "presencia": true
+    },
+    {
+      "id": "B2-A-03",
+      "categoria": "A",
+      "texto": "La demostracion se ve viva: el avatar o la escena se animan/mueven",
+      "anclajes": {
+        "0": "Todo estatico en los N frames (imagen congelada)",
+        "0.5": "Movimiento minimo entre frames",
+        "1": "Animacion o movimiento claramente percibible entre frames"
+      },
+      "aplica": "mean",
+      "tope": 1.0,
+      "presencia": true
+    },
+    {
+      "id": "B2-A-04",
+      "categoria": "A",
+      "texto": "Las acciones del jugador tienen feedback visual (el salto/movimiento se ve reflejado)",
+      "anclajes": {
+        "0": "Sin feedback visual de accion alguna",
+        "0.5": "Feedback parcial o ambiguo",
+        "1": "Feedback claro por accion (salto, desplazamiento)"
+      },
+      "aplica": "max",
+      "tope": 1.0,
+      "presencia": false
+    }
+  ]
+}
