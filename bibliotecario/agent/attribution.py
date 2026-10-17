@@ -490,14 +490,17 @@ def parse_localizador(salida: str, blueprint: str,
     de frase y destino — la deriva medida en las salidas crudas de H9).
 
     Devuelve `validas` (números de línea ya saneados), `no_localizadas`,
-    `invalidas` (motivos legibles para el feedback), `lineas` (frase→línea)
-    y `encabezados` (encabezados con eco válido, materia prima de M5b).
+    `invalidas` (motivos legibles para el feedback), `lineas` (frase→línea),
+    `encabezados` (encabezados con eco válido, materia prima de M5b) y
+    `ecos` (línea→eco normalizado de las entradas de cuerpo — materia prima
+    de la máscara quirúrgica, HITO11 §1.A).
     """
     lines = blueprint.splitlines()
     validas: dict[str, int] = {}
     no_loc: list[int] = []
     invalidas: list[str] = []
     encabs: list[int] = []
+    ecos: dict[int, str] = {}
     resueltas: set[int] = set()   # frases ya con entrada válida (o «-» o enc.)
     vistas: set[int] = set()      # frases con CUALQUIER entrada parseada
     pat_cab = re.compile(
@@ -565,6 +568,7 @@ def parse_localizador(salida: str, blueprint: str,
             resueltas.add(n_f)
             continue
         validas[str(n_f)] = ln_i
+        ecos[ln_i] = eco_norm
         resueltas.add(n_f)
     if entradas == 0:
         invalidas.append("salida sin líneas parseables «N -> M | eco»")
@@ -576,7 +580,8 @@ def parse_localizador(salida: str, blueprint: str,
             "no_localizadas": no_loc,
             "invalidas": invalidas,
             "lineas": {int(k): v for k, v in validas.items()},
-            "encabezados": sorted(set(encabs))}
+            "encabezados": sorted(set(encabs)),
+            "ecos": ecos}
 
 
 def marcar_lineas(blueprint: str, lineas: list[int]) -> tuple[str, dict]:
@@ -630,8 +635,31 @@ def _mascara_con_punteros(origen: str) -> str:
     return MASCARA + (" " + " ".join(extra) if extra else "")
 
 
+def _span_mask(cuerpo: str, eco: str) -> str | None:
+    """HITO11 §1.A: reemplaza SOLO la ocurrencia del eco por MASCARA
+    (máscara quirúrgica — `len(eco)` de costo, no la línea entera).
+    Literal primero; si solo difieren en espacios, regex `\\s+`.
+    Devuelve `None` si el eco no aparece (fallback = línea completa)."""
+    if not eco:
+        return None
+    if eco in cuerpo:
+        resto = cuerpo.replace(eco, MASCARA, 1)
+    else:
+        pat = r"\s+".join(re.escape(t) for t in eco.split())
+        m = re.search(pat, cuerpo) if pat else None
+        if not m:
+            return None
+        resto = cuerpo[:m.start()] + MASCARA + cuerpo[m.end():]
+    faltan = [f"[doc:{a}:{b}]" for a, b in _POINTER.findall(cuerpo)
+              if f"[doc:{a}:{b}]" not in resto]
+    if faltan:
+        resto += " " + " ".join(faltan)
+    return resto
+
+
 def editar_m5(blueprint: str, lineas: list[int],
-              encabezados: list[int]) -> tuple[str, dict]:
+              encabezados: list[int],
+              ecos: dict[int, str] | None = None) -> tuple[str, dict]:
     """M5 completa (HITO8 §1): M5a sobre líneas + M5b sobre cuerpos de
     encabezados, en UN solo pas sobre los índices originales (máscaras y
     vaciados no se pisan ni se desplazan entre sí).
@@ -640,6 +668,9 @@ def editar_m5(blueprint: str, lineas: list[int],
     `encabezados`: números 1-based de encabezados cuyo cuerpo (hasta el
     siguiente `#`) se vacía en una sola línea de plantilla con los punteros
     de todo el cuerpo. El encabezado nunca se modifica.
+    `ecos` (HITO11 §1.A): línea→eco — si el eco está en la línea, se retira
+    SOLO ese span (costo ≈ len(eco), V1 blindado); no encontrarlo cae a la
+    máscara de línea completa de HITO8.
     """
     lines = blueprint.splitlines(keepends=True)
     a_mascara = {int(x) for x in lineas}
@@ -681,6 +712,12 @@ def editar_m5(blueprint: str, lineas: list[int],
         if (idx + 1) in a_mascara:
             if (cuerpo.strip() and not cuerpo.lstrip().startswith("#")
                     and MASCARA not in cuerpo):
+                eco = (ecos or {}).get(idx + 1)
+                span = _span_mask(cuerpo, eco) if eco else None
+                if span is not None:
+                    out.append(span + line[len(cuerpo):])
+                    mascaradas += 1
+                    continue
                 out.append(_mascara_con_punteros(cuerpo)
                            + line[len(cuerpo):])
                 mascaradas += 1

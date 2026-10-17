@@ -618,3 +618,44 @@ def test_parse_corchetes_hito10():
         "[1] -> 26 | Diseñar el advisory como bloqueo suave que requiera "
         "acción explícita\n[2] -> 28 | Vinc", BP7, 2)
     assert not any("parseables" in x for x in r5["invalidas"])
+
+
+def test_parse_ecos_aditivo_hito11():
+    """HITO11 §1.A: `ecos` solo en entradas de cuerpo (materia prima M5 span)."""
+    r = A.parse_localizador(f"1 -> 2 | {ECO2}", BP7, 1)
+    assert r["ecos"] == {2: ECO2}
+    assert A.parse_localizador("1 -> -", BP7, 1)["ecos"] == {}
+
+
+def test_editar_m5_span_quirurgico_hito11():
+    """HITO11 §1.A: solo el span del eco sale; resto de la línea y punteros."""
+    out, stats = A.editar_m5(BP7, [2], [], ecos={2: ECO2})
+    assert stats["mascaradas"] == 1
+    l2 = out.splitlines()[1]
+    assert l2.startswith(A.MASCARA) and l2.endswith("[doc:1:0]")
+    assert "variance-weighted" not in out
+
+
+def test_editar_m5_span_fallback_y_espaciado_hito11():
+    # eco que no aparece → fallback = máscara de línea completa (H8)
+    out, stats = A.editar_m5(BP7, [3], [], ecos={3: "esto no esta"})
+    assert "AdaptiveHarnessEngine" not in out
+    assert stats["mascaradas"] == 1
+    # eco solo difiere en espacios → regex \s+ encuentra el span
+    out2, _ = A.editar_m5(BP7, [2], [], ecos={2: "variance-weighted   task"})
+    assert "variance-weighted" not in out2
+    assert "El sistema usa" in out2 and A.MASCARA in out2
+
+
+def test_editar_m5_span_idempotente_hito11():
+    out1, _ = A.editar_m5(BP7, [2], [], ecos={2: ECO2})
+    out2, stats = A.editar_m5(out1, [2], [], ecos={2: ECO2})
+    assert out2 == out1
+    assert stats == {"mascaradas": 0, "secciones": 0,
+                     "lineas_vaciadas": 0, "omitidas": 1}
+
+
+def test_editar_m5_ecos_nulos_como_sin_ecos():
+    out, stats = A.editar_m5(BP7, [2], [], ecos=None)
+    assert stats["mascaradas"] == 1 and A.MASCARA in out
+    assert "variance-weighted" not in out
