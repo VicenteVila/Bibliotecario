@@ -81,3 +81,38 @@ se mantiene; sin más cambios de flujo.
 4. Corrida oficial única; resultados en §5 de este archivo + hallazgo 26 en
    CONOCIMIENTO, en el commit de cierre.
 5. NO CUMPLE se cierra igual; un intento 8 exigiría declaración nueva.
+
+## §5 Cierre — 2026-10-17 · NO CUMPLE (evidencia)
+
+- **Resultado**: H5' **4/5** (récord de la serie) · G1 **5/5** · G2 **5/5** ·
+  C1' **NO** → NO CUMPLE. Coste **17 juicios + 18 localizadores = 35** de ≤57;
+  **0 generaciones**. Suite al cierre: **323**.
+- **WikiSkill CERRADO — primera aprobación en 7 intentos**: los corchetes
+  `[N]` (arreglo A) eliminaron **todos** los `sin parseables` de la corrida
+  (0 en todo el run, contra 5+ en H9) → **5 máscaras consecutivas**
+  (filas r1..r5), 5 quejas evolucionadas (estratificado → filtrado →
+  Validación pre-release → propuesta → latencia/herramientas) →
+  **R4=OK R5=OK en run5**. La mecánica completa (localizador + máscara +
+  whack-a-mole drenable) queda demostrada de punta a punta.
+- **ReASearch: se quemaron LOS DOS riesgos pre-declarados, sin maquillaje**:
+  1. **Cola de moles profunda (riesgo a)**: las quejas **evolucionaron en
+     cada ronda efectiva hasta run7** (≥8 pares distintos; run5==run6 solo
+     porque la edición r6 fue no-op). La lista no estaba cerca de agotarse.
+  2. **V1 (riesgo b)**: los vaciados de sección consumieron el presupuesto
+     de longitud — 5196 → 4210 → 3656 → … → **2994** en 7 rondas; la edición
+     de r8 (2 máscaras → 2562) cayó a **36 chars del suelo V1 (2598)** →
+     rechazada, causa `validacion_tras_edicion` registrada, arnés
+     `ok=False` → **C1' NO** (ningún otro arnés falló; V1/V2 correctos en
+     todos los anteriores).
+- **Lección clave para un eventual intento 8**: la **vaciación M5b es cara en
+  chars y probablemente innecesaria** — en H15 (solo-máscaras, por bug) las
+  quejas ancladas en encabezados mueren con máscaras de cuerpo (r0→r1
+  cambiaron), y en H17 Wiki mata quejas de sección con máscaras de UNA línea.
+  Con solo-máscaras (~50 chars/mole) el presupuesto V1 de 2598 chars alcanza
+  para decenas de moles: ReASearch arrancaría cada intento con la base 5196
+  y V1 blindado. Si aun así la cola no drena en ~10 rondas, la evidencia de
+  moles infinitos queda cerrada (entonces: enmienda o cierre definitivo de
+  H1 — decisión del dueño).
+- Ruido de red observado sin efecto: reintentos `groq devolvio vacio` y
+  `gemini2 esperando` dentro de juicios (rotación declarada §8.12; env y
+  modelo intactos; ningún juicio falló).
