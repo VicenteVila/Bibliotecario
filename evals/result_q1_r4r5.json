@@ -1904,5 +1904,150 @@
     "technique": "WikiSkill",
     "run": 1,
     "secs": 7.9
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple rigurosamente con las normas de citación, diferenciando claramente entre la arquitectura descrita en la fuente y las propuestas de implementación del usuario.",
+    "arm": "H14",
+    "technique": "PEARL",
+    "run": 0,
+    "secs": 2.6
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple estrictamente con el rigor de citación, declarando explícitamente los silencios de la fuente cuando los módulos propuestos no tienen respaldo en el texto.",
+    "arm": "H14",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "secs": 1.9
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 3: Refinador de Contraste Éxito-Fallo (el texto fuente no menciona este módulo ni esta funcionalidad específica)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
+    ],
+    "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución.",
+    "arm": "H14",
+    "technique": "ReASearch",
+    "run": 0,
+    "secs": 2.6
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 3: Refinador de Contraste Éxito-Fallo (el texto fuente no menciona este módulo ni esta funcionalidad específica)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
+    ],
+    "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución.",
+    "arm": "H14",
+    "technique": "ReASearch",
+    "run": 1,
+    "secs": 5.0
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 3: Refinador de Contraste Éxito-Fallo (el texto fuente no menciona este módulo ni esta funcionalidad específica)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
+    ],
+    "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución.",
+    "arm": "H14",
+    "technique": "ReASearch",
+    "run": 2,
+    "secs": 5.0
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 3: Refinador de Contraste Éxito-Fallo (el texto fuente no menciona este módulo ni esta funcionalidad específica)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
+    ],
+    "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución.",
+    "arm": "H14",
+    "technique": "ReASearch",
+    "run": 3,
+    "secs": 2.5
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint es riguroso, cita correctamente las fuentes y declara explícitamente los parámetros obtenidos de las tablas del paper cuando no estaban en el texto principal.",
+    "arm": "H14",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "secs": 1.3
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el conjunto de validación debe ser 'estratificado' para evitar el sobreajuste, detalle que la fuente no especifica."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución, pero incluye recomendaciones operativas no presentes en la fuente que exceden la descripción del framework.",
+    "arm": "H14",
+    "technique": "WikiSkill",
+    "run": 0,
+    "secs": 3.4
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el conjunto de validación debe ser 'estratificado' para evitar el sobreajuste, un detalle técnico no especificado en la fuente."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución, pero incluye recomendaciones técnicas de implementación (como la estratificación del conjunto de validación) que no están presentes en el texto fuente.",
+    "arm": "H14",
+    "technique": "WikiSkill",
+    "run": 1,
+    "secs": 2.2
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el conjunto de validación debe ser 'estratificado' para evitar el sobreajuste, un detalle técnico no especificado en la fuente."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución, pero incluye recomendaciones técnicas de implementación (como la estratificación del conjunto de validación) que no están presentes en el texto fuente.",
+    "arm": "H14",
+    "technique": "WikiSkill",
+    "run": 2,
+    "secs": 9.3
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el conjunto de validación debe ser 'estratificado' para evitar el sobreajuste, un detalle técnico no especificado en la fuente."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución, pero incluye recomendaciones técnicas de implementación (como la estratificación del conjunto de validación) que no están presentes en el texto fuente.",
+    "arm": "H14",
+    "technique": "WikiSkill",
+    "run": 3,
+    "secs": 2.7
   }
 ]

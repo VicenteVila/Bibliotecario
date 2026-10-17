@@ -117,3 +117,47 @@ H12, H13 sin tocar).
 4. Corrida oficial única; resultados en §5 de este archivo + hallazgo 26 en
    CONOCIMIENTO, en el commit de cierre.
 5. NO CUMPLE se cierra igual; un intento 5 exigiría declaración nueva.
+
+## §5 Cierre — 2026-10-17 · NO CUMPLE (evidencia)
+
+- **Resultado**: H5' **3/5** · G1 **5/5** · G2 **5/5** · C1' **SÍ** → NO CUMPLE
+  (§2 exige los cuatro). Coste **11 juicios + 10 localizadores = 21** de ≤32;
+  **0 reescrituras** (imposibles por construcción); **ningún arnés `ok=False`**
+  (sin fail-fast: C1' distinto al caído del Hito 6). Suite al cierre: 312.
+- **Base estable**: PEARL 7399, PG 2243, TCE 6743 aprueban en **r0** con los
+  mismos textos aprobados del H13 y veredicto idéntico (temp 0, sin parpadeo).
+  **M4 funcionó**: disco de ReASearch 517 → 5432 (base 5196 saneada *antes* de
+  juzgar, por fin el stub de H12 fuera del camino).
+- **Los 2 arneses que fallan lo hacen con las mismas frases del juez en todas
+  las rondas** (temp 0 + documento sin cambios efectivos → idénticas):
+  1. **Quejas ancladas en encabezados** (ReASearch, 2/2):
+     `### Módulo 3: Refinador de Contraste Éxito-Fallo` (l9, sin marca) y
+     `### Orden de Ejecución (propuesta del blueprint)` (l18, encabezado ya
+     marcado). El localizador apuntó a ellos y el validador los rechazó
+     correctamente (r1: «la línea 9/18 es encabezado»): **marcar un encabezado
+     rompe V2**, así que la ruta de solo-marcado no puede resolver quejas que
+     el juez ancla en encabezados.
+  2. **Marcar la línea exacta de la queja no gira el veredicto** (WikiSkill):
+     única ocurrencia de `estratificado` en **l37**, localizada y marcada en r0
+     (5618 → 5644), y el juez repite la misma queja R5 en **r1, r2 y r3** →
+     **las marcas R6 no son honradas por el juez** (o la queja pide borrar la
+     cláusula, que es reescritura y está prohibida por §1.M3). Los textos con
+     marcas heredadas conviven con aprobaciones (PEARL, 4 marcas): la marca ni
+     suspende ni neutraliza por sí sola.
+  3. **Localizador frágil**: **5/10** salidas `sin líneas parseables` (drift de
+     formato del `generate()`); ReASearch r1 respondió 1 de 2 frases y la
+     ausente **no se acreditó** (hueco de conteo); tras una marca puesta, los
+     localizadores vuelven sobre la misma línea ya marcada → rondas no-op con
+     veredicto idéntico (economía de rondas agotada).
+- **Limitaciones/erratas declaradas**: la `salida` cruda del localizador no se
+  persiste en `loc` (solo conteos — diagnóstico de formato imposible a
+  posteriori); frases ausentes sin penalizar; se observaron reintentos
+  `LLM groq devolvio vacio` en el camino del juez (rotación del mecanismo ya
+  declarado en §8.12 — env y modelo ratificados, misma maquinaria que
+  H12/H13, sin cambio de instrumento a mitad de corrida).
+- **Lección para un eventual intento 5** (exige declaración nueva): el
+  **marcado puro está falsado**. Hacía falta edición semántica de cuerpo
+  (borrado/máscara de la cláusula fabricada, validada V1-V3, sin tocar
+  estructura) o que el juez honre R6 (cambio de instrumento = enmienda +
+  recalibración), más manejo de quejas-anclaje-encabezado (marcar el cuerpo
+  bajo el encabezado, nunca el encabezado).
