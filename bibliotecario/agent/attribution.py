@@ -477,22 +477,29 @@ def localizador_reintento(base_prompt: str, fallos: list[str]) -> str:
 
 def parse_localizador(salida: str, blueprint: str,
                       n_frases: int) -> dict:
-    """Valida la salida del localizador contra el blueprint real (HITO7 §1.M1).
+    """Valida la salida del localizador contra el blueprint real (HITO7 §1.M1;
+    arreglos HITO8 §1: pre-normalización determinista de flechas/viñetas,
+    frases sin entrada acreditadas y clave `encabezados` para M5b).
 
     Por entrada: frase en rango, línea en rango, no encabezado/vacío y eco
     (normalizando espacios) que aparezca literal en la línea. Lo que no se
     parsea se ignora; si no parsea NADA, eso sí es inválido (reintento).
     Devuelve `validas` (números de línea ya saneados), `no_localizadas`,
-    `invalidas` (motivos legibles para el feedback) y `lineas` (frase→línea).
+    `invalidas` (motivos legibles para el feedback), `lineas` (frase→línea)
+    y `encabezados` (líneas encabezado señaladas, materia prima de M5b).
     """
+    salida = (salida or "").replace("→", "->").replace("⇒", "->")
     lines = blueprint.splitlines()
     validas: dict[str, int] = {}
     no_loc: list[int] = []
     invalidas: list[str] = []
-    resueltas: set[int] = set()  # frases ya con entrada válida (o «-»)
+    encabs: list[int] = []
+    resueltas: set[int] = set()   # frases ya con entrada válida (o «-»)
+    vistas: set[int] = set()      # frases con CUALQUIER entrada parseada
     pat = re.compile(r"^\s*(\d+)\s*->\s*(-|\d+)\s*(?:\|\s*(.*))?\s*$")
     entradas = 0
     for raw in (salida or "").splitlines():
+        raw = re.sub(r"^\s*[-*•]\s+(?=\d+\s*->)", "", raw)
         m = pat.match(raw)
         if not m:
             continue
@@ -501,6 +508,7 @@ def parse_localizador(salida: str, blueprint: str,
         if not 1 <= n_f <= n_frases:
             invalidas.append(f"frase {n_f}: número fuera de rango")
             continue
+        vistas.add(n_f)
         if n_f in resueltas:
             continue  # ya resuelta; una entrada inválida no tapa su corrección
         if dest == "-":
@@ -512,9 +520,13 @@ def parse_localizador(salida: str, blueprint: str,
             invalidas.append(f"frase {n_f}: línea {ln_i} fuera de rango")
             continue
         linea = lines[ln_i - 1]
-        if not linea.strip() or linea.lstrip().startswith("#"):
+        if not linea.strip():
+            invalidas.append(f"frase {n_f}: la línea {ln_i} está vacía")
+            continue
+        if linea.lstrip().startswith("#"):
             invalidas.append(f"frase {n_f}: la línea {ln_i} es encabezado "
                              "o vacía")
+            encabs.append(ln_i)
             continue
         eco_norm = " ".join((eco or "").split())
         if len(eco_norm) < _ECO_MIN:
@@ -528,10 +540,15 @@ def parse_localizador(salida: str, blueprint: str,
         resueltas.add(n_f)
     if entradas == 0:
         invalidas.append("salida sin líneas parseables «N -> M | eco»")
+    else:
+        for n in range(1, n_frases + 1):
+            if n not in vistas:
+                invalidas.append(f"frase {n}: sin entrada en la salida")
     return {"validas": sorted(set(validas.values())),
             "no_localizadas": no_loc,
             "invalidas": invalidas,
-            "lineas": {int(k): v for k, v in validas.items()}}
+            "lineas": {int(k): v for k, v in validas.items()},
+            "encabezados": sorted(set(encabs))}
 
 
 def marcar_lineas(blueprint: str, lineas: list[int]) -> tuple[str, dict]:
@@ -560,3 +577,102 @@ def marcar_lineas(blueprint: str, lineas: list[int]) -> tuple[str, dict]:
                     if nl else line + _DEMOTED)
         marcadas += 1
     return "".join(lines), {"marcadas": marcadas, "omitidas": omitidas}
+
+
+# --------------------------------------------------------- HITO8 (§1 M5 a/b)
+#
+# HITO7 midió que la marca R6 no gira el veredicto del juez (WikiSkill: línea
+# exacta marcada, misma queja 3 rondas más) y que las quejas ancladas en
+# encabezados no son marcables sin romper V2. Aquí el edit se lleva la
+# afirmación CITADA del texto: plantilla fija, punteros conservados,
+# encabezados byte a byte intactos, 0 generación (HITO8 §1).
+
+MASCARA = "*[contenido retirado: no consta en la fuente]*"
+
+
+def _mascara_con_punteros(origen: str) -> str:
+    """MASCARA + los punteros `[doc:X:Y]` de `origen`, en orden y sin dobles."""
+    vistos: set[str] = set()
+    extra: list[str] = []
+    for a, b in _POINTER.findall(origen or ""):
+        t = f"[doc:{a}:{b}]"
+        if t not in vistos:
+            vistos.add(t)
+            extra.append(t)
+    return MASCARA + (" " + " ".join(extra) if extra else "")
+
+
+def editar_m5(blueprint: str, lineas: list[int],
+              encabezados: list[int]) -> tuple[str, dict]:
+    """M5 completa (HITO8 §1): M5a sobre líneas + M5b sobre cuerpos de
+    encabezados, en UN solo pas sobre los índices originales (máscaras y
+    vaciados no se pisan ni se desplazan entre sí).
+
+    `lineas`: números 1-based de líneas a reemplazar por la plantilla;
+    `encabezados`: números 1-based de encabezados cuyo cuerpo (hasta el
+    siguiente `#`) se vacía en una sola línea de plantilla con los punteros
+    de todo el cuerpo. El encabezado nunca se modifica.
+    """
+    lines = blueprint.splitlines(keepends=True)
+    a_mascara = {int(x) for x in lineas}
+    ancla: dict[int, str] = {}
+    borrar: set[int] = set()
+    secciones = lineas_vaciadas = omitidas = 0
+    for n_enc in sorted({int(x) for x in encabezados}):
+        i = n_enc - 1
+        if not 0 <= i < len(lines) or not lines[i].lstrip().startswith("#"):
+            omitidas += 1
+            continue
+        cuerpo: list[int] = []
+        j = i + 1
+        while j < len(lines) and not lines[j].lstrip().startswith("#"):
+            cuerpo.append(j)
+            j += 1
+        if not cuerpo:
+            omitidas += 1
+            continue
+        if len(cuerpo) == 1 and MASCARA in lines[cuerpo[0]]:
+            omitidas += 1  # ya vaciada: no-op idempotente
+            continue
+        texto = "\n".join(lines[k] for k in cuerpo)
+        nl = re.search(r"\r?\n$", lines[cuerpo[-1]])
+        ancla[cuerpo[0]] = _mascara_con_punteros(texto) + (
+            nl.group(0) if nl else "")
+        borrar.update(cuerpo[1:])
+        secciones += 1
+        lineas_vaciadas += len(cuerpo)
+    mascaradas = 0
+    out: list[str] = []
+    for idx, line in enumerate(lines):
+        if idx in borrar:
+            continue
+        if idx in ancla:
+            out.append(ancla[idx])
+            continue
+        cuerpo = re.sub(r"\r?\n$", "", line)
+        if (idx + 1) in a_mascara:
+            if (cuerpo.strip() and not cuerpo.lstrip().startswith("#")
+                    and MASCARA not in cuerpo):
+                out.append(_mascara_con_punteros(cuerpo)
+                           + line[len(cuerpo):])
+                mascaradas += 1
+                continue
+            omitidas += 1
+        out.append(line)
+    # números de línea que ni siquiera existen (fuera de rango) también omiten
+    omitidas += sum(1 for x in a_mascara if not 1 <= x <= len(lines))
+    return "".join(out), {"mascaradas": mascaradas, "secciones": secciones,
+                          "lineas_vaciadas": lineas_vaciadas,
+                          "omitidas": omitidas}
+
+
+def mascarar_lineas(blueprint: str, lineas: list[int]) -> tuple[str, dict]:
+    """M5a (HITO8 §1): reemplaza cada línea señalada por MASCARA + sus
+    punteros. Inmune a encabezados, vacíos, rango y dobles."""
+    return editar_m5(blueprint, lineas, [])
+
+
+def mascara_seccion(blueprint: str, n_enc: int) -> tuple[str, dict]:
+    """M5b (HITO8 §1): vacía el cuerpo bajo un encabezado en una línea de
+    plantilla; el encabezado queda byte a byte intacto."""
+    return editar_m5(blueprint, [], [n_enc])

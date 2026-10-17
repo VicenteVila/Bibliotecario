@@ -488,3 +488,90 @@ def test_marcar_lineas_no_duplica_si_ya_marcada():
     out, stats = A.marcar_lineas(bp_m, [3])
     assert stats == {"marcadas": 0, "omitidas": 1}
     assert out == bp_m
+
+
+# --- Hito 8: edición dirigida de cuerpo, máscara fija (HITO8 §1) --------------
+#
+# HITO7 midió que la marca R6 no gira el veredicto: aquí la afirmación citada
+# sale del texto (plantilla fija + punteros conservados, 0 generación).
+
+BP8 = ("# Título\n"
+       "Intro con [doc:1:0] y texto. [doc:2:1]\n"
+       "\n"
+       "## Sección A\n"
+       "Cuerpo A1 con [doc:3:0] puntero.\n"
+       "Cuerpo A2 fabricado sin puntero.\n"
+       "\n"
+       "## Sección B\n"
+       "Cuerpo B1 sin puntero.\n")
+
+
+def test_mascarar_lineas_reemplaza_y_conserva_punteros():
+    out, stats = A.mascarar_lineas(BP8, [2])
+    assert stats["mascaradas"] == 1
+    L = out.splitlines()
+    assert L[1] == A.MASCARA + " [doc:1:0] [doc:2:1]"
+    assert L[0] == "# Título"
+    assert "Cuerpo A1" in out and "Cuerpo B1" in out
+    assert out.splitlines(keepends=True)[1].endswith("\n")
+
+
+def test_mascarar_lineas_omite_encabezado_vacio_rango_y_repetido():
+    _, stats = A.mascarar_lineas(BP8, [1, 3, 99, 2, 2])
+    assert stats == {"mascaradas": 1, "secciones": 0,
+                     "lineas_vaciadas": 0, "omitidas": 3}
+
+
+def test_mascara_seccion_vacia_cuerpo_e_intacta_encabezado():
+    out, stats = A.mascara_seccion(BP8, 4)
+    assert stats["secciones"] == 1
+    assert stats["lineas_vaciadas"] == 3
+    L = out.splitlines()
+    assert L[3] == "## Sección A"          # encabezado byte a byte
+    assert A.MASCARA in L[4] and "[doc:3:0]" in L[4]
+    assert "Cuerpo A1" not in out and "Cuerpo A2" not in out
+    assert "## Sección B" in out and "Cuerpo B1" in out
+
+
+def test_mascara_seccion_idempotente_y_sin_encabezado():
+    out1, _ = A.mascara_seccion(BP8, 4)
+    out2, stats = A.mascara_seccion(out1, 4)
+    assert out2 == out1 and stats == {"mascaradas": 0, "secciones": 0,
+                                      "lineas_vaciadas": 0, "omitidas": 1}
+    out3, stats3 = A.mascara_seccion(BP8, 99)
+    assert out3 == BP8 and stats3["omitidas"] == 1
+
+
+def test_editar_m5_combo_mascara_y_seccion_en_un_solo_pas():
+    out, stats = A.editar_m5(BP8, [9], [4])
+    assert stats["mascaradas"] == 1 and stats["secciones"] == 1
+    L = out.splitlines()
+    assert L[3] == "## Sección A"
+    assert L[-1].startswith(A.MASCARA)          # línea 9 (tras vaciar A)
+    assert "Cuerpo B1" not in out
+    assert "Intro con [doc:1:0] y texto." in out  # línea 2 intacta
+
+
+def test_parse_flechas_unicode_y_viñetas_se_normalizan():
+    r = A.parse_localizador(f"1 → 2 | {ECO2}", BP7, 1)
+    assert r["validas"] == [2]
+    r2 = A.parse_localizador("- 1 -> 3 | El módulo AdaptiveHarnessEngine",
+                             BP7, 1)
+    assert r2["validas"] == [3]
+
+
+def test_parse_frase_sin_entrada_se_acredita():
+    r = A.parse_localizador(f"1 -> 2 | {ECO2}", BP7, 2)
+    assert r["validas"] == [2]
+    assert any("frase 2: sin entrada en la salida" in x
+               for x in r["invalidas"])
+
+
+def test_parse_encabezados_alimenta_a_m5b():
+    r = A.parse_localizador("1 -> 4 | Sección A", BP8, 1)
+    assert r["validas"] == []
+    assert r["encabezados"] == [4]
+    assert any("encabezado" in x for x in r["invalidas"])
+    out, stats = A.mascara_seccion(BP8, r["encabezados"][0])
+    assert stats["secciones"] == 1
+    assert "## Sección A" in out and "Cuerpo A1" not in out
