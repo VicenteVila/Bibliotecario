@@ -110,6 +110,17 @@ CREATE TABLE IF NOT EXISTS memory_items (
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
 CREATE INDEX IF NOT EXISTS idx_memory_level ON memory_items(level);
+
+CREATE TABLE IF NOT EXISTS harness_edits (
+    id INTEGER PRIMARY KEY,
+    signature TEXT NOT NULL UNIQUE,
+    occurrences INTEGER NOT NULL DEFAULT 0,
+    evolved INTEGER NOT NULL DEFAULT 0,
+    pf_name TEXT,
+    pattern TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now')),
+    evolved_at TEXT
+);
 """
 
 

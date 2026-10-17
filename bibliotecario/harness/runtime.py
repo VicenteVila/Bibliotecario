@@ -11,20 +11,52 @@ from __future__ import annotations
 
 import json
 import logging
+import re
+import sqlite3
 import threading
 import uuid
 from typing import Any
 
 from bibliotecario.core import storage
+from bibliotecario.harness import edits as ED
 from bibliotecario.harness.layers import (
     ActionRealizationLayer,
     EnvironmentContractLayer,
+    ProceduralSkill,
     ProceduralSkillLayer,
     TrajectoryRegulationLayer,
 )
 from bibliotecario.harness.pfs import SkillProgramRegistry, get_pf_registry
+from bibliotecario.memory import memory_tree as MT
 
 logger = logging.getLogger(__name__)
+
+# Intervención derivada de la firma (Hito 4): solo retry y fallback.
+# decompose no se usa porque exigiría task.complexity, que el loop no conoce
+# y no se inventa — la misma regla de la Fase 1 que deja DecomposePF quieto.
+_SKILL_TEXT = {
+    "retry": "este fallo ya se repitió: reintenta con parámetros modificados, no repitas la misma llamada",
+    "fallback": "este fallo ya se repitió: si el LLM sigue fallando, degrada a respuesta extractiva con la evidencia disponible",
+}
+
+
+def _pick_intervention(signature: str) -> str:
+    s = signature.lower()
+    if any(w in s for w in ("fallo llm", "vacio", "vacío", "timeout", "turno vac")):
+        return "fallback"
+    return "retry"
+
+
+def _persist_skill(name: str, signature: str, intervention: str) -> None:
+    """Misma upsert que tools.register_skill, sin importar agent.tools (ciclo de imports)."""
+    skill_md = f"trigger: {signature}\nintervention: {intervention}"
+    with storage.get_conn() as conn:
+        conn.execute(
+            "INSERT INTO skills (name, skill_md, purpose_md) VALUES (?,?,?) "
+            "ON CONFLICT(name) DO UPDATE SET skill_md=excluded.skill_md, "
+            "purpose_md=excluded.purpose_md, updated_at=datetime('now')",
+            (name, skill_md,
+             "skill evolucionada desde fallos recurrentes (Hito 4, hallazgo 4)"))
 
 
 def _read_metadata(conn, run_id: str) -> dict:
@@ -43,6 +75,12 @@ class RuntimeHarness:
     def __init__(self, pf_registry: SkillProgramRegistry | None = None) -> None:
         self.contract = EnvironmentContractLayer()
         self.skills = ProceduralSkillLayer()
+        try:
+            self.skills.load_from_db()
+        except sqlite3.OperationalError as e:
+            if "no such table" not in str(e).lower():
+                raise
+            logger.warning("skills no rehidratadas (DB sin init): %s", e)
         self.actions = ActionRealizationLayer()
         self.trajectory = TrajectoryRegulationLayer()
         self.pfs = pf_registry or get_pf_registry()
@@ -70,6 +108,58 @@ class RuntimeHarness:
         out = self.trajectory.check_all(sid)
         self._interventions += len(out)
         return out
+
+    # -- meta-evolución (Hito 4, hallazgo 4) --------------------------------
+    def skill_hints(self, task: str, last_error: str) -> list[tuple[ProceduralSkill, str]]:
+        """Skills que aplican a este error, con su hint ya formateado para la historia."""
+        return [(s, f"[skill {s.name}] {s.intervention}")
+                for s in self.skills.retrieve_skills(task, {"last_error": last_error})]
+
+    def meta_evolve(self, task: str, errors: list[str]) -> list[dict]:
+        """Fin de run: cuenta las firmas de fallo y evoluciona a la 2ª (K=2).
+
+        Devuelve los eventos de evolución de esta run (vacío si no tocaba).
+        `errors` llega deduplicado y normalizado desde el loop, y una firma ya
+        evolucionada no se vuelve a tocar. Lo que registra por evolución:
+        PF auto en el registro, skill en la capa y en la tabla skills, y el
+        evento en memory_items (L0) para que background.consolidate lo vea.
+        """
+        events: list[dict] = []
+        for sig in errors:
+            try:
+                row = ED.bump(sig)
+            except sqlite3.OperationalError as e:
+                if "no such table" not in str(e).lower():
+                    raise
+                logger.warning(
+                    "harness_edits ausente: la meta-evolución no persiste "
+                    "(ejecuta storage.init_db()): %s", e)
+                return events
+            if row["occurrences"] < ED.MIN_RUNS or row["evolved"]:
+                continue
+            intervention = _pick_intervention(sig)
+            if not ED.claim_evolution(sig):
+                continue  # otro hilo la evolucionó primero
+            pattern = {"trigger": sig, "field": "last_error", "intervention": intervention}
+            try:
+                names = self.pfs.evolve_from_failures([pattern])
+            except Exception:
+                ED.release_claim(sig)
+                raise
+            pf_name = names[0]
+            ED.mark_evolved(sig, pf_name, pattern)
+            skill = ProceduralSkill(
+                name=f"auto_skill_{pf_name.rsplit('_', 1)[-1]}",
+                trigger_patterns=[re.escape(sig)],
+                intervention=_SKILL_TEXT[intervention])
+            self.skills.register_skill(skill)
+            _persist_skill(skill.name, sig, skill.intervention)
+            MT.add(f"meta-evolución: '{sig}' -> {pf_name}", level="L0")
+            events.append({"signature": sig, "pf": pf_name, "skill": skill.name,
+                           "occurrences": row["occurrences"], "intervention": intervention})
+            logger.info("meta-evolución: firma x%d -> %s (+skill %s)",
+                        row["occurrences"], pf_name, skill.name)
+        return events
 
     # -- persistencia de runs -------------------------------------------------
     def start_run(self, metadata: dict | None = None) -> str:

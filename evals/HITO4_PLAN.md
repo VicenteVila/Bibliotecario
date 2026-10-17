@@ -1,7 +1,8 @@
 # Hito 4 — meta-evolución: que el sistema aprenda de sus fallos
 
-**Estado: DECLARADO 2026-10-16 — umbrales fijados ANTES de medir; nada
-ejecutado todavía.**
+**Estado: CERRADO 2026-10-16 — umbrales declarados ANTES de medir y
+ratificados por el dueño antes de la corrida; resultado: H5 ✅ · H6 ✅ ·
+H7 ✅ · H8 ✅ · C1 ✅ → HITO4 CUMPLE (5/5), ver §6.**
 
 **Objetivo:** cerrar el **hallazgo 4** de `CONOCIMIENTO.md` — la meta-evolución
 nunca ha disparado (`skills=0`, `memory_items=0`, `harness_edits=0` y
@@ -101,3 +102,58 @@ Ningún umbral es estadístico: son comprobaciones de existencia sobre runs
 Tabla *criterio / umbral / medido* en §6 tras la corrida, erratas propias
 numeradas y coste real — la misma estructura que HITO0-HITO3. Cierre del hito
 como sección propia con los veredictos H5-H8+C1 y qué hilos quedan abiertos.
+
+---
+
+## 6. Resultado — 2026-10-16 — **HITO4: CUMPLE (5/5)**
+
+Corrida oficial `evals/run_hito4_meta.py` → `evals/result_hito4_meta.json`
+(DB hermética, 5 runs guionizadas, **0 tokens**), tras la ratificación del
+dueño de §2. Umbrales intactos: ninguno se tocó.
+
+| criterio | umbral (ratificado) | medido | veredicto |
+|---|---|---|---|
+| **H5** la evolución dispara | `auto_evolved ≥1` y `harness_edits evolved ≥1` | 1 y 1 | **CUMPLE** |
+| **H6** lo evolucionado se usa (mismo proceso) | `auto_pf_*` en `pf_fires` de R3 ≥1 | `auto_pf_1` presente | **CUMPLE** |
+| **H7** contadores muertos del hallazgo | `skills ≥1` y `memory_items ≥1` | 1 y 1 | **CUMPLE** |
+| **H8** durabilidad tras reinicio | `auto_pf_*` en `pf_fires` de R4 ≥1 | `auto_pf_1` rehidratado | **CUMPLE** |
+| **C1** controles | run limpia R5 con 0 `auto_pf_*`; suite en verde | 0 fires; **281 passed** | **CUMPLE** |
+
+Observaciones de la corrida (tal cual salieron, sin filtrar):
+
+- **R1** (1ª firma): 0 evoluciones — K=2 respeta «una vez es ruido». Los PFs
+  built-in (`retry`+`fallback`) ya disparan como en H3: es el comportamiento
+  previo, no cuenta para los umbrales.
+- **R2** (2ª firma): evento `{pf: auto_pf_1, skill: auto_skill_1, x2}` — una
+  sola evolución por firma; la tercera y cuarta aparición (R3, R4) no la
+  repiten (`occurrences` llega a 4 en la fila, `evolved` sigue en 1).
+- **R3**: `auto_pf_1` en los fires **y** la skill `auto_skill_1` recibe su
+  hint en la historia y registra outcome de recuperación (1/1, `success_rate=1.0`).
+- **R4**: registro y harness reiniciados — `auto_pf_1` reconstruido desde
+  `harness_edits` (contador restaurado, sin reutilizar nombres) y la capa de
+  skills recargada desde la tabla: vuelve a disparar.
+- **R5**: limpia con el registro rehidratado — 0 fires de `auto_pf_*` (y 0 en
+  total): lo evolucionado no dispara sin fallo.
+
+**Erratas:** ninguna de medición. Nota de implementación pre-medición (los
+tests la cazaron antes de la corrida oficial): el primer `bump` insertaba la
+firma con `occurrences=0` — corregido a 1 en el mismo día y antes de medir;
+también se confirmó que el mensaje real de este guion sale de la rama *toolish*
+(`parse_tool_call` rechaza tools desconocidas antes de llegar a validación),
+así que la firma del experimento se deriva del mensaje exacto y no de una
+constante a mano.
+
+**Coste real:** 0 tokens LLM; 5 runs locales; 281 tests en verde (los 3
+nuevos cubren la cadena R1-R5 como regresión).
+
+**Qué queda fuera / hilos abiertos tras este cierre:** `MT.recall()` sigue sin
+estar en la ruta productiva (el evento de evolución se escribe en
+`memory_items` y lo procesa `background.consolidate`, pero la lectura no está
+cableada); `run_blueprint` (dimensión D) no lleva meta-evolución propia; las
+evals que corran sobre `data/bibliotecario.db` heredarán los `auto_pf_*`
+persistidos (la práctica declarada es DB hermética para evals comparables);
+`decompose_complex_task` sigue exigiendo `task.complexity` que el loop no
+conoce (regla intacta de no inventar complejidad). Del listado del cierre del
+Hito 3 siguen abiertos: verificación de atribución (H1/hallazgo 26), potencia
+del A/B (H4/hallazgo 27) y juez ciego (hallazgo 10).
+

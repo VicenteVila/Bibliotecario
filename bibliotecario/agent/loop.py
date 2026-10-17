@@ -77,6 +77,7 @@ def generate(prompt: str, max_tokens: int = 512, retries: int | None = None,
     mayor parte de la sampling, no del juez."""
     return _llm_generate(prompt, max_tokens, 2 if retries is None else retries,
                          strict_fallback=STRICT_FALLBACK, temperature=temperature)
+from bibliotecario.harness.edits import normalize_signature
 from bibliotecario.harness.runtime import get_harness
 from bibliotecario.ingest import citations_format as CITE_FMT
 from bibliotecario.knowledge import refiner as REF
@@ -566,6 +567,20 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
     last_tool = ""
     pf_fires: list[dict] = []
     pf_states: list[dict] = []  # estados que llegaron a apply_pfs (H3: variación)
+    # Firmas de fallo de esta run (Hito 4): cada mensaje de error se guarda
+    # normalizado y sin repetir; de aquí salen state_pf["last_error"] y la
+    # meta-evolución al cerrar la run.
+    run_errors: list[str] = []
+    skills_applied: dict = {}  # nombre -> ProceduralSkill ya aplicada en esta run
+    errores_at_hints = None
+    meta_events: list[dict] = []
+
+    def _falla(msg: str) -> str:
+        """Registra la firma del fallo (dedupe) y devuelve la normalizada."""
+        sig = normalize_signature(msg)
+        if sig not in run_errors:
+            run_errors.append(sig)
+        return sig
 
     turn = -1  # si el bucle no llega a iterar, el finally sigue sabiendo los turnos
 
@@ -579,6 +594,7 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
             if not out:
                 harness.record_error("loop")
                 last_status, errores = "error", errores + 1
+                _falla("turno vacío (fallo LLM)")
                 flat += 1
                 history.append("turno vacío (fallo LLM)")
                 continue
@@ -593,6 +609,7 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
                            '{"tool": nombre, "args": {...}} con un tool del catálogo (no sueltes args sin "tool")')
                     history.append(msg)
                     failed.append(msg)
+                    _falla(msg)
                     continue
                 # Una respuesta en prosa no se acepta cruda: pasa por el cierre forzado
                 # para que corra el barrido profundo y se exijan las citas. Aceptarla
@@ -612,6 +629,7 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
                        '{"tool": nombre, "args": {...}}')
                 history.append(msg)
                 failed.append(msg)
+                _falla(msg)
                 continue
             call_sig = f"{name}:{sorted(args.items())}"
             v = harness.validate_call(name, args, tool_schemas())
@@ -619,8 +637,10 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
                 harness.record_error("loop")
                 last_status, errores = "error", errores + 1
                 flat += 1
-                history.append(f"{name} inválida: {v.error}")
-                failed.append(f"{name} inválida: {v.error}")
+                msg = f"{name} inválida: {v.error}"
+                history.append(msg)
+                failed.append(msg)
+                _falla(msg)
                 continue
             # PFs con estado real del recorrido (dec. Fase 3): lo que casaba
             # antes era un "ok" escrito a mano; ahora casan Retry/Fallback/
@@ -632,11 +652,25 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
                         "attempt_count": turn, "max_attempts": max_turns,
                         "error_count": errores, "stagnation": flat,
                         "evidence_count": len(evidence),
+                        # último fallo real de esta run (Hito 4): es lo que la
+                        # precondition del PF auto y la skill evolucionada buscan.
+                        "last_error": run_errors[-1] if run_errors else "",
                         # la pregunta es estado real (la conoce el bucle), no
                         # un campo inventado: sin ella dos runs limpias con el
                         # mismo patrón de turnos tendrían estados idénticos.
                         "question": question[:200]}
             pf_states.append(state_pf)
+            # Skills aprendidas de fallos previos (Hito 4): el hint entra en la
+            # historia la primera vez que la skill aplica a este error; el
+            # outcome se registra al cerrar la run.
+            if run_errors:
+                for skill, hint in harness.skill_hints(question, run_errors[-1]):
+                    if skill.name in skills_applied:
+                        continue
+                    skills_applied[skill.name] = skill
+                    history.append(hint)
+                    if errores_at_hints is None:
+                        errores_at_hints = errores
             for pf in harness.apply_pfs(state_pf):
                 pf_fires.append(pf)
                 history.append(f"[PF {pf['pf']}] {pf.get('message', '')}")
@@ -648,6 +682,7 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
                 last_status, errores = "error", errores + 1
                 history.append(f"{name} args incorrectos: {e}")
                 failed.append(f"{name} args: {e}")
+                _falla(f"{name} args: {e}")
                 flat += 1
                 continue
             harness.record_action("loop", {"tool": name, "args": args})
@@ -679,13 +714,25 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
         # finished_at NULL porque la excepcion se escapaba sin cerrarlas.
         harness.finish_run(run_id, None, {"turns": turn + 1, "tools": len(evidence),
                                           "pf_fires": len(pf_fires)})
+        # Meta-evolución al cerrar (Hito 4): cuenta firmas y evoluciona a la
+        # 2ª aparición. Envuelta: un fallo aquí no puede romper la run ya
+        # cerrada; se avisa y la corrida sigue.
+        try:
+            if skills_applied and errores_at_hints is not None:
+                recuperado = errores == errores_at_hints
+                for skill in skills_applied.values():
+                    skill.record_outcome(recuperado)
+            meta_events = harness.meta_evolve(question, run_errors)
+        except Exception as exc:
+            logger.warning("meta-evolución al cerrar la run falló: %s", exc, exc_info=True)
 
     if not isolated:
         REF.save_lesson("qa", what_worked="\n".join(succeeded[-5:]),
                         what_failed="\n".join(failed[-5:]),
                         key_insights=_trajectory_fingerprint(turn, evidence, answer))
     return {"answer": answer, "turns": turn + 1, "evidence": evidence,
-            "run_id": run_id, "pf_fires": pf_fires, "pf_states": pf_states}
+            "run_id": run_id, "pf_fires": pf_fires, "pf_states": pf_states,
+            "meta_evolved": meta_events}
 
 
 def run_blueprint(technique: str, goal: str, max_turns: int = 4,

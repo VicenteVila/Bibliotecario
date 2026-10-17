@@ -7,8 +7,10 @@ Fixes vs origen:
 """
 from __future__ import annotations
 
+import json
 import logging
 import re
+import sqlite3
 from abc import ABC, abstractmethod
 from typing import Any
 
@@ -139,18 +141,53 @@ class SkillProgramRegistry:
                 out.append({"pf": pf.name, "action": "error", "message": str(e)})
         return out
 
-    def evolve_from_failures(self, failure_patterns: list[dict[str, Any]]) -> int:
-        n = 0
+    def _make_auto_pf(self, name: str, pattern: dict[str, Any]) -> ProgramFunction:
+        kind = pattern.get("intervention", "retry")
+        pf = {"decompose": DecomposePF, "fallback": FallbackPF}.get(kind, RetryPF)()
+        pf.name = name
+        trigger = re.escape(str(pattern.get("trigger", ""))[:50])
+        pf.preconditions = [(pattern.get("field", "last_action.status"), trigger or "error")]
+        return pf
+
+    def evolve_from_failures(self, failure_patterns: list[dict[str, Any]]) -> list[str]:
+        """Crea un PF por patrón de fallo y devuelve sus nombres (auto_pf_N).
+
+        Solo lo llama RuntimeHarness.meta_evolve, a la segunda vez que una
+        firma aparece en una run (Hito 4): esto era evolve sin callers.
+        """
+        created: list[str] = []
         for pattern in failure_patterns:
             self._auto_evolved += 1
             name = f"auto_pf_{self._auto_evolved}"
-            kind = pattern.get("intervention", "retry")
-            pf = {"decompose": DecomposePF, "fallback": FallbackPF}.get(kind, RetryPF)()
-            pf.name = name
-            trigger = re.escape(str(pattern.get("trigger", ""))[:50])
-            pf.preconditions = [(pattern.get("field", "last_action.status"), trigger or "error")]
-            self.register(pf)
+            self.register(self._make_auto_pf(name, pattern))
+            created.append(name)
+        return created
+
+    def rehydrate_from_edits(self) -> int:
+        """Reconstruye los auto_pf_* evolucionados desde harness_edits.
+
+        Sin esto la evolución moría con el proceso que la creó: la siguiente
+        sesión arrancaría sin los PFs que sus propios fallos generaron. El
+        contador sigue a lo ya evolucionado para no reutilizar nombres.
+        """
+        from bibliotecario.harness import edits as ED
+
+        n = 0
+        for row in ED.evolved_rows():
+            if row["pf_name"] in self._pfs:
+                continue
+            try:
+                pattern = json.loads(row["pattern"] or "{}")
+            except ValueError:
+                logger.warning("PF %s sin patrón válido: se reconstruye con retry", row["pf_name"])
+                pattern = {"trigger": row["signature"], "field": "last_error"}
+            self.register(self._make_auto_pf(row["pf_name"], pattern))
             n += 1
+            try:
+                suffix = int(str(row["pf_name"]).rsplit("_", 1)[-1])
+                self._auto_evolved = max(self._auto_evolved, suffix)
+            except ValueError:
+                continue
         return n
 
     def stats(self) -> dict[str, Any]:
@@ -167,4 +204,12 @@ def get_pf_registry() -> SkillProgramRegistry:
     if _registry is None:
         _registry = SkillProgramRegistry()
         _registry.register_builtins()
+        try:
+            _registry.rehydrate_from_edits()
+        except sqlite3.OperationalError as e:
+            # DB sin harness_edits todavía (sin init_db): se avisa y se sigue
+            # con los builtins; meta_evolve avisará igual al intentar evolucionar.
+            if "no such table" not in str(e).lower():
+                raise
+            logger.warning("rehidratación de PFs evolucionados no disponible: %s", e)
     return _registry

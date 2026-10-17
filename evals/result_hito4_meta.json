@@ -1,0 +1,100 @@
+{
+  "criterio": "Hito 4 (HITO4_PLAN §2: H5-H8 + C1)",
+  "umbrales": {
+    "H5": "auto_evolved>=1 y harness_edits evolved>=1",
+    "H6": "auto_pf en pf_fires de R3 >= 1",
+    "H7": "skills>=1 y memory_items>=1",
+    "H8": "auto_pf en pf_fires de R4 >= 1",
+    "C1": "run limpia R5 con 0 auto_pf"
+  },
+  "firma": "llamada inválida: emite EXACTAMENTE {\"tool\": nombre, \"args\": {...}} con un tool del catálogo (no sueltes args sin \"tool\"",
+  "db_hermetica": "/tmp/hito4_5ayufrbw/meta.db",
+  "h5": true,
+  "h6": true,
+  "h7": true,
+  "h8": true,
+  "c1_run": true,
+  "hito4": true,
+  "auto_evolved": 1,
+  "contadores": {
+    "harness_edits": [
+      {
+        "signature": "llamada inválida: emite EXACTAMENTE {\"tool\": nombre, \"args\": {...}} con un tool del catálogo (no sueltes args sin \"tool\"",
+        "occurrences": 4,
+        "evolved": 1,
+        "pf_name": "auto_pf_1"
+      }
+    ],
+    "skills": 1,
+    "memory_items": 1
+  },
+  "filas": [
+    {
+      "arm": "HITO4",
+      "run": "R1",
+      "turns": 3,
+      "pf_nombres": [
+        "fallback_on_exhaustion",
+        "retry_on_failure"
+      ],
+      "auto_pf": [],
+      "meta_evolved": []
+    },
+    {
+      "arm": "HITO4",
+      "run": "R2",
+      "turns": 3,
+      "pf_nombres": [
+        "fallback_on_exhaustion",
+        "retry_on_failure"
+      ],
+      "auto_pf": [],
+      "meta_evolved": [
+        {
+          "signature": "llamada inválida: emite EXACTAMENTE {\"tool\": nombre, \"args\": {...}} con un tool del catálogo (no sueltes args sin \"tool\"",
+          "pf": "auto_pf_1",
+          "skill": "auto_skill_1",
+          "occurrences": 2,
+          "intervention": "retry"
+        }
+      ]
+    },
+    {
+      "arm": "HITO4",
+      "run": "R3",
+      "turns": 3,
+      "pf_nombres": [
+        "fallback_on_exhaustion",
+        "retry_on_failure",
+        "auto_pf_1"
+      ],
+      "auto_pf": [
+        "auto_pf_1"
+      ],
+      "meta_evolved": []
+    },
+    {
+      "arm": "HITO4",
+      "run": "R4",
+      "turns": 3,
+      "pf_nombres": [
+        "fallback_on_exhaustion",
+        "retry_on_failure",
+        "auto_pf_1"
+      ],
+      "auto_pf": [
+        "auto_pf_1"
+      ],
+      "meta_evolved": []
+    },
+    {
+      "arm": "HITO4",
+      "run": "R5",
+      "turns": 2,
+      "pf_nombres": [],
+      "auto_pf": [],
+      "meta_evolved": []
+    }
+  ],
+  "nota": "suite: 281 passed (pytest tests/ justo antes de la corrida)"
+}

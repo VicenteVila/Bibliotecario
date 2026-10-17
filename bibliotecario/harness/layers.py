@@ -76,6 +76,38 @@ class ProceduralSkillLayer:
     def register_skill(self, skill: ProceduralSkill) -> None:
         self._skills[skill.name] = skill
 
+    def load_from_db(self) -> int:
+        """Recarga las auto_skill_* persistidas (Hito 4).
+
+        La capa vive en memoria y el proceso no: sin esto, una skill creada
+        por meta-evolución desaparecía al reiniciar y la tabla skills se
+        quedaría como registro de solo lectura. Formato de skill_md escrito
+        por el harness: línea 1 `trigger: <firma>`, línea 2 `intervention: …`.
+        """
+        from bibliotecario.core import storage
+
+        with storage.get_conn() as conn:
+            rows = conn.execute(
+                "SELECT name, skill_md FROM skills WHERE name GLOB 'auto_skill_*'"
+            ).fetchall()
+        n = 0
+        for r in rows:
+            if r["name"] in self._skills:
+                continue
+            trigger = intervention = ""
+            for line in (r["skill_md"] or "").splitlines():
+                if line.startswith("trigger:"):
+                    trigger = line.split(":", 1)[1].strip()
+                elif line.startswith("intervention:"):
+                    intervention = line.split(":", 1)[1].strip()
+            if not trigger:
+                continue
+            self.register_skill(ProceduralSkill(r["name"], [re.escape(trigger)], intervention))
+            n += 1
+        if n:
+            logger.info("rehidratadas %d skills evolucionadas desde la base", n)
+        return n
+
     def retrieve_skills(self, task: str, state: dict) -> list[ProceduralSkill]:
         err = state.get("last_error", "")
         matched = [s for s in self._skills.values()

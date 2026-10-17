@@ -40,9 +40,12 @@ def test_pf_fallback_no_ollama():
 def test_pf_evolve_unique_names():
     reg = get_pf_registry()
     before = reg.stats()["total"]
-    n = reg.evolve_from_failures([{"trigger": "timeout X", "field": "last_action.status", "intervention": "retry"},
-                                  {"trigger": "timeout X", "field": "last_action.status", "intervention": "retry"}])
-    assert n == 2 and reg.stats()["total"] == before + 2
+    # Hito 4: devuelve los nombres creados (el caller los persiste en harness_edits)
+    names = reg.evolve_from_failures([{"trigger": "timeout X", "field": "last_action.status", "intervention": "retry"},
+                                      {"trigger": "timeout X", "field": "last_action.status", "intervention": "retry"}])
+    assert len(names) == 2 and names[0] != names[1]
+    assert all(n.startswith("auto_pf_") for n in names)
+    assert reg.stats()["total"] == before + 2
 
 
 def test_harness_run_persist(tmp_path, monkeypatch):

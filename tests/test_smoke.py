@@ -8,7 +8,8 @@ def test_init_db_creates_schema(tmp_path):
     with storage.get_conn(db) as conn:
         tables = {r[0] for r in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
     for expected in ("documents", "chunks", "nodes", "edges", "validation_tasks",
-                     "task_outcomes", "lessons", "skills", "wiki_pages", "harness_runs"):
+                     "task_outcomes", "lessons", "skills", "wiki_pages", "harness_runs",
+                     "harness_edits"):
         assert expected in tables
 
 
