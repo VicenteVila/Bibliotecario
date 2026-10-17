@@ -600,3 +600,21 @@ def test_parse_formatos_tolerantes_hito9():
     r3 = A.parse_localizador(
         "1 — 3 | eco: El módulo AdaptiveHarnessEngine", BP7, 1)
     assert r3["validas"] == [3]
+
+
+def test_parse_corchetes_hito10():
+    """HITO10 §1.A: la deriva medida `[1] -> …` (salidas crudas de H9)."""
+    r = A.parse_localizador(
+        "[1] -> [3] | El módulo AdaptiveHarnessEngine", BP7, 1)
+    assert r["validas"] == [3]
+    r2 = A.parse_localizador(f"- [1] -> 2 | {ECO2}", BP7, 1)
+    assert r2["validas"] == [2]
+    r3 = A.parse_localizador("[1] -> 4 | Sección A", BP8, 1)   # ancla enc.
+    assert r3["encabezados"] == [4] and r3["invalidas"] == []
+    r4 = A.parse_localizador("[1] -> -", BP7, 1)
+    assert r4["no_localizadas"] == [1]
+    # salida cruda textual de H9 (ReASearch r5): ya NO es «sin parseables»
+    r5 = A.parse_localizador(
+        "[1] -> 26 | Diseñar el advisory como bloqueo suave que requiera "
+        "acción explícita\n[2] -> 28 | Vinc", BP7, 2)
+    assert not any("parseables" in x for x in r5["invalidas"])

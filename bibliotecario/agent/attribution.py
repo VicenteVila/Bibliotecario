@@ -486,7 +486,8 @@ def parse_localizador(salida: str, blueprint: str,
     HITO8 §1: frases sin entrada acreditadas; HITO9 §1.A+B: encabezados con
     eco válido alimentan M5b, y normalizaciones deterministas de formato
     —separadores, prefijos, negrilla, prefijo del eco— sin relajar nunca el
-    eco ≥20 real que decide la verdad).
+    eco ≥20 real que decide la verdad; HITO10 §1.A: corchetes `[N]` alrededor
+    de frase y destino — la deriva medida en las salidas crudas de H9).
 
     Devuelve `validas` (números de línea ya saneados), `no_localizadas`,
     `invalidas` (motivos legibles para el feedback), `lineas` (frase→línea)
@@ -500,12 +501,12 @@ def parse_localizador(salida: str, blueprint: str,
     resueltas: set[int] = set()   # frases ya con entrada válida (o «-» o enc.)
     vistas: set[int] = set()      # frases con CUALQUIER entrada parseada
     pat_cab = re.compile(
-        r"^\s*(?:frase\s+|Frase\s+)?(\d+)\s*(?:->|:)\s*"
-        r"(?:línea\s+|linea\s+|Línea\s+)?(-|\d+)\s*$",
+        r"^\s*\[?\s*(?:frase\s+|Frase\s+)?(\d+)\s*\]?\s*(?:->|:)\s*"
+        r"\[?\s*(?:línea\s+|linea\s+|Línea\s+)?(-|\d+)\s*\]?\s*$",
         re.IGNORECASE)
     entradas = 0
     for raw in (salida or "").splitlines():
-        raw = re.sub(r"^\s*[-*•]\s+(?=\d)", "", raw)
+        raw = re.sub(r"^\s*[-*•]\s+(?=\[?\d)", "", raw)
         if "|" in raw:
             cab, eco = raw.split("|", 1)
             eco = re.sub(r"^\s*\(?\s*eco\s*[:)]\s*", "", eco,
