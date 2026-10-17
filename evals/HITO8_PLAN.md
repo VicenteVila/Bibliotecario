@@ -115,3 +115,47 @@ tocar; solo-adición).
 4. Corrida oficial única; resultados en §5 de este archivo + hallazgo 26 en
    CONOCIMIENTO, en el commit de cierre.
 5. NO CUMPLE se cierra igual; un intento 6 exigiría declaración nueva.
+
+## §5 Cierre — 2026-10-17 · NO CUMPLE (evidencia)
+
+- **Resultado**: H5' **3/5** · G1 **5/5** · G2 **5/5** · C1' **SÍ** → NO CUMPLE
+  (§2 exige los cuatro). Coste **11 juicios + 10 localizadores = 21** de ≤32;
+  **0 generaciones**; **ningún arnés `ok=False`** (V1/V2 nunca fallaron:
+  0 causas `validacion_tras_edicion`). Suite al cierre: **320**. PEARL/PG/TCE
+  aprueban r0 estables (temp 0).
+- **Lo que sí funcionó (primera vez en 5 intentos): la máscara cambia el
+  veredicto de la queja.**
+  - WikiSkill: l37 (única con «estratificado») enmascarada en r0 →
+    `estratificado` **desaparece del texto final** (verificado en el bp) y el
+    juez r1 cambia de queja a «filtrado basado en consistencia histórica».
+  - ReASearch: r0 enmascara [10,19] (los cuerpos bajo l9/l18) → las quejas de
+    r1 son **completamente distintas** (Módulo 4 / state re-emission).
+  - Contra H14 (marca R6 → queja intacta 3 rondas): el juez lee el documento
+    **fresco** y **cada máscara mata su cita**.
+- **Pero el juez es de «whack-a-mole»: cada ronda revela la siguiente
+  fabricación.** ReASearch: quejas distintas en r0, r1, r2 y r3 (4 máscaras,
+  nunca converge en 3 rondas). Su base (H1R) **jamás fue aprobada por el
+  juez** — es un doc con muchas fabricaciones; drenarlas en ≤3 rondas × ≤2
+  frases es inviable. WikiSkill: tras r0, **4 salidas `sin líneas parseables`
+  consecutivas** (r1–r3) → 0 máscaras → misma queja ×2 (temp 0): la
+  pre-normalización de flechas/viñetas **no bastó** (el drift de r1+ no eran
+  flechas; la salida cruda sigue sin persistirse — límite declarado de H14,
+  se confirma).
+- **M5b no disparó jamás (0 secciones vaciadas) — bug de diseño medido:**
+  los `encabezados` detectados en el intento 1 del localizador se descartan
+  al reintentar (ReASearch r1: «frase 2: la línea 18 es encabezado» → el
+  intento 2 omite la frase → parse final `enc=[]`), y el runner solo acciona
+  el parse final. Las quejas ancladas en encabezados (l9/l18 de ReASearch)
+  quedaron sin vaciar: siguen vivas en el bp final.
+- **Lo bueno del arreglado H14**: «frase N: sin entrada en la salida» se ve
+  en r1/r2 de ReASearch (antes se perdía en silencio); veredictos r0
+  estables; encabezados intactos y punteros conservados en todas las filas.
+- **Lección para un eventual intento 6** (exige declaración nueva): el
+  whack-a-mole exige (i) que **M5b dispare de verdad** (acumular
+  `encabezados` de todos los intentos, o aceptar encabezado como terminal),
+  (ii) **rondas/presupuesto acordes al nº de fabricaciones** de la base (o
+  una base de ReASearch con historial de aprobación que hoy no existe), y
+  (iii) un **localizador que no muera de formato** (4 fallos seguidos
+  mataron la convergencia de WikiSkill — candidato: guardar la salida cruda
+  y añadir normalización adicional declarada). La enmienda del juez sigue
+  descartada por comparabilidad (§0 del HITO8 / hallazgo 10).
