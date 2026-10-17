@@ -105,6 +105,46 @@ cierre §5 + CONOCIMIENTO + clave-scan + commit+push. Filas `H1`…`H18`,
 `result_q1_r4r5.json` y `result_fase1_h21.json` nuevo. Commit messages en
 español ASCII sin acentos.
 
-## §5 Cierre
+## §5 Cierre — 2026-10-17 · NO CUMPLE (intento 9, brazo `H21`)
 
-(pendiente de la corrida oficial)
+- **Puerta forense OK** (aserción E13, 0 llamadas nuevas) → corrida oficial
+  única. **H5' 3/5 · G1 5/5 · G2 5/5 · C1' NO** (PG `ok=False`) → **NO
+  CUMPLE**. Coste: **18 juicios** de los ≤25 · **21 localizadores** de los
+  ≤32 · 0 generaciones · suite 338 (se confirma aparte). PEARL/TCE/Wiki
+  aprueban r0 con fuente completa.
+- **PG — riesgos (a)+(b) quemados**: r0 con 4 quejas (2 falsas por
+  nombre-exacto: `refiner`/`mutation`; 2 verdaderas: lessons + extracción) →
+  máscara de 4 líneas → r1 el juez gira a quejas **estructurales**
+  («Módulo 1-3», «Dependencias» — verdaderas: el paper no describe esa
+  arquitectura modular) → r2/r3 vacíos de sección (1858→1902) → edición r4
+  → **227 chars < suelo 1121 (50% de la base 2243) →
+  `validacion_tras_edicion`, `ok=False`** → C1' NO. La cadena de quejas
+  (mezcla de falsas y verdaderas) y los vaciados de sección mataron un
+  arnés con base pequeña; sin maquillaje (la fila de fallo no escribe).
+- **ReASearch — riesgo (d) quemado**: la cola **no era de 1-2** — son
+  **2 quejas por ronda × 10 rondas** de la misma familia **estructural**:
+  «Módulo 1/2/3», «Orden de Ejecución», umbrales/validación pre-release —
+  el paper (optimizador de artefactos) no define esa arquitectura de
+  módulos, así que la fabricación es **pervasiva** y enmascarar menciones
+  individuales no la mata. 5196 → 2993 (suelo 2598 intacto). **6 de 10
+  ediciones fueron no-op** (M1: salida sin parseables ×3, frase ausente,
+  número fuera de rango, eco corto) — con ediciones no-op el juez repite
+  queja idéntica (r2–r5 == r1). `NO APRUEBA tras 10 reparaciones`.
+- **Ambas caídas bajo el instrumento honesto**: con la fuente completa a la
+  vista, PG y ReASearch son **fabricación estructural de su arquitectura de
+  módulos** — sus aprobaciones H17/H18 eran artefacto de la ventana ciega
+  (hallazgo 10); la reparación por máscaras + V1/V2 **no puede converger**
+  donde la fabricación atraviesa todo el documento.
+- **Rotación LLM operó** (groq devolvió vacío, gemini agotada/aparcada 15
+  min) sin abortar la corrida (riesgo (c) mitigado por §8.12). Anomalía
+  registrada: en r2 de PG el juez devolvió prosa de aviso de la API
+  («Direct use of automatic function calling…») antes del JSON — parseado
+  como FALLA con quejas legibles; fila válida.
+- **Balance final de H1 tras 9 intentos + 2 enmiendas**: H5' nunca por
+  encima de 4/5 con instrumento ciego, y **3/5 con instrumento honesto**;
+  G1/G2 5/5 y C1' SÍ se sostienen. **H1 NO CUMPLE y los dos arneses que
+  fallan lo hacen por contenido, no por falta de rondas** (PG por V1,
+  ReASearch por fabricación estructural). Decisiones del dueño: cerrar el
+  hilo definitivamente con esta evidencia, o declarar una vía nueva (p. ej.
+  regeneración de PG/ReASearch con el juez honesto en el bucle de
+  generación — enmienda de generación, no de edición).

@@ -3000,5 +3000,265 @@
     "technique": "ReASearch",
     "run": 0,
     "secs": 2.1
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con el rigor de citación exigido, declarando explícitamente los silencios de la fuente mediante la etiqueta (propuesta del blueprint) y anclando correctamente las funcionalidades técnicas a los fragmentos del paper.",
+    "arm": "H21",
+    "technique": "PEARL",
+    "run": 0,
+    "secs": 3.5
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El paper no menciona un 'failure-vs-success refiner' ni especifica un componente dedicado a la diferenciación explícita de fallos versus éxitos.",
+      "El paper no menciona la 'lessons persistence' ni define un almacén de lecciones persistidas dentro del framework.",
+      "El paper no menciona la 'graph mutation' ni especifica un mecanismo de actualización del grafo mediante mutación o lecciones persistidas."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El proceso específico de extracción automatizada a partir de trayectorias de ejecución no está detallado en el paper; el paper no especifica el algoritmo exacto de extracción."
+    ],
+    "verdict": "El blueprint atribuye al paper componentes y terminología (como 'failure-vs-success refiner', 'lessons persistence' o 'graph mutation') que no existen en el texto, además de rellenar vacíos de información con propuestas propias no presentes en la fuente.",
+    "arm": "H21",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "secs": 2.8
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint incluye módulos como 'Módulo 1: Extracción de Tripletes de Procedimiento', 'Módulo 2: Refiner de Éxito vs. Fracaso', 'Módulo 3: Persistencia de Lecciones', 'Módulo 4: Mutación del Grafo' "
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint rellena detalles técnicos de implementación como 'Dependencia: Ninguna (módulo inicial)' o 'Dependencia: Módulo 1' que no aparecen en el paper, el cual se limita a describir el funcionami"
+    ],
+    "verdict": "El blueprint inventa una estructura de módulos de software y dependencias que no existen en la fuente, atribuyendo al paper una arquitectura de implementación que no se especifica.",
+    "arm": "H21",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "secs": 2.7
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona una 'Validación de Agente con Procedural Graphs Antes de Cada Release', concepto que no aparece en la fuente."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint estructura el sistema en 'Módulos y Dependencias' (1 al 5) con descripciones técnicas que no se corresponden con la arquitectura descrita en el paper."
+    ],
+    "verdict": "El blueprint inventa una estructura de módulos y un propósito de validación pre-release que no existen en el artículo, atribuyendo al sistema una arquitectura que la fuente no especifica.",
+    "arm": "H21",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "secs": 2.7
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint menciona una 'Validación de Agente con Procedural Graphs Antes de Cada Release', concepto que no existe en el paper."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint estructura el sistema en 'Módulos y Dependencias' (1 al 5) como si fueran componentes de software independientes, cuando el paper describe un framework de investigación con fases de infer"
+    ],
+    "verdict": "El blueprint inventa una metodología de 'validación antes de cada release' y una arquitectura modular de software que no se menciona en el artículo científico.",
+    "arm": "H21",
+    "technique": "Procedural Graphs",
+    "run": 3,
+    "secs": 3.1
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' como si fuera una funcionalidad técnica explícita del framework, cuando la fuente solo menciona que el agente realiza análisis de"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint detalla un 'Orden de Ejecución' paso a paso (1 al 8) para una 'Validación Pre-Release' que no existe en el paper; el paper describe un framework de optimización de artefactos, no un siste"
+    ],
+    "verdict": "El blueprint inventa un caso de uso (validación pre-release de software) y módulos técnicos que no existen en la fuente, atribuyendo al framework capacidades de gestión de releases que el paper no menciona.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 0,
+    "secs": 2.5
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' y un 'Orden de Ejecución' que no existen en la fuente, además de atribuir al paper una propuesta de 'Validación Pre-Release' que "
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint inventa una métrica de éxito basada en 'reducción en releases fallidos' y 'auditoría de árboles de búsqueda', detalles que el paper no especifica ni propone como parte de su framework."
+    ],
+    "verdict": "El blueprint atribuye al paper objetivos y módulos de validación de software (pre-release) que no forman parte de la investigación original, la cual se centra en la optimización de prompts, programas y flujos de ML.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 1,
+    "secs": 20.7
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' y un 'Orden de Ejecución' que no existen en la fuente, además de atribuir al paper una propuesta de 'Validación Pre-Release' que "
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint inventa una métrica de éxito basada en 'reducción en releases fallidos' y 'auditoría de árboles de búsqueda', detalles que el paper no especifica ni propone como parte de su framework."
+    ],
+    "verdict": "El blueprint atribuye al paper objetivos y módulos de validación de software (pre-release) que no forman parte de la investigación original, la cual se centra en la optimización de prompts, programas y flujos de ML.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 2,
+    "secs": 2.1
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' y un 'Orden de Ejecución' que no existen en la fuente, además de atribuir al paper una propuesta de 'Validación Pre-Release' que "
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint inventa una métrica de éxito basada en 'reducción en releases fallidos' y 'auditoría de árboles de búsqueda', detalles que el paper no especifica ni propone como parte de su framework."
+    ],
+    "verdict": "El blueprint atribuye al paper objetivos y módulos de validación de software (pre-release) que no forman parte de la investigación original, la cual se centra en la optimización de prompts, programas y flujos de ML.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 3,
+    "secs": 8.2
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' y un 'Orden de Ejecución' que no existen en la fuente, además de atribuir al paper una propuesta de 'Validación Pre-Release' que "
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint inventa una métrica de éxito basada en 'reducción en releases fallidos' y 'auditoría de árboles de búsqueda', detalles que el paper no especifica ni propone como parte de su framework."
+    ],
+    "verdict": "El blueprint atribuye al paper objetivos y módulos de validación de software (pre-release) que no forman parte de la investigación original, la cual se centra en la optimización de prompts, programas y flujos de ML.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 4,
+    "secs": 2.1
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' y un 'Orden de Ejecución' que no existen en la fuente, además de atribuir al paper una propuesta de 'Validación Pre-Release' que "
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint inventa una métrica de éxito basada en 'reducción en releases fallidos' y 'auditoría de árboles de búsqueda', detalles que el paper no especifica ni propone como parte de su framework."
+    ],
+    "verdict": "El blueprint atribuye al paper objetivos y módulos de validación de software (pre-release) que no forman parte de la investigación original, la cual se centra en la optimización de prompts, programas y flujos de ML.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 5,
+    "secs": 13.8
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' y un 'Orden de Ejecución' que no existen en la fuente."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint inventa un 'Mecanismo de verificación' y un 'Umbral de aceptación' para la validación pre-release que la fuente no menciona."
+    ],
+    "verdict": "El blueprint incluye módulos, procesos de validación y riesgos que no están presentes en el texto fuente, atribuyendo al paper una metodología de 'validación pre-release' que no se describe.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 6,
+    "secs": 17.1
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' que no existe en la fuente."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone un 'Orden de Ejecución' y una 'Validación del Blueprint' con umbrales de aceptación específicos que no aparecen en la fuente."
+    ],
+    "verdict": "El blueprint inventa módulos y procedimientos de validación no descritos en el paper y falla al no declarar que la fuente no especifica dichos detalles.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 7,
+    "secs": 2.1
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint atribuye al paper una propuesta de 'Módulo 3: Refinador de Contraste Éxito-Fallo' y un 'Orden de Ejecución' que no aparecen en la fuente."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint inventa una estructura de módulos (1, 2, 4, 5) como si fueran propuestas del paper, cuando el paper describe el funcionamiento de ReASearch, no un blueprint de implementación para tercero"
+    ],
+    "verdict": "El blueprint inventa módulos y estructuras de implementación que no existen en el texto fuente, atribuyendo al paper una arquitectura de software que el documento no propone.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 8,
+    "secs": 3.7
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 1: Estructura de Árbol de Búsqueda' y un 'Módulo 3: Refinador de Contraste Éxito-Fallo' como si fueran componentes de implementación, cuando el paper describe el árbol "
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone un 'Módulo 2: Detector de Estancamiento' con una lógica específica de '3+ y 7+ evaluaciones planas' como una implementación técnica, mientras que la fuente menciona esto como una "
+    ],
+    "verdict": "El blueprint confunde las capacidades observadas y los comportamientos emergentes del sistema ReASearch con módulos de implementación técnica, atribuyendo al paper una arquitectura de software que no especifica.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 9,
+    "secs": 3.2
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint atribuye al paper la propuesta de un 'Módulo 1: Estructura de Árbol de Búsqueda' y un 'Módulo 2: Detector de Estancamiento' como componentes de un blueprint de implementación, cuando el p"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' y un 'Orden de Ejecución' que no aparecen en la fuente, rellenando detalles técnicos inexistentes en el paper."
+    ],
+    "verdict": "El blueprint inventa módulos de implementación y una estructura de diseño que no existen en el paper, atribuyendo erróneamente la propuesta de estos componentes al texto fuente.",
+    "arm": "H21",
+    "technique": "ReASearch",
+    "run": 10,
+    "secs": 3.3
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint es riguroso, sigue fielmente la metodología descrita en la fuente y declara correctamente los parámetros empíricos como tales.",
+    "arm": "H21",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "secs": 7.6
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint refleja con precisión la metodología y los componentes del framework WikiSkill descritos en la fuente, cumpliendo estrictamente con las restricciones de citación y declaración de silencios.",
+    "arm": "H21",
+    "technique": "WikiSkill",
+    "run": 0,
+    "secs": 10.0
   }
 ]
