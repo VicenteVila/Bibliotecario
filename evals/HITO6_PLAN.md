@@ -99,3 +99,60 @@ sin tocar).
    26 actualizado en CONOCIMIENTO, en el commit de cierre.
 5. Si el veredicto es NO CUMPLE se cierra igual; un intento 4 exigiría
    declaración nueva — aquí no se re-baja nada.
+
+## §5 Resultados (escrito al cerrar la corrida oficial, 2026-10-17)
+
+**Veredicto: NO CUMPLE** (H5' y G1 y G2 y C1'). Coste real: **9 juicios + 9
+`generate()`** (5 rechazos de validación) de los ≤ 50 declarados. Suite 301
+verde.
+
+| criterio | umbral | medido | |
+|---|---|---|---|
+| H5' r4_ok y r5_ok | 5/5 | **3/5** (PEARL r2 · PG r1 · TCE r0) | NO |
+| G1 resueltas finales >= base | 5/5 | **5/5** (intentó 2: 4/5) | sí |
+| G2 encabezados base incluidos | 5/5 | **5/5** (intentó 2: 2/5) | sí |
+| C1' suite + >=50% base + sin rechazos | todo | suite sí; 2 rechazos | NO |
+
+Por arnés:
+
+- **PEARL** aprueba en ronda 2 con 7399 chars y los 6 encabezados de la base
+  (incluida `## Bibliografía`): G2 cumplida de verdad, no solo en el conteo.
+  Trayectoria R4/R5: OK/FALLA → FALLA/OK → OK/OK (el juez parpadea entre
+  rondas; al modelo le bastan2).
+- **Procedural Graphs**: el primer intento de reparación fue un stub de 485
+  chars — **el caso exacto del Hito 5 — y V1 lo RECHAZÓ**; el reintento salió
+  con 2243 chars, aceptado, y aprueba ronda 1. Disco **restaurado de 488 a
+  2360 chars** con documento real.
+- **Task-CoEvolve** intacto: aprueba en ronda 0 sin tocarse.
+- **ReASearch** y **WikiSkill**: **fail-fast declarado** — dos rechazos de
+  validación cada uno (`causa=validacion_rechazada`), sin juicio sobre el
+  texto rechazado y sin escritura a `BLUEPRINT.md`. ReASearch perdió el
+  encabezado `«Bibliografía  »` (con los2 espacios finales de la base) en
+  ambos intentos; su segundo borrador además metió espacios finales en el
+  título donde la base no los tiene — V2 es igualdad literal declarada.
+  WikiSkill truncó a 576 y 502 chars y perdió `## Bibliografía`.
+
+Diagnóstico para un posible intento 4 (nada decidido; exige declaración nueva):
+
+- **El bloqueo de degradación funciona**: 0 stubs aceptados, G1/G2 5/5 y PG
+  restaurado — lo que en el intento 2 se compró con el documento aquí se paga
+  con un reintento barato.
+- El cuello de botella **se movió**: la reparación LLM no produce en 2
+  intentos un documento completo para ReASearch/WikiSkill (trunca y pierde
+  encabezados). Candidatos declarables: presupuesto de intentos mayor,
+  reparación por secciones en vez de regeneración completa, V2 con espacios
+  finales normalizados (hoy castiga la forma, no el fondo).
+- **V1-V3 no ven lo semántico**: WikiSkill r1 pasa la validación y lo
+  suspende el juez (R4 vuelve a fabricar). Pega directo al hallazgo 10,
+  que sigue fuera de este hilo.
+- **Disco**: ReASearch queda en el stub de H12 (517 chars) porque ninguna
+  reparación suya llegó a ser aceptada — restaurarlo es una acción declarada
+  aparte, no se hace fuera de corrida.
+
+Erratas: la de redacción — §1.B dice «el texto rechazado… no toca disco» y el
+runner lo guarda como evidencia en `result_fase1_h13.json`
+(`texto_rechazado`); no toca `BLUEPRINT.md` ni los juicios, es más
+información, no un resultado tocado. Aviso de consola del SDK Gemini (AFC)
+durante el juicio de PG ronda 0, igual que en el Hito 5: no afectó a la fila.
+Historial intacto: solo se añadieron filas; conteo de juicios por arm
+C/D/E/R5/F/G/H 15 cada uno, H1 5, H1R 4, H12 11, **H13 9**.

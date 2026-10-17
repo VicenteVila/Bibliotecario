@@ -1787,5 +1787,122 @@
     "technique": "WikiSkill",
     "run": 2,
     "secs": 3.6
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el modelo PEARL puede ser utilizado como un validador de consistencia para agentes externos, una funcionalidad que el paper no menciona ni especifica."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución de la arquitectura, pero extrapola una aplicación práctica (validación de agentes) que no está presente en la fuente.",
+    "arm": "H13",
+    "technique": "PEARL",
+    "run": 0,
+    "secs": 13.2
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que PEARL se utiliza para verificar la consistencia de las predicciones de un agente antes de cada release, lo cual es una invención ajena al paper."
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint atribuye al modelo una función de control de calidad de software (validación de releases) que no existe en la fuente, la cual se limita exclusivamente a tareas de completado de grafos de conocimiento.",
+    "arm": "H13",
+    "technique": "PEARL",
+    "run": 1,
+    "secs": 4.3
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple rigurosamente con las normas de citación, diferenciando claramente entre la arquitectura descrita en la fuente y las propuestas de implementación del usuario.",
+    "arm": "H13",
+    "technique": "PEARL",
+    "run": 2,
+    "secs": 2.5
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El paper no menciona un 'failure-vs-success refiner', 'lessons persistence' ni 'graph mutation' como componentes del framework; estos son inventados por el blueprint."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el grafo se actualiza mediante 'mutación' y 'lecciones persistidas', detalles que el paper no especifica."
+    ],
+    "verdict": "El blueprint inventa componentes funcionales y mecanismos de aprendizaje que no existen en la fuente, atribuyendo capacidades de evolución estructural al framework que el texto original no describe.",
+    "arm": "H13",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "secs": 8.2
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple estrictamente con el rigor de citación, declarando explícitamente los silencios de la fuente cuando los módulos propuestos no tienen respaldo en el texto.",
+    "arm": "H13",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "secs": 2.0
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 3: Refinador de Contraste Éxito-Fallo (el texto fuente no menciona este módulo ni esta funcionalidad específica)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
+    ],
+    "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución.",
+    "arm": "H13",
+    "technique": "ReASearch",
+    "run": 0,
+    "secs": 4.3
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint es riguroso, cita correctamente las fuentes y declara explícitamente los parámetros obtenidos de las tablas del paper cuando no estaban en el texto principal.",
+    "arm": "H13",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "secs": 3.5
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el conjunto de validación debe ser 'estratificado' para evitar el sobreajuste, detalle que la fuente no especifica."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución, pero incluye recomendaciones operativas no presentes en la fuente que exceden la descripción del framework.",
+    "arm": "H13",
+    "technique": "WikiSkill",
+    "run": 0,
+    "secs": 3.8
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el agente ejecuta tareas usando solo las habilidades activas para evitar sesgos en el desarrollo de habilidades, cuando la fuente solo indica que el acceso a la wiki durante el"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone una estrategia de mitigación de riesgos basada en el uso de un conjunto de validación estratificado, detalle que el paper no especifica."
+    ],
+    "verdict": "El blueprint atribuye intenciones no declaradas al diseño del sistema y rellena secciones de mitigación de riesgos con especulaciones técnicas no presentes en la fuente.",
+    "arm": "H13",
+    "technique": "WikiSkill",
+    "run": 1,
+    "secs": 7.9
   }
 ]
