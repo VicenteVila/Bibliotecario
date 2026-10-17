@@ -1,0 +1,12 @@
+{
+  "nombre": "default",
+  "descripcion": "Demo guionizada inicial HITO15 §3: espera, camina, salta, acepta (10 frames c/u de margen). Sin mouse.",
+  "steps": [
+    {"wait": 60},
+    {"action": "ui_right", "hold": 90},
+    {"action": "ui_accept", "hold": 10},
+    {"action": "ui_right", "hold": 60},
+    {"action": "ui_accept", "hold": 10},
+    {"wait": 30}
+  ]
+}
