@@ -312,6 +312,15 @@ def generate(prompt: str, max_tokens: int = 512, retries: int = 2,
                     attempt += 1
                     mi += 1
                     continue
+                if not out.strip():
+                    # Vacio tras agotar reintentos: como en el camino de
+                    # excepción, se rueda al siguiente proveedor en vez de
+                    # devolver "" y dejar al llamante sin fallback. Medido en
+                    # H4 (Fase 4 Hito 3): el cierre quedaba en "  [doc:?]"
+                    # porque un único proveedor agotado bastaba para vaciar
+                    # la respuesta final.
+                    logger.warning("LLM %s siguio devolviendo vacio, paso a siguiente", name)
+                    break
                 return out
             except Exception as e:
                 kind = _classify(e)

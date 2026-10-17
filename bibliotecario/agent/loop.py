@@ -427,7 +427,11 @@ def _final_answer(question: str, best: str, evidence: list[str], flat: int, retr
 
     prompt = _close_prompt(question, ctx, anclaje, best, flat)
     out = generate(prompt, max_tokens=900, retries=retries, **_temp_kw(temperature)).strip()
-    if _toolish(out):
+    # Vacío tras agotar proveedores: devolver "" para que el caller (run)
+    # llegue a _synthesize o al fallback de presupuesto agotado. Antes se
+    # pegaba "  [doc:?]" incluso sin prosa, y esa marca es truthy: tumbaba
+    # el `or` del caller y la run terminaba con la marca como respuesta.
+    if not out or _toolish(out):
         return ""
     out = _fix_truncation(out)
     if evidence and not CITE_FMT.has_citation(out):
