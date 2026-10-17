@@ -48,6 +48,13 @@ MAX_TOKENS = int(os.environ.get("Q1_MAX_TOKENS", "3600"))
 # Se baja a 0 antes de re-medir.
 JUDGE_TEMPERATURE = float(os.environ.get("Q1_TEMPERATURE", "0"))
 
+# HITO13 §1.A — enmienda 2 (fuente completa): cap de la FUENTE en el cuerpo
+# del prompt. Durante H1-H18 y E12 fue 9000 (0,86%-10,4% del paper según la
+# técnica): los veredictos R4/R5 resultaron función de ese sliver (E12: 0/4
+# con falsos positivos). 160000 > la fuente más larga (138.667) — sin
+# truncación. PROMPT, blueprint[:9000], modelo y temp intactos.
+FUENTE_MAX = int(os.environ.get("Q1_FUENTE_MAX", "160000"))
+
 PROMPT = """Eres un revisor estricto de rigor de citación sobre artículos científicos.
 
 Recibes la FUENTE (texto real del paper) y un BLUEPRINT escrito a partir de ella.
@@ -104,7 +111,8 @@ def q1(source: str, blueprint: str, model: str | None = None) -> dict:
         base_url, key = _endpoint(JUDGE_PROVIDER)
     if not key:
         return {"error": f"sin key para {JUDGE_PROVIDER}"}
-    body = (PROMPT + f"\n\nFUENTE:\n{source[:9000]}\n\nBLUEPRINT:\n{blueprint[:9000]}")
+    body = (PROMPT + f"\n\nFUENTE:\n{source[:FUENTE_MAX]}"
+            f"\n\nBLUEPRINT:\n{blueprint[:9000]}")
     model = model or JUDGE_MODEL
     # no_think mete `chat_template_kwargs` en el payload. Solo lo usa el camino
     # de NVIDIA, que es con el que se midió §8.10 — así esa medición sigue

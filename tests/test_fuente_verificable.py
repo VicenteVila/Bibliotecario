@@ -75,3 +75,39 @@ def test_encode_ok_sin_embeddings_en_chunks(doc_prueba, monkeypatch):
     _, win = T.fuente_verificable("TechX", "stagnation advisory",
                                   doc_id=doc_prueba)
     assert "[chunk 0]" in win
+
+
+# --- HITO13 §1.B — enmienda 2: fuente completa -------------------------------
+
+def test_fuente_completa_todos_los_chunks(doc_prueba):
+    d, win = T.fuente_completa("TechX", doc_id=doc_prueba)
+    assert d == doc_prueba
+    assert win.startswith("[chunk 0] Titulo Autores Sello")
+    for i in range(5):
+        assert f"[chunk {i}]" in win
+
+
+def test_fuente_completa_sin_recorte(doc_prueba):
+    with storage.get_conn() as conn:
+        for i in range(5, 50):
+            conn.execute(
+                "INSERT INTO chunks (doc_id, chunk_idx, text, embedding) "
+                "VALUES (?,?,?,?)", (doc_prueba, i, "y" * 500, None))
+    _, win = T.fuente_completa("TechX", doc_id=doc_prueba)
+    assert len(win) > 9000          # el cap vive en q1 (FUENTE_MAX), no aquí
+    assert "[chunk 49]" in win
+
+
+def test_fuente_completa_sin_doc():
+    assert T.fuente_completa("TechQueNoExiste") == (None, "")
+
+
+def test_eval_q1_fuente_max_declarado():
+    """HITO13 §1.A: el cap del instrumento sube a 160000 (fuente completa)."""
+    import sys as _sys
+    from pathlib import Path as _P
+    evals = str(_P(__file__).resolve().parents[1] / "evals")
+    if evals not in _sys.path:
+        _sys.path.insert(0, evals)
+    import eval_q1_r4r5
+    assert eval_q1_r4r5.FUENTE_MAX == 160_000

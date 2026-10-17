@@ -330,6 +330,40 @@ def fuente_verificable(technique: str, blueprint: str,
     return doc_id, "\n\n".join(parts)
 
 
+def fuente_completa(technique: str, procs=None,
+                    doc_id: int | None = None) -> tuple[int | None, str]:
+    """HITO13 §1.B — enmienda 2: TODOS los chunks del documento propio.
+
+    Sin recorte aquí (el cap vive en `q1`: `FUENTE_MAX=160000` en
+    `eval_q1_r4r5.py`); formato `[chunk i]` idéntico a las ventanas
+    anteriores para que el prompt lea la misma estructura.
+    """
+    from bibliotecario.knowledge import procedural as P
+
+    if doc_id is None:
+        if procs is None:
+            procs = P.list_procedures(technique=technique)
+        for n in G.find_nodes(technique, kind="technique", limit=5):
+            if n.metadata.get("doc_id"):
+                doc_id = n.metadata["doc_id"]
+                break
+        if doc_id is None:
+            for p in procs:
+                if p.metadata.get("doc_id"):
+                    doc_id = p.metadata["doc_id"]
+                    break
+    if doc_id is None:
+        return None, ""
+    with storage.get_conn() as conn:
+        rows = conn.execute(
+            "SELECT chunk_idx, text FROM chunks WHERE doc_id=? "
+            "ORDER BY chunk_idx", (doc_id,)).fetchall()
+    if not rows:
+        return doc_id, ""
+    return doc_id, "\n\n".join(
+        f"[chunk {r['chunk_idx']}] {r['text']}" for r in rows)
+
+
 # Presupuesto del blueprint. 1500 no alcanzaba: R7 pide la bibliografía al FINAL
 # del documento y el corte la pegaba (medido en el A/B, 4/22 truncados).
 BLUEPRINT_MAX_TOKENS = 3000
