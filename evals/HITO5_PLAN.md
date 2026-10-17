@@ -1,9 +1,9 @@
 # Hito 5 — Cierre de H1: que la verificación vea lo que el juez ve
 
-**Estado: DECLARADO 2026-10-17 — escrito ANTES de tocar código y ANTES de
-medir (patrón del Hito 4: commit de declaración primero, implementación
-después, ratificación del dueño antes de la corrida oficial). El resultado va
-en §6.**
+**Estado: CERRADO 2026-10-17 — declarado ANTES de tocar código (`6f17a6a`),
+implementado con tests antes de medir (`c5d5691`), umbrales ratificados por el
+dueño y env del juez confirmada antes de la corrida oficial. Resultado:
+H5 ✅ · G1 ✗ · G2 ✗ · C1 ✅ → HITO5 NO CUMPLE, ver §6.**
 
 **Objetivo:** cerrar el **hilo H1 / hallazgo 26** de `CONOCIMIENTO.md`. La
 lectura vinculante de H1 (declarada en `HITO3_PLAN.md` §5 Fase 1 antes de
@@ -156,7 +156,86 @@ causa medida.
 
 ---
 
-## 6. Resultado — PENDIENTE
+## 6. Resultado — 2026-10-17 — **HITO5: NO CUMPLE** (H5 ✅ · G1 ✗ · G2 ✗ · C1 ✅)
 
-*(Se rellena tras la ratificación y la corrida oficial de `run_fase1_h12.py`;
-aquí irán la tabla de umbrales, las erratas, el coste real y qué hilos quedan.)*
+Corrida oficial `evals/run_fase1_h12.py` tras la ratificación del dueño
+(question tool: «Ratificar y medir ya») y con el env del juez confirmada por
+él (`gemini-3.1-flash-lite` @ endpoint OpenAI-compat de Google con
+`GEMINI_API_KEY`). **Ningún umbral se tocó.** Datos: filas `arm="H12"` en
+`evals/result_fase1_h12.json` + juicios en `evals/result_q1_r4r5.json`
+(las filas `H1`/`H1R` quedan intactas).
+
+| criterio | umbral (ratificado) | medido | veredicto |
+|---|---|---|---|
+| **H5** cierre de la lectura H1 | **5/5** con `r4_ok` y `r5_ok` | **5/5** (PEARL r2 · PG r1 · ReASearch r1 · TCE r0 · WikiSkill r2) | **CUMPLE** |
+| **G1** no vaciar las anclas | resueltas finales ≥ base, por arnés | **4/5** — ReASearch 2 → 0 | **NO CUMPLE** |
+| **G2** conservar la estructura | `##` de ronda 0 ⊆ finales, por arnés | **2/5** — pierden `##` PEARL, ReASearch y WikiSkill | **NO CUMPLE** |
+| **C1** controles | sin blueprint vacío/`(` + suite | sin emergencias; **291 tests verdes** | **CUMPLE** |
+| **global** | H5 **y** G1 **y** G2 **y** C1 | — | **NO CUMPLE** |
+
+Por arnés, tal cual salió:
+
+| arnés | base (r0) | rondas | final | len final | marcas R6 | resueltas | G1 | G2 |
+|---|---|---|---|---|---|---|---|---|
+| PEARL | R4 ✔ R5 ✘ | 2 | r2 ✔ ✔ | 5.973 | 22 | 0 → 0 | ✔ | ✘ (pierde `## 5. Checklist…` y `## 6. Bibliografía`) |
+| Procedural Graphs | ✘ ✘ | 1 | r1 ✔ ✔ | **488** | 1 | 0 → 0 | ✔ | ✔* (*base sin `##`: pase vacío) |
+| ReASearch | ✘ ✘ | 1 | r1 ✔ ✔ | **440** | 2 | **2 → 0** | ✘ | ✘ (pierde `## Bibliografía`) |
+| Task-CoEvolve | ✔ ✔ | 0 | r0 ✔ ✔ | 6.743 | 0 | 0 → 0 | ✔ | ✔ |
+| WikiSkill | ✔ ✘ | 2 | r2 ✔ ✔ | 7.191 | 3 | 0 → 0 | ✔ | ✘ (renombra los `##` con numeración) |
+
+**Lo que esta corrida demuestra, sin adornos:**
+
+- **La cláusula de H1 se alcanzó:** los 5 arneses aprueban `r4_ok` y
+  `r5_ok` en su último juicio (H1 empezó en 1/5 · 1/5 y H1R en 3/5 · 1/5).
+  El bucle juez → reparación con evidencia completa (frases del juez +
+  violaciones mecánicas + huérfanas + fuente, barrido documental con R6)
+  funciona para la rúbrica R4/R5.
+- **Y las guardas existían justo para esto y saltan.** ReASearch pagó el
+  veredicto con sus dos citas resolubles (2 → 0) y su `## Bibliografía`;
+  PEARL perdió la bibliografía (R7) en la ronda 2; WikiSkill vació sus 5
+  punteros y renombró todos los encabezados (`## Bibliografía` →
+  `## 5. Bibliografía`: con la igualdad literal declarada, renombrar es
+  fallar — no se reinterpreta a posteriori).
+- **Degeneración medida, no maquillada:** dos de los cinco pasos de H5 son
+  sobre documentos degenerados — PG final **488 chars** (base 3.988) y
+  ReASearch final **440 chars** (base 5.196), y este además ni siquiera es
+  un blueprint: es el borrador de razonamiento del propio modelo («Let's
+  check if there were pointers…»). **El juez los aprobó `R4=OK R5=OK`**,
+  y en cambio rechazó el stub de WikiSkill en ronda 1 (575) por
+  «incompleto»: su detección de integridad es inconsistente. C1 como se
+  declaró (no vacío, no `(`) no los caza, y **la longitud mínima no se
+  inventa ahora como umbral** — queda como contenido declarable del
+  siguiente intento. El veredicto global ya es NO CUMPLE por G1/G2.
+- PG: sus 0 citas vienen del estado H1R (R1 ya las había quitado antes de
+  este intento; la base aquí medía 0), y su G2 pasa vacíamente porque esa
+  base no tenía ningún `##`. TCE aprobó en ronda 0 sin tocarse.
+- El informe con huérfanas funcionó (base: 3/3/0/3/5) y nutrió cada
+  reparación; al final quedan 12 huérfanas en WikiSkill y el juez aprobó
+  igual — no es su rúbrica.
+
+**Erratas:** ninguna de medición; ninguna desviación entre diseño y script
+(marcas R6 y longitud, que §3 dejó como informativos, se calculan aquí desde
+las filas guardadas). **Notas de corrida:** la SDK de Gemini imprimió en
+consola un aviso de «automatic function calling» durante la reparación de PG
+— no tocó la fila (juzgada tras, ✔ ✔) y ningún output quedó vacío.
+
+**Coste real: 11 juicios + 6 reparaciones = 17 llamadas LLM** (declarado
+≤ 29); juicios 3-20 s, reparaciones 8-25 s; suite 291 en verde.
+
+**Qué queda abierto (el hilo NO se cierra — hallazgo 26 ampliado):**
+
+1. **Comprar el veredicto a costa del documento es el modo de fallo nuevo:**
+   la siguiente declaración necesita reparación que no degenere — marcado
+   in-place línea a línea (estilo `demote`, que nunca reescribe prosa) o
+   validación mecánica del draft con rechazo y reintento, en vez de aceptar
+   cualquier texto que el `generate()` devuelva.
+2. **Validar la salida de la reparación:** hoy solo se descarta vacío o con
+   `(`; un borrador de 440 chars de razonamiento pasó el filtro y hasta el
+   juez. Longitud/estructura mínima es candidata obvia a umbral declarado.
+3. **El juez no cubre integridad/estructura** (su rúbrica es R4/R5): dos
+   stubs aprobados y uno rechazado — refuerza el hilo del juez ciego
+   (hallazgo 10).
+4. **Modo B (resolución) empeoró:** al final del intento **0 de 5 arneses
+   con punteros resueltos** (ReASearch perdió los suyos). Sigue siendo un
+   fallo distinto del de H1, declarado fuera de alcance aquí, y ya con
+   coste medido.

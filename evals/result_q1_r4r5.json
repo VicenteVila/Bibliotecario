@@ -1648,5 +1648,144 @@
       "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
     ],
     "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución."
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el modelo PEARL puede ser utilizado como un validador de consistencia para agentes externos, una funcionalidad que el paper no menciona ni especifica."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución de la arquitectura, pero extrapola una aplicación práctica (validación de agentes) que no está presente en la fuente.",
+    "arm": "H12",
+    "technique": "PEARL",
+    "run": 0,
+    "secs": 3.4
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint afirma que el release pasa si las métricas superan los umbrales establecidos basados en los resultados del paper, pero la fuente no menciona ninguna regla de aceptación ni umbrales de ren"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el modelo PEARL puede ser utilizado para verificar la consistencia de las predicciones de un agente antes de un release, un uso no especificado en la fuente."
+    ],
+    "verdict": "El blueprint atribuye al modelo capacidades de validación de software y reglas de aceptación que no están presentes en el texto original, además de rellenar el propósito del modelo con una aplicación práctica no declarada por los autores.",
+    "arm": "H12",
+    "technique": "PEARL",
+    "run": 1,
+    "secs": 3.7
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con el rigor de citación, atribuye correctamente las funciones del modelo a la fuente y declara explícitamente los silencios sobre los umbrales de aceptación.",
+    "arm": "H12",
+    "technique": "PEARL",
+    "run": 2,
+    "secs": 20.2
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El paper no menciona un 'failure-vs-success refiner', 'lessons persistence' ni 'graph mutation' como componentes del framework; estos son inventados por el blueprint."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el grafo se actualiza mediante 'mutación' y 'lecciones persistidas', detalles que el paper no especifica."
+    ],
+    "verdict": "El blueprint inventa componentes funcionales y mecanismos de aprendizaje que no existen en la fuente, atribuyendo capacidades de evolución estructural al framework que el texto original no describe.",
+    "arm": "H12",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "secs": 3.4
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple estrictamente con las reglas R4 y R5 al citar correctamente la fuente y declarar explícitamente los silencios sobre el mecanismo de extracción.",
+    "arm": "H12",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "secs": 2.8
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 3: Refinador de Contraste Éxito-Fallo (el texto fuente no menciona este módulo ni esta funcionalidad específica)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
+    ],
+    "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución.",
+    "arm": "H12",
+    "technique": "ReASearch",
+    "run": 0,
+    "secs": 2.8
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5 al declarar explícitamente que el paper no especifica el módulo mencionado.",
+    "arm": "H12",
+    "technique": "ReASearch",
+    "run": 1,
+    "secs": 7.6
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint es riguroso, cita correctamente las fuentes y declara explícitamente los parámetros obtenidos de las tablas del paper cuando no estaban en el texto principal.",
+    "arm": "H12",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "secs": 20.2
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el conjunto de validación debe ser 'estratificado' para evitar el sobreajuste, detalle que la fuente no especifica."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución, pero incluye recomendaciones operativas no presentes en la fuente que exceden la descripción del framework.",
+    "arm": "H12",
+    "technique": "WikiSkill",
+    "run": 0,
+    "secs": 4.8
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint se corta abruptamente tras citar la fuente, dejando el resto del módulo sin desarrollar ni especificar."
+    ],
+    "verdict": "El blueprint está incompleto y se interrumpe abruptamente, incumpliendo la necesidad de detallar el funcionamiento del módulo mencionado.",
+    "arm": "H12",
+    "technique": "WikiSkill",
+    "run": 1,
+    "secs": 3.1
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple rigurosamente con las restricciones de citación, declarando explícitamente los silencios de la fuente y evitando atribuciones no fundamentadas.",
+    "arm": "H12",
+    "technique": "WikiSkill",
+    "run": 2,
+    "secs": 3.6
   }
 ]
