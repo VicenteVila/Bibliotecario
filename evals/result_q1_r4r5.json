@@ -2935,5 +2935,70 @@
     "technique": "ReASearch",
     "run": 0,
     "secs": 2.0
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con el rigor de citación exigido, declarando explícitamente los silencios de la fuente mediante la etiqueta (propuesta del blueprint) y anclando correctamente las funcionalidades técnicas a los fragmentos del paper.",
+    "arm": "E13",
+    "technique": "PEARL",
+    "run": 0,
+    "secs": 2.7
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El paper no menciona un 'failure-vs-success refiner' ni especifica un componente dedicado a la diferenciación explícita de fallos versus éxitos.",
+      "El paper no menciona la 'lessons persistence' ni define un almacén de lecciones persistidas dentro del framework.",
+      "El paper no menciona la 'graph mutation' ni especifica un mecanismo de actualización del grafo mediante mutación o lecciones persistidas."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El proceso específico de extracción automatizada a partir de trayectorias de ejecución no está detallado en el paper; el paper no especifica el algoritmo exacto de extracción."
+    ],
+    "verdict": "El blueprint atribuye al paper componentes y terminología (como 'failure-vs-success refiner', 'lessons persistence' o 'graph mutation') que no existen en el texto, además de rellenar vacíos de información con propuestas propias no presentes en la fuente.",
+    "arm": "E13",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "secs": 2.1
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint es riguroso, sigue fielmente la metodología descrita en la fuente y declara correctamente los parámetros empíricos como tales.",
+    "arm": "E13",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "secs": 2.4
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint refleja con precisión la metodología y los componentes del framework WikiSkill descritos en la fuente, cumpliendo estrictamente con las restricciones de citación y declaración de silencios.",
+    "arm": "E13",
+    "technique": "WikiSkill",
+    "run": 0,
+    "secs": 2.1
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone un 'Módulo 3: Refinador de Contraste Éxito-Fallo' como si fuera una funcionalidad técnica explícita del framework, cuando la fuente solo menciona que el agente realiza análisis de"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint detalla un 'Orden de Ejecución' paso a paso (1 al 8) para una 'Validación Pre-Release' que no existe en el paper; el paper describe un framework de optimización de artefactos, no un siste"
+    ],
+    "verdict": "El blueprint inventa un caso de uso (validación pre-release de software) y módulos técnicos que no existen en la fuente, atribuyendo al framework capacidades de gestión de releases que el paper no menciona.",
+    "arm": "E13",
+    "technique": "ReASearch",
+    "run": 0,
+    "secs": 2.1
   }
 ]

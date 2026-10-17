@@ -94,6 +94,40 @@ commit+push.
 5. NO CUMPLE / rechazo se cierran igual; el siguiente paso exigiría
    declaración nueva.
 
-## §5 Cierre
+## §5 Cierre — 2026-10-17 · ENMIENDA 2 RECHAZADA POR LA PUERTA 4/4 (intento 9 no corrió)
 
-(pendiente de la corrida oficial)
+- **Resultado E13 (fuente completa)**: **PEARL OK · TCE OK · WikiSkill OK**
+  (los 3 restaurados — confirman el forense de E12: sus quejas de la
+  ventana rica eran falsas) · **PG R4+R5 FALLA** · ReASearch (diag) R4+R5
+  FALLA → **3/4 → §1.D: ENMIENDA 2 RECHAZADA, abort antes de H20** —
+  0 filas `H20`, 0 localizadores, coste **5 juicios**. Riesgo (1).
+- **Forense de la única caída (PG, fuente completa de 131.899 chars)**:
+  1. `lessons persistence` → **`lesson` 0× y `persist` 0×** → queja
+     **VERDADERA**: la aprobación de PG en H17/H18 (ventana 0,9%) era un
+     **artefacto** — PG nunca aprobó a un juez que pudiera ver su fuente.
+  2. `failure-vs-success refiner` → **`refiner` 23×, `success` 44×**
+     («offline LLM refiner inspects the partitioned traces» /
+     «successes versus failures») → queja **FALSA**.
+  3. `graph mutation` → **`mutation` 11×** («Feedback-Driven Mutation»,
+     «mutation engine … deleted the mismatched transition edges») → queja
+     **FALSA** (equivalencia semántica con otro nombre).
+  4. R5 extracción de trayectorias → `trajector` 90× sin algoritmo de
+     extracción explícito → **parcialmente verdadera**.
+  → **Incluso con la fuente COMPLETA el juez erra por nombre-exacto**
+  (hallazgo 10: la ventana no era el único problema; el criterio R4
+  confunde «no con ese nombre» con «no existe»).
+- **ReASearch con fuente completa: cola corta y verdadera** — E13 lista
+  **1 R4 + 1 R5** (contra 2-3 por ronda durante 11 rondas en ventana
+  tiny): `refiner` 0× y `pre-release` 0× en 139K → ambas **verdaderas**;
+  los moles anteriores (stagnation advisory, search-tree, etc.) existen en
+  la fuente y el juez ya no los acusa. **La cola es finita y de 1-2
+  reparaciones.**
+- **Estado del arte al cierre**: bajo fuente completa, **3/5 tienen
+  aprobación verdadera** (PEARL/TCE/Wiki) · **PG** = 1-2 quejas verdaderas
+  + 2 falsas encadenables · **ReASearch** = 1-2 quejas verdaderas. La
+  puerta 4/4 bloqueó por PG, cuya aprobación previa era ella misma un
+  artefacto. Opciones al dueño: **A** declarar intento 9 con puerta
+  re-declarada (≥3/4 + forense) y meter PG+ReASearch al bucle de
+  reparación — primera vez con colas finitas a la vista · **B** cerrar H1
+  con toda la evidencia · **C** enmienda 3 (tolerancia semántica en el
+  prompt — rompe PROMPT intacto).
