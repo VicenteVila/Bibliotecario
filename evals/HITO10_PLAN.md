@@ -116,3 +116,10 @@ se mantiene; sin más cambios de flujo.
 - Ruido de red observado sin efecto: reintentos `groq devolvio vacio` y
   `gemini2 esperando` dentro de juicios (rotación declarada §8.12; env y
   modelo intactos; ningún juicio falló).
+- **ERRATA (2026-10-17, medición posterior)**: la lección de arriba
+  estimaba «solo-máscaras ≈50 chars/mole → decenas de moles». Medido en
+  H17, las máscaras de línea completa en ReASearch cuestan **213-416 chars
+  cada una** (líneas de 250-400+ chars): el presupuesto V1 (2598) alcanza
+  para ≈8-12 moles, no decenas. La vía barata es la **máscara quirúrgica
+  del eco** (ya validado literal dentro de la línea en
+  `parse_localizador`) — declarada en `evals/HITO11_PLAN.md` §0-§1.
