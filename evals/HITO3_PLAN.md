@@ -1,12 +1,17 @@
 # Hito 3 — arneses válidos: diseño y evaluación
 
-**Estado: RATIFICADO 2026-10-16 — Fase 0 ✅ cerrada · Fase 1 ✅ ejecutada
-(hueco A cerrado; H1 medida: NO CUMPLE, ver resultado) · Fase 2 ✅ ejecutada
-(hueco B cerrado; H2 medida: CUMPLE, ver resultado) · Fase 3 ✅ ejecutada
-(hueco C cerrado — estado real a `apply_pfs`; H3 medida con **enmienda 1**
-del dueño: A 10/10 · B 5/5+5/5 → **CUMPLE**, umbral original 0/10
-archivado) · Fase 4 ✅ ejecutada (hueco D cerrado; H4 medida: **NO CUMPLE**
-por el umbral (4) — 18/18 runs, placebo OK, separación NO, ver resultado).****
+**Estado: CERRADO 2026-10-16 — Fase 0 ✅ · Fase 1 ✅ (hueco A; H1 NO CUMPLE)
+· Fase 2 ✅ (hueco B; H2 CUMPLE) · Fase 3 ✅ (hueco C; H3 CUMPLE con
+enmienda 1 del dueño) · Fase 4 ✅ (hueco D; H4 NO CUMPLE).****
+
+**Veredicto final del hito: parcial — el objetivo se cumplió a medias y así
+queda registrado.** Los arneses existen, ejecutan la técnica (H2 5/5) y los
+PFs reaccionan de verdad (H3). La infraestructura de evaluación de arneses
+existe y funciona (script A/B + placebo + umbrales pre-declarados + resultado
+publicado). Lo que no se alcanzó: H1 (la ruta del arnés suspende R4/R5) y H4
+(el A/B no separa dos configuraciones con n=6 en free tier). Ningún umbral se
+re-bajó. Ver §9 "Cierre del hito".
+
 **Decisión del dueño:** «Ratificar H1-H4 tal cual» · «Camino 1».
 H1-H4 quedan fijos tal como se proponen; **nada se mide hasta ahora y a
 partir de ahora no se re-bajan.** Camino de la §7 = **1** (diseñar sobre las
@@ -613,3 +618,58 @@ medido*, erratas propias numeradas, coste real en tokens.
 no se maquilla con una media.** El Hito 2 tuvo que declarar R5 como *no
 medible* durante toda una sección antes de poder medirla, y el resultado fue
 mejor por haberlo hecho así.
+
+---
+
+## 9. Cierre del hito — 2026-10-16
+
+El hito se cierra con sus cuatro hipótesis medidas y **sin re-bajar ningún
+umbral**. Resumen final:
+
+| hipótesis | umbral | medido | veredicto |
+|---|---|---|---|
+| **H1** ruta del arnés no peor que el blueprint | 100% pasan R4+R5 | 3/5 · 1/5 tras reparación R1 | **NO CUMPLE** |
+| **H2** el arnés ejecuta la técnica | ≥3 pasos herramienta, ≥1 sin `deep_sweep` | 5/5 arneses | **CUMPLE** |
+| **H3** los PFs disparan de verdad | ≥1 fire / 10 runs (con enmienda 1) | A 10/10 limpias sin fires · B 5/5 con fires | **CUMPLE** |
+| **H4** el A/B de arneses separa | placebo OK + separación significativa | placebo OK; LOW−FULL diff=2.0 IC95=[−0.185, 4.185] | **NO CUMPLE** |
+
+**Qué se ganó (infraestructura y conocimiento):**
+
+- `instantiate_agent_template` ya no usa `build_blueprint` crudo: pasa por la
+  ruta verificada `build_blueprint_p4` (hueco A cerrado, commit Fase 1).
+- El arnés compone las 4 capas del loop y ejecuta la técnica, no solo
+  retrieval (hueco B cerrado, H2 5/5, commit Fase 2).
+- `apply_pfs` recibe estado real del recorrido, no un dict fabricado; los PFs
+  built-in reaccionan a fallo de verdad (hueco C cerrado, H3 con enmienda 1,
+  commit Fase 3).
+- Existe un instrumento A/B de configuraciones de arnés con placebo,
+  umbrales pre-declarados y resultado publicado (hueco D cerrado, commit
+  Fase 4). El instrumento tenía un bug de cierre vacío que tumbaba los
+  fallbacks; está arreglado (`b6740f4`) y deja el camino limpio para
+  corridas futuras.
+- Cuatro erratas/enmiendas declaradas con fecha y sin reescribir historial.
+
+**Qué queda abierto (para el siguiente hito, no dentro de este):**
+
+- **H1 NO CUMPLE**: `verify_and_mark` no ve fabricaciones sin puntero y el
+  juez no suspende arneses con 0 punteros resueltos (hallazgo 26). Es un
+  fallo de diseño de la verificación, no de generación.
+- **H4 NO CUMPLE**: con n=6 y juez ruidoso free-tier, el A/B no separa
+  presupuestos de turnos (hallazgo 27). Re-corrida que quiera CUMPLE necesita
+  más n o diseño más estable, con declaración previa del dueño.
+- **Meta-evolución sin callers** (hallazgo 4): `evolve_from_failures` y
+  `ProceduralSkillLayer` nadie los llama desde la ruta productiva. Es el
+  salto de "el arnés funciona" a "el arnés se mejora solo".
+- **Juez ciego** (hallazgo 10, decisión abierta del Hito 2): el juez del
+  Hito 2 comparte familia con el agente.
+
+**Coste real del hito** (tokens LLM, rotación free tier): Fase 1 ≈ 25
+`generate()` + 5 juicios · Fase 2 sin tokens (regeneración local) · Fase 3
+sin tokens (runs guionizadas) · Fase 4 54 llamadas de agente + 18 juicios
+≈ 72 llamadas. El detalle por fila está en cada `result_*.json`.
+
+**Regla que cierra:** el Hito 3 se cierra como **parcial y honesto**. Dos de
+cuatro hipótesis NO CUMPLE no es un fracaso del hito: es el sistema diciendo
+dónde está fuerte (diseño y ejecución de arneses) y dónde le falta
+(verificación de atribución y potencia estadística en free tier). Eso es lo
+que un hito de investigación debe dejar escrito.
