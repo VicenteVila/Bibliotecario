@@ -232,6 +232,104 @@ def _source_for(technique: str, procs, max_chunks: int = 8, max_chars: int = 700
     return doc_id, "\n\n".join(parts[:max_chunks])
 
 
+def _toks(text: str) -> set[str]:
+    return {t for t in re.findall(r"[a-záéíóúñü]{4,}", text.lower())}
+
+
+def fuente_verificable(technique: str, blueprint: str,
+                       procs=None, doc_id: int | None = None,
+                       max_chars: int = 9000) -> tuple[int | None, str]:
+    """HITO12 §1.A — ventana de verificación POR BLUEPRINT (enmienda 1, E12).
+
+    `_source_for` muestrea chunks con `LIKE` sobre etiquetas de procedimiento
+    (ES) contra el paper (EN) y devuelve ≤10,4% de la fuente (0,86% en
+    ReASearch): el juez declara «el texto fuente no menciona…» sin ver el
+    texto. Aquí la ventana es: chunk 0 del documento propio (título) + chunks
+    citados por el propio `bp` vía `[doc:X:Y]` + top-10 del documento propio
+    por score híbrido (0,5 densa local + 0,3 keyword, sin LLM ni cuota)
+    contra `bp[:2500]`. Mismo formato `[chunk i]` y mismo pre-recorte a
+    `max_chars` que `_source_for`. Devuelve (doc_id, ventana).
+    """
+    from bibliotecario.knowledge import procedural as P
+
+    if doc_id is None:
+        if procs is None:
+            procs = P.list_procedures(technique=technique)
+        for n in G.find_nodes(technique, kind="technique", limit=5):
+            if n.metadata.get("doc_id"):
+                doc_id = n.metadata["doc_id"]
+                break
+        if doc_id is None:
+            for p in procs:
+                if p.metadata.get("doc_id"):
+                    doc_id = p.metadata["doc_id"]
+                    break
+    if doc_id is None:
+        return None, ""
+
+    cites: list[tuple[int, int]] = []
+    for d, c in re.findall(r"\[doc:(\d+):(\d+)\]", blueprint or ""):
+        t = (int(d), int(c))
+        if t not in cites:
+            cites.append(t)
+
+    q = (blueprint or "")[:2500]
+    try:
+        import numpy as np
+
+        from bibliotecario.core.embeddings import blob_to_vec, encode_one
+
+        qvec = encode_one(q)
+    except Exception:
+        qvec = None
+    qtok = _toks(q)
+
+    with storage.get_conn() as conn:
+        propios = conn.execute(
+            "SELECT chunk_idx, text, embedding FROM chunks WHERE doc_id=? "
+            "ORDER BY chunk_idx", (doc_id,)).fetchall()
+        scored: list[tuple[float, int]] = []
+        for r in propios:
+            dense = 0.0
+            if qvec is not None and r["embedding"]:
+                dense = float(np.dot(qvec, blob_to_vec(r["embedding"])))
+            kw = len(qtok & _toks(r["text"])) / max(1, len(qtok))
+            scored.append((0.5 * dense + 0.3 * kw, r["chunk_idx"]))
+        scored.sort(key=lambda x: (-x[0], x[1]))
+        top10 = [c for _, c in scored[:10]]
+
+        texto: dict[tuple[int, int], str] = {}
+        for r in propios:
+            texto[(doc_id, r["chunk_idx"])] = r["text"]
+        faltan = [(d, c) for d, c in cites if (d, c) not in texto]
+        if faltan:
+            for d in sorted({d for d, _ in faltan}):
+                for r in conn.execute(
+                        "SELECT chunk_idx, text FROM chunks WHERE doc_id=?",
+                        (d,)).fetchall():
+                    texto[(d, r["chunk_idx"])] = r["text"]
+
+    orden: list[tuple[int, int]] = []
+    if (doc_id, 0) in texto:
+        orden.append((doc_id, 0))
+    for c in cites:
+        if c not in orden and c in texto:
+            orden.append(c)
+    for c in top10:
+        if (doc_id, c) not in orden and (doc_id, c) in texto:
+            orden.append((doc_id, c))
+
+    used = 0
+    parts: list[str] = []
+    for key in orden:
+        piece = f"[chunk {key[1]}] {texto[key]}"
+        if used + len(piece) > max_chars:
+            break
+        parts.append(piece)
+        used += len(piece)
+    return doc_id, "\n\n".join(parts)
+
+
 # Presupuesto del blueprint. 1500 no alcanzaba: R7 pide la bibliografía al FINAL
 # del documento y el corte la pegaba (medido en el A/B, 4/22 truncados).
 BLUEPRINT_MAX_TOKENS = 3000
