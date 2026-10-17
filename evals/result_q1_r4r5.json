@@ -2194,5 +2194,234 @@
     "technique": "WikiSkill",
     "run": 3,
     "secs": 3.8
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple rigurosamente con las normas de citación, diferenciando claramente entre la arquitectura descrita en la fuente y las propuestas de implementación del usuario.",
+    "arm": "H16",
+    "technique": "PEARL",
+    "run": 0,
+    "secs": 5.6
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple estrictamente con el rigor de citación, declarando explícitamente los silencios de la fuente cuando los módulos propuestos no tienen respaldo en el texto.",
+    "arm": "H16",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "secs": 3.6
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo 3: Refinador de Contraste Éxito-Fallo (el texto fuente no menciona este módulo ni esta funcionalidad específica)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Orden de Ejecución: el paper no especifica un protocolo de validación pre-release ni pasos secuenciales para este fin"
+    ],
+    "verdict": "El blueprint atribuye al paper módulos y protocolos de validación pre-release que no existen en la fuente, además de rellenar con procedimientos inventados el orden de ejecución.",
+    "arm": "H16",
+    "technique": "ReASearch",
+    "run": 0,
+    "secs": 19.0
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint atribuye a la fuente la propuesta de un 'Módulo 4: Bucle de Optimización Dirigida por Herramientas' y un 'Módulo 5: Re-emisión de Estado', conceptos que no aparecen en el texto proporcion"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint define una 'Métrica de éxito' y un 'Umbral de aceptación' para la validación del sistema, detalles que la fuente no menciona ni especifica."
+    ],
+    "verdict": "El blueprint inventa módulos funcionales y métricas de validación que no están presentes en el texto fuente, incurriendo en fabricaciones y rellenado de información inexistente.",
+    "arm": "H16",
+    "technique": "ReASearch",
+    "run": 1,
+    "secs": 2.3
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint atribuye a la fuente la propuesta de 'validación pre-release del agente', un concepto de ingeniería de software no mencionado en el texto."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El Módulo 5 propone un mecanismo de 're-emisión de estado' para evitar desfases, concepto que no aparece en la fuente, la cual solo menciona que la re-renderización por turno no es una configuración p"
+    ],
+    "verdict": "El blueprint extrapola conceptos de ingeniería de software y mecanismos técnicos no presentes en la fuente, atribuyendo objetivos de validación pre-release ajenos al texto original.",
+    "arm": "H16",
+    "technique": "ReASearch",
+    "run": 2,
+    "secs": 2.9
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint atribuye a la fuente la propuesta de 'validación pre-release del agente', un concepto de ingeniería de software no mencionado en el texto."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El Módulo 5 propone un mecanismo de 're-emisión de estado' para evitar desfases, concepto que no aparece en la fuente, la cual solo menciona que la re-renderización por turno no es una configuración p"
+    ],
+    "verdict": "El blueprint extrapola conceptos de ingeniería de software y mecanismos técnicos no presentes en la fuente, atribuyendo objetivos de validación pre-release ajenos al texto original.",
+    "arm": "H16",
+    "technique": "ReASearch",
+    "run": 3,
+    "secs": 2.4
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone que el advisory actúe como un 'bloqueo suave que requiera acción explícita', cuando la fuente solo menciona que el advisory se inserta en el prompt para ayudar al agente a conside"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone un 'Módulo 5: Re-emisión de Estado' y una estrategia de 'hash de estado' para invalidar nodos, detalles técnicos que la fuente no especifica ni menciona."
+    ],
+    "verdict": "El blueprint atribuye al sistema capacidades de control de flujo (bloqueos) y arquitecturas de gestión de estado (hashes) que no están presentes en la fuente, además de inventar módulos funcionales no descritos.",
+    "arm": "H16",
+    "technique": "ReASearch",
+    "run": 4,
+    "secs": 2.3
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone que el advisory actúe como un 'bloqueo suave que requiera acción explícita', cuando la fuente solo menciona que el advisory se inserta en el prompt para ayudar al agente a conside"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone un 'Módulo 5: Re-emisión de Estado' y una estrategia de 'hash de estado' para invalidar nodos, detalles técnicos que la fuente no especifica ni menciona."
+    ],
+    "verdict": "El blueprint atribuye al sistema capacidades de control de flujo (bloqueos) y arquitecturas de gestión de estado (hashes) que no están presentes en la fuente, además de inventar módulos funcionales no descritos.",
+    "arm": "H16",
+    "technique": "ReASearch",
+    "run": 5,
+    "secs": 2.9
+  },
+  {
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint propone que el advisory actúe como un 'bloqueo suave que requiera acción explícita', cuando la fuente solo menciona que el advisory se inserta en el prompt para ayudar al agente a conside"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone un 'Módulo 5: Re-emisión de Estado' y una estrategia de 'hash de estado' para invalidar nodos, detalles técnicos que la fuente no especifica ni menciona."
+    ],
+    "verdict": "El blueprint atribuye al sistema capacidades de control de flujo (bloqueos) y arquitecturas de gestión de estado (hashes) que no están presentes en la fuente, además de inventar módulos funcionales no descritos.",
+    "arm": "H16",
+    "technique": "ReASearch",
+    "run": 6,
+    "secs": 2.0
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint es riguroso, cita correctamente las fuentes y declara explícitamente los parámetros obtenidos de las tablas del paper cuando no estaban en el texto principal.",
+    "arm": "H16",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "secs": 2.2
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el conjunto de validación debe ser 'estratificado' para evitar el sobreajuste, detalle que la fuente no especifica."
+    ],
+    "verdict": "El blueprint es riguroso en la atribución, pero incluye recomendaciones operativas no presentes en la fuente que exceden la descripción del framework.",
+    "arm": "H16",
+    "technique": "WikiSkill",
+    "run": 0,
+    "secs": 2.1
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el Wiki Maintainer debe incluir 'filtrado basado en consistencia histórica' para mitigar riesgos, detalle que no se especifica en la fuente."
+    ],
+    "verdict": "El blueprint es riguroso en la descripción del framework, pero inventa una estrategia de mitigación técnica (filtrado de consistencia) que no está presente en el texto fuente.",
+    "arm": "H16",
+    "technique": "WikiSkill",
+    "run": 1,
+    "secs": 14.8
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "La sección de 'Validación pre-release' y las 'Mitigaciones' de riesgos (reintentos y timeouts) no están especificadas en la fuente."
+    ],
+    "verdict": "El blueprint es riguroso en la descripción del framework, pero incluye propuestas operativas y estrategias de mitigación de riesgos que no están presentes en el texto fuente.",
+    "arm": "H16",
+    "technique": "WikiSkill",
+    "run": 2,
+    "secs": 3.3
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "La sección de 'Validación pre-release' y las 'Mitigaciones' de riesgos (reintentos y timeouts) no están especificadas en la fuente."
+    ],
+    "verdict": "El blueprint es riguroso en la descripción del framework, pero incluye propuestas operativas y estrategias de mitigación de riesgos que no están presentes en el texto fuente.",
+    "arm": "H16",
+    "technique": "WikiSkill",
+    "run": 3,
+    "secs": 6.2
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "La sección de 'Validación pre-release' y las 'Mitigaciones' de riesgos (reintentos y timeouts) no están especificadas en la fuente."
+    ],
+    "verdict": "El blueprint es riguroso en la descripción del framework, pero incluye propuestas operativas y estrategias de mitigación de riesgos que no están presentes en el texto fuente.",
+    "arm": "H16",
+    "technique": "WikiSkill",
+    "run": 4,
+    "secs": 1.7
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint incluye una sección de 'Validación pre-release' y una propuesta de mitigación para la 'Latencia en la retroalimentación' que no están presentes en la fuente."
+    ],
+    "verdict": "El blueprint es preciso en la descripción técnica del framework, pero incluye secciones de validación y mitigación de riesgos que no se mencionan en el texto original.",
+    "arm": "H16",
+    "technique": "WikiSkill",
+    "run": 5,
+    "secs": 3.3
+  },
+  {
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint propone una mitigación para la latencia y la dependencia de herramientas externas (aislar dependencias en una capa de abstracción con reintentos y timeouts) que no aparece en la fuente."
+    ],
+    "verdict": "El blueprint es preciso en la descripción del framework, pero incluye recomendaciones técnicas de implementación (mitigaciones) que no están presentes en el texto original.",
+    "arm": "H16",
+    "technique": "WikiSkill",
+    "run": 6,
+    "secs": 4.9
   }
 ]

@@ -96,3 +96,42 @@ igual que HITO8 §3, con `MAX_ROUNDS=6` y `loc["salida"]` cruda.
 4. Corrida oficial única; resultados en §5 de este archivo + hallazgo 26 en
    CONOCIMIENTO, en el commit de cierre.
 5. NO CUMPLE se cierra igual; un intento 7 exigiría declaración nueva.
+
+## §5 Cierre — 2026-10-17 · NO CUMPLE (evidencia)
+
+- **Resultado**: H5' **3/5** · G1 **5/5** · G2 **5/5** · C1' **SÍ** → NO CUMPLE.
+  Coste **17 juicios + 20 localizadores = 37** de ≤45 (juicios exactamente en
+  el tope declarado); **0 generaciones**; **ningún arnés `ok=False`**
+  (V1/V2 nunca fallaron, incluso con 6 vaciados de sección). Suite: **322**.
+  PEARL/PG/TCE aprueban r0 estables.
+- **Arreglo A (M5b) — SÍ disparó**, primera vez: ReASearch vacía las
+  secciones **[9, 18]** en r0 (exactamente los anclajes vivos de H7/H8) y
+  luego [11] y [1, 13] (el título «…Validación Pre-Release»): 5 secciones
+  vaciadas + 6 líneas enmascaradas en total. La base cae 5196 → 3326 (64%,
+  V1 intacto).
+- **Arreglo C (6 rondas) — drenó más moles, no alcanzó**: las quejas siguen
+  **evolucionando con cada edición efectiva** (whack-a-mole confirmado a
+  escala: ReASearch ≥7 quejas distintas; WikiSkill 4 máscaras → 4 quejas
+  distintas). Las rondas sin edición efectiva repiten queja idéntica
+  (temp 0).
+- **Arreglo B (formato) — INSUFICIENTE, y la salida cruda lo prueba** (el
+  arreglo de diagnóstico cumplió su función): la deriva real es el modelo
+  escribiendo **`[1] -> …`** con corchetes (imitando la lista `[i]` del
+  prompt). 5 salidas no-parseables almacenadas lo muestran; ninguna de las
+  normalizaciones declaradas (flechas, viñetas, negrilla, prefijos, `:`)
+  cubre los corchetes. **Mata fuego en potencia**: en ReASearch r5/r6 el
+  modelo señaló la línea 26 mole («Diseñar el advisory como bloqueo suave…»,
+  la queja viva de las rondas 4-6) y el encabezado-título con eco completo —
+  ambos objetivos existían y no se pudieron aplicar.
+- **Límite económico observado**: WikiSkill consumió 12 localizadores en 6
+  rondas (formato fallido en 4 de ellas); ReASearch 8. Los juicios llegaron
+  exactos a 17/17: cualquier reintentación de juez habría abortado el tope.
+- **Lección para un eventual intento 7** (exige declaración nueva): (i)
+  normalizar **corchetes alrededor del número de frase** — la deriva medida,
+  un caso de prueba directo con las 5 salidas almacenadas; (ii) revisar si
+  el whack-a-mole tiene techo (el último mole de WikiSkill apareció en r6
+  sin margen de ronda; ReASearch drenó 4 rondas efectivas seguidas y paró
+  por fallo de formato, no por agotamiento de moles — señal de que puede
+  **converger** con formato correcto + rondas); (iii) coste: juicios en el
+  tope → presupuesto de juicios acorde a más rondas si se amplía MAX_ROUNDS.
+  La enmienda del juez sigue descartada (comparabilidad, §0).
