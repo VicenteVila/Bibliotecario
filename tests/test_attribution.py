@@ -383,3 +383,108 @@ def test_validate_structure_acepta_al_bueno():
 def test_encabezados_misma_definicion_que_g2():
     """Solo `## ` con espacio: `#` y `###` fuera, como en G2 desde HITO5."""
     assert A.encabezados("# Uno\n## Dos\n### Tres\n## Cuatro") == ["Dos", "Cuatro"]
+
+
+# --- Hito 7: localizador guiado + marcado (HITO7 §1) ---------------------------
+#
+# Sonda previa: la localización literal frase↔línea no es viable (LCS 8–27
+# chars). Estos tests defienden el contrato del localizador: solo devuelve
+# números con eco verificable, y la edición es append de marca sobre línea.
+
+BP7 = ("# Título del blueprint\n"
+       "El sistema usa variance-weighted task selection. [doc:1:0]\n"
+       "El módulo AdaptiveHarnessEngine orquesta los pasos.\n"
+       "\n"
+       "## Bibliografía\n")
+
+ECO2 = "El sistema usa variance-weighted task selection"
+
+
+def test_localizador_prompt_numerado_y_formato():
+    p = A.localizador_prompt(["Frase fabricada"], BP7)
+    assert "[1] Frase fabricada" in p
+    assert "1| # Título del blueprint" in p
+    assert "5| ## Bibliografía" in p
+    assert "N -> M | eco" in p or "<número de frase> -> <número de línea>" in p
+    assert "no reescribas nada" in p
+
+
+def test_parse_localizador_entrada_valida():
+    r = A.parse_localizador(f"1 -> 2 | {ECO2}", BP7, 1)
+    assert r["validas"] == [2]
+    assert r["lineas"] == {1: 2}
+    assert r["invalidas"] == []
+    assert r["no_localizadas"] == []
+
+
+def test_parse_localizador_guion_no_localiza_no_invalida():
+    r = A.parse_localizador("1 -> -", BP7, 1)
+    assert r["validas"] == []
+    assert r["no_localizadas"] == [1]
+    assert r["invalidas"] == []
+
+
+def test_parse_localizador_rechaza_fuera_de_rango_y_encabezado():
+    r = A.parse_localizador(
+        "1 -> 99 | " + ECO2 + "\n"
+        "2 -> 1 | " + ECO2 + "\n"
+        "3 -> 999 | " + ECO2,
+        BP7, 3)
+    assert r["validas"] == []
+    assert any("fuera de rango" in x for x in r["invalidas"])
+    assert any("encabezado" in x for x in r["invalidas"])
+
+
+def test_parse_localizador_rechaza_eco_malo():
+    r = A.parse_localizador(
+        "1 -> 2 | esto no esta en la linea de ejemplo no\n"
+        "2 -> 3 | El m",  # eco demasiado corto
+        BP7, 2)
+    assert r["validas"] == []
+    assert any("eco no aparece" in x for x in r["invalidas"])
+    assert any("eco demasiado corto" in x for x in r["invalidas"])
+
+
+def test_parse_localizador_sin_entradas_es_invalido():
+    r = A.parse_localizador("prosa suelta sin formato", BP7, 1)
+    assert r["validas"] == []
+    assert any("parseables" in x for x in r["invalidas"])
+
+
+def test_parse_localizador_correccion_no_queda_bloqueada():
+    """Una entrada inválida no tapa la corrección posterior de la misma frase."""
+    r = A.parse_localizador(
+        f"1 -> 1 | {'x' * 30}\n"        # encabezado: inválida
+        f"1 -> 2 | {ECO2}",             # corrección de la misma frase
+        BP7, 1)
+    assert r["validas"] == [2]
+
+
+def test_localizador_reintento_lleva_los_fallos():
+    p = A.localizador_reintento("BASE", ["frase 1: el eco no aparece"])
+    assert p.startswith("BASE")
+    assert "frase 1: el eco no aparece" in p
+
+
+def test_marcar_lineas_marca_sin_tocar_prosa():
+    out, stats = A.marcar_lineas(BP7, [2, 3])
+    assert stats == {"marcadas": 2, "omitidas": 0}
+    assert "selection. [doc:1:0] (propuesta del blueprint)\n" in out
+    assert "pasos. (propuesta del blueprint)\n" in out
+    assert out.splitlines()[0] == "# Título del blueprint"  # encabezado intacto
+    import re as _re
+    limpia = _re.sub(r"\s*\(propuesta del blueprint\)", "", out)
+    assert limpia == BP7
+
+
+def test_marcar_lineas_omite_encabezado_vacio_y_repetido():
+    out, stats = A.marcar_lineas(BP7, [1, 4, 2, 2, 99])
+    assert stats == {"marcadas": 1, "omitidas": 3}
+    assert out.splitlines()[0] == "# Título del blueprint"
+
+
+def test_marcar_lineas_no_duplica_si_ya_marcada():
+    bp_m, _ = A.marcar_lineas(BP7, [3])
+    out, stats = A.marcar_lineas(bp_m, [3])
+    assert stats == {"marcadas": 0, "omitidas": 1}
+    assert out == bp_m

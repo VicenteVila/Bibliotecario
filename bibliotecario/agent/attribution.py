@@ -412,3 +412,151 @@ def validate_structure(base_bp: str, draft_bp: str) -> list[str]:
         fallos.append("V2: faltan encabezados de la base: "
                       + ", ".join(f"«{h}»" for h in faltan[:8]))
     return fallos
+
+
+# --------------------------------------------------------- HITO7 (§1 M1 / M2)
+#
+# El intento 3 midió que la reparación por regeneración no converge para 2 de
+# 5 (trunca y pierde encabezados) y que la regeneración de WikiSkill INSERTÓ
+# fabricaciones nuevas. Sonda previa a declarar: la localización literal
+# frase-del-juez ↔ línea no es viable (LCS medido 8–27 chars: las frases del
+# juez son paráfrasis). Aquí el único que entiende la paráfrasis es el LLM,
+# y lo único que se le deja devolver son números de línea + eco — la edición
+# sigue siendo determinista. **Cero reescritura de blueprint (HITO7 §1.M3).**
+
+_ECO_MIN = 20  # eco mínimo (normalizado) para que una entrada cuente
+
+
+def localizador_prompt(frases: list[str], blueprint: str) -> str:
+    """Prompt del localizador guiado (HITO7 §1.M1): frases del juez → líneas.
+
+    La salida permitida es estrictamente `N -> M | eco` o `N -> -`; el modelo
+    nunca ve permitido devolver texto del blueprint, solo apuntar a él.
+    """
+    lista = "\n".join(f"[{i + 1}] {f}" for i, f in enumerate(frases))
+    numerado = "\n".join(f"{i + 1}| {ln}"
+                         for i, ln in enumerate(blueprint.splitlines()))
+    return f"""Un revisor automático señaló estas frases como problemas en el blueprint.
+
+FRASES SEÑALADAS:
+{lista}
+
+BLUEPRINT (cada línea precedida de «N| » con su número de línea):
+{numerado}
+
+Para CADA frase, localiza la LÍNEA donde el blueprint afirma o rellena ese
+contenido. Responde EXACTAMENTE una línea por frase, en este formato:
+
+  <número de frase> -> <número de línea> | <eco literal de un fragmento de
+  esa línea, tal cual aparece, mínimo 20 caracteres>
+
+o, si la frase no corresponde a ninguna línea:
+
+  <número de frase> -> -
+
+Reglas:
+- La línea debe existir, no ser un encabezado (no empieza por #) ni estar vacía.
+- El eco debe ser texto EXACTO de esa línea (puedes recortarlo, no cambiarlo).
+- No inventes números y no reescribas nada: solo apunta.
+
+Devuelve SOLO las líneas de respuesta, sin nada más."""
+
+
+_REINTENTO_LOC = """
+
+Tu intento anterior tuvo entradas inválidas:
+{fallos}
+Corrígelas. Recuerda: eco EXACTO de la línea real, sin cambiar caracteres."""
+
+
+def localizador_reintento(base_prompt: str, fallos: list[str]) -> str:
+    """Bloque de feedback del 1 reintento (HITO6 §1.B aplicado al M1)."""
+    return base_prompt + _REINTENTO_LOC.format(
+        fallos="\n".join(f"- {x}" for x in fallos))
+
+
+def parse_localizador(salida: str, blueprint: str,
+                      n_frases: int) -> dict:
+    """Valida la salida del localizador contra el blueprint real (HITO7 §1.M1).
+
+    Por entrada: frase en rango, línea en rango, no encabezado/vacío y eco
+    (normalizando espacios) que aparezca literal en la línea. Lo que no se
+    parsea se ignora; si no parsea NADA, eso sí es inválido (reintento).
+    Devuelve `validas` (números de línea ya saneados), `no_localizadas`,
+    `invalidas` (motivos legibles para el feedback) y `lineas` (frase→línea).
+    """
+    lines = blueprint.splitlines()
+    validas: dict[str, int] = {}
+    no_loc: list[int] = []
+    invalidas: list[str] = []
+    resueltas: set[int] = set()  # frases ya con entrada válida (o «-»)
+    pat = re.compile(r"^\s*(\d+)\s*->\s*(-|\d+)\s*(?:\|\s*(.*))?\s*$")
+    entradas = 0
+    for raw in (salida or "").splitlines():
+        m = pat.match(raw)
+        if not m:
+            continue
+        entradas += 1
+        n_f, dest, eco = int(m.group(1)), m.group(2), m.group(3)
+        if not 1 <= n_f <= n_frases:
+            invalidas.append(f"frase {n_f}: número fuera de rango")
+            continue
+        if n_f in resueltas:
+            continue  # ya resuelta; una entrada inválida no tapa su corrección
+        if dest == "-":
+            no_loc.append(n_f)
+            resueltas.add(n_f)
+            continue
+        ln_i = int(dest)
+        if not 1 <= ln_i <= len(lines):
+            invalidas.append(f"frase {n_f}: línea {ln_i} fuera de rango")
+            continue
+        linea = lines[ln_i - 1]
+        if not linea.strip() or linea.lstrip().startswith("#"):
+            invalidas.append(f"frase {n_f}: la línea {ln_i} es encabezado "
+                             "o vacía")
+            continue
+        eco_norm = " ".join((eco or "").split())
+        if len(eco_norm) < _ECO_MIN:
+            invalidas.append(f"frase {n_f}: eco demasiado corto")
+            continue
+        if eco_norm not in " ".join(linea.split()):
+            invalidas.append(f"frase {n_f}: el eco no aparece en la línea "
+                             f"{ln_i}")
+            continue
+        validas[str(n_f)] = ln_i
+        resueltas.add(n_f)
+    if entradas == 0:
+        invalidas.append("salida sin líneas parseables «N -> M | eco»")
+    return {"validas": sorted(set(validas.values())),
+            "no_localizadas": no_loc,
+            "invalidas": invalidas,
+            "lineas": {int(k): v for k, v in validas.items()}}
+
+
+def marcar_lineas(blueprint: str, lineas: list[int]) -> tuple[str, dict]:
+    """Aplica la marca R6 al final de cada línea localizada (HITO7 §1.M2).
+
+    Edición de línea, nunca de frase: los bytes de la prosa quedan intactos.
+    Inmune a encabezados, vacíos, números fuera de rango y dobles (defensa en
+    profundidad — la validación ya los filtra en `parse_localizador`).
+    """
+    lines = blueprint.splitlines(keepends=True)
+    marcadas = omitidas = 0
+    for ln_i in sorted({int(x) for x in lineas}):
+        i = ln_i - 1
+        if not 0 <= i < len(lines):
+            omitidas += 1
+            continue
+        line = lines[i]
+        if not line.strip() or line.lstrip().startswith("#"):
+            omitidas += 1
+            continue
+        if _DEMOTED in line:
+            omitidas += 1
+            continue
+        nl = re.search(r"\r?\n$", line)
+        lines[i] = (line[:nl.start()] + _DEMOTED + line[nl.start():]
+                    if nl else line + _DEMOTED)
+        marcadas += 1
+    return "".join(lines), {"marcadas": marcadas, "omitidas": omitidas}
