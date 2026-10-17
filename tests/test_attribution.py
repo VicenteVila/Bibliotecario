@@ -407,6 +407,7 @@ def test_localizador_prompt_numerado_y_formato():
     assert "5| ## Bibliografía" in p
     assert "N -> M | eco" in p or "<número de frase> -> <número de línea>" in p
     assert "no reescribas nada" in p
+    assert "encabezado" in p  # HITO9 §1.A: anclas en encabezado permitidas
 
 
 def test_parse_localizador_entrada_valida():
@@ -567,11 +568,35 @@ def test_parse_frase_sin_entrada_se_acredita():
                for x in r["invalidas"])
 
 
-def test_parse_encabezados_alimenta_a_m5b():
+def test_parse_encabezados_con_eco_alimenta_a_m5b():
+    """HITO9 §1.A: encabezado con eco válido resuelve la frase y llega a M5b."""
     r = A.parse_localizador("1 -> 4 | Sección A", BP8, 1)
     assert r["validas"] == []
+    assert r["invalidas"] == []          # ya no es reintento: es ancla buena
     assert r["encabezados"] == [4]
-    assert any("encabezado" in x for x in r["invalidas"])
     out, stats = A.mascara_seccion(BP8, r["encabezados"][0])
     assert stats["secciones"] == 1
     assert "## Sección A" in out and "Cuerpo A1" not in out
+
+
+def test_parse_encabezado_sin_eco_valido_sigue_invalido():
+    r = A.parse_localizador(
+        "1 -> 4 | texto que no aparece en el encabezado xx", BP8, 1)
+    assert r["encabezados"] == []        # sin eco fuerte no se vacía nada
+    assert any("encabezado" in x for x in r["invalidas"])
+    r2 = A.parse_localizador("1 -> 4 | Secci", BP8, 1)   # eco < umbral
+    assert r2["encabezados"] == []
+    assert any("encabezado" in x for x in r2["invalidas"])
+
+
+def test_parse_formatos_tolerantes_hito9():
+    """HITO9 §1.B: negrilla, prefijos frase/línea, separador ':', prefijo eco."""
+    r = A.parse_localizador(
+        "**Frase 1** → **línea 3** | El módulo AdaptiveHarnessEngine",
+        BP7, 1)
+    assert r["validas"] == [3]
+    r2 = A.parse_localizador(f"1: 2 | {ECO2}", BP7, 1)
+    assert r2["validas"] == [2]
+    r3 = A.parse_localizador(
+        "1 — 3 | eco: El módulo AdaptiveHarnessEngine", BP7, 1)
+    assert r3["validas"] == [3]

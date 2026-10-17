@@ -428,7 +428,8 @@ _ECO_MIN = 20  # eco mínimo (normalizado) para que una entrada cuente
 
 
 def localizador_prompt(frases: list[str], blueprint: str) -> str:
-    """Prompt del localizador guiado (HITO7 §1.M1): frases del juez → líneas.
+    """Prompt del localizador guiado (HITO7 §1.M1; HITO9 §1.A: encabezados
+    ancla permitidos con eco, para que M5b reciba material).
 
     La salida permitida es estrictamente `N -> M | eco` o `N -> -`; el modelo
     nunca ve permitido devolver texto del blueprint, solo apuntar a él.
@@ -455,8 +456,12 @@ o, si la frase no corresponde a ninguna línea:
   <número de frase> -> -
 
 Reglas:
-- La línea debe existir, no ser un encabezado (no empieza por #) ni estar vacía.
-- El eco debe ser texto EXACTO de esa línea (puedes recortarlo, no cambiarlo).
+- La línea debe existir y no estar vacía.
+- Si la afirmación vive en una línea de contenido, apunta a esa línea (no
+  empieza por #); si la frase se ancla en un encabezado, apunta al encabezado
+  con su eco.
+- El eco debe ser texto EXACTO de esa misma línea (puedes recortarlo, no
+  cambiarlo).
 - No inventes números y no reescribas nada: solo apunta.
 
 Devuelve SOLO las líneas de respuesta, sin nada más."""
@@ -478,33 +483,44 @@ def localizador_reintento(base_prompt: str, fallos: list[str]) -> str:
 def parse_localizador(salida: str, blueprint: str,
                       n_frases: int) -> dict:
     """Valida la salida del localizador contra el blueprint real (HITO7 §1.M1;
-    arreglos HITO8 §1: pre-normalización determinista de flechas/viñetas,
-    frases sin entrada acreditadas y clave `encabezados` para M5b).
+    HITO8 §1: frases sin entrada acreditadas; HITO9 §1.A+B: encabezados con
+    eco válido alimentan M5b, y normalizaciones deterministas de formato
+    —separadores, prefijos, negrilla, prefijo del eco— sin relajar nunca el
+    eco ≥20 real que decide la verdad).
 
-    Por entrada: frase en rango, línea en rango, no encabezado/vacío y eco
-    (normalizando espacios) que aparezca literal en la línea. Lo que no se
-    parsea se ignora; si no parsea NADA, eso sí es inválido (reintento).
     Devuelve `validas` (números de línea ya saneados), `no_localizadas`,
     `invalidas` (motivos legibles para el feedback), `lineas` (frase→línea)
-    y `encabezados` (líneas encabezado señaladas, materia prima de M5b).
+    y `encabezados` (encabezados con eco válido, materia prima de M5b).
     """
-    salida = (salida or "").replace("→", "->").replace("⇒", "->")
     lines = blueprint.splitlines()
     validas: dict[str, int] = {}
     no_loc: list[int] = []
     invalidas: list[str] = []
     encabs: list[int] = []
-    resueltas: set[int] = set()   # frases ya con entrada válida (o «-»)
+    resueltas: set[int] = set()   # frases ya con entrada válida (o «-» o enc.)
     vistas: set[int] = set()      # frases con CUALQUIER entrada parseada
-    pat = re.compile(r"^\s*(\d+)\s*->\s*(-|\d+)\s*(?:\|\s*(.*))?\s*$")
+    pat_cab = re.compile(
+        r"^\s*(?:frase\s+|Frase\s+)?(\d+)\s*(?:->|:)\s*"
+        r"(?:línea\s+|linea\s+|Línea\s+)?(-|\d+)\s*$",
+        re.IGNORECASE)
     entradas = 0
     for raw in (salida or "").splitlines():
-        raw = re.sub(r"^\s*[-*•]\s+(?=\d+\s*->)", "", raw)
-        m = pat.match(raw)
+        raw = re.sub(r"^\s*[-*•]\s+(?=\d)", "", raw)
+        if "|" in raw:
+            cab, eco = raw.split("|", 1)
+            eco = re.sub(r"^\s*\(?\s*eco\s*[:)]\s*", "", eco,
+                         flags=re.IGNORECASE)
+        else:
+            cab, eco = raw, None
+        # formato solo del lado de la cabecera: el eco se toca lo mínimo
+        cab = (cab.replace("→", "->").replace("⇒", "->")
+                  .replace("—", "->").replace("–", "->")
+                  .replace("**", "").replace("__", ""))
+        m = pat_cab.match(cab)
         if not m:
             continue
         entradas += 1
-        n_f, dest, eco = int(m.group(1)), m.group(2), m.group(3)
+        n_f, dest = int(m.group(1)), m.group(2)
         if not 1 <= n_f <= n_frases:
             invalidas.append(f"frase {n_f}: número fuera de rango")
             continue
@@ -523,18 +539,29 @@ def parse_localizador(salida: str, blueprint: str,
         if not linea.strip():
             invalidas.append(f"frase {n_f}: la línea {ln_i} está vacía")
             continue
-        if linea.lstrip().startswith("#"):
-            invalidas.append(f"frase {n_f}: la línea {ln_i} es encabezado "
-                             "o vacía")
-            encabs.append(ln_i)
-            continue
+        linea_norm = " ".join(linea.split())
         eco_norm = " ".join((eco or "").split())
-        if len(eco_norm) < _ECO_MIN:
-            invalidas.append(f"frase {n_f}: eco demasiado corto")
+        es_enc = linea.lstrip().startswith("#")
+        if es_enc:
+            texto_enc = linea.lstrip("#").strip()   # sin almohadillas
+            umbral = max(1, min(_ECO_MIN, len(texto_enc)))
+        else:
+            umbral = _ECO_MIN
+        if len(eco_norm) < umbral:
+            invalidas.append(
+                f"frase {n_f}: eco demasiado corto"
+                + (" para el encabezado" if es_enc else "")
+                + (f" de la línea {ln_i}" if es_enc else ""))
             continue
-        if eco_norm not in " ".join(linea.split()):
-            invalidas.append(f"frase {n_f}: el eco no aparece en la línea "
-                             f"{ln_i}")
+        if eco_norm not in linea_norm:
+            invalidas.append(
+                f"frase {n_f}: el eco no aparece en "
+                + ("el encabezado de la línea " if es_enc else "la línea ")
+                + str(ln_i))
+            continue
+        if es_enc:
+            encabs.append(ln_i)     # HITO9 §1.A: ancla en encabezado → M5b
+            resueltas.add(n_f)
             continue
         validas[str(n_f)] = ln_i
         resueltas.add(n_f)
