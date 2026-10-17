@@ -393,17 +393,32 @@ def verify_and_mark(bp: dict) -> dict:
     original, sin tocarlo. Cuesta cero `generate()` extra y el responsable
     decide. R6 cubre el caso de no saber: una violación puede ser un término
     legítimo que simplemente no está en ese chunk.
+
+    Hito 5 (hallazgo 26, modo A): el informe suma las **huérfanas** — línea
+    con término técnico sin puntero ni marca R6. Antes `verificado=True` era
+    posible con fabricaciones que el juez luego suspendía (ReASearch: 0
+    violaciones, 2/2 resueltas, R4 suspensa); un informe que no ve eso miente
+    en falso. El texto sigue intacto: la reparación es del runner, no suya.
     """
     from bibliotecario.agent import attribution as A
 
     if not bp.get("blueprint") or bp["blueprint"].startswith("("):
         return {**bp, "verificado": False, "violaciones": []}
 
+    orph = A.check_orphan_claims(bp["blueprint"])
     pointers = A._POINTER.findall(bp["blueprint"])
     if not pointers:
+        # Un blueprint sin punteros no está "verificado": no hay nada que
+        # comprobar. Marcarlo como limpio sería mentir con el mismo número
+        # (medido: una run de Task-CoEvolve salió verificado=True con 0
+        # citas). Con huérfanas, en cambio, sí hay fallo que informar.
+        if orph:
+            return {**bp, "verificado": False, "sin_punteros": True,
+                    "violaciones": orph, "reescrituras": 0}
         return {**bp, "verificado": None, "sin_punteros": True, "violaciones": []}
     v = A.check_attributions(bp["blueprint"], _cited_chunks(bp.get("doc_id"), bp["blueprint"]))
-    return {**bp, "verificado": not v, "violaciones": v, "reescrituras": 0}
+    v_all = v + orph
+    return {**bp, "verificado": not v_all, "violaciones": v_all, "reescrituras": 0}
 
 
 def build_blueprint_p4(technique: str, goal: str) -> dict:

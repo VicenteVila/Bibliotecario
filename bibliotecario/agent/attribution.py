@@ -94,6 +94,51 @@ def check_attributions(blueprint: str, chunks: dict[int, str]) -> list[dict]:
     return violations
 
 
+# Marcas de R6/de silencio que separan lo propio de lo de la fuente en la
+# propia línea (o en la inmediatamente siguiente, que es lo que R6 exige).
+_MARKER = re.compile(
+    r"propuesta del blueprint"
+    r"|el paper no\b"
+    r"|no consta en la fuente",
+    re.IGNORECASE,
+)
+
+
+def check_orphan_claims(blueprint: str) -> list[dict]:
+    """Afirmaciones con término técnico que no llevan puntero NI marca R6.
+
+    El modo A del hallazgo 26: `check_attributions` solo examina frases con
+    puntero («sin puntero no hay a qué verificar»), así que una fabricación
+    anclada sin `[doc:id:chunk]` le es invisible — ReASearch salió
+    `verificado=True` con 2/2 citas resueltas y el juez lo suspendió por
+    inventar módulos presentados como del paper. Aquí se mira justo eso:
+    línea con término técnico (mismo detector `_TECH` de siempre), sin puntero
+    y sin la marca que R6 obliga a poner en su propia línea.
+
+    Declarado lo que NO caza: una paráfrasis sin términos técnicos («selecciona
+    tareas por varianza» a secas) sigue sin poder comprobarse sin juez; esto
+    amplía el informe al tramo mecánico, no sustituye al juicio. Cero tokens y
+    cero reescritura: devuelve el listado, el texto no se toca.
+    """
+    lines = blueprint.splitlines()
+    out: list[dict] = []
+    for i, line in enumerate(lines):
+        s = line.strip()
+        if not s or s.startswith("#"):
+            continue
+        if _POINTER.search(line):
+            continue
+        nxt = lines[i + 1].strip() if i + 1 < len(lines) else ""
+        if _MARKER.search(line) or _MARKER.search(nxt):
+            continue
+        terms = _terms(line)
+        if terms:
+            out.append({"tipo": "huerfana", "chunk": None,
+                        "termino": terms[0], "terminos": terms,
+                        "frase": s[:200], "linea": i + 1})
+    return out
+
+
 def _repair_prompt(blueprint: str, violations: list[dict]) -> str:
     """Instrucción de reescritura con las violaciones concretas, no genérica."""
     lines = []

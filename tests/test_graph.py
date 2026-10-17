@@ -258,6 +258,50 @@ def test_verify_and_mark_no_destruye_el_blueprint(tmp_path, monkeypatch):
     assert out["reescrituras"] == 0
 
 
+def test_verify_and_mark_ve_huerfanas_sin_puntero(tmp_path, monkeypatch):
+    """Hito 5 (hallazgo 26, modo A): el informe deja de fingir limpieza.
+
+    ReASearch salió `verificado=True` con 0 violaciones y el juez lo suspendió
+    por inventar módulos sin puntero: `check_attributions` no los veía. Ahora
+    las huérfanas entran en `violaciones` — también cuando no hay ningún
+    puntero que comprobar — y el texto sigue intacto, sin llamar al LLM.
+    """
+    from bibliotecario.agent import tools as T
+    db = tmp_path / "m2.db"
+    monkeypatch.setattr(storage, "db_path", lambda: db)
+    storage.init_db(db)
+    with storage.get_conn(db) as conn:
+        conn.execute("INSERT INTO documents (path, title, paper_hash) VALUES (?,?,?)",
+                     ("f", "P", "hm2"))
+        conn.execute("INSERT INTO chunks (doc_id, chunk_idx, text, embedding) VALUES (?,?,?,?)",
+                     (1, 0, "variance-weighted task selection over episodes.", b"\x00"))
+    monkeypatch.setattr(T, "generate", lambda *a, **k: pytest.fail("no debe llamar al LLM"))
+    original = ("usa AdaptiveHarnessEngine. [doc:1:0]\n"
+                "El FailureVsSuccessRefiner refina el bucle de recompensa.")
+
+    out = T.verify_and_mark({"blueprint": original, "doc_id": 1})
+
+    assert out["blueprint"] == original, "no debe reescribir"
+    assert out["verificado"] is False
+    tipos = [v["tipo"] for v in out["violaciones"]]
+    assert "termino_ausente" in tipos and "huerfana" in tipos
+    assert out["reescrituras"] == 0
+
+    # Sin ningún puntero el informe ya no devuelve «nada que comprobar» si
+    # hay huérfanas: era justo la mentira del modo A.
+    sin = T.verify_and_mark({"blueprint": "El FailureVsSuccessRefiner refina.",
+                             "doc_id": None})
+    assert sin["verificado"] is False
+    assert sin["sin_punteros"] is True
+    assert sin["violaciones"][0]["tipo"] == "huerfana"
+
+    # Un blueprint sin punteros y sin huérfanas mantiene la lectura de siempre.
+    limpio = T.verify_and_mark({"blueprint": "El agente valida cada paso.",
+                                "doc_id": None})
+    assert limpio["verificado"] is None
+    assert limpio["violaciones"] == []
+
+
 def test_pearl_pipeline_sin_llm(monkeypatch):
     monkeypatch.setattr(PEARL, "generate", lambda *a, **k: "")
     P.register_procedure("variance-weighted sampling", technique="Task-CoEvolve", doc_id=3)

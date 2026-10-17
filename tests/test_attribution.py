@@ -95,6 +95,73 @@ def test_frase_de_propuesta_sin_puntero_no_se_verifica():
     assert A.check_attributions(bp, {}) == []
 
 
+# --- Hito 5: huérfanas (modo A del hallazgo 26) ------------------------------
+#
+# `check_attributions` solo mira frases con puntero; ReASearch salió
+# `verificado=True` con 2/2 resueltas y el juez lo suspendió por inventar
+# módulos anclados sin `[doc:id:chunk]`. Estos tests defienden el complemento:
+# caza lo que va sin puntero y sin marca R6, y no acusa a lo honesto.
+
+def test_huerfana_sin_puntero_ni_marca():
+    bp = "El AdaptiveHarnessExecutionEngine orquesta la ejecución de pasos."
+    v = A.check_orphan_claims(bp)
+    assert v and v[0]["tipo"] == "huerfana"
+    assert v[0]["termino"] == "AdaptiveHarnessExecutionEngine"
+
+
+def test_huerfana_con_puntero_no_cuenta():
+    """Con ancla ya la mira `check_attributions`; aquí no debe duplicar."""
+    bp = "El AdaptiveHarnessExecutionEngine orquesta pasos. [doc:1:0]"
+    assert A.check_orphan_claims(bp) == []
+
+
+def test_huerfana_con_marca_r6_no_cuenta():
+    """R6 en la propia línea: la afirmación está declarada como propuesta."""
+    bp = "El FailureVsSuccessRefiner refina el bucle (propuesta del blueprint)."
+    assert A.check_orphan_claims(bp) == []
+
+
+def test_huerfana_con_marca_en_linea_siguiente_no_cuenta():
+    """R6 permite la marca en la línea inmediatamente debajo del punto."""
+    bp = "- **Módulo X**: hace Y\n  *(propuesta del blueprint)*"
+    assert A.check_orphan_claims(bp) == []
+
+
+def test_huerfana_declaracion_de_silencio_no_cuenta():
+    """Con término técnico presente, pero declarado como silencio (R5/R6):
+    la marca es lo que la salva — ese es el caso en que importa."""
+    bp = "El paper no especifica el umbral de gating (0.30)."
+    assert A.check_orphan_claims(bp) == []
+
+
+def test_linea_comun_sin_terminos_no_es_huerfana():
+    """Sin término técnico no hay nada técnico que atribuir: no se acusa."""
+    assert A.check_orphan_claims("El agente valida cada paso antes de cerrar.") == []
+
+
+def test_encabezado_con_termino_no_es_huerfana():
+    assert A.check_orphan_claims("## Módulos AdaptiveHarnessEngine") == []
+
+
+def test_huerfana_caza_numero_tecnico_suelto():
+    bp = "El gate cierra con 0.30 cuando la cobertura baja."
+    v = A.check_orphan_claims(bp)
+    assert v and "0.30" in v[0]["terminos"]
+
+
+def test_huerfana_solo_las_lineas_que_tocan():
+    """Selección por línea: señala la huérfana y deja limpias las de al lado."""
+    bp = ("El agente valida cada paso antes de cerrar.\n"
+          "El FailureVsSuccessRefiner refina el bucle.\n"
+          "## Validación\n"
+          "El umbral es 0.30. [doc:1:0]\n"
+          "Otra cosa sin términos.")
+    v = A.check_orphan_claims(bp)
+    assert len(v) == 1
+    assert v[0]["linea"] == 2
+    assert v[0]["termino"] == "FailureVsSuccessRefiner"
+
+
 # ------------------------------------------------------------ ruta 5 (§5.10)
 #
 # P3 destruyó el documento reescribiéndolo (§5.8.3). La garantía que estos
