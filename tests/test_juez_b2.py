@@ -257,3 +257,38 @@ def test_gate_u4_orden_default_sobre_idle():
     i2 = _eval_todo(score=0.0, sb2=0.50)
     ok, _ = runner.gate_u4(d, i2)
     assert not ok
+
+
+# ---------------------------------------------------------------- evaluar
+
+def test_evaluar_reintenta_5xx_y_reporta_intentos(monkeypatch):
+    # HITO16 §4: reintento ≤2 en 5xx; str(HTTPError) no contiene "HTTP 5"
+    import urllib.error
+    llamadas = []
+
+    def _503(prompt, frames):
+        llamadas.append(1)
+        raise urllib.error.HTTPError("https://x", 503, "Unavailable",
+                                     {}, None)
+
+    monkeypatch.setattr(juez_b2, "_llamar", _503)
+    monkeypatch.setattr(juez_b2.time, "sleep", lambda _s: None)
+    r = juez_b2.evaluar(RUB, [])
+    assert "error" in r and r["intentos"] == 2
+    assert len(llamadas) == 2
+
+
+def test_evaluar_error_no_reintentable_una_llamada(monkeypatch):
+    import urllib.error
+    llamadas = []
+
+    def _400(prompt, frames):
+        llamadas.append(1)
+        raise urllib.error.HTTPError("https://x", 400, "Bad Request",
+                                     {}, None)
+
+    monkeypatch.setattr(juez_b2, "_llamar", _400)
+    monkeypatch.setattr(juez_b2.time, "sleep", lambda _s: None)
+    r = juez_b2.evaluar(RUB, [])
+    assert "error" in r and r["intentos"] == 1
+    assert len(llamadas) == 1

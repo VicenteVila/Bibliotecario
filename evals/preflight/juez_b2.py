@@ -207,10 +207,18 @@ def evaluar(rubrica: dict, frames: list[Path],
             raw, usage_i = _llamar(prompt, frames)
         except Exception as e:  # red/endpoint: no es fallo de parseo
             ult = str(e)[:300]
-            if "429" in ult or "HTTP 5" in ult or "timed out" in ult:
+            # HITO16 §4: reintento ≤2 por evaluación en 429/5xx/timeout.
+            # Se mira e.code (urllib str() es "HTTP Error 503", que no
+            # contiene "HTTP 5": con solo el string los 5xx no reintentaban).
+            cod = getattr(e, "code", None)
+            transitorio = ((isinstance(cod, int)
+                            and (cod == 429 or 500 <= cod <= 599))
+                           or "429" in ult or "HTTP 5" in ult
+                           or "timed out" in ult)
+            if transitorio:
                 time.sleep(min(60, 5 * 2 ** i))
                 continue
-            return {"error": ult, "usage": usage}
+            return {"error": ult, "usage": usage, "intentos": i + 1}
         usage = usage_i or usage
         got = parsear(raw, rubrica)
         if got:
@@ -219,7 +227,9 @@ def evaluar(rubrica: dict, frames: list[Path],
             return got
         ult = f"no parseable: {(raw or '')[:200]}"
         time.sleep(2)
-    return {"error": ult, "usage": usage}
+    # agotó intentos (5xx/parse en todos): reporta cuántos gastó para que
+    # `llamadas` de U6 cuente los reintentos, no solo los éxitos.
+    return {"error": ult, "usage": usage, "intentos": intentos}
 
 
 def agregar(parsed: dict, rubrica: dict) -> dict:

@@ -3,5 +3,79 @@
   "tarea": "platformer-juego",
   "juez": "gemini-3.1-flash-lite",
   "temperatura": 0.0,
-  "rubrica": "/mnt/c/Bibliotecario/evals/preflight/rubricas/platformer-juego.json"
+  "rubrica": "/mnt/c/Bibliotecario/evals/preflight/rubricas/platformer-juego.json",
+  "BUILD": 1.0,
+  "M_B1": 0.8333,
+  "b1_fila": {
+    "task": "platformer-juego",
+    "m_pass": 10,
+    "m_total": 12,
+    "validation": "FAILED",
+    "build_ok": true,
+    "score": 83.33,
+    "failed": [
+      "meta-existe",
+      "monedas-existen"
+    ],
+    "log": "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org\n\n=== CAPA B-1 v2 · tarea: platformer-juego ===\n   escena principal: res://main.tscn\n[PASS] build — el proyecto carga en Godot headless — res://main.tscn\n[PASS] jugador-existe — hay un nodo jugador — Player\n[PASS] jugador-fisica — el jugador es CharacterBody2D (física real) — tipo real: CharacterBody2D · esperado CharacterBody2D\n[FAIL] meta-existe — hay un nodo meta/victoria — no encontrado. nombres: [\"Goal\", \"Meta\", \"Finish\", \"Exit\", \"Victoria\", \"Win\", \"goal\"]\n[FAIL] monedas-existen — hay monedas/objetos recogibles — no encontrado. nombres: [\"Coin\", \"Moneda\", \"coin\", \"Oro\", \"Pickable\"]\n[PASS] hud-visible — hay un HUD (CanvasLayer) — CanvasLayer\n[PASS] hud-puntos — el HUD muestra puntos — 'Puntos: 0'\n   nodo bajo prueba: Player @ (100.0, 500.0)\n[PASS] jugador-mueve — el jugador se mueve bajo input de flecha — dx=200.00 px en 45 frames\n   nodo bajo prueba: Player @ (100.0, 500.0)\n[PASS] jugador-salta — el jugador salta bajo ui_accept (espacio) — subida máx 66.33 px\n   nodo bajo prueba: Player @ (100.0, 500.3)\n[PASS] colisiona-y-gravedad — el jugador asienta en el suelo (gravedad + colisión, sin teleport) — is_on_floor=true · descenso 75.0 px\n   nodo bajo prueba: Player @ (100.0, 500.3)\n[PASS] camara-sigue — la cámara sigue al jugador — dist cámara→jugador 0.0 → 0.0\n\n=== M = 9/11 ===\nVALIDATION_FAILED\n"
+  },
+  "evaluaciones": {
+    "default": {
+      "caso": "default",
+      "error": "HTTP Error 503: Service Unavailable",
+      "frames": 14,
+      "secs": 8.6,
+      "usage": {}
+    },
+    "default2": {
+      "caso": "default2",
+      "error": "HTTP Error 503: Service Unavailable",
+      "frames": 14,
+      "secs": 8.5,
+      "usage": {}
+    },
+    "negro": {
+      "caso": "negro",
+      "error": "HTTP Error 503: Service Unavailable",
+      "frames": 14,
+      "secs": 18.0,
+      "usage": {}
+    },
+    "idle": {
+      "caso": "idle",
+      "error": "HTTP Error 503: Service Unavailable",
+      "frames": 26,
+      "secs": 8.6,
+      "usage": {}
+    }
+  },
+  "Score_final": null,
+  "llamadas": 4,
+  "tokens_total": 0,
+  "gates": {
+    "U5": {
+      "ok": true,
+      "detalle": "ρ en /mnt/c/Bibliotecario/evals/preflight/rubricas/platformer-juego.json (fuera de EG: True) · workspace hits=0 · copia hits=0"
+    },
+    "U6": {
+      "ok": true,
+      "detalle": "B-1: BUILD=1.0 M_B1=0.8333 · llamadas=4/10 · suite+ruff aparte"
+    },
+    "U1": {
+      "ok": false,
+      "detalle": "error: HTTP Error 503: Service Unavailable"
+    },
+    "U2": {
+      "ok": false,
+      "detalle": "error: HTTP Error 503: Service Unavailable"
+    },
+    "U3": {
+      "ok": false,
+      "detalle": "falta una de las dos corridas de default"
+    },
+    "U4": {
+      "ok": false,
+      "detalle": "falta default o idle"
+    }
+  }
 }
