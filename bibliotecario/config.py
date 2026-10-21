@@ -3,6 +3,27 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
+
+def _load_env():
+    env_path = Path(".env")
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        os.environ.setdefault(key.strip(), value.strip())
+
+
+# Carga ANTES de cualquier constante de entorno. Hasta 2026-10-21 estaba al
+# final del módulo: NVIDIA_MODEL, GROQ_MODEL, NVIDIA_FALLBACK_MODEL y
+# BIBLIOTECARIO_DATA_DIR del .env se leían antes de existir y se ignoraban en
+# silencio (solo las keys, que se leen perezosas dentro de funciones,
+# funcionaban). `setdefault` mantiene la prioridad: lo exportado en el entorno
+# manda sobre el .env.
+_load_env()
+
 # Anclado a la raiz del repo, no al cwd. Con Path("data"), lanzar el harness
 # desde otro directorio (p.ej. evals/) creaba data/ vacio en silencio y se
 # evaluaba contra un corpus inexistente en lugar de fallar. Sigue siendo
@@ -25,21 +46,6 @@ _NVIDIA_MODEL = os.environ.get("NVIDIA_MODEL", "nvidia/nemotron-3-super-120b-a12
 _NVIDIA_FALLBACK = os.environ.get("NVIDIA_FALLBACK_MODEL", "openai/gpt-oss-20b")
 _EMBED_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 _EMBED_DIM = 384
-
-
-def _load_env():
-    env_path = Path(".env")
-    if not env_path.exists():
-        return
-    for line in env_path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        os.environ.setdefault(key.strip(), value.strip())
-
-
-_load_env()
 
 
 def gemini_api_key() -> str | None:

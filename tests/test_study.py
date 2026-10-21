@@ -7,6 +7,12 @@ que es R5 aplicada al propio artefacto.
 """
 from __future__ import annotations
 
+import re
+import sqlite3
+
+import pytest
+
+from bibliotecario.config import data_dir
 from bibliotecario.core import storage
 from bibliotecario.knowledge import study as S
 
@@ -142,3 +148,29 @@ def test_list_studies(monkeypatch):
 def _llm_mod():
     from bibliotecario.core import llm
     return llm
+
+
+def test_corpus_real_sin_citas_a_documentos_inexistentes():
+    """Toda `[doc:N…]` de la wiki de la DB real apunta a un documento que existe.
+
+    Clase de error medida: la higiene 16/17 (2026-10-21) borró documentos y
+    dejó citas colgadas en `study-5` (se corrigieron a mano junto con dos mal
+    mapeadas por posición). Este test impide que un borrado futuro deje la wiki
+    citando al vacío. DB real en solo lectura; se salta en un clon sin corpus.
+    """
+    db = data_dir() / "bibliotecario.db"
+    if not db.exists():
+        pytest.skip("sin data/bibliotecario.db: no hay wiki que comprobar")
+    conn = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    try:
+        ids = {r[0] for r in conn.execute("SELECT id FROM documents")}
+        paginas = conn.execute("SELECT slug, body FROM wiki_pages").fetchall()
+    finally:
+        conn.close()
+    malas = [
+        (slug, m.group(0))
+        for slug, body in paginas
+        for m in re.finditer(r"\[doc:(\d+)(?::\d+)?\]", body or "")
+        if int(m.group(1)) not in ids
+    ]
+    assert not malas, f"citas a documentos inexistentes: {malas}"

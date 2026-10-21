@@ -199,15 +199,23 @@ blueprints leen corpus que crece). Si algún día se evalúa un blueprint filtra
 esa fuente habrá que meterla en el filtro.
 
 **Pendientes**: los 2 papers del lote 1 **no se siembran en el grafo**
-(`knowledge/seed.py` solo crea nodos de `TECHNIQUES` conocidas) ·
-`.env` tiene `NVIDIA_MODEL`, pero `config._NVIDIA_MODEL` se lee **antes** de
-`: _load_env()`: hay que exportarlo (`LLM_PROVIDERS=nvidia NVIDIA_MODEL=...`)
-como en las corridas oficiales. ~~dedup robusto contra deriva del extractor~~
-→ hecho: ver «Ingesta idempotente» más abajo. ~~limpieza de 7/16/17~~ →
-hecha el 2026-10-21: ver «Higiene de duplicados». **Revisión de citas
-posicionales en `study-5`**: la cita `[doc:15:0]` de «Trace2Skill» apunta al
-doc 15 (HARDE), pero Trace2Skill solo aparece en los chunks de doc 5 y 27 —
-corregida la huérfana `[doc:16:0]` → `[doc:5:38]`, la otra queda por revisar.
+(`knowledge/seed.py` solo crea nodos de `TECHNIQUES` conocidas; sembrar
+papers de arneses = experimento nuevo con línea base propia, `HITO3_PLAN.md` §7) ·
+~~`.env` con `NVIDIA_MODEL` ignorado en silencio~~ → **arreglado 2026-10-21**:
+`_load_env()` se ejecuta antes de leer `NVIDIA_MODEL`/`GROQ_MODEL`/
+`NVIDIA_FALLBACK_MODEL`/`BIBLIOTECARIO_DATA_DIR` (antes corría al final del
+módulo y esas cuatro constantes se leían antes de que el `.env` existiera;
+sigue mandando lo exportado, `setdefault`) · `tests/test_config_env.py` (3) ·
+~~limpieza de 7/16/17~~ → hecha: ver «Higiene de duplicados» ·
+~~citas mal mapeadas de `study-5`~~ → **corregidas 2026-10-21**: junto con la
+huérfana `[doc:16:0]`, las citas de los tres métodos de la frase «…utilizan
+pipelines especializados» (`[doc:1:0]` de EvoSkill y `[doc:15:0]` de
+Trace2Skill) apuntaban a PEARL y a HARDE, donde esos nombres **no aparecen**;
+las tres → `[doc:5:38]` (Related Work de WikiSkill, que sí los nombra a los
+tres) · `tests/test_study.py::test_corpus_real_sin_citas_a_documentos_inexistentes`
+(146 citas en la wiki, 0 huérfanas). **Sigue pendiente** una auditoría
+semántica de las 146 citas fuera de esa frase: solo se verificaron
+huérfanas (todas) y los nombres de métodos de `study-5`.
 
 ### Ingesta idempotente — upsert semántico — *(2026-10-21)*
 
