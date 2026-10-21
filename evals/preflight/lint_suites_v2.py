@@ -84,7 +84,7 @@ def lint_file(path: Path) -> list[str]:
     stem = path.stem
     try:
         suite = yaml.safe_load(path.read_text(encoding="utf-8"))
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         return [f"{stem}: YAML inválido — {e}"]
     if not isinstance(suite, dict) or "task" not in suite or "checks" not in suite:
         return [f"{stem}: falta `task` o `checks`"]
@@ -145,9 +145,14 @@ def main() -> int:
     missing = sorted(set(expected) - stems)
     if missing:
         all_errs.append(f"sin suite: {missing}")
+    # `platformer-juego` es la tarea ANCLA de B-1/B-2 (HITO16_PLAN §0): su
+    # suite v2 existe para el gate U6 del Hito 16 con rúbrica propia
+    # (rubricas/platformer-juego.json), pero la tarea no forma parte del set
+    # expandido de 52 (evals/game_tasks_expanded.yaml) — no es huérfana.
+    anclas = {"platformer-juego"}
     extra_real = sorted(
         s for s in stems - set(expected)
-        if s not in {"v2-fixture", "v2-compat"}
+        if s not in {"v2-fixture", "v2-compat"} | anclas
     )
     if extra_real:
         all_errs.append(f"suites huérfanas: {extra_real}")
@@ -167,7 +172,8 @@ def main() -> int:
             kinds[c["kind"]] += 1
             n_checks += 1
     print("LINT PASSED")
-    print(f"  suites: {len(files)} (52 reales + 2 de validación)")
+    print(f"  suites: {len(files)} ({len(expected)} reales + "
+          f"{len(files) - len(expected)} de validación/ancla)")
     print(f"  checks: {n_checks} en total")
     print(f"  familias (tareas reales): {len(fam)} — " +
           ", ".join(f"{k}={v}" for k, v in sorted(fam.items())))
