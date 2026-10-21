@@ -46,6 +46,22 @@ def test_pi_rechaza_version_y_vacio():
     assert any("events" in e for e in errs)
 
 
+def test_pi_vacia_declarada_solo_omite_el_vacio():
+    # HITO16 §1.4: control idle con Π vacía por diseño
+    assert pi_schema.validar_pi({"version": 1, "events": []},
+                                vacia_ok=True) == []
+    assert pi_schema.validar_pi({"version": 1}, vacia_ok=True) == []
+    # sigue estricto por defecto: la misma Π vacía es fallo
+    errs = pi_schema.validar_pi({"version": 1, "events": []})
+    assert any("events" in e for e in errs)
+    # vacia_ok no perdona el resto del schema
+    errs2 = pi_schema.validar_pi({"version": 2, "events": []}, vacia_ok=True)
+    assert any("version" in e for e in errs2)
+    assert not any("events" in e for e in errs2)
+    assert pi_schema.validar_pi({"version": 1, "events": "x"},
+                                vacia_ok=True) == ["events ausente o vacío"]
+
+
 def test_pi_rechaza_orden_y_techo_20s():
     doc = _pi([_key(100, "ui_left", "down"), _key(50, "ui_left", "up")])
     assert any("orden" in e for e in pi_schema.validar_pi(doc))

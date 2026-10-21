@@ -21,17 +21,26 @@ UI_TO_XSYM: dict[str, str] = {
 }
 
 
-def validar_pi(doc: dict) -> list[str]:
-    """Devuelve la lista de errores del documento `Π` (vacía = válido)."""
+def validar_pi(doc: dict, *, vacia_ok: bool = False) -> list[str]:
+    """Devuelve la lista de errores del documento `Π` (vacía = válido).
+
+    HITO16 §1.4/§1.5 — `vacia_ok=True` declara el control de orden `idle`,
+    cuya Π es vacía por diseño (el script no genera entrada): se omite SOLO
+    ese error y el resto del schema sigue validando igual. Por defecto la
+    validación sigue siendo estricta: una captura real sin eventos es fallo.
+    """
     errs: list[str] = []
     if not isinstance(doc, dict):
         return ["Π no es un objeto"]
     if doc.get("version") != 1:
         errs.append(f"version != 1: {doc.get('version')!r}")
     evs = doc.get("events")
+    vacia_declarada = vacia_ok and (evs is None or evs == [])
     if not isinstance(evs, list) or not evs:
-        errs.append("events ausente o vacío")
-        return errs
+        if not vacia_declarada:
+            errs.append("events ausente o vacío")
+            return errs
+        evs = []
 
     prev_t = -1
     prev_motion_t: int | None = None

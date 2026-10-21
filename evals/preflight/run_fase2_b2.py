@@ -188,8 +188,9 @@ def _frames_idle(out_dir: Path, display: str) -> list[Path]:
     p = subprocess.run([sys.executable, str(HERE / "replay_pi.py"),
                         "replay", "--pi", str(destino / "demo_pi.json"),
                         "--out", str(destino), "--display", display,
-                        "--dur-ms", "10000"], capture_output=True,
-                       text=True, timeout=600, check=False)
+                        "--dur-ms", "10000", "--pi-vacia"],
+                       capture_output=True, text=True, timeout=600,
+                       check=False)
     if p.returncode != 0:
         raise SystemExit(f"replay idle falló: {p.stdout[-600:]}"
                          f"{p.stderr[-400:]}")

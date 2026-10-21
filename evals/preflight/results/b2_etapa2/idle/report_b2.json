@@ -1,0 +1,18 @@
+[
+  {
+    "fase": "captura",
+    "script": "idle",
+    "display": "localhost:99",
+    "workspace": "/mnt/c/EG/workspace/current",
+    "motor_secs": 11.0,
+    "motor_exit": 0,
+    "ok": false,
+    "errores_schema": [
+      "events ausente o vacío"
+    ],
+    "eventos": 0,
+    "duracion_ms": 0,
+    "demo": "/mnt/c/Bibliotecario/evals/preflight/results/b2_etapa2/idle/demo_pi.json",
+    "salida": "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org\nWARNING: Could not set V-Sync mode, as changing V-Sync mode is not supported by the graphics driver.\n     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)\nOpenGL API 4.5 (Core Profile) Mesa 25.2.8-0ubuntu0.24.04.2 - Compatibility - Using Device: Mesa - llvmpipe (LLVM 20.1.2, 256 bits)\n\n"
+  }
+]

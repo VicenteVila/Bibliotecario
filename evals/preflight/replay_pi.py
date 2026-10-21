@@ -229,13 +229,18 @@ def fase_captura(script: str, workspace: Path, out: Path,
             rep["salida"] = (salida or "")[-4000:]
             return rep
         doc = json.loads(pi_file.read_text(encoding="utf-8"))
-        errs = pi_schema.validar_pi(doc)
+        # HITO16 §1.4: `idle` es el control declarado con Π vacía (sin
+        # entrada que grabar); para ese script el vacío no es fallo.
+        vacia_ok = script == "idle"
+        errs = pi_schema.validar_pi(doc, vacia_ok=vacia_ok)
         out.mkdir(parents=True, exist_ok=True)
         destino = out / "demo_pi.json"
         destino.write_text(json.dumps(doc, ensure_ascii=False, indent=2),
                            encoding="utf-8")
         rep.update({"ok": not errs, "errores_schema": errs,
                     "eventos": len(doc.get("events") or []),
+                    "pi_declarada_vacia": vacia_ok
+                    and not (doc.get("events") or []),
                     "duracion_ms": pi_schema.duracion_ms(doc),
                     "demo": str(destino)})
         if errs:
@@ -250,9 +255,10 @@ def fase_captura(script: str, workspace: Path, out: Path,
 
 
 def fase_replay(pi_file: Path, workspace: Path, out: Path,
-                display: str, dur_ms: int | None = None) -> dict:
+                display: str, dur_ms: int | None = None,
+                vacia_ok: bool = False) -> dict:
     doc = json.loads(pi_file.read_text(encoding="utf-8"))
-    errs = pi_schema.validar_pi(doc)
+    errs = pi_schema.validar_pi(doc, vacia_ok=vacia_ok)
     plan = pi_schema.pi_a_xdotool(doc)
     # HITO16 §1.5: con Π vacío (demo idle de control) la duración del propio
     # trazo es 0 y la grabación no alcanzaría los ≥10 frames; se fuerza un
@@ -404,6 +410,9 @@ def main() -> int:
     ap.add_argument("--workspace", default=str(DEFAULT_WORKSPACE))
     ap.add_argument("--dur-ms", type=int, default=None,
                     help="suelo de duración de grabación en ms (Π vacío)")
+    ap.add_argument("--pi-vacia", action="store_true",
+                    help="declara que la Π es vacía por diseño (control "
+                         "idle, HITO16 §1.4)")
     args = ap.parse_args()
 
     out = Path(args.out)
@@ -429,7 +438,7 @@ def main() -> int:
             raise SystemExit(f"Π inexistente: {pi_file}")
         print(f"[B2] replay {pi_file} ...", flush=True)
         r = fase_replay(pi_file, workspace, out, args.display,
-                        dur_ms=args.dur_ms)
+                        dur_ms=args.dur_ms, vacia_ok=args.pi_vacia)
         informes.append(r)
         print(f"  -> ok={r.get('ok')} frames={r.get('frames')} "
               f"negros={r.get('frames_negros')} "
