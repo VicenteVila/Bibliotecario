@@ -1120,7 +1120,7 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 > | §5.2.1 congelados B-1 | el motor y el comando **ya están medidos**; el conjunto de tests se congela **al escribirse** |
 >
 > **No se ratifica aún** (y por tanto **no se usa como regla**): §2.1 · §3 ·
-> §4.0 · §4.1 · §4.2 · §5.1 · **fase B-2** · §5.4 · §6 · §7 ·
+> §4.0 · §4.1 · §4.2 · §5.1 · §5.4 · §6 · §7 ·
 > §8 parcialmente *(**base humana `game_development` SÍ medida y ratificada**;
 > `H0` y `web_development` siguen sin valor)* · §10.3.
 
@@ -1134,7 +1134,7 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | §5.1 umbrales A (intactos Hito 0-2) | sí | ☐ *sin ratificar* |
 | **§5.2.0 reencuadre**: techo 40 y pesos → **Capa A-bis**, sin tocarlos | sí | ☑ **2026-10-14** |
 | **§5.2.1 scorer Capa B — FASE B-1** (`game_development`) = **tests de comportamiento en Godot** · binario · determinista · **preflight 2026-10-14: 5/5 PASS** | sí | ☑ **2026-10-14** |
-| **§5.2.1 scorer Capa B — FASE B-2** (`game_development`) = replay + juez multimodal (GameCraft) | **NO** — bloqueada (`xdotool`, trazas `Π`) | ☐ **dejar en blanco** |
+| **§5.2.1 scorer Capa B — FASE B-2** (`game_development`) = replay + juez multimodal (GameCraft) | sí | ☑ **2026-10-21** — *bloqueo resuelto en Hito 15 (`xdotool`, trazas `Π`); ratificación del dueño junto con §2-§3 de `HITO16_PLAN.md`, **antes de la corrida oficial*** |
 | **§5.2.1 fórmula** `Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)` | sí | ☑ **2026-10-14** |
 | **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☑ **2026-10-14** |
 | **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☑ **2026-10-14** |

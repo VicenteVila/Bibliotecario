@@ -90,6 +90,12 @@ Si `events: []` → `0` (hoy reventaría `events[-1]`).
 
 ## §2 — Umbrales (ratificar ANTES de medir)
 
+**Ratificados 2026-10-21 por el dueño — ANTES de la corrida oficial** (voto
+previo a medir: «Sí, primero los dos arreglos menores, después lo demás»),
+junto con §3 y la fila `FASE B-2` de `BENCHMARK_SPEC.md` §11. Desde aquí
+ningún umbral se toca: si un gate falla → **NO CUMPLE con evidencia y decisión
+del dueño**.
+
 | gate | umbral |
 |---|---|
 | **U1** juez válido | default → JSON estricto completo: ids exactos de ρ, todos los scores ∈ {0,0.5,1}, justificaciones no vacías, en ≤2 intentos |
