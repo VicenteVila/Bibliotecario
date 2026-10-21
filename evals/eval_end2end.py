@@ -406,7 +406,41 @@ def main() -> None:
     ap.add_argument("--provider", default="",
                     help="fija proveedores (p.ej. nvidia). Sin esto el round-robin "
                          "reparte la run entre Nemotron y Gemini y se mezclan dos agentes")
+    ap.add_argument("--capas", default="",
+                    help="capas del corpus que el retrieval acepta, coma-separadas "
+                         "(p. ej. evaluacion). Vacío = corpus completo, que es como se "
+                         "corrió siempre: filtrar cambia la línea base, y eso se dice "
+                         "en meta['corpus'], no se descubre comparando medias.")
+    ap.add_argument("--sin-lock", action="store_true",
+                    help="omite la comprobación de evals/CORPUS_LOCK.json (tests/smoke). "
+                         "Queda registrado en meta como no verificado.")
     args = ap.parse_args()
+
+    from evals import corpus_lock
+    from bibliotecario.ingest.base import CAPAS
+
+    if args.capas:
+        malas = [c for c in args.capas.split(",") if c.strip() and c.strip() not in CAPAS]
+        if malas:
+            ap.error(f"--capas desconocidas: {malas} (válidas: {', '.join(CAPAS)})")
+        os.environ["BIBLIOTECARIO_CAPAS"] = args.capas
+    # Congelación del corpus (CORPUS_LOCK): si el corpus de evaluación cambió,
+    # la run no es comparable con las anteriores y se corta ANTES de gastar un
+    # solo token. --sin-lock es la salida declarada, no el silencio.
+    corpus_meta = {"capas": args.capas or None, "lock_verificado": not args.sin_lock}
+    if args.sin_lock:
+        print("aviso: --sin-lock, corpus NO verificado contra CORPUS_LOCK.json", file=sys.stderr)
+    else:
+        r = corpus_lock.check()
+        for p in r["avisos"]:
+            print(f"aviso (corpus): {p}", file=sys.stderr)
+        if r["fatal"]:
+            for p in r["fatal"]:
+                print(f"FATAL (corpus): {p}", file=sys.stderr)
+            raise SystemExit(
+                "corpus de evaluación no coincide con evals/CORPUS_LOCK.json: "
+                "declara el cambio con `python evals/corpus_lock.py build` y corre "
+                "una línea base nueva (el benchmark cambió, no se compara en silencio)")
 
     if args.provider:
         os.environ["LLM_PROVIDERS"] = args.provider
@@ -456,7 +490,11 @@ def main() -> None:
             # El anclaje se lee del entorno, pero se graba aqui: una run sin
             # esta clave no se puede distinguir de una con anclaje al compararla.
             "anchor_grounding": LOOP.ANCHOR_GROUNDING,
-            "temperature": args.temperature}
+            "temperature": args.temperature,
+            # Capa del corpus + si el lock se comprobó. Sin estas dos claves no
+            # se puede saber si dos runs leyeron el mismo corpus: la comparación
+            # sería silenciosa.
+            "corpus": corpus_meta}
 
     # Ver run_one(): el kwarg solo viaja si se pidio una temperatura concreta.
     temp_kw = {} if args.temperature is None else {"temperature": args.temperature}

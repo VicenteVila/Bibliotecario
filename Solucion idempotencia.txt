@@ -1,0 +1,224 @@
+El análisis del repositorio **Bibliotecario** revela que el módulo de ingestión (`bibliotecario/ingest/pipeline.py`) sufre de una pérdida crítica de idempotencia debido a su estrategia de deduplicación y a la inmutabilidad forzada de los metadatos.
+
+A continuación se detalla el diagnóstico técnico y la solución arquitectónica.
+
+### 1. Diagnóstico de la Debilidad (Por qué pierde idempotencia)
+
+La función `store()` en `pipeline.py` utiliza el hash SHA-256 del texto extraído (`paper_hash = fingerprint(doc.text)`) como única fuente de verdad para evitar duplicados. Esto genera tres problemas graves:
+
+1.  **Bloqueo de Actualizaciones (El problema del "Early Return"):**
+    Si mejoras la lógica de extracción de metadatos (por ejemplo, corriges la detección del sello de arXiv girado en `bibliography.py` o mejoras la extracción de citas en `citations.py`) y vuelves a ejecutar la ingesta sobre los mismos PDFs, el `paper_hash` coincidirá y la función retornará inmediatamente. **Los metadatos nunca se actualizarán en la base de datos.** Esto te obliga a mantener scripts manuales "ad-hoc" como `backfill_bibliography()`, rompiendo la naturaleza declarativa e idempotente de un pipeline de datos (donde correr el pipeline $N$ veces sobre la fuente $X$ debería resultar siempre en el mismo estado final).
+2.  **Duplicación por Versiones o Fuentes Distintas:**
+    Los papers canónicos tienen identificadores únicos (ArXiv ID, DOI). Sin embargo, el sistema los ignora para la deduplicación. Si ingieres la versión `v1` de un paper y luego la `v2` (o si ingieres el mismo paper desde un PDF y luego desde un DOCX/OCR), el texto variará ligeramente, el hash será distinto y **el sistema lo ingerirá como un documento completamente nuevo**, duplicando el conocimiento y los embeddings en tu grafo/memoria.
+3.  **Acoplamiento en el `INSERT`:**
+    Las citas y la bibliografía se calculan y guardan en la columna JSON `metadata` *durante* el `INSERT`. Si el documento ya existe, no hay mecanismo para hacer un `UPDATE` de esos metadatos.
+
+---
+
+### 2. Solución: Estrategia de "Upsert" Semántico
+
+Para recuperar la idempotencia, la ingesta debe evolucionar de un modelo de "Inserción con Hash" a un modelo de **"Upsert Semántico"**.
+
+El nuevo flujo debe ser:
+1.  **Extraer primero los identificadores canónicos** (ArXiv ID, DOI) antes de consultar la base de datos.
+2.  **Buscar en la DB por Identificador Semántico** (prioridad) y luego por `paper_hash` (fallback).
+3.  **Lógica de Decisión Idempotente:**
+    *   Si el documento existe y el `paper_hash` **y** los `metadata` son idénticos $\rightarrow$ Retornar (Duplicado puro).
+    *   Si el documento existe pero los `metadata` han mejorado (ej. ahora sí detectaste el ArXiv ID) $\rightarrow$ **Actualizar** la fila `documents` (sin recalcular chunks).
+    *   Si el documento existe pero el `paper_hash` cambió (ej. nueva versión v2 del paper o mejora en el OCR) $\rightarrow$ **Actualizar** fila, borrar chunks antiguos y re-indexar todo.
+
+#### Implementación del Código (`pipeline.py`)
+
+Sustituye la función `store()` por esta versión robusta:
+
+```python
+def store(doc: base.Document) -> base.IngestResult:
+    validation = schemas.validate(doc)
+    q_score, q_alerts = quality.score(doc.source_type, doc.text, doc.metadata)
+    if not validation["valid"]:
+        return base.IngestResult(ok=False, title=doc.title, quality_score=q_score,
+                                 quality_alerts=q_alerts, validation=validation,
+                                 error=f"validación: {validation['issues']}")
+
+    import json as _json
+    
+    # 1. Extracción TEMPRANA de metadatos (Bibliografía y Citas)
+    meta = bibliography.merge_metadata(
+        doc.metadata if isinstance(doc.metadata, dict) else None,
+        bibliography.extract_bibliography(doc.text, title=doc.title),
+    )
+    meta["citations"] = citations.extract_citations(doc.text)
+    fp = base.fingerprint(doc.text)
+
+    # Identificador semántico (ArXiv) para deduplicación prioritaria
+    arxiv_id = meta.get("arxiv", {}).get("id")
+
+    with storage.get_conn() as conn:
+        existing_doc = None
+        
+        # BÚSQUEDA 1: Por Identificador Canónico (Evita duplicar v1 y v2 del mismo paper)
+        if arxiv_id:
+            row = conn.execute(
+                "SELECT id, paper_hash FROM documents WHERE json_extract(metadata, '$.arxiv.id') = ?", 
+                (arxiv_id,)
+            ).fetchone()
+            if row:
+                existing_doc = row
+
+        # BÚSQUEDA 2: Por Hash de Contenido (Fallback para papers sin ArXiv/DOI)
+        if not existing_doc:
+            row = conn.execute("SELECT id, paper_hash FROM documents WHERE paper_hash=?", (fp,)).fetchone()
+            if row:
+                existing_doc = row
+
+        # LÓGICA IDEMPOTENTE (UPSERT)
+        if existing_doc:
+            doc_id = existing_doc["id"]
+            
+            # Cargar metadatos antiguos para comparar
+            old_meta = {}
+            try:
+                row_meta = conn.execute("SELECT metadata FROM documents WHERE id=?", (doc_id,)).fetchone()
+                if row_meta and row_meta["metadata"]:
+                    old_meta = _json.loads(row_meta["metadata"])
+            except (TypeError, ValueError):
+                pass
+                
+            # A. Duplicado Puro: Texto y metadatos idénticos
+            if existing_doc["paper_hash"] == fp and meta == old_meta:
+                return base.IngestResult(ok=True, doc_id=doc_id, title=doc.title,
+                                         quality_score=q_score, quality_alerts=["duplicado: ya ingerido"],
+                                         validation=validation)
+                                         
+            # B. Actualización: El texto cambió (nueva versión) O los metadatos mejoraron
+            conn.execute(
+                "UPDATE documents SET path=?, title=?, paper_hash=?, metadata=? WHERE id=?",
+                (doc.source, doc.title, fp, _json.dumps(meta, ensure_ascii=False, default=str), doc_id)
+            )
+            
+            # Solo re-indexar chunks si el texto cambió (ahorra cómputo si solo mejoraron los metadatos)
+            if existing_doc["paper_hash"] != fp:
+                conn.execute("DELETE FROM chunks WHERE doc_id=?", (doc_id,))
+                conn.execute("DELETE FROM wiki_pages WHERE slug=?", (f"raw-{doc_id}",))
+                action = "actualizado (nueva versión/extracción)"
+                
+                chunks = base.chunk_text(doc.text)
+                if chunks:
+                    vecs = encode(chunks)
+                    conn.executemany(
+                        "INSERT INTO chunks (doc_id, chunk_idx, text, embedding) VALUES (?,?,?,?)",
+                        [(doc_id, i, ch, embed_blob(vecs[i])) for i, ch in enumerate(chunks)],
+                    )
+                slug = f"raw-{doc_id}"
+                conn.execute("INSERT INTO wiki_pages (slug, title, body, kind) VALUES (?,?,?,?)",
+                             (slug, f"[raw] {doc.title}", doc.text[:20000], "raw"))
+            else:
+                action = "metadatos actualizados"
+                
+        else:
+            # C. Inserción Nueva
+            cur = conn.execute("INSERT INTO documents (path, title, paper_hash, metadata) VALUES (?,?,?,?)",
+                               (doc.source, doc.title, fp, _json.dumps(meta, ensure_ascii=False, default=str)))
+            doc_id = cur.lastrowid
+            action = "insertado"
+            
+            chunks = base.chunk_text(doc.text)
+            if chunks:
+                vecs = encode(chunks)
+                conn.executemany(
+                    "INSERT INTO chunks (doc_id, chunk_idx, text, embedding) VALUES (?,?,?,?)",
+                    [(doc_id, i, ch, embed_blob(vecs[i])) for i, ch in enumerate(chunks)],
+                )
+            slug = f"raw-{doc_id}"
+            conn.execute("INSERT INTO wiki_pages (slug, title, body, kind) VALUES (?,?,?,?)",
+                         (slug, f"[raw] {doc.title}", doc.text[:20000], "raw"))
+
+    logger.info("Documento %s doc_id=%s '%s'", action, doc_id, doc.title)
+    return base.IngestResult(ok=True, doc_id=doc_id, title=doc.title, chunks=len(chunks),
+                             quality_score=q_score, quality_alerts=q_alerts, validation=validation)
+```
+
+### 3. Mejora de Esquema Recomendada (Migración)
+
+El uso de `json_extract(metadata, '$.arxiv.id')` en la consulta SQL puede volverse lento si la base de datos crece mucho. Te recomiendo añadir una migración en `storage.py` para promover los identificadores a columnas nativas con restricción única:
+
+```sql
+ALTER TABLE documents ADD COLUMN arxiv_id TEXT UNIQUE;
+ALTER TABLE documents ADD COLUMN doi TEXT UNIQUE;
+```
+*Nota: SQLite permite múltiples valores `NULL` en columnas `UNIQUE`, por lo que esta migración es segura incluso si ya tienes documentos sin ArXiv ID en tu base de datos actual.*
+
+Al hacer esto, `bibliography.py` y `citations.py` podrán escribir directamente en estas columnas, y la deduplicación por identificador canónico será instantánea y robusta, eliminando por completo la necesidad de funciones como `backfill_bibliography`.
+
+
+
+
+
+**No, en absoluto.** El problema de la pérdida de idempotencia y el problema con las palabras de 3 letras (como "why") son dos bugs **totalmente independientes** que coexisten en el repositorio.
+
+El fallo de idempotencia afecta a la **gestión de estado** (no actualiza metadatos en documentos ya guardados), mientras que el problema de las palabras de 3 letras es un fallo en la **lógica de recuperación e indexación** (tokenización).
+
+A continuación te explico el verdadero motivo y cómo solucionarlo.
+
+### 1. Diagnóstico real: El filtro de longitud `{4,}`
+
+El motivo por el cual "why" (y otras palabras críticas como "how", "who", o siglas técnicas como "RAG", "LLM", "API") no se indexan ni se usan para hacer *match* durante la búsqueda de papers se debe a una **guillotina por longitud** aplicada en las expresiones regulares (regex) del sistema.
+
+Este bug ocurre en dos puntos críticos del código:
+
+1.  **En `bibliotecario/memory/retriever.py` (Función `_tokens`):**
+    ```python
+    def _tokens(text: str) -> set[str]:
+        return {t for t in re.findall(r"[a-záéíóúñü]{4,}", text.lower())}
+    ```
+    El cuantificador `{4,}` le indica a Python que **solo extraiga palabras de 4 letras o más**. Al calcular la relevancia híbrida (score keyword), el sistema descarta por completo "why" (3 letras), "how" (3 letras) o acrónimos técnicos cortos como "RAG".
+
+2.  **En `bibliotecario/agent/tools.py` (Función `_doc_keyword_chunks`):**
+    ```python
+    terms = [t for t in re.findall(r"[a-z0-9\-]{4,}", question.lower()) if t not in stop]
+    ```
+    Aquí se aplica la misma guillotina. Fíjate en la ironía: la función tiene una lista de palabras vacías (`stop`) que ya incluye "how" o "what" (que tienen 4 letras), pero como "why" tiene 3 letras, el regex la descarta *antes* de que la lista `stop` pueda siquiera evaluarla.
+
+### 2. Por qué esto rompe el sistema de QA
+
+Cuando el agente hace una pregunta tipo *"Why does the harness fail?"*, el tokenizador descarta "why" y "the", dejando solo "does", "harness" y "fail". Si el chunk del paper responde *"The reason is..."* o *"This happens because..."* sin usar las palabras exactas, el algoritmo de *keyword matching* puntúa ese chunk como irrelevante, aunque la respuesta esté ahí.
+
+---
+
+### 3. Solución: Ampliar el umbral de tokenización
+
+Para arreglar esto, debes cambiar el umbral de `{4,}` a `{3,}` (para aceptar siglas y palabras de 3 letras) y confiar en la lista `stop` para controlar el ruido, en lugar de usar la longitud de la palabra como filtro.
+
+**Paso A: Corregir `bibliotecario/memory/retriever.py`**
+Busca la función `_tokens` y cambia el regex:
+
+```python
+def _tokens(text: str) -> set[str]:
+    # Cambiado de {4,} a {3,} para incluir "why", "how", "RAG", etc.
+    return {t for t in re.findall(r"[a-záéíóúñü]{3,}", text.lower())}
+```
+
+**Paso B: Corregir `bibliotecario/agent/tools.py`**
+Haz lo mismo en `_doc_keyword_chunks` y en `_toks`.
+
+```python
+def _doc_keyword_chunks(doc_id: int, question: str, per_doc: int) -> list[dict]:
+    stop = {"when", "which", "does", "the", "and", "for", "how", "what", "with", "that",
+            "from", "this", "into", "each", "than", "them", "they", "there", "their",
+            "who", "why"} # Añadidos "who" y "why" a la stoplist si resultan ser demasiado genéricos para tu caso de uso.
+    
+    # Cambiado de {4,} a {3,}
+    terms = [t for t in re.findall(r"[a-z0-9\-]{3,}", question.lower()) if t not in stop]
+    # ... resto de la función sin cambios ...
+```
+
+**Paso C: Corregir `_toks` en `tools.py`**
+Esta función también se usa para calcular similitudes léxicas en `fuente_verificable`.
+
+```python
+def _toks(text: str) -> set[str]:
+    # Cambiado de {4,} a {3,}
+    return {t for t in re.findall(r"[a-záéíóúñü]{3,}", text.lower())}
+```
+
+Con estos cambios, "why", "RAG" o "LLM" entrarán de inmediato en el índice de palabras clave y el scoring híbrido (`W_KEYWORD`) empezará a darles el peso léxico correcto a los chunks que contienen estas palabras exactas.

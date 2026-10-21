@@ -4,7 +4,7 @@
   "recall@1": 0.933,
   "recall@3": 1.0,
   "recall@5": 1.0,
-  "MRR@10": 0.956
+  "MRR@10": 0.967
  },
  "rows": [
   {
@@ -13,7 +13,7 @@
    "difficulty": "facil",
    "rank": 1,
    "top1_doc": 1,
-   "latency_s": 6.5
+   "latency_s": 4.9
   },
   {
    "id": "pearl-2",
@@ -21,7 +21,7 @@
    "difficulty": "media",
    "rank": 1,
    "top1_doc": 1,
-   "latency_s": 0.3
+   "latency_s": 0.7
   },
   {
    "id": "pearl-3",
@@ -29,7 +29,7 @@
    "difficulty": "dificil",
    "rank": 1,
    "top1_doc": 1,
-   "latency_s": 0.3
+   "latency_s": 0.7
   },
   {
    "id": "proc-1",
@@ -37,7 +37,7 @@
    "difficulty": "facil",
    "rank": 1,
    "top1_doc": 2,
-   "latency_s": 0.3
+   "latency_s": 0.6
   },
   {
    "id": "proc-2",
@@ -45,7 +45,7 @@
    "difficulty": "media",
    "rank": 1,
    "top1_doc": 2,
-   "latency_s": 0.3
+   "latency_s": 0.7
   },
   {
    "id": "proc-3",
@@ -53,7 +53,7 @@
    "difficulty": "dificil",
    "rank": 1,
    "top1_doc": 2,
-   "latency_s": 0.3
+   "latency_s": 0.7
   },
   {
    "id": "tce-1",
@@ -61,7 +61,7 @@
    "difficulty": "facil",
    "rank": 1,
    "top1_doc": 3,
-   "latency_s": 0.2
+   "latency_s": 0.6
   },
   {
    "id": "tce-2",
@@ -69,7 +69,7 @@
    "difficulty": "media",
    "rank": 1,
    "top1_doc": 3,
-   "latency_s": 0.2
+   "latency_s": 0.7
   },
   {
    "id": "tce-3",
@@ -77,7 +77,7 @@
    "difficulty": "dificil",
    "rank": 1,
    "top1_doc": 3,
-   "latency_s": 0.3
+   "latency_s": 0.7
   },
   {
    "id": "reas-1",
@@ -85,7 +85,7 @@
    "difficulty": "facil",
    "rank": 1,
    "top1_doc": 4,
-   "latency_s": 0.3
+   "latency_s": 0.6
   },
   {
    "id": "reas-2",
@@ -93,7 +93,7 @@
    "difficulty": "media",
    "rank": 1,
    "top1_doc": 4,
-   "latency_s": 0.3
+   "latency_s": 0.7
   },
   {
    "id": "reas-3",
@@ -101,15 +101,15 @@
    "difficulty": "dificil",
    "rank": 1,
    "top1_doc": 4,
-   "latency_s": 0.3
+   "latency_s": 0.7
   },
   {
    "id": "wiki-1",
    "paper": "WikiSkill",
    "difficulty": "facil",
-   "rank": 3,
+   "rank": 2,
    "top1_doc": 3,
-   "latency_s": 0.3
+   "latency_s": 0.6
   },
   {
    "id": "wiki-2",
@@ -117,7 +117,7 @@
    "difficulty": "media",
    "rank": 1,
    "top1_doc": 5,
-   "latency_s": 0.3
+   "latency_s": 0.7
   },
   {
    "id": "wiki-3",
@@ -125,7 +125,7 @@
    "difficulty": "dificil",
    "rank": 1,
    "top1_doc": 5,
-   "latency_s": 0.4
+   "latency_s": 0.7
   }
  ]
 }

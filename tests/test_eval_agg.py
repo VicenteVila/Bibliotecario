@@ -152,7 +152,7 @@ def test_reanudar_no_pierde_filas(tmp_path, monkeypatch):
     # pearl-b1 ya está hecho; solo pearl-b2 se calcula en esta sesión.
     monkeypatch.setattr(sys, "argv", ["eval_end2end.py", "--golden", "golden_blind_qa.jsonl",
                                       "--ids", "pearl-b1,pearl-b2", "--turns", "4",
-                                      "--out", str(rp)])
+                                      "--sin-lock", "--out", str(rp)])
     monkeypatch.setattr(H, "run_one", lambda q, turns, **kw: {**prev, "id": q["id"],
                                                               "judge": 3, "difficulty": "media"})
     H.main()
@@ -674,7 +674,7 @@ def test_temperature_llega_a_run_one_en_las_dos_ramas(tmp_path, monkeypatch):
                             ["eval_end2end.py", "--golden", "golden_blind_qa.jsonl",
                              "--ids", "pearl-b1,pearl-b2", "--turns", "4",
                              "--workers", workers, "--temperature", "0.0",
-                             "--out", str(tmp_path / f"r{workers}.json")])
+                             "--sin-lock", "--out", str(tmp_path / f"r{workers}.json")])
         H.main()
         assert len(seen) == 2, f"workers={workers}: {len(seen)} llamadas"
         assert seen == [0.0, 0.0], (

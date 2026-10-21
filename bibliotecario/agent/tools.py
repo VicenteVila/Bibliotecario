@@ -12,6 +12,7 @@ import re
 from bibliotecario.config import data_dir
 from bibliotecario.core import storage
 from bibliotecario.core.llm import generate
+from bibliotecario.core.tokens import count_terms, token_list, tokens
 from bibliotecario.knowledge import graph as G
 from bibliotecario.knowledge import pearl as PEARL
 from bibliotecario.memory import retriever
@@ -28,7 +29,18 @@ def search_papers(query: str, top_k: int = 8) -> dict:
 
 
 def retrieve_evidence(query: str, top_m: int = 8) -> dict:
-    return {"paths": PEARL.retrieve_evidence(query, top_m=top_m)}
+    """Evidencia del grafo, filtrada por la misma capa que el retriever.
+
+    PEARL devuelve caminos por nodos, no por consulta de texto: si el filtro
+    de capas (BIBLIOTECARIO_CAPAS) solo se aplicara en retriever.search(), la
+    tool de evidencia seguiría exponiendo papers fuera de capa y el filtro no
+    sería real. Los caminos sin ningún doc_id permitido se descartan.
+    """
+    paths = PEARL.retrieve_evidence(query, top_m=top_m)
+    if retriever.allowed_capas() is None:
+        return {"paths": paths}
+    kept = [p for p in paths if retriever.docs_in_allowed_capa(p.get("doc_ids") or [])]
+    return {"paths": kept}
 
 
 def _doc_nchunks(doc_id: int) -> int:
@@ -59,11 +71,12 @@ def _doc_keyword_chunks(doc_id: int, question: str, per_doc: int) -> list[dict]:
     cercanos; el detalle fino (la cifra exacta, la regla de desempate) está en un
     chunk que comparte vocabulario con la *pregunta* aunque no sea el más cercano.
     Contar ocurrencias de términos dentro del propio documento es determinista y
-    barato, y es lo que localiza esos chunks.
+    barato, y es lo que localiza esos chunks. Los términos y el conteo vienen del
+    tokenizador compartido: tokens **exactos**, nunca subcadenas (`"use"` dentro
+    de `"users"`), y con la stoplist común en vez de una guillotina de longitud
+    que se comía `RAG`, `OCR` y las cifras.
     """
-    stop = {"when", "which", "does", "the", "and", "for", "how", "what", "with", "that",
-            "from", "this", "into", "each", "than", "them", "they", "there", "their"}
-    terms = [t for t in re.findall(r"[a-z0-9\-]{4,}", question.lower()) if t not in stop]
+    terms = token_list(question)
     if not terms:
         return []
     try:
@@ -74,8 +87,7 @@ def _doc_keyword_chunks(doc_id: int, question: str, per_doc: int) -> list[dict]:
         return []
     scored = []
     for r in rows:
-        t = (r["text"] or "").lower()
-        s = sum(t.count(term) for term in terms)
+        s = count_terms(r["text"] or "", terms)
         if s:
             scored.append({"chunk": r["chunk_idx"], "kw": s, "text": r["text"]})
     scored.sort(key=lambda x: (-x["kw"], x["chunk"]))
@@ -246,7 +258,7 @@ def _source_for(technique: str, procs, max_chunks: int = 8, max_chars: int = 700
 
 
 def _toks(text: str) -> set[str]:
-    return {t for t in re.findall(r"[a-záéíóúñü]{4,}", text.lower())}
+    return tokens(text)
 
 
 def _fuente_numerada(technique: str, procs, max_chunks: int = 8,
@@ -519,6 +531,11 @@ def build_blueprint(technique: str, goal: str, extra_source: str = "",
                 "citas_posicionales": None}
     names = [p.label for p in procs[:20]]
     paths = PEARL.retrieve_evidence(f"{technique} {goal}", top_m=5)
+    # Cadena de evidencia: misma capa que retrieve_evidence (labels visibles
+    # en el prompt). La fuente de chunks (procedure → doc) es flujo de
+    # blueprint y no lleva filtro: los blueprints leen fundacional+extendido.
+    if retriever.allowed_capas() is not None:
+        paths = [p for p in paths if retriever.docs_in_allowed_capa(p.get("doc_ids") or [])]
     chain = "\n".join(" → ".join(f"{s['label']}" for s in p["steps"]) for p in paths)
     mapa: dict[int, tuple[int, int]] = {}
     if positional:

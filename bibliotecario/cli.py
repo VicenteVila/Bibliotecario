@@ -13,13 +13,13 @@ def cmd_status(_a):
 
 
 def cmd_ingest(a):
-    r = API.ingest(a.source, ocr=a.ocr)
+    r = API.ingest(a.source, ocr=a.ocr, capa=a.capa)
     print(("OK" if r.ok else "FALLO"), r.title, f"chunks={r.chunks} q={r.quality_score:.0f}", r.error)
 
 
 def cmd_ingest_dir(a):
     import json
-    print(json.dumps(API.ingest_dir(a.directory, ocr=a.ocr), indent=1, ensure_ascii=False))
+    print(json.dumps(API.ingest_dir(a.directory, ocr=a.ocr, capa=a.capa), indent=1, ensure_ascii=False))
 
 
 def cmd_ask(a):
@@ -72,8 +72,12 @@ def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="bibliotecario", description="Agente de búsqueda sobre papers")
     sub = p.add_subparsers(dest="cmd", required=True)
     s = sub.add_parser("status"); s.set_defaults(f=cmd_status)
-    s = sub.add_parser("ingest"); s.add_argument("source"); s.add_argument("--ocr", action="store_true"); s.set_defaults(f=cmd_ingest)
-    s = sub.add_parser("ingest-dir"); s.add_argument("directory"); s.add_argument("--ocr", action="store_true"); s.set_defaults(f=cmd_ingest_dir)
+    s = sub.add_parser("ingest"); s.add_argument("source"); s.add_argument("--ocr", action="store_true")
+    s.add_argument("--capa", default="extendido", choices=["fundacional", "evaluacion", "extendido"],
+                   help="capa del corpus (default: extendido)"); s.set_defaults(f=cmd_ingest)
+    s = sub.add_parser("ingest-dir"); s.add_argument("directory"); s.add_argument("--ocr", action="store_true")
+    s.add_argument("--capa", default="extendido", choices=["fundacional", "evaluacion", "extendido"],
+                   help="capa del corpus (default: extendido)"); s.set_defaults(f=cmd_ingest_dir)
     s = sub.add_parser("ask"); s.add_argument("question"); s.add_argument("--turns", type=int, default=10); s.set_defaults(f=cmd_ask)
     s = sub.add_parser("blueprint"); s.add_argument("technique"); s.add_argument("goal"); s.set_defaults(f=cmd_blueprint)
     s = sub.add_parser("implement"); s.add_argument("technique"); s.add_argument("goal"); s.set_defaults(f=cmd_implement)

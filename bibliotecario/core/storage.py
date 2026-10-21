@@ -152,11 +152,36 @@ def init_db(path: Path | None = None):
     try:
         conn.executescript(_SCHEMA_SQL)
         # Migraciones idempotentes para DBs creadas con schema anterior:
-        for ddl in ("ALTER TABLE documents ADD COLUMN metadata TEXT",):
+        for ddl in (
+            "ALTER TABLE documents ADD COLUMN metadata TEXT",
+            # Capa semántica del documento: 'fundacional', 'evaluacion',
+            # 'extendido' (multivalor, coma-separada: los papers del set
+            # fundacional Y de evaluacion son los mismos cinco). Se etiqueta
+            # AL INGERIR, no a posteriori, y es la que usa el filtro de
+            # retrieval (memory/retriever.py, BIBLIOTECARIO_CAPAS).
+            "ALTER TABLE documents ADD COLUMN corpus_capa TEXT DEFAULT 'extendido'",
+        ):
             try:
                 conn.execute(ddl)
             except Exception as e:
                 if "duplicate column" not in str(e).lower():
+                    raise
+        # Índices del upsert semántico (ingest/pipeline._find_existing): la
+        # clave arXiv vive dentro de `metadata` (JSON) y el path es el fallback
+        # para fuentes sin identificador. Índice de expresión, NO unique: hoy
+        # hay filas que comparten arXiv id (7/16/17) y una restricción UNIQUE
+        # reventaría el init_db — la unicidad la resuelve la aplicación.
+        for ddl in (
+            (
+                "CREATE INDEX IF NOT EXISTS idx_documents_arxiv "
+                "ON documents (json_extract(metadata, '$.arxiv.id'))"
+            ),
+            "CREATE INDEX IF NOT EXISTS idx_documents_path ON documents(path)",
+        ):
+            try:
+                conn.execute(ddl)
+            except Exception as e:
+                if "already exists" not in str(e).lower():
                     raise
         # El CHECK de wiki_pages.kind no se puede ALTERar en SQLite: hay que
         # recrear la tabla. 'study' añade la capa de comprension

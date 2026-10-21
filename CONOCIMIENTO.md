@@ -71,8 +71,11 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 
 | qué | dónde |
 |---|---|
-| PDFs (63 MB, **en `.gitignore`**) | `Documentos/` — **24 ficheros, todos con extensión** |
+| PDFs (**en `.gitignore`**) | `Documentos/` — **26 ficheros en la raíz** (77 MB) + `game_development/` (5) + `descartados/` (1) |
 | SQLite (chunks, documentos, nodos) | `data/bibliotecario.db` |
+| Capa de cada documento | `documents.corpus_capa` — `fundacional` / `evaluacion` / `extendido` (multivalor) |
+| Congelación del corpus de evaluación | `evals/corpus_lock.py` (`label`/`build`/`check`) → `evals/CORPUS_LOCK.json` |
+| Filtro de capas en el retrieval | env **`BIBLIOTECARIO_CAPAS`** (`memory/retriever.py: allowed_capas()`) |
 | Semilla del grafo (**solo 5 técnicas**) | `bibliotecario/knowledge/seed.py:15-60` |
 | Ingesta | `bibliotecario/ingest/pipeline.py` — `extract()` L19-36, `ingest_dir()` L92 |
 | Construcción de blueprint | `bibliotecario/agent/tools.py` — `build_blueprint`, `instantiate_agent_template`, `verify_and_*` |
@@ -81,12 +84,18 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Resultados del juez nuevo | `evals/result_q1_noise_gemini.json`, `evals/result_q1_r4_all.json` |
 | `.env` (claves, chmod 600, no trackeado) | `.env` |
 
-### Estado de la DB (2026-10-14)
+### Estado de la DB (2026-10-21, tras higiene 16/17)
 
-`25 documentos` · `2296 chunks` · `126 nodos` · `180 aristas` · `275 lessons`
+`25 documentos` · `2255 chunks` · `126 nodos` · `180 aristas` · `275 lessons`
 · **`0 skills`** · **`0 memory_items`** · `35 wiki_pages`
 
-| tipo de nodo | antes | ahora |
+| capa | docs | chunks |
+|---|---|---|
+| `fundacional,evaluacion` | 5 (doc 1-5) | 413 |
+| `evaluacion,extendido` | 5 (doc 6-10) | 429 |
+| `extendido` | 15 (doc 11-15, 18-27; **16 y 17 borrados**) | 1413 |
+
+| tipo de nodo | antes (2026-09) | ahora |
 |---|---|---|
 | technique | 5 | **14** |
 | procedure | ~26 | **98** |
@@ -96,7 +105,19 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 > **Ingesta completada 2026-10-14** — antes: `11 documentos · ~842 chunks`.
 > **+14 documentos · +1454 chunks.** Los 2 ficheros sin extensión fueron
 > renombrados a `.pdf`; el `.docx` ya estaba en la DB (doc 4).
-> `ingest_dir()` deduplica por hash — re-ingerir es seguro.
+>
+> **Lote 1 (2026-10-21)**: +2 documentos (`Recurrent Harness for Agentic
+> Continual Learning`, `Self-Evolving Agent Harness`) · **+117 chunks**,
+> ambos en capa `extendido`, declarados en `CORPUS_LOCK.json` como lote 1.
+>
+> ~~⚠️ **«`ingest_dir()` deduplica por hash — re-ingerir es seguro» era
+> demasiado optimista**~~: la dedup comparaba el **texto extraído**, y 4 ficheros
+> (docs 13, 17, 18, 23) se extrajeron en un entorno ligeramente distinto, con
+> **1-2 caracteres de diferencia** (un `\n` desplazado alrededor de un
+> diacrítico combinante). Re-ingerir la raíz los volvió a insertar como
+> documentos nuevos (26-31) y hubo que borrarlos. **Resuelto el 2026-10-21**:
+> el upsert por `path`+hash absorbe esa deriva (ver «Ingesta idempotente»),
+> los 4 duplicados ya no existen y una re-ingesta de la raíz da `0 insertados`.
 
 ### Corpus por dominio — regla *(2026-10-15)*
 
@@ -116,8 +137,8 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 
 | qué | dónde |
 |---|---|
-| PDFs de dominio | `Documentos/<dominio>/` — hoy solo `game_development/` (**4 PDF**) |
-| DB de dominio | `data/corpora/game_development.db` — `4 docs · 236 chunks` · `metadata.domain` |
+| PDFs de dominio | `Documentos/<dominio>/` — hoy solo `game_development/` (**5 PDF**) |
+| DB de dominio | `data/corpora/game_development.db` — `5 docs · 333 chunks` · `metadata.domain` |
 | Cambio de DB | env **`BIBLIOTECARIO_DB`** (`config.db_path()`) — sin ella, la general en su ruta de siempre |
 | Ingesta de dominio | `BIBLIOTECARIO_DB=data/corpora/game_development.db python3 -m bibliotecario.cli ingest-dir Documentos/<dominio>` |
 | Descartados (con motivo) | `Documentos/descartados/` |
@@ -135,6 +156,175 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 > **No ingerido**; archivo movido a `Documentos/descartados/` (no borrado).
 > Si aparece el SAGE de testing, se ingerirá en `game_development/`.
 
+### Capas de corpus y `CORPUS_LOCK` — *(2026-10-21)*
+
+> **Origen**: revisión adoptada (`§ El marco correcto: separación de corpus y
+> versionado`) — «define las tres capas y el `CORPUS_LOCK.json` **antes de
+> ingerir el primer paper nuevo**». Hecho en ese orden: capas → lock → lote 1.
+
+| capa | qué es | ¿crece? | versionado |
+|---|---|---|---|
+| `fundacional` | los 5 papers de los que arranca el grafo (`seed.py`, set original) | **no** (congelado) | hash |
+| `evaluacion` | papers sobre los que están escritas las preguntas ciegas: **doc 1-10** | **no** (congelado) | hash + lote |
+| `extendido` | el resto, y todo lo que entre después | sí | por lotes |
+
+Una capa **no es una carpeta**: se guarda al ingerir en `documents.corpus_capa`
+(multivalor, coma-separada — los cinco fundacionales son *también* diana de
+preguntas, y los doc 6-10 entraron crecidos pero ahora están congelados).
+Se etiqueta **en la ingesta** (`pipeline.store(capa=...)`, `--capa` en la CLI),
+nunca a posteriori.
+
+| pieza | dónde |
+|---|---|
+| Columna + migración idempotente | `core/storage.py:init_db()` → `ALTER TABLE documents ADD COLUMN corpus_capa` |
+| Etiqueta por defecto y validación | `ingest/base.py` — `CAPAS`, `CAPA_DEFAULT='extendido'`, `normalize_capa()` |
+| Etiquetado derivado (no a mano) | `evals/corpus_lock.py label` — `evaluacion` = unión de `doc_id` de **todos** los `golden*.jsonl`; `fundacional` = por **título** (no por id: si la BD se reconstruye, los ids se mueven) |
+| Lock | `evals/corpus_lock.py build` → `evals/CORPUS_LOCK.json` (paper_hash, sha256 del fichero, chunks, capas, lote, sha de cada golden) |
+| Comprobación | `evals/corpus_lock.py check` — `fatal` (rompe) vs `avisos` |
+| Filtro de retrieval | env **`BIBLIOTECARIO_CAPAS`** (`memory/retriever.py: allowed_capas()`) — sin la variable, **sin filtro** (comportamiento de siempre) |
+| Evidencia de grafo también filtrada | `agent/tools.py: retrieve_evidence()` — si no, el filtro solo valdría en `search()` |
+| Eval | `evals/eval_end2end.py --capas evaluacion` (+ `--sin-lock` para tests/smoke); guarda `meta.corpus = {capas, lock_verificado}` |
+
+**Estado**: `label` + `build` + `check` OK. Lote 0 = doc 1-25, **lote 1 = doc
+26-27**. Con `BIBLIOTECARIO_CAPAS=evaluacion`, `recall@1=0.933 · recall@3=1.0 ·
+MRR@10=0.956` — **idéntico a sin filtro** (la eval de QA va a doc 1-5) y el
+top-10 no contiene ningún doc fuera de la capa; sin filtro, el ranking de las
+15 preguntas del golden **no cambia ni una fila** tras el lote 1
+(`evals/result_retrieval.json`, respaldo en `result_retrieval_prev_20260929.json`).
+
+**Alcance declarado (lo que NO lleva filtro)**: la *fuente* de los blueprints
+(`_fuente_numerica`/`fuente_completa`, por `procedure → doc_id`) lee
+`fundacional`+`extendido` y no se filtra — es lo que pide el marco (los
+blueprints leen corpus que crece). Si algún día se evalúa un blueprint filtrado,
+esa fuente habrá que meterla en el filtro.
+
+**Pendientes**: los 2 papers del lote 1 **no se siembran en el grafo**
+(`knowledge/seed.py` solo crea nodos de `TECHNIQUES` conocidas) ·
+`.env` tiene `NVIDIA_MODEL`, pero `config._NVIDIA_MODEL` se lee **antes** de
+`: _load_env()`: hay que exportarlo (`LLM_PROVIDERS=nvidia NVIDIA_MODEL=...`)
+como en las corridas oficiales. ~~dedup robusto contra deriva del extractor~~
+→ hecho: ver «Ingesta idempotente» más abajo. ~~limpieza de 7/16/17~~ →
+hecha el 2026-10-21: ver «Higiene de duplicados». **Revisión de citas
+posicionales en `study-5`**: la cita `[doc:15:0]` de «Trace2Skill» apunta al
+doc 15 (HARDE), pero Trace2Skill solo aparece en los chunks de doc 5 y 27 —
+corregida la huérfana `[doc:16:0]` → `[doc:5:38]`, la otra queda por revisar.
+
+### Ingesta idempotente — upsert semántico — *(2026-10-21)*
+
+**Problema**: `store()` deduplicaba solo por `sha256(texto extraído)` y
+devolvía temprano. Dos consecuencias medidas: (a) una mejora del extractor
+nunca llegaba a una fila ya guardada (por eso existía `backfill_bibliography`);
+(b) si la extracción derivaba **un solo carácter** (combinante diacrítico junto
+a un salto de línea), el mismo fichero entraba como documento nuevo —4
+duplicados reales (docs 13, 17, 18, 23) y una fila huérfana más (doc 16,
+mismo `path` que el 7).
+
+**Solución** — `ingest/pipeline.py`: `_find_existing()` / `_find_by_path()` /
+`_merge_meta()` / `_write_chunks()`.
+
+| orden de búsqueda | cuándo aplica | por qué |
+|---|---|---|
+| `paper_hash` | siempre, primero | contenido idéntico = mismo documento; además es la columna UNIQUE, mirarla primero imposible chocar contra ella |
+| `arxiv.id` (`json_extract` + `idx_documents_arxiv`), **y solo si además coincide `path`** | 24/25 docs tienen id | misma clave **y mismo fichero** = mismo documento: v1/v2 y PDF/DOCX/OCR dejan de duplicar |
+| `path` + título normalizado (`_find_by_path`) | mismo fichero, texto distinto | deriva del extractor → reindexa **esa** fila; título distinto ⇒ es otro documento y se inserta |
+
+> **La guarda de `arxiv.id` importa**: sin acuerdo de `path` se devuelve
+> `None` (con warning) y el fichero entra como fila nueva. Una traducción
+> conserva el título original, así que «mismo arXiv + mismo título» no
+> distingue *misma obra, otro idioma* de *mismo paper* — pisar un doc de
+> `evaluacion` con texto en otro idioma no se recupera, mientras que un
+> duplicado se limpia a mano. Es lo que evitó que la re-ingesta oficial
+> machacara el doc 7 (inglés) con la traducción.
+
+| rama | condición | `IngestResult.action` | escribe |
+|---|---|---|---|
+| duplicado | hash + fila intactos | `duplicado` | **nada** |
+| metadatos | hash igual; meta, título o path cambió | `metadatos actualizados` | `UPDATE documents`, sin re-embedder |
+| texto nuevo | misma clave, hash distinto | `actualizado` | fila + chunks + wiki `raw-<id>` · **`corpus_capa` intacta** |
+| alta | sin fila | `insertado` | fila con la capa de la corrida |
+
+Reglas de seguridad: `_merge_meta` da prioridad a lo nuevo **solo si no está
+vacío** (páginas/OCR no se borran); el hash se consulta **primero**, así que
+escribir `paper_hash` en un `UPDATE` no puede chocar con `UNIQUE`; y **no** se
+pone `UNIQUE(arxiv_id)` — había 3 filas con `2609.26891` (7/16/17) y la
+restricción reventaría `init_db` (hoy queda 1 sola, pero la guarda se mantiene:
+la unicidad la resuelve la aplicación) — `init_db` solo crea
+`idx_documents_arxiv` (índice de expresión) + `idx_documents_path`.
+`ingest_dir` devuelve `acciones`, para que «25 ficheros, 0 inserts» sea un dato
+del JSON y no una suposición.
+
+**Evidencia**:
+- *copia de BD, dos corridas* → corrida 1 `{'duplicado': 17, 'actualizado': 4,
+  'metadatos actualizados': 5}` con **27 docs · 2413 chunks · 37 wiki
+  intactos**; corrida 2 `{'duplicado': 26}`: punto fijo.
+- *BD real, tras la higiene* → `ingest_dir(Documentos)`: **25 ficheros, 25 ok,
+  `{'duplicado': 17, 'actualizado': 3, 'metadatos actualizados': 5}`,
+  `insertado: 0`** en 38 s, con **25 docs · 2255 chunks · 35 wiki · 0 chunks sin
+  embedding** (reindizados 13/18/23 = mismos que en la copia, menos el 17 ya
+  borrado; metadatos de 1-5). `corpus_lock build` → `check` **OK** ·
+  `eval_retrieval` **idéntico a antes de la higiene** (`recall@1=0.933`,
+  `@3/@5=1.0`, `MRR@10=0.967`) · **418/418 tests** · ruff limpio.
+Tests: `tests/test_upsert.py` (8).
+
+### Higiene de duplicados — filas 7/16/17 — *(2026-10-21)*
+
+`2609.26891` («Harness as a Language») vivía en **3 filas**: doc 7 (inglés,
+`evaluacion,extendido`), doc 16 (inglés re-extraído, `extendido`) y doc 17
+(traducción ES, `extendido`) — 158 chunks contaban el mismo paper tres veces y
+la traducción pesaba doble en la recuperación. Hecho ese día, en este orden:
+
+1. **Respaldo** `data/bibliotecario.db` → `/tmp/opencode/bibliotecario_before_higiene_20261021.db` (API `sqlite3.backup`, WAL incluido).
+2. **La traducción sale del inbox**: `Documentos/Harness como lenguaje….pdf` →
+   `Documentos/traducciones/` (carpeta nueva, al lado de `descartados/`; no se
+   borra nada y `ingest_dir` no entra en subcarpetas, así la re-ingesta no la
+   re-crea).
+3. **Borrado de 16 y 17** con `storage.get_conn()` + sus páginas
+   `raw-16`/`raw-17`. *Lección medida*: con un `sqlite3.connect` crudo la
+   cascada **no se dispara** (`PRAGMA foreign_keys` por defecto OFF aunque el
+   DDL diga `ON DELETE CASCADE`) → quedaron 158 chunks huérfanos que hubo que
+   borrar aparte; `storage._connect` sí pone `foreign_keys=ON`, así que usar
+   **ese** conector.
+4. **Cita huérfana reescrita**: `study-5` citaba `[doc:16:0]` para «SkillOpt…»
+   y ese texto **no está** en doc 16 (cita posicional mal mapeada); el chunk
+   que sí sostiene la frase es `[doc:5:38]` (Related Work: «Trace2Skill … and
+   SkillOpt … use specialized agent pipelines»). Ver pendiente de `[doc:15:0]`
+   arriba.
+5. **Re-ingesta + lock + eval** con los números de «Evidencia» de arriba.
+
+Estado resultante: **1 fila por paper**, `documents` sin duplicados de
+contenido ni de traducción; `knowledge/seed.py` resuelve JAZ por **título**
+(→ doc 7, no hace falta tocar nada); los `evals/result_*.json` históricos que
+mencionan al doc 16 quedan como registro de corridas pasadas.
+
+### Tokenizador compartido (canal keyword) — *(2026-10-21)*
+
+**Problema**: cuatro dialectos distintos de «palabra», todos con guillotina de
+longitud `{4,}` (o `len(t) > 3`), y solo uno de ellos veía cifras:
+
+| dónde | antes | efecto |
+|---|---|---|
+| `memory/retriever._tokens` (kw 0.3) | `[a-záéíóúñü]{4,}`, sin stoplist, **sin dígitos** | se comía `why`, `how`, `RAG`, `OCR`, `τ=5` |
+| `agent/tools._doc_keyword_chunks` | `[a-z0-9\-]{4,}` + stoplist propia, y conteo por **subcadena** | `"use"` contaba dentro de `"users"` |
+| `agent/tools._toks` (similitud de fuente) | igual que el retriever | divergía de `deep_sweep` |
+| `knowledge/pearl.seed_nodes` | `split()` crudo + `len(t) > 3` | `failure?` se buscaba literal con `?`; `RAG` no entraba |
+
+**Ahora**: un único módulo `core/tokens.py` — cifra (`10`) **o** compuesto
+con guion (`task-coevolve`, `path-entity`) **o** ≥3 letras; stoplist compartida
+EN+ES (`STOP`, aplicada en los cuatro sitios; `drop_stop=False` para quien
+necesite las palabras vacías); orden preservado (`token_list`) porque las
+semillas del grafo lo usan; y `count_terms()` cuenta **tokens exactos**, no
+subcadenas.
+
+**Medido** (15 preguntas del golden, ranking híbrido completo,
+`evals/eval_retrieval.py`): `recall@1=0.933` (igual), `recall@3/5=1.0` (igual),
+**`MRR@10 0.956 → 0.967`** (`wiki-1` pasa de rank 3 a 2). Variantes descartadas
+por igualdad o peor resultado: `{3,}` literal de la propuesta, `{4,}`+cifras.
+*Verificado tras la higiene 16/17: mismas cifras exactas.*
+El **compuesto con guion es imprescindible**: trocearlo en `task` + `coevolve`
+hacía que términos presentes en casi todos los chunks diluyeran el léxico y el
+chunk con `earliest candidate` bajara del puesto 8 al 12, rompiendo
+`test_cierre_incluye_el_dato_literal`. Tests: `tests/test_tokens.py` (7).
+
 ### 3.4 Las 14 técnicas sembradas y sus papers
 
 **5 originales** (docs 1-5): `PEARL` · `Procedural Graphs` · `Task-CoEvolve`
@@ -148,7 +338,7 @@ en el chunk; **ninguno inventado**:
 | **MetaSkill** | Learning Meta-Skills… AI4AI | 13 | meta-skills de test-time · banco congelado · Add/Revise/Keep |
 | **Mixture of Self-Improving Branches** | MoSIB | 14 | ramas paralelas · subconjuntos de desarrollo que evolucionan · router |
 | **HARDE** | HARDE | 15 | módulos trigger/monitor/feedback · probing aislado → optimización guiada |
-| **JAZ** | Harness as a Language | 16 | primitivo `invoke` · delegación tail-recursive · memoria por prompting |
+| **JAZ** | Harness as a Language | 7 | primitivo `invoke` · delegación tail-recursive · memoria por prompting |
 | **Harness-of-Harness** | HoH | 18 | 3 roles (Planner/Developer/QA) · bucle multi-día |
 | **HarnessDev** | HarnessDev | 19 | Creation + Evolution · development loop de 4 pasos |
 | **Malena** | How Much of a Harness… | 22 | **una sola sesión larga** · sin orquestación externa |
@@ -203,7 +393,7 @@ Se declaran como `technique: null` en vez de inventarles un método:
 | **B — Evaluación** | *cómo se mide* un arnés | **`Stop Comparing LLM Agents…`**, **`EVO-BENCH…`**, `Evaluación y análisis comparativo…` |
 | **C — Mejora** | *cómo se optimiza* | `Sistema de optimización autoevolutivo…`, `Aprendizaje de meta-habilidades…` |
 | **D — Métricas** | *qué se mide* | `Plasticidad del agente…`, `Más allá del modelo…`, `Anatomía, arquitectura y evolución…`, `De la respuesta a preguntas a la finalización de tareas…` |
-| **Marco** | estructura del arnés | `Harness as a Language…` (+ traducción ES — **duplicado**) |
+| **Marco** | estructura del arnés | `Harness as a Language…` (doc 7; la traducción ES vive en `Documentos/traducciones/`, fuera del inbox) |
 | **Técnicas** | contenido dentro del arnés | `PEARL…`, `Procedural Graphs…`, `Task-CoEvolve…`, `The Optimizer Is the Agent…`, `WikiSkill…` |
 
 ### Explotados
@@ -572,6 +762,11 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 | un paper del corpus | `Documentos/` |
 | papers de **dominio** (juegos) | `Documentos/game_development/` · DB `data/corpora/game_development.db` |
 | el PDF descartado y el motivo | `Documentos/descartados/` · `CONOCIMIENTO.md` §2 «Corpus por dominio» |
+| la traducción ES (fuera del inbox, no borrada) | `Documentos/traducciones/` · `CONOCIMIENTO.md` §2 «Higiene de duplicados» |
+| **las capas del corpus y el congelado de la eval** | `CONOCIMIENTO.md` §2 «Capas de corpus y CORPUS_LOCK» · `evals/corpus_lock.py` (`label`/`build`/`check`) · `evals/CORPUS_LOCK.json` · filtro `BIBLIOTECARIO_CAPAS` |
+| **la ingesta idempotente (upsert por hash → arXiv+path → path)** | `CONOCIMIENTO.md` §2 «Ingesta idempotente» · `ingest/pipeline.py` (`_find_existing`, `_merge_meta`) · `tests/test_upsert.py` |
+| **la higiene 16/17 y la guarda anti-pisado** | `CONOCIMIENTO.md` §2 «Higiene de duplicados» · respaldo `/tmp/opencode/bibliotecario_before_higiene_20261021.db` |
+| **el tokenizador del canal keyword (siglas, cifras, stoplist)** | `CONOCIMIENTO.md` §2 «Tokenizador compartido» · `core/tokens.py` · `tests/test_tokens.py` · medición `evals/eval_retrieval.py` |
 | **las 14 técnicas sembradas** | `CONOCIMIENTO.md` §3.4 · código en `bibliotecario/knowledge/seed.py` |
 | **los 4 papers de medición (sin bucle)** | `CONOCIMIENTO.md` §3.5 — *Harness Engineering · Beyond the Model · Agent Plasticity · Empirical Study* |
 | el texto ya extraído de un paper | `sqlite3 data/bibliotecario.db` → tabla `chunks` |

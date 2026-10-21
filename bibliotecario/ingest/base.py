@@ -25,10 +25,40 @@ class IngestResult:
     quality_alerts: list = field(default_factory=list)
     validation: dict = field(default_factory=dict)
     error: str = ""
+    # Qué hizo el upsert: insertado | actualizado | metadatos actualizados |
+    # duplicado | '' (fallo de validación). `quality_alerts` es solo calidad.
+    action: str = ""
 
 
 def fingerprint(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+# Capas semánticas del corpus (diseño de la revisión adoptada, § corpus y
+# versionado). Una capa NO es una carpeta: se guarda en documents.corpus_capa
+# al ingerir y es la que filtra el retrieval (BIBLIOTECARIO_CAPAS).
+# Los cinco papers fundacionales son también el set de evaluación, por eso
+# corpus_capa es multivalor: "fundacional,evaluacion".
+CAPAS = ("fundacional", "evaluacion", "extendido")
+CAPA_DEFAULT = "extendido"
+
+
+def normalize_capa(capa: str | None) -> str:
+    """Valida una capa y la devuelve en orden canónico, coma-separada.
+
+    `None` o vacío → capa por defecto (`extendido`). Un token desconocido es
+    error, no un typo silencioso: si la capa mal escrita llegara a la BD, el
+    filtrado de retrieval la trataría como una cuarta capa real y excluiría
+    documentos sin que nadie lo notara.
+    """
+    if capa is None or not str(capa).strip():
+        return CAPA_DEFAULT
+    parts = [p.strip().lower() for p in str(capa).split(",") if p.strip()]
+    bad = [p for p in parts if p not in CAPAS]
+    if bad:
+        raise ValueError(f"capa desconocida: {bad!r} (válidas: {', '.join(CAPAS)})")
+    seen = [c for c in CAPAS if c in parts]
+    return ",".join(seen)
 
 
 def chunk_text(text: str, size: int = 1200, overlap: int = 150) -> list[str]:

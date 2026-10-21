@@ -15,14 +15,22 @@ from collections import deque
 
 from bibliotecario.core import storage
 from bibliotecario.core.llm import generate
+from bibliotecario.core.tokens import token_list
 from bibliotecario.knowledge import graph as G
 
 logger = logging.getLogger(__name__)
 
 
 def seed_nodes(query: str, limit: int = 8) -> list[G.Node]:
+    """Semillas del subgrafo: tokens de la pregunta en orden, sin palabras vacías.
+
+    Antes era `split()` crudo con `len(t) > 3`: `"failure?"` buscaba
+    literalmente `failure?` en los labels, y `RAG`/`OCR` (3 letras) no entraban.
+    El tokenizador compartido (`core.tokens`) normaliza a minúsculas, quita la
+    stoplist y separa puntuación.
+    """
     seeds: list[G.Node] = []
-    for token in [t for t in query.replace("?", " ").split() if len(t) > 3][:12]:
+    for token in token_list(query)[:12]:
         seeds.extend(G.find_nodes(token, limit=3))
     seen, uniq = set(), []
     for n in seeds:

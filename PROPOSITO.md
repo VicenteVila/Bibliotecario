@@ -65,10 +65,29 @@ nueva**. Nunca en silencio. Nunca mezclando series.
 Lo que entra determina lo que se puede diseñar. Los modos de fallo reales, ya
 presentes en la carpeta:
 
-- **duplicado por traducción** — mismo contenido que pesa doble en la recuperación
+- **duplicado por traducción** — mismo contenido que pesa doble en la recuperación.
+  Ya no entra uno *nuevo* por casualidad y, sobre todo, **nunca pisa**: si un
+  fichero comparte `arxiv.id` pero no el `path`, se inserta como fila nueva con
+  warning (la traducción conserva el título original, así que «mismo arXiv +
+  mismo título» no distingue *otro idioma* de *mismo paper*). Las filas ya
+  duplicadas (7/16/17) se limpiaron el **2026-10-21**: 16 y 17 borrados y la
+  traducción movida a `Documentos/traducciones/`, fuera del inbox
+  (`CONOCIMIENTO.md` §2 «Higiene de duplicados»).
+- **duplicado por deriva del extractor** — mismo PDF reingerido como documento
+  nuevo porque el texto extraído difiere en 1-2 caracteres; medido 2026-10-21
+  (4 ficheros). La dedup por hash **no** lo cubría → **cubierto el 2026-10-21**
+  por el upsert semántico (`paper_hash` → `arxiv.id` con `path` → `path`+título):
+  re-ingerir el mismo fichero reindiza la fila existente en vez de crear otro
+  documento (`CONOCIMIENTO.md` §2 «Ingesta idempotente»).
 - **tema equivocado** — ruido que el *retrieval* devuelve como si fuera pertinente
 - **preprint sin revisar** — frontera sí, pero no verificado
 - **encuesta de encuestas** — sensación de conocimiento sin método nuevo
+
+**Nada entra sin capa** (`fundacional` / `evaluacion` / `extendido`, en
+`documents.corpus_capa` al ingerir): si el corpus crece sin etiquetar, dentro de
+unos meses no se sabe qué es fundacional y la eval se compara contra un corpus
+distinto sin darse cuenta. El sello es `evals/CORPUS_LOCK.json`
+(`corpus_lock.py check` corta la run si el corpus de evaluación cambió).
 
 Una puntuación de calidad **que no puede rechazar no es un filtro, es decoración.**
 

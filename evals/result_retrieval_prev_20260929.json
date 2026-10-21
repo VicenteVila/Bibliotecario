@@ -1,0 +1,131 @@
+{
+ "aggregate": {
+  "n": 15,
+  "recall@1": 0.933,
+  "recall@3": 1.0,
+  "recall@5": 1.0,
+  "MRR@10": 0.956
+ },
+ "rows": [
+  {
+   "id": "pearl-1",
+   "paper": "PEARL",
+   "difficulty": "facil",
+   "rank": 1,
+   "top1_doc": 1,
+   "latency_s": 6.5
+  },
+  {
+   "id": "pearl-2",
+   "paper": "PEARL",
+   "difficulty": "media",
+   "rank": 1,
+   "top1_doc": 1,
+   "latency_s": 0.3
+  },
+  {
+   "id": "pearl-3",
+   "paper": "PEARL",
+   "difficulty": "dificil",
+   "rank": 1,
+   "top1_doc": 1,
+   "latency_s": 0.3
+  },
+  {
+   "id": "proc-1",
+   "paper": "Procedural Graphs",
+   "difficulty": "facil",
+   "rank": 1,
+   "top1_doc": 2,
+   "latency_s": 0.3
+  },
+  {
+   "id": "proc-2",
+   "paper": "Procedural Graphs",
+   "difficulty": "media",
+   "rank": 1,
+   "top1_doc": 2,
+   "latency_s": 0.3
+  },
+  {
+   "id": "proc-3",
+   "paper": "Procedural Graphs",
+   "difficulty": "dificil",
+   "rank": 1,
+   "top1_doc": 2,
+   "latency_s": 0.3
+  },
+  {
+   "id": "tce-1",
+   "paper": "Task-CoEvolve",
+   "difficulty": "facil",
+   "rank": 1,
+   "top1_doc": 3,
+   "latency_s": 0.2
+  },
+  {
+   "id": "tce-2",
+   "paper": "Task-CoEvolve",
+   "difficulty": "media",
+   "rank": 1,
+   "top1_doc": 3,
+   "latency_s": 0.2
+  },
+  {
+   "id": "tce-3",
+   "paper": "Task-CoEvolve",
+   "difficulty": "dificil",
+   "rank": 1,
+   "top1_doc": 3,
+   "latency_s": 0.3
+  },
+  {
+   "id": "reas-1",
+   "paper": "ReASearch",
+   "difficulty": "facil",
+   "rank": 1,
+   "top1_doc": 4,
+   "latency_s": 0.3
+  },
+  {
+   "id": "reas-2",
+   "paper": "ReASearch",
+   "difficulty": "media",
+   "rank": 1,
+   "top1_doc": 4,
+   "latency_s": 0.3
+  },
+  {
+   "id": "reas-3",
+   "paper": "ReASearch",
+   "difficulty": "dificil",
+   "rank": 1,
+   "top1_doc": 4,
+   "latency_s": 0.3
+  },
+  {
+   "id": "wiki-1",
+   "paper": "WikiSkill",
+   "difficulty": "facil",
+   "rank": 3,
+   "top1_doc": 3,
+   "latency_s": 0.3
+  },
+  {
+   "id": "wiki-2",
+   "paper": "WikiSkill",
+   "difficulty": "media",
+   "rank": 1,
+   "top1_doc": 5,
+   "latency_s": 0.3
+  },
+  {
+   "id": "wiki-3",
+   "paper": "WikiSkill",
+   "difficulty": "dificil",
+   "rank": 1,
+   "top1_doc": 5,
+   "latency_s": 0.4
+  }
+ ]
+}

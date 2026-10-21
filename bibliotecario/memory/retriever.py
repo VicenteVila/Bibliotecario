@@ -6,7 +6,7 @@ aquí hay un único punto de fusión documentado: 0.5 denso + 0.3 keyword + 0.2 
 from __future__ import annotations
 
 import logging
-import re
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -14,18 +14,55 @@ import numpy as np
 
 from bibliotecario.core import storage
 from bibliotecario.core.embeddings import blob_to_vec, encode_one
+from bibliotecario.core.tokens import tokens as _tokens
 from bibliotecario.knowledge import pearl as PEARL
 
 W_DENSE, W_KEYWORD, W_GRAPH = 0.5, 0.3, 0.2
 
 
-def _tokens(text: str) -> set[str]:
-    return {t for t in re.findall(r"[a-záéíóúñü]{4,}", text.lower())}
+def allowed_capas() -> set[str] | None:
+    """Capas que el retrieval acepta, desde `BIBLIOTECARIO_CAPAS` (coma-separadas).
+
+    Sin la variable → None → sin filtro: el corpus entero, el comportamiento
+    de siempre. La variable es la única palanca (convención `BIBLIOTECARIO_*`
+    igual que `BIBLIOTECARIO_DB`): el eval la fija con `--capas` y la registra
+    en su meta, para que una run filtrada nunca se confunda con una sin filtrar.
+    """
+    raw = os.environ.get("BIBLIOTECARIO_CAPAS", "").strip()
+    if not raw:
+        return None
+    return {p.strip().lower() for p in raw.split(",") if p.strip()}
+
+
+def _capa_ok(row_capa: str | None, allowed: set[str] | None) -> bool:
+    """El documento pasa si alguna de sus capas está permitida (multivalor)."""
+    if allowed is None:
+        return True
+    return bool({p.strip().lower() for p in (row_capa or "").split(",") if p.strip()} & allowed)
+
+
+def docs_in_allowed_capa(doc_ids) -> list[int]:
+    """Subconjunto de `doc_ids` que pasa el filtro de capas (sin filtro → todos).
+
+    Lo usan también las tools que vienen del grafo (PEARL), cuyo filtro no se
+    aplica en el WHERE de chunks: sin esto el filtro solo valdría para la
+    búsqueda de texto y la evidencia de nodos seguiría exponiendo lo prohibido.
+    """
+    ids = [int(i) for i in doc_ids]
+    allowed = allowed_capas()
+    if allowed is None or not ids:
+        return ids
+    with storage.get_conn() as conn:
+        rows = conn.execute(
+            f"SELECT id, corpus_capa FROM documents WHERE id IN ({','.join('?' * len(ids))})",
+            ids).fetchall()
+    return [r["id"] for r in rows if _capa_ok(r["corpus_capa"], allowed)]
 
 
 def search(query: str, top_k: int = 8) -> list[dict]:
     qvec = encode_one(query)
     qtok = _tokens(query)
+    allowed = allowed_capas()
     graph_docs: dict[int, float] = {}
     try:
         # Sin LLM: la búsqueda híbrida no debe consumir cuota (el ranking LLM vive en retrieve_evidence).
@@ -37,9 +74,11 @@ def search(query: str, top_k: int = 8) -> list[dict]:
     scored = []
     with storage.get_conn() as conn:
         rows = conn.execute(
-            "SELECT c.doc_id, c.chunk_idx, c.text, c.embedding, d.title FROM chunks c "
-            "JOIN documents d ON d.id=c.doc_id").fetchall()
+            "SELECT c.doc_id, c.chunk_idx, c.text, c.embedding, d.title, d.corpus_capa "
+            "FROM chunks c JOIN documents d ON d.id=c.doc_id").fetchall()
     for r in rows:
+        if not _capa_ok(r["corpus_capa"], allowed):
+            continue
         dense = float(np.dot(qvec, blob_to_vec(r["embedding"]))) if r["embedding"] else 0.0
         ct = _tokens(r["text"])
         kw = len(qtok & ct) / max(1, len(qtok))

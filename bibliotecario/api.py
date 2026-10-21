@@ -62,12 +62,12 @@ def init() -> dict:
     return SEED.seed()
 
 
-def ingest(source: str, ocr: bool = False):
-    return pipeline.ingest(source, ocr=ocr)
+def ingest(source: str, ocr: bool = False, capa: str | None = None):
+    return pipeline.ingest(source, ocr=ocr, capa=capa)
 
 
-def ingest_dir(directory: str, ocr: bool = False) -> dict:
-    return pipeline.ingest_dir(directory, ocr=ocr)
+def ingest_dir(directory: str, ocr: bool = False, capa: str | None = None) -> dict:
+    return pipeline.ingest_dir(directory, ocr=ocr, capa=capa)
 
 
 def ask(question: str, max_turns: int = 10) -> dict:
