@@ -15,6 +15,7 @@ falla a medias se puede reanudar sin repetir las buenas.
 from __future__ import annotations
 
 import json
+import os
 import re
 import sys
 import time
@@ -273,10 +274,15 @@ def _biblio_check(blueprint: str) -> dict:
     with storage.get_conn() as conn:
         ids = {r["id"] for r in conn.execute("SELECT id FROM documents")}
         titles = {r["title"].lower().rstrip(".") for r in conn.execute("SELECT title FROM documents")}
-    has_section = 1 if re.search(r"(?im)^#{1,3}\s*bibliograf", blueprint) else 0
+    # Encabezado con numeración ("## 7. Bibliografía") cuenta igual que sin ella:
+    # sin esto el medidor cobraba R7 a los brazos que numeran secciones (bug
+    # detectado 2026-10-21 al cerrar POSICIONAL_PLAN.md §5; se corrigió la
+    # regex y se repuntuaron todas las filas con --repuntua, umbral intacto).
+    _h = r"(?im)^#{1,3}\s*(?:\d+\s*[.)]\s+)?bibliograf"
+    has_section = 1 if re.search(_h, blueprint) else 0
     # Solo lo que hay DESPUÉS del encabezado cuenta como entrada de bibliografía.
     tail = blueprint
-    m = re.search(r"(?im)^#{1,3}\s*bibliograf\w*\s*$", blueprint)
+    m = re.search(_h + r"\w*\s*$", blueprint)
     if m:
         tail = blueprint[m.end():]
     cited_ids = {int(d) for d in re.findall(r"\[doc:(\d+)\]", tail)}
@@ -287,6 +293,14 @@ def _biblio_check(blueprint: str) -> dict:
 
 def _techniques() -> list[str]:
     return sorted(n.label for n in G.find_nodes("", kind="technique", limit=50))
+
+
+def _firma_modelo() -> dict:
+    """Modelo/proveedor de esta run — las filas viejas no lo traen y comparar
+    brazos corridos con modelos distintos sin saberlo costó un falso R7."""
+    from bibliotecario.core import llm
+    return {"models": llm._models("nvidia"),
+            "prov": os.environ.get("LLM_PROVIDERS", "round-robin")}
 
 
 def run_one(arm: str, technique: str, run: int) -> dict:
@@ -306,6 +320,7 @@ def run_one(arm: str, technique: str, run: int) -> dict:
         bp = r.get("blueprint", "")
         return {"arm": arm, "technique": technique, "run": run, "ok": True,
                 "secs": round(time.time() - t0, 1),
+                "modelo": _firma_modelo(),
                 "loop_turns": r.get("loop_turns"),
                 "procedures": r.get("procedures", []),
                 "verificado": r.get("verificado"),
@@ -318,15 +333,43 @@ def run_one(arm: str, technique: str, run: int) -> dict:
     except Exception as e:  # una run rota no debe tumbar el batch
         return {"arm": arm, "technique": technique, "run": run, "ok": False,
                 "secs": round(time.time() - t0, 1), "blueprint": "",
+                "modelo": _firma_modelo(),
                 "checks": {}, "error": str(e)[:300]}
 
 
+def _repuntua() -> int:
+    """Reaplica `score()` a las filas guardadas (sin llamadas LLM).
+
+    Para corregir el instrumento sin redefinir umbrales: el blueprint ya está
+    en OUT, así que arreglar una regex del medidor se reaplica a los cinco
+    brazos por igual y el único coste es CPU.
+    """
+    done = json.loads(OUT.read_text(encoding="utf-8"))
+    corpus = _corpus()
+    n = 0
+    for r in done:
+        if r.get("ok") and r.get("blueprint"):
+            r["checks"] = score(r["blueprint"], corpus)
+            n += 1
+    OUT.write_text(json.dumps(done, ensure_ascii=False, indent=2), encoding="utf-8")
+    print(f"repuntuadas {n}/{len(done)} filas con el instrumento corregido")
+    _summary(done, False)
+    return 0
+
+
 def main() -> int:
+    if "--repuntua" in sys.argv:
+        return _repuntua()
     smoke = "--smoke" in sys.argv
     techs = _techniques()
     runs = 1 if smoke else RUNS
     # El humo prueba el brazo nuevo (P); B..E ya están en OUT, `seen` los salta.
     arms = ("P",) if smoke else ARMS
+    # `--solo=C`: un solo brazo (re-baseline: re-correr C con el modelo actual
+    # para que P vs C no mezcle formato Y modelo).
+    for a in sys.argv:
+        if a.startswith("--solo="):
+            arms = tuple(x for x in ARMS if x == a.split("=", 1)[1].upper())
 
     done = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else []
     seen = {(d["arm"], d["technique"], d["run"]) for d in done if d.get("ok")}

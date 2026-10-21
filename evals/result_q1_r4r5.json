@@ -435,12 +435,6 @@
   {
     "arm": "E",
     "technique": "PEARL",
-    "run": 0,
-    "error": "no parseable: We need to check R4 and R5 compliance. R4: No attributing to source what source does not say. R5: Declare silences; if b"
-  },
-  {
-    "arm": "E",
-    "technique": "PEARL",
     "run": 1,
     "r4_ok": true,
     "r4_fabricaciones": [],
@@ -509,12 +503,6 @@
     "r5_ok": true,
     "r5_rellenados": [],
     "verdict": "El blueprint contiene varias atribuciones no respaldadas por la fuente y, por tanto, no cumple con los requisitos de rigor de citación."
-  },
-  {
-    "arm": "E",
-    "technique": "ReASearch",
-    "run": 0,
-    "error": "no parseable: We need to check R4 and R5 compliance. R4: No attributing to source what source doesn't say. R5: Declare silences; if bl"
   },
   {
     "arm": "E",
@@ -3260,5 +3248,221 @@
     "technique": "WikiSkill",
     "run": 0,
     "secs": 10.0
+  },
+  {
+    "arm": "P",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5; no hay fabricaciones ni rellenos indebidos."
+  },
+  {
+    "arm": "P",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con los requisitos de rigor de citación: no atribuye a la fuente información que no contiene y declara correctamente los silencios."
+  },
+  {
+    "arm": "P",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "M1: \"En lugar de entidades de KG, se construye el subgrafo de dependencias y rastros del agente\" (no aparece en la fuente)"
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene afirmaciones que no están presentes en la fuente y no están marcadas como silencios, violando la regla R4; la regla R5 se cumple."
+  },
+  {
+    "arm": "P",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "M6: Failure-vs-Success Refiner compares trajectories of validation successes vs failures to propose mutations"
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene afirmaciones no respaldadas por la fuente, pero declara los silencios correctamente."
+  },
+  {
+    "arm": "P",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "procedure-triplet extraction"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "failure-vs-success refiner"
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos de silencios que no están respaldados por la fuente."
+  },
+  {
+    "arm": "P",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El módulo 'Failure-vs-Success Refiner' que contrasta trayectorias exitosas y fallidas no se menciona en la fuente."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume la existencia de un 'Failure-vs-Success Refiner' que no es declarado ni mencionado en la fuente."
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos no respaldados por la fuente."
+  },
+  {
+    "arm": "P",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Failure-vs-Success Refiner"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Failure-vs-Success Refiner"
+    ],
+    "verdict": "El blueprint contiene afirmaciones y componentes que no están respaldados por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "P",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "M1: \"tool-driven optimization loop\" claim not present in source"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Metric threshold \"Cobertura de Lecciones ≥ 80%\" not specified in source"
+    ],
+    "verdict": "El blueprint contiene atribuciones y detalles que no están respaldados por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "P",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "la persistencia de lecciones debe ser automática y no depender de la invocación voluntaria del agente.",
+      "el estado compactado con lecciones clave se re-emite en cada iteración del bucle."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "la persistencia de lecciones debe ser automática y no depender de la invocación voluntaria del agente.",
+      "el estado compactado con lecciones clave se re-emite en cada iteración del bucle."
+    ],
+    "verdict": "El blueprint contiene afirmaciones que no están respaldadas por la fuente, por lo que no cumple con R4 y R5."
+  },
+  {
+    "arm": "P",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las normas R4 y R5."
+  },
+  {
+    "arm": "P",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint incluye un módulo 'ReleaseGate' que integra Task-CoEvolve en un pipeline CI/CD, algo que no se menciona en la fuente."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el proceso realiza 'K' iteraciones de búsqueda, pero la fuente no especifica cuántas iteraciones se deben ejecutar."
+    ],
+    "verdict": "El blueprint contiene fabricaciones y omisiones que violan las reglas de citación."
+  },
+  {
+    "arm": "P",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "Blueprint complies with R4 and R5."
+  },
+  {
+    "arm": "P",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Raw Layer Permanent, Write Once"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Wiki Maintainer updates skill-impact.md"
+    ],
+    "verdict": "Both R4 and R5 are violated due to fabricated details not present in the source."
+  },
+  {
+    "arm": "P",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "R_best baseline no-skill baseline"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "R_best baseline no-skill baseline"
+    ],
+    "verdict": "El blueprint contiene fabricaciones y omisiones que no están respaldadas por la fuente."
+  },
+  {
+    "arm": "P",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "Blueprint complies with source; no fabrication or omission."
+  },
+  {
+    "arm": "E",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El módulo debe ejecutarse antes de cada inferencia para asegurar que el contexto refleje el estado actual del grafo de conocimiento."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El LLM debe estar configurado para operar en modo de inferencia ligera (ej. cuantizado) para minimizar latencia en validación."
+    ],
+    "verdict": "El blueprint contiene varias afirmaciones que no están respaldadas por la fuente, violando las reglas R4 y R5."
+  },
+  {
+    "arm": "E",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "ReASearch divides the content into two layers: a small static layer with general rules and description of the search loop"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Módulo de Memoria de Experimentos Recientes renders the last 20 experiments as a structured table with fields: parent, metric, memory, state, description"
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos que no están respaldados por la fuente."
   }
 ]

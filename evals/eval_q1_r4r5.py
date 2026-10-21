@@ -54,6 +54,13 @@ JUDGE_TEMPERATURE = float(os.environ.get("Q1_TEMPERATURE", "0"))
 # con falsos positivos). 160000 > la fuente más larga (138.667) — sin
 # truncación. PROMPT, blueprint[:9000], modelo y temp intactos.
 FUENTE_MAX = int(os.environ.get("Q1_FUENTE_MAX", "160000"))
+# Corta del BLUEPRINT en el prompt del juez. El default 9000 fue congelado
+# con los brazos históricos: E mide ≤6736 chars y nunca lo alcanzó, pero P
+# (nemotron-ultra) escribe 7-12k y 10/15 blueprints se cortaban — el juez no
+# veía la cola (Bibliografía, declaraciones de silencio), que es donde vive
+# R5. Medido al cerrar POSICIONAL_PLAN.md §5 (2026-10-21); para P se juzga
+# con Q1_BP_MAX=16000 (vista completa, comparable porque E nunca se truncó).
+BP_MAX = int(os.environ.get("Q1_BP_MAX", "9000"))
 
 PROMPT = """Eres un revisor estricto de rigor de citación sobre artículos científicos.
 
@@ -112,7 +119,7 @@ def q1(source: str, blueprint: str, model: str | None = None) -> dict:
     if not key:
         return {"error": f"sin key para {JUDGE_PROVIDER}"}
     body = (PROMPT + f"\n\nFUENTE:\n{source[:FUENTE_MAX]}"
-            f"\n\nBLUEPRINT:\n{blueprint[:9000]}")
+            f"\n\nBLUEPRINT:\n{blueprint[:BP_MAX]}")
     model = model or JUDGE_MODEL
     # no_think mete `chat_template_kwargs` en el payload. Solo lo usa el camino
     # de NVIDIA, que es con el que se midió §8.10 — así esa medición sigue

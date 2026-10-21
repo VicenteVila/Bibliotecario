@@ -1,0 +1,178 @@
+[
+  {
+    "arm": "P",
+    "technique": "PEARL",
+    "run": 0,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "No violations found."
+  },
+  {
+    "arm": "P",
+    "technique": "PEARL",
+    "run": 1,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con los requisitos R4 y R5."
+  },
+  {
+    "arm": "P",
+    "technique": "PEARL",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint adapta los componentes de PEARL para validar un agente antes de cada release."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "M1: Extracción de subgrafo contextual del agente"
+    ],
+    "verdict": "El blueprint contiene atribuciones y rellenos no respaldados por la fuente, incumpliendo los requisitos de rigor de citación."
+  },
+  {
+    "arm": "P",
+    "technique": "Procedural Graphs",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "El blueprint describe un módulo \"Release Gate Evaluator\" (M8) que no aparece en la fuente original del paper."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint asume que el módulo \"Failure‑vs‑Success Refiner\" (M6) compara trayectorias de éxito y fracaso para proponer mutaciones, detalle que la fuente no menciona."
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos no respaldados por la fuente, incumpliendo R4 y R5."
+  },
+  {
+    "arm": "P",
+    "technique": "Procedural Graphs",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "procedure-triplet extraction"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Validador de Trayectoria"
+    ],
+    "verdict": "El blueprint contiene atribuciones y rellenos que no están respaldados por la fuente, violando tanto R4 como R5."
+  },
+  {
+    "arm": "P",
+    "technique": "Procedural Graphs",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Failure-vs-Success Refiner (Refinador Éxito vs Fallo)"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Failure-vs-Success Refiner (Refinador Éxito vs Fallo)"
+    ],
+    "verdict": "El blueprint incluye varias afirmaciones y componentes que no están presentes ni implícitos en la fuente original, violando tanto la regla R4 como la regla R5."
+  },
+  {
+    "arm": "P",
+    "technique": "ReASearch",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Failure-vs-Success Refiner"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "Failure-vs-Success Refiner"
+    ],
+    "verdict": "The blueprint contains a fabrication: the Failure-vs-Success Refiner is not mentioned in the source."
+  },
+  {
+    "arm": "P",
+    "technique": "ReASearch",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Módulo \"M1: Tool-Driven Optimization Loop\" atribuido a \"tool-driven optimization loop\" [doc:4:0] que no aparece en el fragmento fuente 0."
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "El blueprint incluye el módulo \"M6: Release Gate Evaluator\" sin declarar que la fuente no lo menciona."
+    ],
+    "verdict": "El blueprint contiene fabricaciones y rellenos que no están respaldados por la fuente."
+  },
+  {
+    "arm": "P",
+    "technique": "ReASearch",
+    "run": 2,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "\"la persistencia de lecciones debe ser automática y no depender de la invocación voluntaria del agente.\""
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "\"la persistencia de lecciones debe ser automática y no depender de la invocación voluntaria del agente.\""
+    ],
+    "verdict": "El blueprint contiene afirmaciones que no están respaldadas por la fuente y no se declaran como silencias, violando tanto R4 como R5."
+  },
+  {
+    "arm": "P",
+    "technique": "Task-CoEvolve",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "All good"
+  },
+  {
+    "arm": "P",
+    "technique": "WikiSkill",
+    "run": 0,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "R_best initialized with baseline no-skill score"
+    ],
+    "r5_ok": false,
+    "r5_rellenados": [
+      "R_best initialized with baseline no-skill score"
+    ],
+    "verdict": "El blueprint contiene afirmaciones que no están respaldadas por la fuente y rellena silencios, por lo que no cumple con R4 ni R5."
+  },
+  {
+    "arm": "P",
+    "technique": "WikiSkill",
+    "run": 1,
+    "r4_ok": false,
+    "r4_fabricaciones": [
+      "Wiki Maintainer only sees D_train traces"
+    ],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint contiene fabricaciones respecto a la fuente, por lo que no cumple con los requisitos de rigor de citación."
+  },
+  {
+    "arm": "P",
+    "technique": "WikiSkill",
+    "run": 2,
+    "r4_ok": true,
+    "r4_fabricaciones": [],
+    "r5_ok": true,
+    "r5_rellenados": [],
+    "verdict": "El blueprint cumple con las reglas R4 y R5."
+  },
+  {
+    "arm": "P",
+    "technique": "Task-CoEvolve",
+    "run": 0,
+    "error": "no parseable: We need to check R4 and R5 compliance. The blueprint is a document that claims to adapt Task-CoEvolve. We must see if it"
+  },
+  {
+    "arm": "P",
+    "technique": "Task-CoEvolve",
+    "run": 1,
+    "error": "no parseable: We need to check R4 and R5 compliance. The blueprint is a detailed implementation plan. We must see if it attributes cor"
+  }
+]

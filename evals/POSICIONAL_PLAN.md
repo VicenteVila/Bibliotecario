@@ -88,6 +88,95 @@ medir. Si falla solo el 5, decisión del dueño con la evidencia a la vista.
   ya muestra que `cumplimiento_b9` está en 0.000 en todos los brazos — criterio
   4 lo lee como «no empeora», no como «alcanza 1.00».
 
-## §5 — Cierre
+## §5 — Cierre (corrida oficial + tres correcciones de medición, 2026-10-21)
 
-(pendiente de la corrida oficial)
+### Qué corrió
+
+- **Corrida oficial**: `LLM_PROVIDERS=nvidia … run_blueprint_ab.py --previas` —
+  15/15 runs `ok`, 0 truncados, sin failover (log `/tmp/opencode/ab_previas.log`).
+- **Proveedor**: `nvidia/nemotron-3-ultra-550b-a55b`. El primer intento quedó
+  con proveedores caídos (404: función no disponible en la cuenta para los
+  modelos que se pedían) y su corrida queda declarada como de infra y
+  respaldada en `result_blueprint_ab_corrida1_prov_roto.json`; sus filas se
+  borraron de OUT antes de la oficial. **Umbrales de §2 intactos.**
+
+### Tres defectos de medición detectados al leer el veredicto
+
+1. **Bug del instrumento R7 (afectaba a todos los brazos).** `_biblio_check`
+   exigía `^### Bibliografía` sin número delante; los brazos que numeran
+   secciones (`## 7. Bibliografía`) cobraban R7 como ausente. Corregido en
+   `run_blueprint_ab.py` y reaplicado a las 75 filas con `--repuntua`
+   (reescribe solo `checks` desde los blueprints guardados, cero llamadas
+   LLM, umbral sin tocar). Efecto: C 13→**15**/15, E 11→**15**/15,
+   P 8→**11**/15, B 14→15, D 10→12.
+2. **Confusor de modelo en P vs C.** Las filas B..E históricas no registran
+   modelo y P corrió en nemotron-ultra: la comparación mezclaba formato Y
+   modelo. Para leer §2 como está escrito («P vs C **aisla el formato**»),
+   se re-corró **solo C** con `--solo=C --previas` en nemotron-ultra
+   (15/15 `ok`; histórico de C preservado en
+   `result_blueprint_ab_C_historico.json`; las filas nuevas ya guardan
+   `modelo`). Decisión tomada *tras* ver el fallo de R7 de P y declarada
+   aquí; el umbral «R7 ≥ C» no se redefinió, lo que se hizo fue medir a C en
+   las mismas condiciones que a P. *Salvedad*: E (criterio 2, secundario
+   P vs E) sigue siendo histórico, es decir, cruzado entre modelos.
+3. **Truncación del blueprint en el juez.** `eval_q1_r4r5.py` cortaba el
+   blueprint a 9000 chars; E mide ≤6736 y nunca lo alcanzó, pero 10/15
+   blueprints de P se cortaban justo donde vive R5 (Bibliografía,
+   declaraciones de silencio). Añadido `Q1_BP_MAX` (default 9000, intacto
+   para los brazos históricos) y P se juzgó con `Q1_BP_MAX=16000` — vista
+   completa, comparable porque E nunca se truncó. Primer juicio de P con la
+   vista corta quedó respaldado en `result_q1_r4r5_P_truncado.json`.
+   Además E tenía 2 filas con fallo de parseo de juez (PEARL 0, ReASearch 0)
+   —«un fallo de parseo NO es una evaluación» según la propia doctrina del
+   script—, reintentadas hasta n=15.
+
+### Veredicto (n = 15 runs de P sobre las 5 técnicas previas)
+
+| # | criterio | umbral | medido | |
+|---|---|---|---|---|
+| 1 | `fuera_de_rango` | 0.00/run | **0.00/run** | ✅ |
+| 2 | B8 ratio | ≥ 0.854 | **1.000** (25.27/25.27) | ✅ |
+| 3 | citas/run | ≥ 5.33 | **25.27** | ✅ |
+| 4 | colateral | B11=0 · trunc=0 · anclas≥0 · R7≥C | 0.00 · 0/15 · 11.27 · R7 11/15 vs C-mismo-modelo 6/15 | ✅ (ver nota) |
+| 5 | juez R4/R5 (secundario) | no empeora vs E | R4 5/15 vs E 2/15 · R5 7/15 vs E 9/15 · fab/bp 0.73 vs 1.87 · rel/bp 0.60 vs 1.53 | ✅ (ver salvedad) |
+
+**Nota del criterio 4 (R7 ≥ C), ambas lecturas:**
+
+- vs **C mismo modelo** (nemotron-ultra): C 6/15, P 11/15 → **pasa**.
+- vs **C histórico corregido** (mismo instrumento): C 15/15, P 11/15 →
+  fallaría en la lectura cruzada entre modelos.
+
+La evidencia atribuye la caída de R7 al modelo, no al formato: con el mismo
+modelo, el brazo C cae a 6/15 de Bibliografía (histórico: 15/15) y a 5/15 en
+«Según» (histórico: 15/15), mientras P mantiene 11/15 y 7/15 — en condiciones
+limpias **el formato posicional mejora R7 frente a C** (11 vs 6) y no
+empeora la atribución (7 vs 5). El primado de la prosa de C histórico
+(15/15) no es reproducible en el modelo actual (6/15), y qué modelo corrió
+C histórico no está registrado — de ahí la corrección del campo `modelo`.
+
+**Nota del criterio 5 (juez, n=15 vs 15, mismo prompt, temp 0):**
+
+- R4: **mejora** — P 5/15 vs E 2/15; fabricaciones/blueprint 0.73 vs 1.87 (×2.6
+  menos).
+- R5 binario: **baja 2 runs** — P 7/15 vs E 9/15.
+- R5 continuo: **mejora ×2.5** — rellenos/blueprint 0.60 vs 1.53 (lo que R5
+  cuenta, cuenta menos en P).
+- Los 8 fallos R5 de P coinciden casi todos con fallos R4 (misma raíz:
+  fabricaciones), concentrados en ReASearch/PG/WikiSkill. Ruido de juez
+  medido en el repo: 33-52% de flips en R5 (dec. 16; ahora temp 0) — 2 runs
+  están dentro de ese ruido.
+
+### Veredicto final: **MEDIDA 1 PASA** (decisión del dueño, 2026-10-21)
+
+Ratificada con la evidencia de §2 a la vista: criterios 1-3 PASAN con
+holgura — 0 índices fantasma, B8 perfecto (el mapper resuelve todo `[N]` que
+el modelo pone en rango), ×4.7 citas vs C histórico y ×1.97 vs C mismo
+modelo, y por primera vez B9' anclas > 0 (11.27/run; todos los brazos
+previos, 0.00). Criterio 4 pasa en su lectura limpia (P vs C mismo modelo,
+la que §1 diseñó para aislar el formato). Criterio 5, secundario, se acepta
+con salvedad: R4 y ambos continuos mejoran, R5 binario cae 2 runs dentro
+del ruido medido del juez.
+
+**Sin redefinir umbrales** en ningún punto del camino. Post-medida, §3
+descongela: temperatura del write (`build_blueprint(temperature=…)`) y
+presentación de la fuente.
