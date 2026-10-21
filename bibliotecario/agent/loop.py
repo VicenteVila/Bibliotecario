@@ -736,7 +736,8 @@ def run(question: str, max_turns: int = MAX_TURNS, isolated: bool = False,
 
 
 def run_blueprint(technique: str, goal: str, max_turns: int = 4,
-                  temperature: float | None = None) -> dict:
+                  temperature: float | None = None,
+                  positional: bool = False) -> dict:
     """P1' (§5): el loop **dirige**, pero el blueprint lo escribe la **tool**.
 
     Por qué no se enruta `build_blueprint` al loop tal cual: `run()` genera
@@ -749,6 +750,10 @@ def run_blueprint(technique: str, goal: str, max_turns: int = 4,
     alcanza. Esa evidencia se le pasa a `build_blueprint`, que escribe con su
     propio presupuesto. El brazo A/B del A/B es llamar a `build_blueprint`
     directamente, sin esto.
+
+    `positional=True` (brazo P): la tool escribe con citas por índice `[N]`
+    mapeadas por código — misma evidencia del loop, mismo presupuesto; solo
+    cambia el formato de citado.
     """
     from bibliotecario.agent.tools import build_blueprint
 
@@ -758,5 +763,5 @@ def run_blueprint(technique: str, goal: str, max_turns: int = 4,
         max_turns=max_turns, isolated=True, temperature=temperature,
     )
     extra = "\n".join(gathered.get("evidence") or [])[:6000]
-    bp = build_blueprint(technique, goal, extra_source=extra)
+    bp = build_blueprint(technique, goal, extra_source=extra, positional=positional)
     return {**bp, "loop_turns": gathered["turns"], "evidence": gathered["evidence"]}

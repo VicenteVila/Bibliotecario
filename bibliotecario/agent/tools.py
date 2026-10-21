@@ -180,14 +180,12 @@ def answer_multi_hop(question: str, top_k: int = 6) -> dict:
     return {"answer": answer, "citations": [f"[{d}:{c}] {next(h['title'] for h in hits if h['doc_id']==d and h['chunk']==c)}" for d, c in cites]}
 
 
-def _source_for(technique: str, procs, max_chunks: int = 8, max_chars: int = 7000) -> tuple[int | None, str]:
-    """Chunks de la fuente de la técnica, para poder atribuir lo que se diga.
+def _fuente_chunks(technique: str, procs,
+                   max_chunks: int = 8) -> tuple[int | None, list[tuple[int, str]]]:
+    """Selección de chunks de la fuente de la técnica: (doc_id, [(chunk_idx, texto)]).
 
-    P2 (§5): **no se puede exigir R1-R7 sin el texto al lado.** El prompt
-    anterior solo llevaba nombres de procedimientos y cadenas del grafo, así
-    que el modelo no tenía nada que citar — y por eso H3 midió 0 citas. Aquí se
-    pasan los chunks que nombran esos procedimientos, más el chunk 0 (donde
-    están autores y título, que es lo que R7 pide para la bibliografía).
+    Compartida por `_source_for` (legacy) y `_fuente_numerada` (posicional):
+    la selección es la misma; lo que cambia es el formato de citado.
     """
     from bibliotecario.core import storage
     from bibliotecario.knowledge import graph as G
@@ -203,7 +201,7 @@ def _source_for(technique: str, procs, max_chunks: int = 8, max_chars: int = 700
                 doc_id = p.metadata["doc_id"]
                 break
     if doc_id is None:
-        return None, ""
+        return None, []
 
     with storage.get_conn() as conn:
         # Cabecera (título/autores/sello) + cualquier chunk que nombre un
@@ -220,20 +218,90 @@ def _source_for(technique: str, procs, max_chunks: int = 8, max_chars: int = 700
             f"({','.join('?' * len(idxs))}) ORDER BY chunk_idx",
             (doc_id, *sorted(idxs)),
         ).fetchall()
+    return doc_id, [(r["chunk_idx"], r["text"]) for r in rows[:max_chunks]]
+
+
+def _source_for(technique: str, procs, max_chunks: int = 8, max_chars: int = 7000) -> tuple[int | None, str]:
+    """Chunks de la fuente de la técnica, para poder atribuir lo que se diga.
+
+    P2 (§5): **no se puede exigir R1-R7 sin el texto al lado.** El prompt
+    anterior solo llevaba nombres de procedimientos y cadenas del grafo, así
+    que el modelo no tenía nada que citar — y por eso H3 midió 0 citas. Aquí se
+    pasan los chunks que nombran esos procedimientos, más el chunk 0 (donde
+    están autores y título, que es lo que R7 pide para la bibliografía).
+    """
+    doc_id, chunks = _fuente_chunks(technique, procs, max_chunks=max_chunks)
+    if doc_id is None:
+        return None, ""
 
     used = 0
     parts: list[str] = []
-    for r in rows:
-        piece = f"[chunk {r['chunk_idx']}] {r['text']}"
+    for idx, text in chunks:
+        piece = f"[chunk {idx}] {text}"
         if used + len(piece) > max_chars:
             break
         parts.append(piece)
         used += len(piece)
-    return doc_id, "\n\n".join(parts[:max_chunks])
+    return doc_id, "\n\n".join(parts)
 
 
 def _toks(text: str) -> set[str]:
     return {t for t in re.findall(r"[a-záéíóúñü]{4,}", text.lower())}
+
+
+def _fuente_numerada(technique: str, procs, max_chunks: int = 8,
+                     max_chars: int = 7000) -> tuple[int | None, str, dict[int, tuple[int, int]]]:
+    """Igual selección que `_source_for`, pero citable solo por posición.
+
+    Presenta cada chunk como `[1]`, `[2]`… — sin `doc_id` ni `chunk_idx` a la
+    vista. El modelo no puede fabricar identificadores que no ve: solo indices
+    pequeños que este módulo mapea después. Devuelve además
+    `mapa: {posición: (doc_id, chunk_idx)}` para `map_positional_citations`.
+    """
+    doc_id, chunks = _fuente_chunks(technique, procs, max_chunks=max_chunks)
+    if doc_id is None:
+        return None, "", {}
+
+    used = 0
+    parts: list[str] = []
+    mapa: dict[int, tuple[int, int]] = {}
+    for pos, (idx, text) in enumerate(chunks, start=1):
+        piece = f"[{pos}] {text}"
+        if used + len(piece) > max_chars:
+            break
+        mapa[pos] = (doc_id, idx)
+        parts.append(piece)
+        used += len(piece)
+    return doc_id, "\n\n".join(parts), mapa
+
+
+# Cita posicional `[N]`. No toca `[doc:X:Y]` (los dos puntos rompen el patrón),
+# así que un blueprint legacy que mezcle formatos no se corrompe.
+_POS_CITE = re.compile(r"\[\s*(\d{1,3})\s*\]")
+
+
+def map_positional_citations(text: str, mapa: dict[int, tuple[int, int]]) -> tuple[str, dict]:
+    """`[N]` → `[doc:doc_id:chunk_idx]`; índice fuera de rango → `[doc:0:0]`.
+
+    Determinista, sin LLM y solo sobre tokens entre corchetes — la doctrina de
+    `normalize_pointers`: no se reescribe prosa (P3 destruyó el documento
+    reescribiéndola, §5.8.3). `[doc:0:0]` es un destino que nunca resuelve, así
+    que el `check_attributions` existente lo caza como `puntero_roto` sin
+    máquina nueva aguas abajo.
+    """
+    mapeados = fuera = 0
+
+    def _sub(m: re.Match) -> str:
+        nonlocal mapeados, fuera
+        dest = mapa.get(int(m.group(1)))
+        if dest is None:
+            fuera += 1
+            return "[doc:0:0]"
+        mapeados += 1
+        return f"[doc:{dest[0]}:{dest[1]}]"
+
+    out = _POS_CITE.sub(_sub, text or "")
+    return out, {"mapeados": mapeados, "fuera_de_rango": fuera}
 
 
 def fuente_verificable(technique: str, blueprint: str,
@@ -390,8 +458,36 @@ R6. Separa lo tuyo de lo de la fuente **EN LA PROPIA FRASE**: escribe «(propues
 R8. **Cada módulo y cada dependencia lleva su propia cita dentro del propio punto.** Una cita en la cabecera de la sección («Según X [doc:0:0], los siguientes módulos son…») **no cubre los puntos de debajo**: cada módulo que enumeres necesita su cita literal + puntero **en su propia línea**, con el formato exacto de R1: «…» [doc:<id>:<chunk>]. **El puntero es `[doc:<id>:<chunk>]` y nada más**: «citado en §3.2.1», «(Figura 2)», «(ecuación 4)» o «Yang et al. 2026» **no son punteros** y no cuentan como cita. Si el módulo es propuesta tuya y no del paper, márcalo con R6 («(propuesta del blueprint)») **en vez** de citarlo: no le pongas un puntero que no hay. No vale citar solo el primero y dejar el resto sin ancla.
 R7. **Última sección del documento, sin falta**: «## Bibliografía», listando SOLO los documentos realmente consultados, cada uno con autores y año **tal como aparecen en la fuente** más su [doc:<id>]. Si no puedes extraer autores o año, di «no consta en la fuente»; no los inventes."""
 
+# Variante posicional de las reglas (brazo de citas por índice). Idéntica en
+# sustancia; cambia SOLO el formato del puntero: `[N]` en vez de
+# `[doc:<id>:<chunk>]`, y añade R0 — el modelo nunca escribe identificadores,
+# porque el identificador es justo lo que medía fabricar (doc_id invisible en
+# FUENTE: `_source_for` nunca lo mostraba y el modelo lo adivinaba).
+_WRITING_RULES_NUM = """R0. **El único puntero permitido es el número de candidato `[N]`**, tal como
+    aparece en FUENTE («[1]», «[2]»…). No escribas `[doc:…]`, ni ids de
+    documento, ni «chunk N»: si un número no está en FUENTE, no existe.
+    La sección «evidencia reunida por el loop», si aparece, es ORIENTATIVA:
+    no la cites ni la parafrasees como fuente — solo puedes citar [N].
+""" + _WRITING_RULES.replace(
+    "«<fragmento textual del paper, tal cual, en su idioma>» [doc:<id>:<chunk>] — <tu paráfrasis en español>.",
+    "«<fragmento textual del paper, tal cual, en su idioma>» [N] — <tu paráfrasis en español>.",
+).replace(
+    "Ejemplo correcto: «the framework localizes the active node» [doc:2:41] — el método localiza el nodo activo antes de decidir.",
+    "Ejemplo correcto: «the framework localizes the active node» [3] — el método localiza el nodo activo antes de decidir.",
+).replace(
+    "con el formato exacto de R1: «…» [doc:<id>:<chunk>]. **El puntero es `[doc:<id>:<chunk>]` y nada más**",
+    "con el formato exacto de R1: «…» [N]. **El puntero es `[N]` y nada más**",
+).replace(
+    "«Según X [doc:0:0], los siguientes módulos son…»",
+    "«Según X [1], los siguientes módulos son…»",
+).replace(
+    "más su [doc:<id>]", "más su [N]",
+)
 
-def build_blueprint(technique: str, goal: str, extra_source: str = "") -> dict:
+
+def build_blueprint(technique: str, goal: str, extra_source: str = "",
+                    positional: bool = False,
+                    temperature: float | None = None) -> dict:
     """Blueprint de implementación: camina el grafo procedimental y sintetiza guía accionable.
 
     P2 (§5): el prompt exige R1-R7 y va **con el texto de la fuente al lado**,
@@ -401,6 +497,16 @@ def build_blueprint(technique: str, goal: str, extra_source: str = "") -> dict:
     `extra_source` lo pasa P1' (el brazo C del A/B): la evidencia que el loop
     reunió con las herramientas. En el brazo B va vacío, que es la condición
     de un solo `generate()`.
+
+    `positional=True` (brazo posicional del A/B): la fuente se presenta como
+    candidatos `[1]`..`[N]` sin doc_id visible, y tras generar se mapean a
+    `[doc:X:Y]` por código (`map_positional_citations`). El modelo no escribe
+    identificadores — el doc_id no está en FUENTE legacy y el modelo lo
+    adivinaba, que es una fuente de `puntero_roto` medible sin juez.
+    Por defecto False: el camino legacy queda byte-idéntico.
+
+    `temperature` (None = default del backend, 0.2) se expone para poder medir
+    temp 0 en el A/B sin cambiar la ruta por defecto.
     """
     from bibliotecario.knowledge import procedural as P
     procs = P.list_procedures(technique=technique)
@@ -409,33 +515,45 @@ def build_blueprint(technique: str, goal: str, extra_source: str = "") -> dict:
         # prompt — H5 lo tapó porque el modelo se negó por su cuenta, una vez.
         # Hoy se niega el código: no se escribe blueprint de algo sin respaldo.
         return {"technique": technique, "goal": goal, "procedures": [],
-                "blueprint": f"(no existe: no hay ningun procedimiento registrado para '{technique}' en el grafo)"}
+                "blueprint": f"(no existe: no hay ningun procedimiento registrado para '{technique}' en el grafo)",
+                "citas_posicionales": None}
     names = [p.label for p in procs[:20]]
     paths = PEARL.retrieve_evidence(f"{technique} {goal}", top_m=5)
     chain = "\n".join(" → ".join(f"{s['label']}" for s in p["steps"]) for p in paths)
-    doc_id, source = _source_for(technique, procs)
+    mapa: dict[int, tuple[int, int]] = {}
+    if positional:
+        doc_id, source, mapa = _fuente_numerada(technique, procs)
+        reglas = _WRITING_RULES_NUM
+    else:
+        doc_id, source = _source_for(technique, procs)
+        reglas = _WRITING_RULES
     if extra_source:
         source = f"{source}\n\n[evidencia reunida por el loop]\n{extra_source}" if source else extra_source
     if not source:
         # Sin fuente no se puede cumplir R1-R7; se declara en vez de fingir.
         return {"technique": technique, "goal": goal, "procedures": names, "doc_id": doc_id,
-                "blueprint": "(sin fuente: no hay chunks de la técnica, no se puede escribir con cita)"}
+                "blueprint": "(sin fuente: no hay chunks de la técnica, no se puede escribir con cita)",
+                "citas_posicionales": None}
     prompt = (
         f"Escribe un blueprint de implementación de la técnica '{technique}' "
         f"con objetivo: {goal}.\n\n"
         f"FUENTE (únicas fuentes disponibles; no hay más):\n{source}\n\n"
         f"Procedimientos registrados en el grafo desde esa fuente: {', '.join(names)}\n"
         f"Cadenas del grafo:\n{chain}\n\n"
-        f"{_WRITING_RULES}\n\n"
+        f"{reglas}\n\n"
         "Devuelve blueprint markdown: módulos, dependencias, orden, validación, "
         "riesgos, y la bibliografía."
     )
     # 1500 tokens cortaba la bibliografía: va al FINAL del documento, así que es
     # lo primero que se pierde. Medido en el A/B — 4 de 22 blueprints salieron
     # truncados. Se sube el tope; el coste por blueprint sube y hay que decirlo.
-    bp = generate(prompt, max_tokens=BLUEPRINT_MAX_TOKENS) or "(sin LLM: usa los procedimientos listados)"
+    temp_kw = {} if temperature is None else {"temperature": temperature}
+    bp = generate(prompt, max_tokens=BLUEPRINT_MAX_TOKENS, **temp_kw) or "(sin LLM: usa los procedimientos listados)"
+    cit_map: dict | None = None
+    if positional and mapa and bp and not bp.startswith("("):
+        bp, cit_map = map_positional_citations(bp, mapa)
     return {"technique": technique, "goal": goal, "procedures": names,
-            "doc_id": doc_id, "blueprint": bp}
+            "doc_id": doc_id, "blueprint": bp, "citas_posicionales": cit_map}
 
 
 def _cited_chunks(doc_id: int | None, blueprint: str) -> dict[tuple[int, int], str]:

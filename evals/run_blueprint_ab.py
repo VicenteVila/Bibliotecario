@@ -30,7 +30,10 @@ from bibliotecario.knowledge.study import normalize_pointers
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "evals" / "result_blueprint_ab.json"
 RUNS = 3
-ARMS = ("B", "C", "D", "E")
+# P: Medida 1 (declarada 2026-10-21, ver evals/POSICIONAL_PLAN.md) — citas por
+# índice `[N]` mapeadas por código. Se añade sin reabrir B/C/D/E: las runs
+# buenas ya están en OUT y `seen` las salta.
+ARMS = ("B", "C", "D", "E", "P")
 
 # Mínimo de palabras para que una frase copiada cuente como copia (B11).
 _MIN_PHRASE = 8
@@ -296,6 +299,8 @@ def run_one(arm: str, technique: str, run: int) -> dict:
             r = api.blueprint_verified(technique, goal)
         elif arm == "E":
             r = api.blueprint_p4(technique, goal)
+        elif arm == "P":
+            r = api.blueprint_positional(technique, goal)
         else:
             r = api.blueprint_loop(technique, goal)
         bp = r.get("blueprint", "")
@@ -307,6 +312,7 @@ def run_one(arm: str, technique: str, run: int) -> dict:
                 "sin_punteros": r.get("sin_punteros"),
                 "reescrituras": r.get("reescrituras"),
                 "violaciones": r.get("violaciones"),
+                "citas_posicionales": r.get("citas_posicionales"),
                 "blueprint": bp, "checks": score(bp, _corpus()),
                 "error": None}
     except Exception as e:  # una run rota no debe tumbar el batch
@@ -319,10 +325,18 @@ def main() -> int:
     smoke = "--smoke" in sys.argv
     techs = _techniques()
     runs = 1 if smoke else RUNS
-    arms = ("B",) if smoke else ARMS
+    # El humo prueba el brazo nuevo (P); B..E ya están en OUT, `seen` los salta.
+    arms = ("P",) if smoke else ARMS
 
     done = json.loads(OUT.read_text(encoding="utf-8")) if OUT.exists() else []
     seen = {(d["arm"], d["technique"], d["run"]) for d in done if d.get("ok")}
+
+    # `--previas`: solo las técnicas ya medidas en B..E (5 del A/B previo).
+    # Comparar P sobre las 14 con C sobre las 5 mezclaría poblaciones; el
+    # criterio de POSICIONAL_PLAN.md se lee sobre la intersección.
+    if "--previas" in sys.argv:
+        previas = {d["technique"] for d in done if d.get("ok") and d["arm"] != "P"}
+        techs = [t for t in techs if t in previas]
 
     print("=" * 70)
     print(f"A/B de P1  ·  brazos {list(arms)}  ·  {len(techs)} técnicas  ·  {runs} runs")
@@ -393,6 +407,16 @@ def _summary(done: list[dict], smoke: bool) -> None:
             if reesc:
                 print(f"    P3 que pagaron reescritura         {len(reesc):6d}/{n}"
                       f"   ({sum(r['reescrituras'] for r in reesc)} llamadas extra)")
+        if arm == "P":
+            cpos = [r["citas_posicionales"] for r in rows if r.get("citas_posicionales")]
+            if cpos:
+                mapeados = sum(c["mapeados"] for c in cpos) / len(cpos)
+                fuera = sum(c["fuera_de_rango"] for c in cpos) / len(cpos)
+                print(f"    R1' [N]→[doc:id:chunk] mapeados    {mapeados:6.2f}/run")
+                print(f"    R1' indice fuera de rango          {fuera:6.2f}/run"
+                      f"   [criterio: 0,00]")
+                if len(cpos) != n:
+                    print(f"    (solo {len(cpos)}/{n} runs devolvieron mapa)")
     if smoke:
         print("\nMODO HUMO: una sola run por brazo, no sirve para comparar.")
 

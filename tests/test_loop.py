@@ -380,8 +380,9 @@ def test_run_blueprint_p1_prima_la_tool_sobre_el_loop(monkeypatch):
                          "evidence": ["search_papers(q): hallazgo"], "run_id": "r1"},
     )
 
-    def fake_build(technique, goal, extra_source=""):
+    def fake_build(technique, goal, extra_source="", positional=False):
         seen["extra"] = extra_source
+        seen["positional"] = positional
         return {"technique": technique, "goal": goal, "procedures": ["p"],
                 "blueprint": "bp de la tool"}
 
@@ -392,6 +393,11 @@ def test_run_blueprint_p1_prima_la_tool_sobre_el_loop(monkeypatch):
     assert out["blueprint"] == "bp de la tool"
     assert out["loop_turns"] == 3
     assert "search_papers" in seen["extra"]
+    assert seen["positional"] is False
+
+    # Brazo P: el kwarg llega a la tool sin tocar el resto del contrato.
+    LOOP.run_blueprint("Task-CoEvolve", "validar release", positional=True)
+    assert seen["positional"] is True
 
 
 def test_run_blueprint_sin_evidence_del_loop_sigue_escribiendo(monkeypatch):
@@ -404,7 +410,8 @@ def test_run_blueprint_sin_evidence_del_loop_sigue_escribiendo(monkeypatch):
     )
     monkeypatch.setattr(
         T, "build_blueprint",
-        lambda technique, goal, extra_source="": {"blueprint": "ok", "procedures": []},
+        lambda technique, goal, extra_source="", positional=False:
+            {"blueprint": "ok", "procedures": []},
     )
     assert LOOP.run_blueprint("Task-CoEvolve", "objetivo")["blueprint"] == "ok"
 

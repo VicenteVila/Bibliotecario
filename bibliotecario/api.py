@@ -34,6 +34,7 @@ __all__ = [
     "blueprint",
     "blueprint_loop",
     "blueprint_p4",
+    "blueprint_positional",
     "blueprint_route5",
     "blueprint_verified",
     "build_blueprint",
@@ -107,6 +108,21 @@ def blueprint_p4(technique: str, goal: str) -> dict:
     usan el brazo E y, desde el Hito 3, la ruta del arnés (H1).
     """
     return build_blueprint_p4(technique, goal)
+
+
+def blueprint_positional(technique: str, goal: str, max_turns: int = 4) -> dict:
+    """Brazo P del A/B: P1' + P2-pos — citas por índice `[N]` mapeadas por código.
+
+    Aislamiento: respecto al brazo C solo cambia el formato de citado — la
+    fuente se presenta como `[1]`, `[2]`…, el modelo cita esas posiciones y
+    `map_positional_citations` las convierte en `[doc:doc_id:chunk]` sin tocar
+    la prosa. R1' es el único punto de fallo nuevo: un índice fuera de rango
+    se escribe `[doc:0:0]` y lo caza el `check_attributions` existente.
+
+    `bp["citas_posicionales"]` trae `{mapeados, fuera_de_rango}` para el resumen
+    del A/B; en el resto de brazos es `None`.
+    """
+    return LOOP.run_blueprint(technique, goal, max_turns=max_turns, positional=True)
 
 
 def study(doc_id: int, force: bool = False) -> dict:
