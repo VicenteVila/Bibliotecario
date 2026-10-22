@@ -1,0 +1,146 @@
+{
+ "hito": 19,
+ "modo": "g0",
+ "fecha": "2026-10-22T23:11:23",
+ "modelo": "nvidia/nemotron-3-ultra-550b-a55b",
+ "tareas": [
+  "checkout-rounding",
+  "dsl-parser"
+ ],
+ "matriz": {
+  "A1": {
+   "checkout-rounding": 63.6364,
+   "dsl-parser": 97.8261
+  },
+  "A5": {
+   "checkout-rounding": 87.2727,
+   "dsl-parser": 0.0
+  }
+ },
+ "dictamen": {
+  "ventana": "VENTANA_FALLA",
+  "a1_media": 80.73,
+  "a5_media": 43.64,
+  "coste": "NO_ARRANCA",
+  "tokens_por_celda": 104787,
+  "proyeccion_60": 6287265,
+  "proyeccion_40": 4191510,
+  "techo_tokens": 3000000,
+  "n_final": 0,
+  "arranca_oficial": false
+ },
+ "celdas": {
+  "A1_checkout-rounding": {
+   "score": 63.6364,
+   "hidden": {
+    "passed": 35,
+    "total": 55
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 44.1,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 6767,
+    "completion_tokens": 2413,
+    "total_tokens": 9180
+   }
+  },
+  "A5_checkout-rounding": {
+   "score": 87.2727,
+   "hidden": {
+    "passed": 48,
+    "total": 55
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 6 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.50', 'SUB"
+   ],
+   "final": "",
+   "elapsed_s": 639.5,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 158858,
+    "completion_tokens": 25981,
+    "total_tokens": 184839
+   }
+  },
+  "A1_dsl-parser": {
+   "score": 97.8261,
+   "hidden": {
+    "passed": 45,
+    "total": 46
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 88.9,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 5971,
+    "completion_tokens": 5074,
+    "total_tokens": 11045
+   }
+  },
+  "A5_dsl-parser": {
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 4
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 15,
+   "invalid_actions": 1,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido",
+    "PÚBLICOS: 0 pasan, 0 fallan, 2 errores\n/mnt/c/Bibliotecario/.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n/mnt/c/Bibliotecario/."
+   ],
+   "final": "",
+   "elapsed_s": 1060.6,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 173860,
+    "completion_tokens": 40227,
+    "total_tokens": 214087
+   }
+  }
+ },
+ "commits": {
+  "head": "cb56769fca8d56e5a8c93dd62a435bfebf61e6dd",
+  "dirty": true
+ }
+}

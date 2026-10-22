@@ -1,0 +1,7 @@
+[22:40:49] G0 humo (§1.7): [('A1', 'checkout-rounding'), ('A5', 'checkout-rounding'), ('A1', 'dsl-parser'), ('A5', 'dsl-parser')]
+[22:41:34] A1/checkout-rounding: score=63.6364% turns=1 llm=1 tools=0 paro=one_shot tok=9180 44.1s
+[22:52:13] A5/checkout-rounding: score=87.2727% turns=16 llm=16 tools=16 paro=max_turns tok=184839 639.5s
+[22:53:42] A1/dsl-parser: score=97.8261% turns=1 llm=1 tools=0 paro=one_shot tok=11045 88.9s
+[23:11:23] A5/dsl-parser: score=0.0% turns=16 llm=16 tools=15 paro=max_turns tok=214087 1060.6s
+[23:11:24] DICTAMEN G0: ventana=VENTANA_FALLA coste=NO_ARRANCA (proj60=6287265 <= 3000000) n_final=0 arranca=False
+[23:11:24] evidencia: evals/results/result_sens_sd_g0.json

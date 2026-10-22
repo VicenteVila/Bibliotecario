@@ -212,7 +212,7 @@ def modo_g0(model: str) -> int:
     out = REPO / "evals" / "results" / "result_sens_sd_g0.json"
     out.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
     log(f"DICTAMEN G0: ventana={ver['ventana']} coste={ver['coste']} "
-        f"(proj60={ver['proyeccion_60']} <= {TECHO_TOKENS}) "
+        f"(proj60={ver['proyeccion_60']}, techo={TECHO_TOKENS}) "
         f"n_final={ver['n_final']} arranca={ver['arranca_oficial']}")
     log(f"evidencia: {out.relative_to(REPO)}")
     return 0 if ver["arranca_oficial"] else 2
