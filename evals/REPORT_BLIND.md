@@ -4,7 +4,7 @@ Set: `evals/golden_blind_qa.jsonl` (escrito leyendo los chunks, sin ejecutar el
 agente ni el juez). 8 por paper, 35 respondibles y 5 no respondibles (una por
 paper). Agente pineado a `nvidia/nemotron-3-super-120b-a12b` (`--provider
 nvidia`), juez a `openai/gpt-oss-20b` (familia distinta). Datos:
-`evals/result_blind_r{1,2,3}.json`.
+`evals/results/result_blind_r{1,2,3}.json`.
 
 ## Aviso: una versión anterior de este informe daba 4.219 y era inválida
 

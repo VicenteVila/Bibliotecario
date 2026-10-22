@@ -23,8 +23,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from calibrate_r4 import _contexto_blueprints, classify
 
 ROOT = Path(__file__).resolve().parents[1]
-Q1 = ROOT / "evals" / "result_q1_r4r5.json"
-OUT = ROOT / "evals" / "result_r4_rescore.json"
+Q1 = ROOT / "evals" / "results" / "result_q1_r4r5.json"
+OUT = ROOT / "evals" / "results" / "result_r4_rescore.json"
 
 TECH = {"PEARL": 1, "Procedural Graphs": 2, "Task-CoEvolve": 3,
         "ReASearch": 4, "WikiSkill": 5}

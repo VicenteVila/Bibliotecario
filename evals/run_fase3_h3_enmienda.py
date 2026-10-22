@@ -25,7 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "evals" / "result_fase3_h3_enmienda.json"
+OUT = ROOT / "evals" / "results" / "result_fase3_h3_enmienda.json"
 ARM = "H3E"
 
 _TOOL_OK = '```json\n{"tool": "get_status", "args": {}}\n```'

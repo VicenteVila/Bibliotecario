@@ -30,8 +30,8 @@ from bibliotecario.core.llm import _endpoint, _openai_compat_usage
 from bibliotecario.knowledge import procedural as P
 
 ROOT = Path(__file__).resolve().parents[1]
-AB = ROOT / "evals" / "result_blueprint_ab.json"
-OUT = ROOT / "evals" / "result_q1_r4r5.json"
+AB = ROOT / "evals" / "results" / "result_blueprint_ab.json"
+OUT = ROOT / "evals" / "results" / "result_q1_r4r5.json"
 
 JUDGE_MODEL = os.environ.get("JUDGE_MODEL", "openai/gpt-oss-20b")
 JUDGE_PROVIDER = os.environ.get("JUDGE_PROVIDER", "nvidia")

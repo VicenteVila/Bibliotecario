@@ -67,8 +67,8 @@ Idénticos a HITO7-HITO9 §2 — no se re-baja nada:
 
 ## §3 Runner
 
-`evals/run_fase1_h17.py` → `evals/result_fase1_h17.json` (filas `H17`) y
-juicios `arm="H17"` en `evals/result_q1_r4r5.json` (H1…H16 sin tocar).
+`evals/run_fase1_h17.py` → `evals/results/result_fase1_h17.json` (filas `H17`) y
+juicios `arm="H17"` en `evals/results/result_q1_r4r5.json` (H1…H16 sin tocar).
 Igual que HITO9 §3 con `MAX_ROUNDS=8`, `MAX_LOC=36`; `loc["salida"]` cruda
 se mantiene; sin más cambios de flujo.
 

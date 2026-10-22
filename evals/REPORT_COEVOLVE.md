@@ -30,7 +30,7 @@ anteriores a hoy. La instrumentación de puntuación se añadió el 2026-10-10, 
 los 245 scores que existen son exactamente los 245 `task_outcomes`, todos del
 mismo día. La `metadata` de los runs viejos solo lleva `turns` y `tools`.
 
-La historia real está en `evals/result_*.json`: 41 ficheros entre 2026-09-29 y
+La historia real está en `evals/results/result_*.json`: 41 ficheros entre 2026-09-29 y
 2026-10-10, con puntuación por pregunta. Ahí se mide.
 
 ## 2. Estado del pool
@@ -175,6 +175,6 @@ print(SEL.inclusion_probabilities(TP.task_stats(), 0.2))
 PY
 ```
 
-La deriva se lee de `evals/result_*.json` agrupados por `meta.golden`, usando
+La deriva se lee de `evals/results/result_*.json` agrupados por `meta.golden`, usando
 `eval_end2end.run_success` como métrica binaria; el suelo de ruido son las
 réplicas exactas (`blind_r5`/`r6`, `ext2_r1`/`r2`, `abst_t0_applied`/`rep2`).

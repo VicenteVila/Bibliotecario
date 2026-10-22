@@ -31,17 +31,17 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from eval_q1_r4r5 import _source, q1
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "evals" / "result_q1_noise.json"
+OUT = ROOT / "evals" / "results" / "result_q1_noise.json"
 
 BRAZOS = {
-    "B": ROOT / "evals" / "result_blueprint_ab.json",
-    "C": ROOT / "evals" / "result_blueprint_ab.json",
-    "D": ROOT / "evals" / "result_blueprint_ab.json",
-    "E": ROOT / "evals" / "result_blueprint_ab.json",
-    "F": ROOT / "evals" / "result_arm_f.json",
-    "G": ROOT / "evals" / "result_arm_g.json",
-    "G2": ROOT / "evals" / "result_arm_g2.json",
-    "H": ROOT / "evals" / "result_arm_h.json",
+    "B": ROOT / "evals" / "results" / "result_blueprint_ab.json",
+    "C": ROOT / "evals" / "results" / "result_blueprint_ab.json",
+    "D": ROOT / "evals" / "results" / "result_blueprint_ab.json",
+    "E": ROOT / "evals" / "results" / "result_blueprint_ab.json",
+    "F": ROOT / "evals" / "results" / "result_arm_f.json",
+    "G": ROOT / "evals" / "results" / "result_arm_g.json",
+    "G2": ROOT / "evals" / "results" / "result_arm_g2.json",
+    "H": ROOT / "evals" / "results" / "result_arm_h.json",
 }
 UMBRAL_R5 = 10
 # se juzga sobre 14-15 blueprints; el umbral esta escrito para 15. Se reportan

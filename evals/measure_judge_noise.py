@@ -16,7 +16,7 @@ original, byte a byte.
 Uso:
     python evals/measure_judge_noise.py --reps 3
     python evals/measure_judge_noise.py --reps 3 --arms 0.2,0.0
-Salida: evals/result_judge_noise.json
+Salida: evals/results/result_judge_noise.json
 """
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ sys.path.insert(0, str(EVALS.parent))
 
 from evals.judge import judge
 
-OUT = EVALS / "result_judge_noise.json"
+OUT = EVALS / "results" / "result_judge_noise.json"
 
 
 def _load_runs(runs: list[int]) -> tuple[dict, dict]:
@@ -41,7 +41,7 @@ def _load_runs(runs: list[int]) -> tuple[dict, dict]:
               (EVALS / "golden_blind_qa.jsonl").read_text().splitlines() if l.strip()}
     rows: dict[tuple[int, str], dict] = {}
     for r in runs:
-        f = EVALS / f"result_blind_r{r}.json"
+        f = EVALS / "results" / f"result_blind_r{r}.json"
         if not f.exists():
             print(f"aviso: falta {f.name}, la run {r} se omite", file=sys.stderr)
             continue

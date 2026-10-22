@@ -12,7 +12,7 @@ Fases (coste: ≤10 llamadas gemini-3.1-flash-lite; el resto 0):
   U2  negro → ítems de presencia = 0 y Score_B2 ≤ 0.30.
   U4  orden → Score_B2(default) − Score_B2(idle) ≥ 0.10.
 
-Persiste evals/result_fase2_b2.json. Exit 0 solo si U1-U6 cumplen todos.
+Persiste evals/results/result_fase2_b2.json. Exit 0 solo si U1-U6 cumplen todos.
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ import juez_b2
 
 ROOT = HERE.parents[1]
 REPO_EGS = "/mnt/c/EG"
-OUT_JSON = ROOT / "evals" / "result_fase2_b2.json"
+OUT_JSON = ROOT / "evals" / "results" / "result_fase2_b2.json"
 RESULTS = HERE / "results"
 FRAMES_H15 = RESULTS / "b2_etapa1" / "cap1" / "frames"
 WORKSPACE = Path("/mnt/c/EG/workspace/current")

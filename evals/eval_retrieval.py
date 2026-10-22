@@ -1,7 +1,7 @@
 """Nivel 1: precisión de retrieval (mecánico, 0 llamadas LLM).
 
 Por cada pregunta del golden set: retriever.search(q, top_k=10) y métricas
-recall@1/3/5 + MRR contra el doc_id objetivo. Salida: tabla + evals/result_retrieval.json.
+recall@1/3/5 + MRR contra el doc_id objetivo. Salida: tabla + evals/results/result_retrieval.json.
 """
 from __future__ import annotations
 
@@ -40,7 +40,7 @@ def main() -> dict:
     agg = {"n": n, "recall@1": round(r1 / n, 3), "recall@3": round(r3 / n, 3),
            "recall@5": round(r5 / n, 3), "MRR@10": round(rr_sum / n, 3)}
     print(f"\nrecall@1={agg['recall@1']} recall@3={agg['recall@3']} recall@5={agg['recall@5']} MRR@10={agg['MRR@10']}")
-    (EVALS / "result_retrieval.json").write_text(json.dumps({"aggregate": agg, "rows": out}, indent=1))
+    (EVALS / "results" / "result_retrieval.json").write_text(json.dumps({"aggregate": agg, "rows": out}, indent=1))
     return agg
 
 

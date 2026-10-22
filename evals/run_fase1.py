@@ -17,7 +17,7 @@ esqueleto que las filas del A/B). El juicio R4/R5 va aparte, con el juez
 reproducible del Hito 2:
 
     JUDGE_MODEL=gemini-3.1-flash-lite Q1_BASE_URL=... Q1_API_KEY=... \
-      python evals/eval_q1_r4r5.py --arm=H1 --file=evals/result_fase1_h1.json
+      python evals/eval_q1_r4r5.py --arm=H1 --file=evals/results/result_fase1_h1.json
 """
 from __future__ import annotations
 
@@ -35,7 +35,7 @@ from run_dimension_d import GOAL, TECNICAS
 from bibliotecario.agent.tools import instantiate_agent_template
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "evals" / "result_fase1_h1.json"
+OUT = ROOT / "evals" / "results" / "result_fase1_h1.json"
 ARM = "H1"
 
 

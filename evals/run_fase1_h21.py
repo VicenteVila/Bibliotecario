@@ -48,14 +48,14 @@ from bibliotecario.agent.tools import (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-H1 = ROOT / "evals" / "result_fase1_h1.json"
-H1R = ROOT / "evals" / "result_fase1_h1r.json"
-H13 = ROOT / "evals" / "result_fase1_h13.json"
-H14 = ROOT / "evals" / "result_fase1_h14.json"
-H17 = ROOT / "evals" / "result_fase1_h17.json"
-H18 = ROOT / "evals" / "result_fase1_h18.json"
-OUT = ROOT / "evals" / "result_fase1_h21.json"
-JUICIOS = ROOT / "evals" / "result_q1_r4r5.json"
+H1 = ROOT / "evals" / "results" / "result_fase1_h1.json"
+H1R = ROOT / "evals" / "results" / "result_fase1_h1r.json"
+H13 = ROOT / "evals" / "results" / "result_fase1_h13.json"
+H14 = ROOT / "evals" / "results" / "result_fase1_h14.json"
+H17 = ROOT / "evals" / "results" / "result_fase1_h17.json"
+H18 = ROOT / "evals" / "results" / "result_fase1_h18.json"
+OUT = ROOT / "evals" / "results" / "result_fase1_h21.json"
+JUICIOS = ROOT / "evals" / "results" / "result_q1_r4r5.json"
 ARM = "H21"
 E_ARM = "E13"   # HITO14 §0: patrón E13 como puerta forense.
 MAX_ROUNDS = 10       # HITO11 §1.B: cola profunda de ReASearch, V1 blindado por span.

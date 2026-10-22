@@ -93,8 +93,8 @@ los cuatro criterios** — no se relaja nada, se empieza desde lo ya probado.
 
 ## §3 Runner
 
-`evals/run_fase1_h14.py` → `evals/result_fase1_h14.json` (filas `H14`) y
-juicios `arm="H14", run=ronda` en `evals/result_q1_r4r5.json` (H1, H1R,
+`evals/run_fase1_h14.py` → `evals/results/result_fase1_h14.json` (filas `H14`) y
+juicios `arm="H14", run=ronda` en `evals/results/result_q1_r4r5.json` (H1, H1R,
 H12, H13 sin tocar).
 
 - Ronda 0: guardado + juicio fresco de la base §1 + saneo de disco M4.

@@ -79,7 +79,7 @@ commit+push.
   la cabeza), M4, M1+M5 span, causas e idempotencia iguales a H18-H19;
   cambios: `_calibracion` con filas H18 bajo fuente completa (E13) y
   juicio con `fuente_completa(tech)` cacheada por técnica.
-- Filas: `evals/result_fase1_h20.json` + juicios `arm="H20"` (y `E13`).
+- Filas: `evals/results/result_fase1_h20.json` + juicios `arm="H20"` (y `E13`).
   El brazo declarado `H19` (Hito 12) quedó sin filas por el abort de E12 y
   **no se reutiliza**.
 

@@ -37,18 +37,18 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from run_dimension_d import GOAL, TECNICAS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "evals" / "result_fase2_h2.json"
+OUT = ROOT / "evals" / "results" / "result_fase2_h2.json"
 ARM = "H2"
 HERRAMIENTAS_LOOP = ("deep_sweep", "search_papers", "retrieve_evidence", "get_subgraph")
 
 
 def _blueprint_juzgado(technique: str) -> str:
     """Texto del blueprint de Fase 1: el reparado si existe, si no el original."""
-    reparados = json.loads((ROOT / "evals" / "result_fase1_h1r.json").read_text(encoding="utf-8"))
+    reparados = json.loads((ROOT / "evals" / "results" / "result_fase1_h1r.json").read_text(encoding="utf-8"))
     for fila in reparados:
         if fila.get("technique") == technique and fila.get("ok"):
             return fila["blueprint"]
-    originales = json.loads((ROOT / "evals" / "result_fase1_h1.json").read_text(encoding="utf-8"))
+    originales = json.loads((ROOT / "evals" / "results" / "result_fase1_h1.json").read_text(encoding="utf-8"))
     for fila in originales:
         if fila.get("technique") == technique and fila.get("ok"):
             return fila["blueprint"]

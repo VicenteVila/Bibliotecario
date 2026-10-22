@@ -47,7 +47,7 @@ from evals.judge import JUDGE_MODEL, judge, judge_abstention
 
 
 def save(out, agg=None, path: Path | None = None, meta: dict | None = None):
-    (path or (EVALS / "result_end2end.json")).write_text(
+    (path or (EVALS / "results" / "result_end2end.json")).write_text(
         json.dumps({"meta": meta or {}, "aggregate": agg or {}, "rows": out},
                    indent=1, ensure_ascii=False),
         encoding="utf-8")

@@ -22,8 +22,8 @@ Qué hace, por cada uno de los 5 arneses:
    juzga (no se reutilizan juicios).
 
 Escrituras idempotentes: filas `arm="H17"` en
-`evals/result_fase1_h17.json` y juicios `arm="H17", run=ronda` en
-`evals/result_q1_r4r5.json` (H1…H16 sin tocar). Re-ejecutar el script
+`evals/results/result_fase1_h17.json` y juicios `arm="H17", run=ronda` en
+`evals/results/result_q1_r4r5.json` (H1…H16 sin tocar). Re-ejecutar el script
 retoma por el último juicio.
 
 Uso (env del juez obligatoria: sin ella se aborta):
@@ -60,12 +60,12 @@ from bibliotecario.agent.tools import (
 from bibliotecario.knowledge import procedural as P
 
 ROOT = Path(__file__).resolve().parents[1]
-H1 = ROOT / "evals" / "result_fase1_h1.json"
-H1R = ROOT / "evals" / "result_fase1_h1r.json"
-H13 = ROOT / "evals" / "result_fase1_h13.json"
-H14 = ROOT / "evals" / "result_fase1_h14.json"
-OUT = ROOT / "evals" / "result_fase1_h17.json"
-JUICIOS = ROOT / "evals" / "result_q1_r4r5.json"
+H1 = ROOT / "evals" / "results" / "result_fase1_h1.json"
+H1R = ROOT / "evals" / "results" / "result_fase1_h1r.json"
+H13 = ROOT / "evals" / "results" / "result_fase1_h13.json"
+H14 = ROOT / "evals" / "results" / "result_fase1_h14.json"
+OUT = ROOT / "evals" / "results" / "result_fase1_h17.json"
+JUICIOS = ROOT / "evals" / "results" / "result_q1_r4r5.json"
 ARM = "H17"
 MAX_ROUNDS = 8        # HITO10 §1.B: techo declarado contra el whack-a-mole.
 MAX_LOC = 36          # HITO10 §1.B: presupuesto global de localizadores.

@@ -27,7 +27,7 @@ from run_blueprint_ab import RUNS, _corpus, _techniques, score
 from bibliotecario import api
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "evals" / "result_arm_g.json"
+OUT = ROOT / "evals" / "results" / "result_arm_g.json"
 ARM = "G"
 
 
@@ -48,7 +48,7 @@ def main() -> None:
     global OUT, ARM
     ap = argparse.ArgumentParser()
     ap.add_argument("--arm", default="G")
-    ap.add_argument("--out", default="evals/result_arm_g.json")
+    ap.add_argument("--out", default="evals/results/result_arm_g.json")
     a = ap.parse_args()
     ARM = a.arm
     OUT = Path(a.out) if Path(a.out).is_absolute() else ROOT / a.out

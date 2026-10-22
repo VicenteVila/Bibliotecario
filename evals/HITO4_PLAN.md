@@ -107,7 +107,7 @@ como sección propia con los veredictos H5-H8+C1 y qué hilos quedan abiertos.
 
 ## 6. Resultado — 2026-10-16 — **HITO4: CUMPLE (5/5)**
 
-Corrida oficial `evals/run_hito4_meta.py` → `evals/result_hito4_meta.json`
+Corrida oficial `evals/run_hito4_meta.py` → `evals/results/result_hito4_meta.json`
 (DB hermética, 5 runs guionizadas, **0 tokens**), tras la ratificación del
 dueño de §2. Umbrales intactos: ninguno se tocó.
 

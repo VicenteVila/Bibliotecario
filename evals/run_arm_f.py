@@ -24,7 +24,7 @@ from run_blueprint_ab import RUNS, _corpus, _techniques, score
 from bibliotecario import api
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "evals" / "result_arm_f.json"
+OUT = ROOT / "evals" / "results" / "result_arm_f.json"
 ARM = "F"
 
 
@@ -84,7 +84,7 @@ def _resumen(rs: list[dict]) -> None:
     print(f"  B9  comillados(def. antigua)/run   {m(lambda c: c['comillados_literales']):.2f}")
     print(f"  B11 frases copiadas/run            {m(lambda c: c['frases_largas_copiadas']):.2f}   [umbral == 0]")
     print(f"  blueprints sin NINGUNA cita        {sum(1 for r in ok if r['checks']['citas']==0)}")
-    print("\n  R4 se puntúa aparte: eval_q1_r4r5.py --arm=F --file=evals/result_arm_f.json")
+    print("\n  R4 se puntúa aparte: eval_q1_r4r5.py --arm=F --file=evals/results/result_arm_f.json")
 
 
 if __name__ == "__main__":

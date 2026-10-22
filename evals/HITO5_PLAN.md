@@ -104,11 +104,11 @@ Tres hechos de los que parte el diseño:
 ## 3. Diseño de medición — `evals/run_fase1_h12.py`
 
 - **Campaña única, ambas escrituras idempotentes:**
-  - `evals/result_fase1_h12.json` — una fila por arnés y ronda (`arm="H12"`,
+  - `evals/results/result_fase1_h12.json` — una fila por arnés y ronda (`arm="H12"`,
     `round=0..3`): blueprint, informe mecánico (huérfanas, violaciones),
     `score()` (punteros y resueltas), `dir`. Re-ejecutar retoma por la última
     fila.
-  - `evals/result_q1_r4r5.json` — los juicios se escriben **allí mismo**
+  - `evals/results/result_q1_r4r5.json` — los juicios se escriben **allí mismo**
     (`arm="H12"`, `run=round`) vía `q1()` importado; las filas `H1`/`H1R` no
     se tocan y `eval_q1_r4r5.py --arm=H12` no re-juzga lo ya juzgado.
 - **Algoritmo por arnés:** si no hay juicio de la ronda actual → juzgar la
@@ -162,7 +162,7 @@ Corrida oficial `evals/run_fase1_h12.py` tras la ratificación del dueño
 (question tool: «Ratificar y medir ya») y con el env del juez confirmada por
 él (`gemini-3.1-flash-lite` @ endpoint OpenAI-compat de Google con
 `GEMINI_API_KEY`). **Ningún umbral se tocó.** Datos: filas `arm="H12"` en
-`evals/result_fase1_h12.json` + juicios en `evals/result_q1_r4r5.json`
+`evals/results/result_fase1_h12.json` + juicios en `evals/results/result_q1_r4r5.json`
 (las filas `H1`/`H1R` quedan intactas).
 
 | criterio | umbral (ratificado) | medido | veredicto |

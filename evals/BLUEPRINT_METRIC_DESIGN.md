@@ -598,8 +598,8 @@ Sin este A/B, P1 seria exactamente el error que documenta la Errata 1 del Hito
 ### 5.8 Resultados — lo que midió el A/B (2026-10-11)
 
 Se corrieron los cuatro brazos sobre las mismas 5 técnicas × 3 runs = 15
-blueprints cada uno. Los resultados viven en `evals/result_blueprint_ab.json`;
-los del juez, en `evals/result_q1_r4r5.json`. Se fijaron los umbrales y el
+blueprints cada uno. Los resultados viven en `evals/results/result_blueprint_ab.json`;
+los del juez, en `evals/results/result_q1_r4r5.json`. Se fijaron los umbrales y el
 criterio **antes** de la primera run (§6 dec. 3).
 
 #### 5.8.1 Forma — el suelo mecánico (§3.1)

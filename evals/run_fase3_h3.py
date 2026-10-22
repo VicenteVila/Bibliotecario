@@ -31,7 +31,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "evals" / "result_fase3_h3.json"
+OUT = ROOT / "evals" / "results" / "result_fase3_h3.json"
 GOLDEN = ROOT / "evals" / "golden_qa.jsonl"
 ARM = "H3"
 

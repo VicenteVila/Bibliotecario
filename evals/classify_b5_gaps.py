@@ -14,7 +14,7 @@ tres categorías son deterministas sobre el texto del módulo:
 Solo corre sobre blueprints **ya generados**: 0 llamadas de generación, 0
 tokens. Es la prueba de que la clasificación de §8.9 no es una lectura.
 
-Uso:  python evals/classify_b5_gaps.py --arm=H --file=evals/result_arm_h.json
+Uso:  python evals/classify_b5_gaps.py --arm=H --file=evals/results/result_arm_h.json
 """
 
 from __future__ import annotations
@@ -88,13 +88,13 @@ def main() -> None:
     a = ap.parse_args()
 
     armen = a.arm
-    path = Path(a.file) if a.file else ROOT / "evals" / f"result_arm_{armen.lower()}.json"
+    path = Path(a.file) if a.file else ROOT / "evals" / "results" / f"result_arm_{armen.lower()}.json"
 
     if a.all:
         print(f"  {'brazo':6} {'mód':>4} {'cita':>5} {'B5':>7}  "
               f"{'exentas':>7} {'notación':>8} {'sin atrib':>9}")
         print("  " + "-" * 56)
-        for p in sorted((ROOT / "evals").glob("result_arm_*.json")):
+        for p in sorted((ROOT / "evals").glob("results/result_arm_*.json")):
             rows = [r for r in json.loads(p.read_text(encoding="utf-8"))
                     if r.get("ok") and (r.get("blueprint") or "").strip()]
             if not rows:

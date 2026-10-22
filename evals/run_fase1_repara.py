@@ -13,7 +13,7 @@ Uso (con la rotación por defecto del agente, como la generación):
 
     .venv/bin/python evals/run_fase1_repara.py
     JUDGE_MODEL=gemini-3.1-flash-lite Q1_BASE_URL=... Q1_API_KEY=... \
-      .venv/bin/python evals/eval_q1_r4r5.py --arm=H1R --file=evals/result_fase1_h1r.json
+      .venv/bin/python evals/eval_q1_r4r5.py --arm=H1R --file=evals/results/result_fase1_h1r.json
 """
 from __future__ import annotations
 
@@ -30,9 +30,9 @@ from run_dimension_d import TECNICAS
 from bibliotecario.agent.tools import BLUEPRINT_MAX_TOKENS, generate
 
 ROOT = Path(__file__).resolve().parents[1]
-H1 = ROOT / "evals" / "result_fase1_h1.json"
-H1J = ROOT / "evals" / "result_q1_r4r5.json"
-OUT = ROOT / "evals" / "result_fase1_h1r.json"
+H1 = ROOT / "evals" / "results" / "result_fase1_h1.json"
+H1J = ROOT / "evals" / "results" / "result_q1_r4r5.json"
+OUT = ROOT / "evals" / "results" / "result_fase1_h1r.json"
 ARM = "H1R"
 
 _PROMPT = """Estás reparando un blueprint del sistema Bibliotecario.

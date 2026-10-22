@@ -50,7 +50,7 @@ from evals.judge import judge
 
 LOOP.STRICT_FALLBACK = True
 
-OUT = EVALS / "result_probe_extraction.json"
+OUT = EVALS / "results" / "result_probe_extraction.json"
 DEFAULT_Q = ["wiki-b1", "wiki-b7", "tce-b7"]
 # Scores del brazo ancho, medidos en las 3 runs ciegas validadas.
 WIDE = {"wiki-b1": [2, 2, 2], "wiki-b7": [2, 2, 2], "tce-b7": [4, 4, 4]}

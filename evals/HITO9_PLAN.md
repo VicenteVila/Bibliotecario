@@ -82,8 +82,8 @@ Idénticos a HITO7/HITO8 §2 — no se re-baja nada:
 
 ## §3 Runner
 
-`evals/run_fase1_h16.py` → `evals/result_fase1_h16.json` (filas `H16`) y
-juicios `arm="H16"` en `evals/result_q1_r4r5.json` (H1…H15 sin tocar).
+`evals/run_fase1_h16.py` → `evals/results/result_fase1_h16.json` (filas `H16`) y
+juicios `arm="H16"` en `evals/results/result_q1_r4r5.json` (H1…H15 sin tocar).
 Base, M4, validación tras edición, causas, idempotencia y env obligatoria:
 igual que HITO8 §3, con `MAX_ROUNDS=6` y `loc["salida"]` cruda.
 

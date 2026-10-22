@@ -1,7 +1,7 @@
 # HITO 14 — H1 intento 9 redeclarado: puerta forense (brazo `H21`)
 
 **Declaración escrita ANTES de medir.** Evidencia ya registrada sin tocar nada:
-E13 (Hito 13, `evals/result_q1_r4r5.json`, 2026-10-17) y su forense en
+E13 (Hito 13, `evals/results/result_q1_r4r5.json`, 2026-10-17) y su forense en
 `evals/HITO13_PLAN.md` §5. Este plan solo redeclara la puerta y el intento 9
 tras la decisión **A** del dueño («intento 9 con puerta forense»).
 

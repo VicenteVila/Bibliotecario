@@ -112,7 +112,7 @@ def medir(technique: str) -> dict:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default="evals/result_dimension_d.json")
+    ap.add_argument("--out", default="evals/results/result_dimension_d.json")
     args = ap.parse_args()
 
     filas = [medir(t) for t in TECNICAS]

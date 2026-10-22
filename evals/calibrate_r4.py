@@ -37,7 +37,7 @@ from bibliotecario.core.llm import _endpoint, _openai_compat_usage
 
 ROOT = Path(__file__).resolve().parents[1]
 GOLD = ROOT / "evals" / "calib_r4_gold.json"
-OUT = ROOT / "evals" / "result_calib_r4.json"
+OUT = ROOT / "evals" / "results" / "result_calib_r4.json"
 
 JUDGE_MODEL = "openai/gpt-oss-20b"
 JUDGE_PROVIDER = "nvidia"
@@ -191,7 +191,7 @@ def _contexto_blueprints() -> list[str]:
     blueprint. El juez juzgaba si la etiqueta existía sobre una frase que yo le
     estaba escribiendo yo mismo, y en dos items seguidos no la daba por buena.
     """
-    f = ROOT / "evals" / "result_blueprint_ab.json"
+    f = ROOT / "evals" / "results" / "result_blueprint_ab.json"
     if not f.exists():
         return []
     return [r["blueprint"] for r in json.loads(f.read_text(encoding="utf-8"))

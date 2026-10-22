@@ -23,8 +23,8 @@ Qué hace, por cada uno de los 5 arneses (TCE incluido):
    tres fallos seguidos = arnés fallo (sin ronda 4).
 
 Escrituras idempotentes: blueprints/estado mecánico en
-`evals/result_fase1_h13.json` (filas `arm="H13"`, `round`), juicios en el
-compartido `evals/result_q1_r4r5.json` (`arm="H13"`, `run=round` — las filas
+`evals/results/result_fase1_h13.json` (filas `arm="H13"`, `round`), juicios en el
+compartido `evals/results/result_q1_r4r5.json` (`arm="H13"`, `run=round` — las filas
 `H1`/`H1R`/`H12` no se tocan). Re-ejecutar el script retoma por el último
 juicio.
 
@@ -65,10 +65,10 @@ from bibliotecario.knowledge import procedural as P
 from bibliotecario.knowledge.study import normalize_pointers
 
 ROOT = Path(__file__).resolve().parents[1]
-H1 = ROOT / "evals" / "result_fase1_h1.json"
-H1R = ROOT / "evals" / "result_fase1_h1r.json"
-OUT = ROOT / "evals" / "result_fase1_h13.json"
-JUICIOS = ROOT / "evals" / "result_q1_r4r5.json"
+H1 = ROOT / "evals" / "results" / "result_fase1_h1.json"
+H1R = ROOT / "evals" / "results" / "result_fase1_h1r.json"
+OUT = ROOT / "evals" / "results" / "result_fase1_h13.json"
+JUICIOS = ROOT / "evals" / "results" / "result_q1_r4r5.json"
 ARM = "H13"
 MAX_ROUNDS = 3  # HITO6 §3: base + hasta 3 rondas; no hay ronda 4.
 MAX_INTENTOS = 2  # HITO6 §1.B: 1 reintento de validación; 2.º = arnés fallo.

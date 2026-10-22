@@ -84,7 +84,7 @@ def main() -> None:
             print(f"  {cond:5} cobertura {covs} de {len(kws)}   faltan(base)={faltan}",
                   flush=True)
 
-    Path("evals/result_close_diversity.json").write_text(
+    Path("evals/results/result_close_diversity.json").write_text(
         json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
 
     print("\n" + "=" * 68)
@@ -97,7 +97,7 @@ def main() -> None:
                     for a in d["answers"][cond]]
             fila[grupo] = st.mean(vals)
         print(f"{cond:10} {fila['residuo']:>17.1%} {fila['control']:>17.1%}")
-    print("guardado evals/result_close_diversity.json")
+    print("guardado evals/results/result_close_diversity.json")
 
 
 if __name__ == "__main__":

@@ -47,7 +47,7 @@ def main() -> dict:
     # Nota media por pregunta en las 3 runs, para correlacionar.
     scores: dict[str, list] = {}
     for r in (1, 2, 3):
-        f = EVALS / f"result_blind_r{r}.json"
+        f = EVALS / "results" / f"result_blind_r{r}.json"
         if not f.exists():
             continue
         for row in json.loads(f.read_text())["rows"]:
@@ -114,14 +114,14 @@ def main() -> dict:
         print(f"  {o['id']:10} visible={o['frac_visible']:.2f} truncado={o['frac_truncado']:.2f} "
               f"invisible={o['frac_invisible']:.2f} judge={o['judge_mean']}")
 
-    (EVALS / "result_visibility.json").write_text(
+    (EVALS / "results" / "result_visibility.json").write_text(
         json.dumps({"aggregate": {"n": len(out),
                                   "frac_visible_media": round(st.mean([o["frac_visible"] for o in out]), 3),
                                   "frac_truncado_media": round(st.mean([o["frac_truncado"] for o in out]), 3),
                                   "frac_invisible_media": round(st.mean([o["frac_invisible"] for o in out]), 3),
                                   "por_categoria": {c: len(v) for c, v in by_cat.items()}},
                     "rows": out}, indent=1, ensure_ascii=False))
-    print(f"\n-> {EVALS / 'result_visibility.json'}")
+    print(f"\n-> {EVALS / 'results' / 'result_visibility.json'}")
     return out
 
 

@@ -66,10 +66,15 @@ Python **siempre** con `.venv/bin/python` (no `python` suelto).
 - El juez B-2 (`evals/preflight/juez_b2.py`) tiene un **fallo de grounding
   medido**: inventa contenido sobre frames negros (U2). No confíes en un
   Score_B2 sin leer `evals/HITO16_PLAN.md` §5.
-- `Score_final` en `result_fase2_b2.json` es **dato, no nota**, si la corrida
-  es NO CUMPLE.
+- `Score_final` en `evals/results/result_fase2_b2.json` es **dato, no nota**,
+  si la corrida es NO CUMPLE.
 - Los gates y corridas oficiales viven en `evals/preflight/`; los runners
   necesitan env (`Q1_API_KEY`, `Q1_BASE_URL`) — el patrón exacto de export
   está documentado en `_endpoint()` de `juez_b2.py`.
+- Sed de mudanza `s|evals/result_|evals/results/|g` **come el prefijo
+  `result_`** (deja `evals/results/fase2_b2.json`). Usa
+  `s|evals/result_|evals/results/result_|g` y verifica con un path conocido
+  (que `evals/results/result_fase2_b2.json` exista y las rutas citadas en
+  doc apunten a él) antes de confiar en el barrido.
 - Si algo de la raíz de `evals/` no aparece en `evals/README.md`, añádelo
   ahí al crearlo: el mapa se mantiene con cada cambio.

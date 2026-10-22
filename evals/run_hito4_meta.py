@@ -22,7 +22,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "evals" / "result_hito4_meta.json"
+OUT = ROOT / "evals" / "results" / "result_hito4_meta.json"
 ARM = "HITO4"
 
 _TOOL_OK = '```json\n{"tool": "get_status", "args": {}}\n```'

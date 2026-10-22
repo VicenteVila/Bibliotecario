@@ -27,7 +27,7 @@ from bibliotecario.core import llm as LLM
 os.environ.setdefault("LLM_PROVIDERS", "nvidia")
 LOOP.STRICT_FALLBACK = True
 
-OUT = EVALS / "result_early_exit.json"
+OUT = EVALS / "results" / "result_early_exit.json"
 DEFAULT_IDS = ["reas-b2", "reas-b6", "tce-b4"]
 
 

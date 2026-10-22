@@ -36,7 +36,7 @@ from evals.eval_end2end import run_one  # noqa: E402
 from evals.judge import JUDGE_MODEL  # noqa: E402
 
 ROOT = EVALS.parent
-OUT = ROOT / "evals" / "result_fase4_h4.json"
+OUT = ROOT / "evals" / "results" / "result_fase4_h4.json"
 GOLDEN = ROOT / "evals" / "golden_qa.jsonl"
 ARM = "H4"
 TEMP = 0.0

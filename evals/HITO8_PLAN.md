@@ -89,8 +89,8 @@ Idénticos a HITO7 §2 — no se re-baja nada:
 
 ## §3 Runner
 
-`evals/run_fase1_h15.py` → `evals/result_fase1_h15.json` (filas `H15`) y
-juicios `arm="H15", run=ronda` en `evals/result_q1_r4r5.json` (H1…H14 sin
+`evals/run_fase1_h15.py` → `evals/results/result_fase1_h15.json` (filas `H15`) y
+juicios `arm="H15", run=ronda` en `evals/results/result_q1_r4r5.json` (H1…H14 sin
 tocar; solo-adición).
 
 - Base por arnés = **mejor estado aprobado conocido** (cadena H14 → H13 →

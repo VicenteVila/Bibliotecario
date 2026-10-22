@@ -89,7 +89,7 @@ por blueprint, 0 llamadas LLM.
   bucle, M1+M5 span, causas e idempotencia **iguales a H18**; cambios:
   fuente por blueprint (§1.B) y **fase E12 con abort** (§1.D; juicios
   `arm="E12"` en `result_q1_r4r5.json`, re-ejecutable).
-- Filas: `evals/result_fase1_h19.json` + juicios `arm="H19"`.
+- Filas: `evals/results/result_fase1_h19.json` + juicios `arm="H19"`.
 
 ## §4 Disciplina
 

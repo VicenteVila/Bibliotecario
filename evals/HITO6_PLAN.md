@@ -75,8 +75,8 @@ base — directamente comparables con 4/5 y 2/5 del intento 2.
 
 ## §3 Runner
 
-`evals/run_fase1_h13.py` → `evals/result_fase1_h13.json` (filas `H13`) y
-juicios `arm="H13", run=ronda` en `evals/result_q1_r4r5.json` (H1, H1R, H12
+`evals/run_fase1_h13.py` → `evals/results/result_fase1_h13.json` (filas `H13`) y
+juicios `arm="H13", run=ronda` en `evals/results/result_q1_r4r5.json` (H1, H1R, H12
 sin tocar).
 
 - **Ronda 0**: juicio fresco de la base H1R/H1 con el mismo instrumento —

@@ -70,7 +70,7 @@ gravedad, coyote time, cámara). Estructura:
    - `negro` — sintético `ffmpeg -f lavfi -i color=c=black:s=1280x720` (control).
 4. **5 evaluaciones lógicas**: default (U1+U3a) · default 2.ª corrida (U3b) ·
    negro (U2) · idle (U4).
-5. Persiste `evals/result_fase2_b2.json`: por caso ítems, categorías,
+5. Persiste `evals/results/result_fase2_b2.json`: por caso ítems, categorías,
    Score_B2, usage/tokens, umbral cumplido + BUILD, M_B1, Score final.
 
 ### 1.4 `evals/preflight/pi_scripts/idle.json`
@@ -149,7 +149,7 @@ Commit messages en español ASCII sin acentos.
 **CERRADO 2026-10-22 · NO CUMPLE.** Corrida oficial única con medición
 (intento 4) sobre los umbrales ratificados el 2026-10-21, sin tocar nada
 tras medir. **U1 · U3 · U5 · U6 OK — U2 y U4 FALLAN con evidencia**; queda
-decisión del dueño (§2). Evidencia: `evals/result_fase2_b2.json` +
+decisión del dueño (§2). Evidencia: `evals/results/result_fase2_b2.json` +
 `evals/preflight/results/b2_etapa2/`.
 
 ### Disciplina §4 — commits
@@ -177,7 +177,7 @@ juez (prompt/temp/modelo), rúbrica, pesos, umbrales ni frames.
 
 ### Corrida oficial (intento 4, 2026-10-22) — gates
 
-| gate | ok | detalle literal de `evals/result_fase2_b2.json` |
+| gate | ok | detalle literal de `evals/results/result_fase2_b2.json` |
 |---|---|---|
 | **U1** | ✅ | 15/15 ítems · scores∈{0,0.5,1}=True · justif 15/15 · intentos 1/2 |
 | **U2** | ❌ | presencia=0: **0/10** (≠0: `B2-D-01…D-04`, `B2-V-01…03`, `B2-V-05`, `B2-A-02`, `B2-A-03`) · `Score_B2_negro=0.7762` (≤0.30 exigido) |

@@ -1,6 +1,7 @@
 # `evals/` — qué es cada cosa
 
-163 ficheros en la raíz, más `logs/` (37) y `preflight/` (159). Esta es la
+74 ficheros en la raíz, más `results/` (89), `logs/` (37) y `preflight/`
+(159). Esta es la
 clase de cada uno, el decodificador de nombres y las reglas. Los
 **veredictos por hito** no se duplican aquí: viven en la tabla «el Hito N»
 de `CONOCIMIENTO.md` §8 (fuente única).
@@ -9,8 +10,8 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 
 | clase | n | dónde | qué es | regla |
 |---|---|---|---|---|
-| **Evidencia** `result_*.json` | 89 | raíz | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido |
-| **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `result_<mismo nombre>.json` (raíz) + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
+| **Evidencia** `result_*.json` | 89 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
+| **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
 | **Planes y reportes** `HITO*.md` + specs | 23 | raíz | 17 hitos (`HITO0-2.md` reportes; `HITO3-16_PLAN.md` planes con §0 estado → §5 cierre/veredicto) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
 | **Logs** `*.log` | 37 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
@@ -36,7 +37,7 @@ ver §3 de `HITO16_PLAN.md` y §5.2.1/§5.2.2 de `BENCHMARK_SPEC.md`.
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |
 | `result_blind_*`, `result_abst_*` | ensayos ciegos de QA y pruebas de abstención |
 | `result_smoke_*` | humo (coste mínimo, sin umbral) |
-| `run_<X>.py` → `result_<X>.json` + `logs/run_<X>.log` | trío runner → evidencia → stdout del mismo experimento |
+| `run_<X>.py` → `results/result_<X>.json` + `logs/run_<X>.log` | trío runner → evidencia → stdout del mismo experimento |
 | `*_prev*.json` | corrida anterior conservada antes de repetir (historial, no borrar) |
 
 ## Cómo se ejecuta algo de aquí
@@ -52,6 +53,10 @@ ver §3 de `HITO16_PLAN.md` y §5.2.1/§5.2.2 de `BENCHMARK_SPEC.md`.
 
 Al crear cualquier fichero nuevo en `evals/`, añádelo a la tabla de su clase
 aquí. Si un día se mueve algo a subdirectorios, **el movimiento y el barrido
-de todas las referencias (99 rutas en markdown, 71 en código) van en el MISMO
-commit con la puerta verde**; un enlace roto en la cadena de evidencia es peor
-que el desorden.
+de todas las referencias (busca `grep -rn '<ruta_vieja>'` hasta 0 — en la
+mudanza B2: 19 markdown y 40 .py, 22 rutas únicas) van en el MISMO commit
+con la puerta verde**; un enlace roto en la cadena de evidencia es peor que
+el desorden. Ojo con el sed: `s|evals/result_|evals/results/|g` **come el
+prefijo `result_`** — guarda con `s|evals/result_|evals/results/result_|g`
+y verifica con un path conocido. Los JSON y `.log` en sí **no se editan**:
+solo cambian sus rutas en código y documentación.

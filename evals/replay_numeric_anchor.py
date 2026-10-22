@@ -92,7 +92,7 @@ def main() -> dict:
     chunks = load_chunks()
     allrows = []
     for run in RUNS:
-        f = EVALS / f"result_blind_{run}.json"
+        f = EVALS / "results" / f"result_blind_{run}.json"
         if f.exists():
             allrows.extend(json.loads(f.read_text())["rows"])
 
@@ -121,8 +121,8 @@ def main() -> dict:
     for qid, n in sorted(donde.items(), key=lambda kv: -kv[1]):
         print(f"   {qid:10} {n}")
     out = {"violation_rate": pct, "config": nombre, "por_pregunta": donde}
-    (EVALS / "result_numeric_anchor.json").write_text(json.dumps(out, indent=1))
-    print(f"\n-> {EVALS / 'result_numeric_anchor.json'}")
+    (EVALS / "results" / "result_numeric_anchor.json").write_text(json.dumps(out, indent=1))
+    print(f"\n-> {EVALS / 'results' / 'result_numeric_anchor.json'}")
     return out
 
 

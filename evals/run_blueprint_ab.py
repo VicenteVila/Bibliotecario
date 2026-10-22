@@ -29,7 +29,7 @@ from bibliotecario.knowledge import graph as G
 from bibliotecario.knowledge.study import normalize_pointers
 
 ROOT = Path(__file__).resolve().parents[1]
-OUT = ROOT / "evals" / "result_blueprint_ab.json"
+OUT = ROOT / "evals" / "results" / "result_blueprint_ab.json"
 RUNS = 3
 # P: Medida 1 (declarada 2026-10-21, ver evals/POSICIONAL_PLAN.md) — citas por
 # índice `[N]` mapeadas por código. Se añade sin reabrir B/C/D/E: las runs

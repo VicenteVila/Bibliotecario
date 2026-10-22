@@ -79,7 +79,7 @@ respondibles (una por paper, para medir abstención real). Agente pineado con
 respondibles (4.171 / 4.273 / 4.486; r2 tiene 2 caídas de infraestructura que se
 excluyen de la media). `cite_precision 0.900`, `abstain_rate 0.867`, ~646k
 tokens de agente por run.
-Detalle completo en `evals/REPORT_BLIND.md`; datos en `evals/result_blind_r*.json`.
+Detalle completo en `evals/REPORT_BLIND.md`; datos en `evals/results/result_blind_r*.json`.
 
 Un 504 del proveedor **no cuenta como nota del agente**: la fila lleva
 `infra_error` y queda fuera de `judge_mean`. Sin eso, dos caídas bajaban la media

@@ -110,10 +110,10 @@ def main() -> int:
         print(f"  [{'COGE' if caught else 'PASA'}] {name}  score={s}")
 
     print(f"\n{ok}/{len(results)} defectos cogidos por el juez.")
-    (ROOT / "evals" / "result_judge_calib.json").write_text(
+    (ROOT / "evals" / "results" / "result_judge_calib.json").write_text(
         json.dumps([{"case": n, **r} for n, r in results], ensure_ascii=False, indent=2),
         encoding="utf-8")
-    print("guardado en evals/result_judge_calib.json")
+    print("guardado en evals/results/result_judge_calib.json")
     return 0
 
 

@@ -92,8 +92,8 @@ umbrales ni el instrumento.
   / intento 8 / HITO11 §2-§3. Cadena de base + M4 + bucle + causas +
   escrituras idempotentes **iguales a HITO10**; único cambio de flujo:
   `editar_m5(..., ecos=parse.get("ecos"))`.
-- Filas: `evals/result_fase1_h18.json`; juicios `arm="H18"` en
-  `evals/result_q1_r4r5.json` (H1…H17 sin tocar).
+- Filas: `evals/results/result_fase1_h18.json`; juicios `arm="H18"` en
+  `evals/results/result_q1_r4r5.json` (H1…H17 sin tocar).
 
 ## §4 Disciplina
 

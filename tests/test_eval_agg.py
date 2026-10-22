@@ -508,7 +508,7 @@ def test_umbral_de_exito_no_satura_el_bernoulli():
     import glob
 
     rows = []
-    for f in glob.glob(str(H.EVALS / "result_blind*.json")):
+    for f in glob.glob(str(H.EVALS / "results" / "result_blind*.json")):
         rows += [r for r in json.loads(Path(f).read_text(encoding="utf-8"))["rows"]
                  if not r.get("unanswerable") and not r.get("infra_error")
                  and r.get("judge") is not None]

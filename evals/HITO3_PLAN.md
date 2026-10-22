@@ -215,8 +215,8 @@ El responsable fija o cambia H1-H4. **Nada se mide antes.**
   que §8.10 (`evals/eval_q1_r4r5.py`), vía `Q1_BASE_URL`/`Q1_API_KEY`
   (mecanismo de la dec. 18). Instrumento con 0% de flips medido (§8.12).
 - **Runner y ficheros:** generación en `evals/run_fase1.py` →
-  `evals/result_fase1_h1.json` (filas `arm="H1"`) → juicio con
-  `evals/eval_q1_r4r5.py --arm=H1 --file=evals/result_fase1_h1.json`.
+  `evals/results/result_fase1_h1.json` (filas `arm="H1"`) → juicio con
+  `evals/eval_q1_r4r5.py --arm=H1 --file=evals/results/result_fase1_h1.json`.
 - **Generación:** sin pin de proveedor — la rotación por defecto (Groq →
   NVIDIA → Gemini) y las temperaturas por defecto, exactamente como
   `api.blueprint_p4`; la generación de todos los brazos del Hito 2 corrió
@@ -556,7 +556,7 @@ resultado queda registrado como está.
    **más n o un diseño más estable**, con su propia declaración previa y sin
    tocar este umbral. Esa decisión es del dueño.
 
-**Registro completo:** `evals/result_fase4_h4.json` (`arm="H4"`,
+**Registro completo:** `evals/results/result_fase4_h4.json` (`arm="H4"`,
 `h4: false`, umbrales `u1=true u2=true u3=true u4=false`). Log de la
 corrida en `/tmp/opencode/h4_run.log` (reintentos 503/413 de la rotación
 free tier; ningún cambio de instrumento).

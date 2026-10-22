@@ -16,7 +16,7 @@
   `agent/loop.py` — `run_blueprint(..., positional=False)`;
   `api.blueprint_positional` (brazo P);
   `tests/test_positional_citations.py` (8 tests) — **suite 382/382, ruff limpio**.
-- **Brazos previos** en `evals/result_blueprint_ab.json`: mismas 5 técnicas
+- **Brazos previos** en `evals/results/result_blueprint_ab.json`: mismas 5 técnicas
   (PEARL, Procedural Graphs, ReASearch, Task-CoEvolve, WikiSkill) × 3 runs ×
   brazos B/C/D/E. Valores de referencia hoy medidos (promedio/run):
 
