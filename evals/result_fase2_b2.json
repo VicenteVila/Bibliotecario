@@ -22,36 +22,207 @@
   "evaluaciones": {
     "default": {
       "caso": "default",
-      "error": "HTTP Error 503: Service Unavailable",
       "frames": 14,
-      "secs": 52.9,
-      "usage": {}
+      "secs": 9.7,
+      "intentos": 1,
+      "items": {
+        "B2-D-01": 0.0,
+        "B2-D-02": 0.0,
+        "B2-D-03": 1.0,
+        "B2-D-04": 0.0,
+        "B2-D-05": 0.0,
+        "B2-D-06": 0.0,
+        "B2-V-01": 0.5,
+        "B2-V-02": 1.0,
+        "B2-V-03": 1.0,
+        "B2-V-04": 1.0,
+        "B2-V-05": 1.0,
+        "B2-A-01": 1.0,
+        "B2-A-02": 0.5,
+        "B2-A-03": 0.0,
+        "B2-A-04": 0.0
+      },
+      "justificaciones": {
+        "B2-D-01": "El avatar permanece estático en la misma posición horizontal durante todos los frames.",
+        "B2-D-02": "No se observa ningún movimiento vertical ni arco de salto en la secuencia.",
+        "B2-D-03": "El avatar mantiene un contacto estable y constante sobre la plataforma verde.",
+        "B2-D-04": "La cámara es estática y no acompaña ninguna acción del jugador.",
+        "B2-D-05": "No se observa ningún elemento que represente una meta o fin de nivel.",
+        "B2-D-06": "No hay objetos coleccionables presentes en la escena.",
+        "B2-V-01": "Existe un HUD básico con el texto 'Puntos: 0' en la esquina superior izquierda.",
+        "B2-V-02": "El cuadrado rojo es claramente distinguible como el avatar del jugador.",
+        "B2-V-03": "La plataforma verde es claramente visible como geometría de suelo.",
+        "B2-V-04": "La acción principal no está obstruida por ningún elemento de la interfaz.",
+        "B2-V-05": "La escena contiene sprites renderizados de forma consistente.",
+        "B2-A-01": "Existe una coherencia cromática simple entre el fondo, el avatar y la plataforma.",
+        "B2-A-02": "La composición es básica, limitándose a un fondo, una plataforma y un actor.",
+        "B2-A-03": "No se observa ninguna animación o movimiento en el avatar o la escena.",
+        "B2-A-04": "No hay feedback visual al no realizarse ninguna acción observable."
+      },
+      "usage": {
+        "completion_tokens": 601,
+        "prompt_tokens": 16767,
+        "total_tokens": 17368
+      },
+      "D": 0.1667,
+      "V": 0.8,
+      "A": 0.375,
+      "Score_B2": 0.3096
     },
     "default2": {
       "caso": "default2",
-      "error": "HTTP Error 503: Service Unavailable",
       "frames": 14,
-      "secs": 20.6,
-      "usage": {}
+      "secs": 7.7,
+      "intentos": 1,
+      "items": {
+        "B2-D-01": 0.0,
+        "B2-D-02": 0.0,
+        "B2-D-03": 1.0,
+        "B2-D-04": 0.0,
+        "B2-D-05": 0.0,
+        "B2-D-06": 0.0,
+        "B2-V-01": 0.5,
+        "B2-V-02": 1.0,
+        "B2-V-03": 1.0,
+        "B2-V-04": 1.0,
+        "B2-V-05": 1.0,
+        "B2-A-01": 1.0,
+        "B2-A-02": 0.5,
+        "B2-A-03": 0.0,
+        "B2-A-04": 0.0
+      },
+      "justificaciones": {
+        "B2-D-01": "El avatar permanece estático en la misma posición horizontal durante todos los frames.",
+        "B2-D-02": "No se observa ningún movimiento vertical ni arco de salto en la secuencia.",
+        "B2-D-03": "El avatar mantiene un contacto estable y constante sobre la plataforma verde.",
+        "B2-D-04": "La cámara es estática y no acompaña ninguna acción del jugador.",
+        "B2-D-05": "No se observa ningún elemento que represente una meta o fin de nivel.",
+        "B2-D-06": "No hay objetos coleccionables presentes en la escena.",
+        "B2-V-01": "Existe un HUD básico con el texto 'Puntos: 0' en la esquina superior izquierda.",
+        "B2-V-02": "El cuadrado rojo es claramente distinguible como el avatar del jugador.",
+        "B2-V-03": "La plataforma verde es claramente visible como geometría de suelo.",
+        "B2-V-04": "La acción principal no está obstruida por ningún elemento de la interfaz.",
+        "B2-V-05": "La escena contiene sprites renderizados de forma consistente.",
+        "B2-A-01": "Existe una coherencia cromática simple entre el fondo, el avatar y la plataforma.",
+        "B2-A-02": "La composición es básica, limitándose a un fondo, una plataforma y un actor.",
+        "B2-A-03": "No se observa ninguna animación o movimiento en el avatar o la escena.",
+        "B2-A-04": "No hay feedback visual al no realizarse ninguna acción observable."
+      },
+      "usage": {
+        "completion_tokens": 601,
+        "prompt_tokens": 16767,
+        "prompt_tokens_details": {
+          "cached_tokens": 14285
+        },
+        "total_tokens": 17368
+      },
+      "D": 0.1667,
+      "V": 0.8,
+      "A": 0.375,
+      "Score_B2": 0.3096
     },
     "negro": {
       "caso": "negro",
-      "error": "HTTP Error 503: Service Unavailable",
       "frames": 14,
-      "secs": 41.5,
-      "usage": {}
+      "secs": 13.4,
+      "intentos": 1,
+      "items": {
+        "B2-D-01": 1.0,
+        "B2-D-02": 1.0,
+        "B2-D-03": 1.0,
+        "B2-D-04": 1.0,
+        "B2-D-05": 1.0,
+        "B2-D-06": 1.0,
+        "B2-V-01": 1.0,
+        "B2-V-02": 1.0,
+        "B2-V-03": 1.0,
+        "B2-V-04": 1.0,
+        "B2-V-05": 0.5,
+        "B2-A-01": 1.0,
+        "B2-A-02": 0.5,
+        "B2-A-03": 1.0,
+        "B2-A-04": 1.0
+      },
+      "justificaciones": {
+        "B2-D-01": "El avatar se desplaza claramente de izquierda a derecha a lo largo de los frames.",
+        "B2-D-02": "Se observa un arco de salto completo donde el personaje asciende y desciende sobre las plataformas.",
+        "B2-D-03": "El avatar mantiene un contacto estable y coherente con las plataformas de suelo.",
+        "B2-D-04": "La cámara sigue el movimiento del jugador a través del escenario.",
+        "B2-D-05": "Se observa una bandera al final del recorrido que actúa como meta clara.",
+        "B2-D-06": "Hay monedas claramente visibles distribuidas por el nivel.",
+        "B2-V-01": "El HUD es legible y muestra puntuación y tiempo en la parte superior.",
+        "B2-V-02": "El avatar es un sprite nítido y claramente distinguible del entorno.",
+        "B2-V-03": "La geometría de plataformas y suelo es claramente visible en toda la escena.",
+        "B2-V-04": "La acción principal ocurre sin ser obstruida por elementos de la interfaz.",
+        "B2-V-05": "La escena contiene sprites y elementos de juego renderizados de forma consistente.",
+        "B2-A-01": "Existe una paleta de colores integrada y legible entre el fondo, los elementos y el avatar.",
+        "B2-A-02": "La escena presenta una composición básica de capas con fondo y elementos de juego.",
+        "B2-A-03": "El avatar presenta animaciones de movimiento y salto claramente percibibles.",
+        "B2-A-04": "Las acciones de salto y movimiento tienen un feedback visual claro mediante la animación del sprite."
+      },
+      "usage": {
+        "completion_tokens": 764,
+        "prompt_tokens": 16767,
+        "total_tokens": 17531
+      },
+      "D": 1.0,
+      "V": 0.8,
+      "A": 0.875,
+      "Score_B2": 0.7762
     },
     "idle": {
       "caso": "idle",
-      "error": "HTTP Error 503: Service Unavailable",
       "frames": 26,
-      "secs": 32.8,
-      "usage": {}
+      "secs": 50.1,
+      "intentos": 2,
+      "items": {
+        "B2-D-01": 0.0,
+        "B2-D-02": 0.0,
+        "B2-D-03": 1.0,
+        "B2-D-04": 0.0,
+        "B2-D-05": 0.0,
+        "B2-D-06": 0.0,
+        "B2-V-01": 0.5,
+        "B2-V-02": 1.0,
+        "B2-V-03": 1.0,
+        "B2-V-04": 1.0,
+        "B2-V-05": 0.5,
+        "B2-A-01": 1.0,
+        "B2-A-02": 0.5,
+        "B2-A-03": 0.0,
+        "B2-A-04": 0.0
+      },
+      "justificaciones": {
+        "B2-D-01": "El avatar permanece estático en la misma posición horizontal en todos los frames.",
+        "B2-D-02": "No se observa ningún movimiento vertical ni salto en la secuencia.",
+        "B2-D-03": "El avatar se mantiene posicionado de forma estable sobre la plataforma verde en todos los frames.",
+        "B2-D-04": "La cámara es estática y no acompaña ninguna acción del jugador.",
+        "B2-D-05": "No se observa ningún elemento que represente una meta o un objetivo de nivel.",
+        "B2-D-06": "No hay objetos coleccionables presentes en la escena.",
+        "B2-V-01": "El HUD es mínimo, mostrando solo el texto 'Puntos: 0' en la esquina superior izquierda.",
+        "B2-V-02": "El avatar es un cuadrado rojo claramente distinguible sobre el fondo gris.",
+        "B2-V-03": "La plataforma verde es claramente visible como geometría de suelo.",
+        "B2-V-04": "La acción principal no está obstruida por ningún elemento de la interfaz.",
+        "B2-V-05": "La escena contiene elementos básicos renderizados, pero es extremadamente minimalista.",
+        "B2-A-01": "Existe una coherencia cromática simple entre el fondo, el avatar y la plataforma.",
+        "B2-A-02": "La composición es básica, limitándose a un avatar sobre una plataforma sin elementos adicionales.",
+        "B2-A-03": "No hay ninguna animación ni movimiento del avatar o la escena en los frames proporcionados.",
+        "B2-A-04": "No se observa ninguna acción del jugador, por lo tanto no hay feedback visual."
+      },
+      "usage": {
+        "completion_tokens": 621,
+        "prompt_tokens": 29967,
+        "total_tokens": 30588
+      },
+      "D": 0.1667,
+      "V": 0.8,
+      "A": 0.375,
+      "Score_B2": 0.3096
     }
   },
-  "Score_final": null,
-  "llamadas": 8,
-  "tokens_total": 0,
+  "Score_final": 0.4346,
+  "llamadas": 5,
+  "tokens_total": 82855,
   "gates": {
     "U5": {
       "ok": true,
@@ -59,23 +230,23 @@
     },
     "U6": {
       "ok": true,
-      "detalle": "B-1: BUILD=1.0 M_B1=0.8333 · llamadas=8/10 · suite+ruff aparte"
+      "detalle": "B-1: BUILD=1.0 M_B1=0.8333 · llamadas=5/10 · suite+ruff aparte"
     },
     "U1": {
-      "ok": false,
-      "detalle": "error: HTTP Error 503: Service Unavailable"
+      "ok": true,
+      "detalle": "15/15 ítems · scores∈{0,0.5,1}=True · justif=15/15 · intentos=1/2"
     },
     "U2": {
       "ok": false,
-      "detalle": "error: HTTP Error 503: Service Unavailable"
+      "detalle": "presencia=0: 0/10 (≠0: ['B2-D-01', 'B2-D-02', 'B2-D-03', 'B2-D-04', 'B2-V-01', 'B2-V-02', 'B2-V-03', 'B2-V-05', 'B2-A-02', 'B2-A-03']) · Score_B2_negro=0.7762 (≤0.3)"
     },
     "U3": {
-      "ok": false,
-      "detalle": "falta una de las dos corridas de default"
+      "ok": true,
+      "detalle": "ΔScore_B2=0.0 (≤0.1) · Δcategorías={'D': 0.0, 'V': 0.0, 'A': 0.0} (≤0.15 c/u)"
     },
     "U4": {
       "ok": false,
-      "detalle": "falta default o idle"
+      "detalle": "Score_B2(default)=0.3096 − Score_B2(idle)=0.3096 = 0.0 (≥0.1)"
     }
   }
 }
