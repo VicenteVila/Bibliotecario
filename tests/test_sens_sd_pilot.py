@@ -333,12 +333,15 @@ def test_g0_techo_y_escalado():
 def test_g0_presupuesto_reduce_n_o_no_arranca():
     m = {v: {t: (50.0 if v == "A1" else 90.0) for t in G0_TASKS}
          for v in ("A1", "A5")}
-    # 60 celdas x 60k = 3.6M > techo; 40 x 60k = 2.4M <= techo -> N=8
-    ver = _veredicto_g0(m, _cells(60_000))
+    # derivado del techo vigente: 1.2x el techo a 60 celdas, 0.8x a 40 celdas
+    coste_reduccion = TECHO_TOKENS // 50
+    ver = _veredicto_g0(m, _cells(coste_reduccion))
+    assert ver["proyeccion_60"] > TECHO_TOKENS >= ver["proyeccion_40"]
     assert ver["coste"] == "REDUCIR_N_8" and ver["n_final"] == 8
     assert ver["arranca_oficial"]
-    # 60 celdas x 100k y 40 x 100k superan el techo -> no arranca
-    ver2 = _veredicto_g0(m, _cells(100_000))
+    # 4/3 del techo incluso a 40 celdas -> no arranca
+    coste_no_arranca = TECHO_TOKENS // 30
+    ver2 = _veredicto_g0(m, _cells(coste_no_arranca))
     assert ver2["coste"] == "NO_ARRANCA" and not ver2["arranca_oficial"]
     assert ver2["proyeccion_40"] > TECHO_TOKENS
 

@@ -142,6 +142,14 @@ datos. Modelo **fijo** en las cinco.
 ### 1.8 Presupuesto
 - Corrida oficial: K×N = 60 runs × ≤16 turnos, **techo 3M tokens**; reducción
   a `N = 8` solo vía la regla G0 de §1.7 (nunca tras medir).
+- **Enmienda del dueño 2026-10-22 (TRAS G0, ANTES de la corrida oficial)**:
+  techo **3M → 7M**, `N = 12` intacto. Causa: G0 midió 104.787 tokens/celda →
+  proyección **6,29M** (N=12) / 4,19M (N=8), ambas sobre el techo declarado sin
+  estimación previa del coste de ultra. El dueño **acepta además la
+  VENTANA_FALLA del G0 como dato** (A1 media 80.73 vs A5 media 43.64;
+  `A5/dsl-parser = 0.0` por SyntaxError no recuperado) y autoriza el arranque:
+  los gates **U3-U5** deciden si `Sens(x)` discrimina. Nada se re-baja tras
+  medir; la evidencia G0 queda en `results/result_sens_sd_g0.json`.
 
 ## §2 — Umbrales (RATIFICADOS 2026-10-22)
 

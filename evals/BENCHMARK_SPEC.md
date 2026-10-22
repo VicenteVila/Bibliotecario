@@ -1147,6 +1147,7 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | **§5.2.1 FASE B-2 enmienda H17 — prefiltro no-LLM (Opción B) + gate U7 de grounding** | sí | ☑ **2026-10-22** — *decisión del dueño junto con §2 de `HITO17_PLAN.md` (opción B + gates U1-U7), **ANTES de implementar y de medir**; diseño en §1.B del plan; salida propia `evals/results/result_fase2_b2_h17.json` (la de H16 intacta) · **corrida oficial 2026-10-22 → NO CUMPLE** (U2 ✅ por construcción con prefiltro 0 llamadas; **U4 ❌ medido** Δ=0.0 default−idle; U7 sin medir por 503 del endpoint degradado; F1-F3 documentados con coste en `HITO17_PLAN.md` §5)* |
 | **§5.2.1 FASE B-2 enmienda H18 — scorer híbrido (M_mov determinista + juez V/A)** | sí | ☑ **2026-10-22** — *ratificación del dueño junto con §1-§2 de `HITO18_PLAN.md` (diseño + gates U1-U7 con U4′ de movimiento y U7a/U7b), **ANTES de implementar y de medir**; diagnóstico: el juez reporta ausente un movimiento objetivamente presente (0.952 vs 0.046, 20×) — §0 del plan; salida propia `evals/results/result_fase2_b2_h18.json` · **corrida oficial 2026-10-22 → CUMPLE** (8/8 gates · Score_final **0.9187** · U4′ 0.9519/0.0489 determinista · U7b 0.8725/0.0 · U2 por construcción · 5/8 llamadas · §5 del plan)* |
 | **§4.2 + §5.4 enmienda H19 — piloto `Sens(x)` en `software_development`** (`H_aux` K=5 A1-A5 · 12 tareas duras · verificador pytest determinista · traza TraceForge · gates G0 + U1-U7) | sí | ☑ **2026-10-22** — *ratificación del dueño junto con §1-§2 de `HITO19_PLAN.md` (diseño + gates), **ANTES de implementar y de medir**; diseño congelado en §1.B del plan (12 tareas, parámetros A1-A5, esquema de traza) · salidas: `evals/results/result_sens_sd_g0.json` (G0) y `evals/results/result_sens_sd_pilot.json` (oficial) · **corrida oficial → pendiente** (se anota aquí el resultado al cerrar §5)* |
+| **§11 enm. 8 — H19: techo de presupuesto 3M→7M (`N=12` intacto) y aceptación de la VENTANA_FALLA del G0** | sí | ☑ **2026-10-22** — *decisión del dueño **TRAS G0 y ANTES de la corrida oficial**; causa: proyección medida 6.29M (N=12) / 4.19M (N=8) sobre el techo declarado, sin estimación previa del coste de ultra; ventana A1 80.73 vs A5 43.64 aceptada **como dato** (gates U3-U5 deciden si `Sens(x)` discrimina); sin cambio de gates, de `N` ni de `Sens`* |
 | **§5.2.1 fórmula** `Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)` | sí | ☑ **2026-10-14** |
 | **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☑ **2026-10-14** |
 | **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☑ **2026-10-14** |
@@ -1169,9 +1170,11 @@ estáticos tras el primer smoke) y enmienda 4 (2026-10-15, `node_exists`
 admite texto de UI) — ambas sin cambio de kinds ni umbrales.** Posterior
 a esta sección: fila **FASE B-2 ☑ 2026-10-21** (H16, corrida 2026-10-22
 → NO CUMPLE), **enmienda 5 (2026-10-22, H17: prefiltro no-LLM + U7)**,
-**enmienda 6 (2026-10-22, H18: scorer híbrido M_mov + juez V/A)** y
+**enmienda 6 (2026-10-22, H18: scorer híbrido M_mov + juez V/A)**,
 **enmienda 7 (2026-10-22, H19: piloto `Sens(x)` en `software_development` —
-matriz `H_aux` K=5, 12 tareas, gates G0+U1-U7, esquema de traza del piloto)**.
+matriz `H_aux` K=5, 12 tareas, gates G0+U1-U7, esquema de traza del piloto)** y
+**enmienda 8 (2026-10-22, H19: techo 3M→7M y aceptación de VENTANA_FALLA tras
+G0)**.
 Las enmiendas 1 y 2 figuran abajo como registro previo a esa ratificación.
 *(Cualquier cambio futuro tras ratificar se anota aquí con fecha y motivo —
 no se reescribe en silencio.)*

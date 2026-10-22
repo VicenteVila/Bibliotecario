@@ -33,7 +33,7 @@ SD_ROOT = Path(__file__).resolve().parent
 REPO = SD_ROOT.parents[1]
 MODEL = "nvidia/nemotron-3-ultra-550b-a55b"  # §1.5: dueño 2026-10-22 antes de medir
 G0_TASKS = ["checkout-rounding", "dsl-parser"]
-TECHO_TOKENS = 3_000_000  # §1.8: techo de la corrida oficial
+TECHO_TOKENS = 7_000_000  # §1.8: enmienda 2026-10-22 (dueño, tras G0, N=12 intacto)
 STATE_OFICIAL = SD_ROOT / "_run_state_oficial.json"
 TRACES_OFICIAL = SD_ROOT / "traces.sqlite"
 TRACES_OTROS = SD_ROOT / "traces_g0.sqlite"
