@@ -763,6 +763,7 @@ que es **la más débil en ambos arneses** (crítica nº1 de Qwen a ReaWeb:
 
 | busco… | voy a… |
 |---|---|
+| **cómo trabajar en este repo (reglas, puerta, trampas)** | `AGENTS.md` (raíz) · mapa de `evals/` → `evals/README.md` |
 | el propósito del proyecto | `PROPOSITO.md` |
 | la regla con la que se mide | `evals/BENCHMARK_SPEC.md` |
 | las decisiones numeradas | `evals/BLUEPRINT_METRIC_DESIGN.md` §6 |
