@@ -13,9 +13,31 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 | **Evidencia** `result_*.json` | 89 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
 | **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
-| **Planes y reportes** `HITO*.md` + specs | 25 | raíz | 18 hitos (`HITO0-2.md` reportes; `HITO3-18_PLAN.md` planes con §0 estado → §5 cierre/veredicto; todos cerrados salvo que se indique) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
+| **Planes y reportes** `HITO*.md` + specs | 26 | raíz | 19 hitos (`HITO0-2.md` reportes; `HITO3-19_PLAN.md` planes con §0 estado → §5 cierre/veredicto; todos cerrados salvo que se indique) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
 | **Logs** `*.log` | 37 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
 | **Datos** | 9 | `golden_*.jsonl` (datasets gold), `calib_r4_gold.json`, `game_tasks_expanded.yaml` (60 tareas, citado), `CORPUS_LOCK.json` | referenciados por tests/evals → no mover sin barrido |
+
+## `sd_pilot/` — piloto `Sens(x)` (Hito 19, dominio `software_development`)
+
+Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
+§1.B de `HITO19_PLAN.md` (rutas, parámetros, ids, esquema de traza):
+
+| fichero | qué es |
+|---|---|
+| `harness.py` | bucle observe-reason-act + herramientas (`read_file`/`write_file`/`run_tests`), PFs, regulación, skills, trazas |
+| `variants.py` | `VARIANTS` A1-A5 (parámetros congelados) |
+| `tasks.py` | `TASK_IDS` (12), ejes de dureza, `lint_tasks()`, `qa_task()` |
+| `verifier.py` | pytest público (herramienta del agente) y oculto (`m_h(x)`) |
+| `sens.py` | Pearson, `Q_h^(−x)`, gates U2-U7, umbrales congelados |
+| `run_pilot.py` | modos `--g0` / `--oficial` / `--debug-celda` (BUILD) |
+| `skills_pack/` | 4 skills congelados (idénticos en A4 y A5) |
+| `sd_tasks/<id>/` | las 12 fixtures: `TASK.md` + `workspace/` + `tests_hidden/` + `reference/` |
+| `traces.sqlite`, `_run_state_oficial.json` | trazas TraceForge y estado por celda de la corrida oficial (reanudable) |
+
+Evidencia: `results/result_sens_sd_g0.json` (dictámen G0) y
+`results/result_sens_sd_pilot.json` (corrida oficial) + `logs/sens_sd_g0.log`
+y `logs/sens_sd_pilot_run.log`. Tests: `tests/test_sens_sd_pilot.py` (puros,
+sin LLM).
 
 ## `preflight/` (159 ficheros) — la evaluación **viva**
 
@@ -43,12 +65,13 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO18_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22 — scorer B-2 híbrido válido, Score_final 0.9187) |
+| `HITO3_PLAN.md`…`HITO19_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22 — scorer B-2 híbrido válido, Score_final 0.9187; H19 en curso — piloto `Sens(x)`) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |
 | `result_blind_*`, `result_abst_*` | ensayos ciegos de QA y pruebas de abstención |
 | `result_smoke_*` | humo (coste mínimo, sin umbral) |
+| `result_sens_sd_g0.json`, `result_sens_sd_pilot.json` | G0 humo y corrida oficial del **Hito 19** (`Sens(x)`); su stdout es `logs/sens_sd_g0.log` y `logs/sens_sd_pilot_run.log` |
 | `run_<X>.py` → `results/result_<X>.json` + `logs/run_<X>.log` | trío runner → evidencia → stdout del mismo experimento |
 | `*_prev*.json` | corrida anterior conservada antes de repetir (historial, no borrar) |
 

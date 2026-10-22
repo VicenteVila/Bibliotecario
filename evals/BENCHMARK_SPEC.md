@@ -832,6 +832,15 @@ Langfuse / Arize Phoenix… el BudgetTracker es reactivo, no analítico»*.
 > **Congelado:** el esquema de traza, los campos capturados y el punto de
 > instrumentación. Cambiar la instrumentación a mitad de serie invalida `RR(k)`.
 
+**Esquema congelado del piloto HITO19** *(enmienda 7; fijado en §1.B de
+`HITO19_PLAN.md` al ratificar, 2026-10-22)* — collector `sqlite` en
+`evals/sd_pilot/traces.sqlite`; span raíz `agent="sens_pilot"` con metadata
+`{variant, task, model, run_id, max_turns, subsystems}`; hijos `agent="turn"`
+(metadata `{turn}`; input = contexto renderizado, output = respuesta cruda),
+`agent="llm"` (tokens/coste por llamada) y `agent="tool"` (metadata
+`{tool_name}`; input = args, output = resultado truncado);
+`set_metadata_context(variant, task, run_id)` por celda.
+
 ---
 
 ## 6. Harness Card — **obligatoria para cada arnés**
@@ -1137,6 +1146,7 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | **§5.2.1 scorer Capa B — FASE B-2** (`game_development`) = replay + juez multimodal (GameCraft) | sí | ☑ **2026-10-21** — *bloqueo resuelto en Hito 15 (`xdotool`, trazas `Π`); ratificación del dueño junto con §2-§3 de `HITO16_PLAN.md`, **antes de la corrida oficial** · **corrida oficial 2026-10-22 → NO CUMPLE** (U1/U3/U5/U6 ✅; **U2 ❌** juez caucho sobre negro puro 0.7762; **U4 ❌** default−idle = 0.0) — umbrales intactos, evidencia y verificación del instrumento en `evals/HITO16_PLAN.md` §5* |
 | **§5.2.1 FASE B-2 enmienda H17 — prefiltro no-LLM (Opción B) + gate U7 de grounding** | sí | ☑ **2026-10-22** — *decisión del dueño junto con §2 de `HITO17_PLAN.md` (opción B + gates U1-U7), **ANTES de implementar y de medir**; diseño en §1.B del plan; salida propia `evals/results/result_fase2_b2_h17.json` (la de H16 intacta) · **corrida oficial 2026-10-22 → NO CUMPLE** (U2 ✅ por construcción con prefiltro 0 llamadas; **U4 ❌ medido** Δ=0.0 default−idle; U7 sin medir por 503 del endpoint degradado; F1-F3 documentados con coste en `HITO17_PLAN.md` §5)* |
 | **§5.2.1 FASE B-2 enmienda H18 — scorer híbrido (M_mov determinista + juez V/A)** | sí | ☑ **2026-10-22** — *ratificación del dueño junto con §1-§2 de `HITO18_PLAN.md` (diseño + gates U1-U7 con U4′ de movimiento y U7a/U7b), **ANTES de implementar y de medir**; diagnóstico: el juez reporta ausente un movimiento objetivamente presente (0.952 vs 0.046, 20×) — §0 del plan; salida propia `evals/results/result_fase2_b2_h18.json` · **corrida oficial 2026-10-22 → CUMPLE** (8/8 gates · Score_final **0.9187** · U4′ 0.9519/0.0489 determinista · U7b 0.8725/0.0 · U2 por construcción · 5/8 llamadas · §5 del plan)* |
+| **§4.2 + §5.4 enmienda H19 — piloto `Sens(x)` en `software_development`** (`H_aux` K=5 A1-A5 · 12 tareas duras · verificador pytest determinista · traza TraceForge · gates G0 + U1-U7) | sí | ☑ **2026-10-22** — *ratificación del dueño junto con §1-§2 de `HITO19_PLAN.md` (diseño + gates), **ANTES de implementar y de medir**; diseño congelado en §1.B del plan (12 tareas, parámetros A1-A5, esquema de traza) · salidas: `evals/results/result_sens_sd_g0.json` (G0) y `evals/results/result_sens_sd_pilot.json` (oficial) · **corrida oficial → pendiente** (se anota aquí el resultado al cerrar §5)* |
 | **§5.2.1 fórmula** `Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)` | sí | ☑ **2026-10-14** |
 | **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☑ **2026-10-14** |
 | **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☑ **2026-10-14** |
@@ -1158,8 +1168,10 @@ A/B/C). Tras ella: enmienda 3 (2026-10-15, bugfix de timing de los checks
 estáticos tras el primer smoke) y enmienda 4 (2026-10-15, `node_exists`
 admite texto de UI) — ambas sin cambio de kinds ni umbrales.** Posterior
 a esta sección: fila **FASE B-2 ☑ 2026-10-21** (H16, corrida 2026-10-22
-→ NO CUMPLE), **enmienda 5 (2026-10-22, H17: prefiltro no-LLM + U7)** y
-**enmienda 6 (2026-10-22, H18: scorer híbrido M_mov + juez V/A)**.
+→ NO CUMPLE), **enmienda 5 (2026-10-22, H17: prefiltro no-LLM + U7)**,
+**enmienda 6 (2026-10-22, H18: scorer híbrido M_mov + juez V/A)** y
+**enmienda 7 (2026-10-22, H19: piloto `Sens(x)` en `software_development` —
+matriz `H_aux` K=5, 12 tareas, gates G0+U1-U7, esquema de traza del piloto)**.
 Las enmiendas 1 y 2 figuran abajo como registro previo a esa ratificación.
 *(Cualquier cambio futuro tras ratificar se anota aquí con fecha y motivo —
 no se reescribe en silencio.)*
