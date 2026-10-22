@@ -24,7 +24,9 @@ Orden de lectura recomendado:
   antes; nunca subir `.env` ni claves.
 - **Secretos**: `.env` (gitignored) guarda `NVIDIA_API_KEY`, `GEMINI_API_KEY`
   y demás. **Jamás imprimirlas ni commitearlas.** Escaneo antes de cada commit:
-  `git diff --cached | grep -c "nvapi-"` debe dar 0 (ojo: `grep -c` sin
+  `git diff --cached | grep -cE "nvapi-[A-Za-z0-9]{6}"` debe dar 0 (ojo: el
+  patrón literal `nvapi-` aparece en este propio fichero como ejemplo — por
+  eso el scan exige carácter alfanumérico tras el guion; y `grep -c` sin
   coincidencias devuelve exit 1 y rompe cadenas `&&`; usa `;` o `|| true`).
 - **`EG/`, `EW/`, `TraceForge/` son otros repos/trabajos externos**: en este
   proyecto son **solo lectura**. Todo trabajo con el workspace de Godot se hace
