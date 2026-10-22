@@ -1,7 +1,8 @@
 # HITO 19 — PLAN (declaración v2): piloto de `Sens(x)` con arnés mínimo en `software_development`
 
-> **DECLARADO 2026-10-22 (v2, rediseño) — PENDIENTE DE RATIFICACIÓN (§1 y §2 en ☐).**
-> En este momento: **código 0, corridas 0**. La v1 (`da46830`) declaraba un
+> **DECLARADO 2026-10-22 (v2) — RATIFICADO por el dueño 2026-10-22: §1 y §2
+> ☑ (el dueño pidió dificultad alta: «necesito buenos agentes»).**
+> En el momento de la ratificación: **código 0, corridas 0**. La v1 (`da46830`) declaraba un
 > `H_aux` de *knobs* de generación de juegos; se retira **sin código ni
 > corridas** tras la corrección del dueño: un **arnés** es la capa de 6/7
 > subsistemas que envuelve al LLM para hacerlo agente (doc 6 y doc 12 del
@@ -54,7 +55,7 @@ indefinido.
 ningún benchmark. Puede cerrar **NO CUMPLE** (resultado negativo válido; los
 umbrales no se tocan tras medir).
 
-## §1 — Diseño propuesto — ☐ pendiente de ratificación
+## §1 — Diseño propuesto — ☑ RATIFICADO 2026-10-22
 
 ### 1.1 Dominio y arnés mínimo
 - Dominio: **`software_development`**. Paquete nuevo `evals/sd_pilot/`
@@ -134,18 +135,69 @@ datos. Modelo **fijo** en las cinco.
 - Corrida oficial: K×N = 60 runs × ≤16 turnos, **techo 3M tokens**; reducción
   a `N = 8` solo vía la regla G0 de §1.7 (nunca tras medir).
 
-## §2 — Umbrales (propuestos — RATIFICAR antes de implementar/medir)
+## §2 — Umbrales (RATIFICADOS 2026-10-22)
 
 | gate | umbral | por qué | estado |
 |---|---|---|---|
-| **G0** humo | ventana `A5 > A1` en las 2 tareas · coste en techo · traza operativa · reglas §1.7 aplicadas y documentadas | sin ventana no hay `Sens`; sin coste no hay corrida | ☐ |
-| **U1** `H_aux` | K = 5 variantes congeladas (matriz §1.2 + modelo fijo + `max_turns=16`) | sin `H_aux` no hay `Sens` | ☐ |
-| **U2** matriz | 60 celdas, **0 huecos**, `m_h(x)` float determinista | `Sens` exige score por tarea | ☐ |
-| **U3** separación | `spread Q_h ≥ 15` puntos | si los arneses no difieren, Pearson es ruido | ☐ |
-| **U4** `Sens` finito | finito en ≥ 6/12 tareas (no-definibles se marcan, no cuentan como 0) | Pearson exige varianza | ☐ |
-| **U5** discrimina | ≥ 6/12 tareas con `Sens(x) > 0` | si ninguna discrimina → **NO CUMPLE con evidencia** | ☐ |
-| **U6** disciplina | umbrales y tamaño **antes** de medir · ruff + pytest · corrida oficial única · sin retoques tras medir · intentos fallidos documentados con causa y coste | `AGENTS.md` | ☐ |
-| **U7** **dificultad** (req. del dueño) | media global de celdas **≤ 60** · media de A5 **≤ 80** (sin techo) · **≥ 8/12** tareas con `A5 < 100` (ni el mejor las tiene fáciles) | «necesito buenos agentes»: tareas que exigen agente bueno, medidas | ☐ |
+| **G0** humo | ventana `A5 > A1` en las 2 tareas · coste en techo · traza operativa · reglas §1.7 aplicadas y documentadas | sin ventana no hay `Sens`; sin coste no hay corrida | ☑ |
+| **U1** `H_aux` | K = 5 variantes congeladas (matriz §1.2 + modelo fijo + `max_turns=16`) | sin `H_aux` no hay `Sens` | ☑ |
+| **U2** matriz | 60 celdas, **0 huecos**, `m_h(x)` float determinista | `Sens` exige score por tarea | ☑ |
+| **U3** separación | `spread Q_h ≥ 15` puntos | si los arneses no difieren, Pearson es ruido | ☑ |
+| **U4** `Sens` finito | finito en ≥ 6/12 tareas (no-definibles se marcan, no cuentan como 0) | Pearson exige varianza | ☑ |
+| **U5** discrimina | ≥ 6/12 tareas con `Sens(x) > 0` | si ninguna discrimina → **NO CUMPLE con evidencia** | ☑ |
+| **U6** disciplina | umbrales y tamaño **antes** de medir · ruff + pytest · corrida oficial única · sin retoques tras medir · intentos fallidos documentados con causa y coste | `AGENTS.md` | ☑ |
+| **U7** **dificultad** (req. del dueño) | media global de celdas **≤ 60** · media de A5 **≤ 80** (sin techo) · **≥ 8/12** tareas con `A5 < 100` (ni el mejor las tiene fáciles) | «necesito buenos agentes»: tareas que exigen agente bueno, medidas | ☑ |
+
+### §1.B — Congelación de implementación (fijada al ratificar/ implementar)
+
+**Rutas** (paquete nuevo, todo bajo `evals/sd_pilot/`):
+`harness.py` (bucle mínimo + herramientas) · `variants.py` (A1-A5) ·
+`verifier.py` (pytest público/oculto) · `sens.py` (matriz, `Q_h^(−x)`, Pearson,
+gates) · `tasks.py` (specs e ids) · `skills_pack/` (skills congelados) ·
+`sd_tasks/<id>/` (12 tareas) · `run_pilot.py` (modos `--g0` y `--oficial`) ·
+`traces.sqlite` (TraceForge). Evidencia: `evals/results/result_sens_sd_pilot.json`
++ `evals/logs/sens_sd_pilot_run.log` (G0: `evals/logs/sens_sd_g0.log`).
+Tests: `tests/test_sens_sd_pilot.py`.
+
+**Variantes (parámetros exactos)** — modelo `nvidia/nemotron-3-super-120b-a12b`,
+`LLM_PROVIDERS=nvidia`, `temperature` = 0.2 (default de backend, sin override):
+- **A1** one-shot: 1 llamada, workspace completo en el prompt, salida en
+  bloques `###FILE: path ###` (convención de `measure_b1.py`), `max_tokens=8192`.
+  Sin herramientas, sin iteración.
+- **A2** bucle ≤16 turnos, tools `read_file`/`write_file`/`run_tests` (pytest
+  públicos), `max_tokens=4096`, historial crudo.
+- **A3** = A2 + PFs reutilizados (`SkillProgramRegistry` con
+  `ValidateBeforeActPF`/`RetryPF` sobre estado `{last_action.status,
+  error_count, attempt_count}`); sus mensajes entran al historial.
+- **A4** = A3 + `skills_pack/` (4 skills congelados, idénticos en todas las
+  celdas A4/A5: leer-antes-de-escribir · iterar-con-tests-públicos ·
+  contratos-estrictos · casos-límite).
+- **A5** = A4 + `TrajectoryRegulationLayer` (estancamiento/reintentos/
+  presupuesto → mensajes correctivos) + digest estructurado de los últimos 5
+  errores siempre en contexto.
+
+**Las 12 tareas** (ids congelados; selección = estas 12, regla fija):
+`checkout-rounding` · `repo-cache-layer` · `dsl-parser` · `interval-scheduler` ·
+`seeded-bugs-billing` · `cli-subcommand` · `workflow-statemachine` ·
+`batch-coalescer` · `schema-validator` · `plugin-registry` · `csv-diff-engine` ·
+`config-migration`. Cada una: `TASK.md` + `workspace/` (3-8 ficheros +
+`tests_public/`) + `tests_hidden/` + `reference/` (solo QA de BUILD).
+Ejes de dureza (≥2 por tarea, exigido por lint): multi-fichero · límites
+ocultos · arquitectura · recuperación · contrato estricto.
+QA de BUILD por tarea (obligatorio, documentado): `reference` aplicada →
+**100% ocultos**; workspace vacío → **≥1 fallo público** y **<100% ocultos**.
+`run_tests` solo ve públicos; los ocultos viven fuera del workspace (el
+verificador los copia a un dir limpio — supuesto no-adversarial declarado).
+
+**G0**: tareas `checkout-rounding` + `dsl-parser` × {A1, A5}. Reglas §1.7.
+
+**Esquema de traza (congelado, §5.4)**: collector `sqlite` en
+`evals/sd_pilot/traces.sqlite`; span raíz `agent="sens_pilot"` con
+metadata `{variant, task, model, run_id, max_turns, subsystems}`; hijos
+`agent="turn"` (metadata `{turn}`; input = contexto renderizado, output =
+respuesta cruda), `agent="llm"` (tokens/coste), `agent="tool"` (metadata
+`{tool_name}`; input = args, output = resultado truncado).
+`set_metadata_context(variant, task, run_id)` por celda.
 
 **CUMPLE** = G0 + U1-U7 todos OK → `Sens(x)` calculable y ≥50% de tareas
 discriminan, con tareas duras. **NO CUMPLE** = cualquier gate cae → evidencia +
