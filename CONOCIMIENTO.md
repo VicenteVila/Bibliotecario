@@ -66,6 +66,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Plan Hito 15 | `evals/HITO15_PLAN.md` |
 | Plan Hito 16 | `evals/HITO16_PLAN.md` — **CERRADO 2026-10-22 · NO CUMPLE** (§5) |
 | Plan Hito 17 | `evals/HITO17_PLAN.md` — **CERRADO 2026-10-22 NO CUMPLE** (§5: U2 ✅ por construcción con prefiltro; U4 ❌ medido Δ=0.0; U7 sin medir por 503; F1-F3 con coste; ratificación y umbrales intactos) |
+| Plan Hito 18 | `evals/HITO18_PLAN.md` — **DECLARADO 2026-10-22, pendiente de ratificación** (§1-§2 en ☐): scorer B-2 híbrido — `M_mov` determinista (frame-diff) para acción, juez solo V/A, prefiltro intacto; `Score_B2 = 0.50·S_mov + 0.25·V + 0.25·A`; gates U1-U7 con U4′ de movimiento y U7a/U7b; llamadas ≤8; código 0 y llamadas 0 |
 | Erratas y fracasos declarados | `evals/BLUEPRINT_METRIC_DESIGN.md` — §8.8-§8.13 |
 | Hitos previos | `evals/HITO0.md`, `HITO1.md`, `PLAN_READING.md`, `REPORT_BLIND.md`, `REPORT_COEVOLVE.md` |
 
