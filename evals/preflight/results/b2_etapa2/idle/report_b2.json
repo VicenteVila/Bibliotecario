@@ -102,5 +102,23 @@
     "luminancia_media": 78.21,
     "mp4": "/mnt/c/Bibliotecario/evals/preflight/results/b2_etapa2/idle/replay.mp4",
     "frames_dir": "/mnt/c/Bibliotecario/evals/preflight/results/b2_etapa2/idle/frames"
+  },
+  {
+    "fase": "replay",
+    "pi": "/mnt/c/Bibliotecario/evals/preflight/results/b2_etapa2/idle/demo_pi.json",
+    "eventos": 0,
+    "duracion_ms": 0,
+    "duracion_grab_ms": 10000,
+    "errores_schema": [],
+    "display": "localhost:99",
+    "wid": "2097155",
+    "geometria": "Window 2097155\n  Position: 0,0 (screen: 0)\n  Geometry: 1280x720",
+    "ffmpeg_exit": 0,
+    "ok": true,
+    "frames": 26,
+    "frames_negros": 0,
+    "luminancia_media": 78.21,
+    "mp4": "/mnt/c/Bibliotecario/evals/preflight/results/b2_etapa2/idle/replay.mp4",
+    "frames_dir": "/mnt/c/Bibliotecario/evals/preflight/results/b2_etapa2/idle/frames"
   }
 ]
