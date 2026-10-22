@@ -1,0 +1,23 @@
+U5 ρ oculta: OK — ρ en /mnt/c/Bibliotecario/evals/preflight/rubricas/platformer-juego.json (fuera de EG: True) · workspace hits=0 · copia hits=0
+U6 B-1: BUILD=1.0 M_B1=0.8333
+frames: default …
+  default 14 · idle …
+  idle 26 · negro …
+  negro 14 · trampas U7a/U7b …
+  listas
+M_mov: default=0.9519 idle=0.0489 S_mov=1.0 · U7b mov=0.8725 est=0.0
+
+==================================================================
+HITO18 B-2 etapa 2 (hibrido) — UMBRALES
+==================================================================
+  U1  OK     15/15 ítems · scores∈{0,0.5,1}=True · justif=15/15 · intentos=1/2
+  U2  OK     presencia=0: 10/10 · Score_B2_negro=0.0 (≤0.3) · prefiltro activo (anulacion por construccion)
+  U3  OK     ΔScore_B2_hib=0.0 (≤0.1) · ΔV/A={'V': 0.0, 'A': 0.0} (≤0.15 c/u)
+  U4  OK     M_mov(default)=0.9519 (≥0.2) · Δ(default−idle)=0.903 (≥0.15) · M_mov(idle)=0.0489 (≤0.15)
+  U5  OK     ρ en /mnt/c/Bibliotecario/evals/preflight/rubricas/platformer-juego.json (fuera de EG: True) · workspace hits=0 · copia hits=0
+  U6  OK     B-1: BUILD=1.0 M_B1=0.8333 · llamadas=5/8 · suite+ruff aparte
+  U7a  OK     Score_B2(con)=0.675 (≥0.5) · Score_B2(vacio)=0.0 (≤0.0)
+  U7b  OK     trampa mov=0.8725 (≥0.2) · estática=0.0 (≤0.05)
+  llamadas=5 · tokens=38335 · Score_final=0.9187
+  → CUMPLE · /mnt/c/Bibliotecario/evals/results/result_fase2_b2_h18.json
+==================================================================

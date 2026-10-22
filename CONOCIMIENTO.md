@@ -66,7 +66,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Plan Hito 15 | `evals/HITO15_PLAN.md` |
 | Plan Hito 16 | `evals/HITO16_PLAN.md` — **CERRADO 2026-10-22 · NO CUMPLE** (§5) |
 | Plan Hito 17 | `evals/HITO17_PLAN.md` — **CERRADO 2026-10-22 NO CUMPLE** (§5: U2 ✅ por construcción con prefiltro; U4 ❌ medido Δ=0.0; U7 sin medir por 503; F1-F3 con coste; ratificación y umbrales intactos) |
-| Plan Hito 18 | `evals/HITO18_PLAN.md` — **RATIFICADO `87ad18f` → IMPLEMENTADO** (§1.B declarado antes de medir): scorer B-2 híbrido — `evals/preflight/{movimiento_b2.py, run_fase2_b2_h18.py}` + `tests/test_movimiento_h18.py` (11 puros) + enmienda 6 de §11. `Score_B2 = 0.50·S_mov + 0.25·V + 0.25·A`; U4′ determinista (M_mov ≥0.20 / Δ≥0.15 / idle≤0.15); U7a (juez) + U7b (métrica); llamadas ≤8; idle/negro sin llamadas. **Pendiente: corrida oficial única → §5** |
+| Plan Hito 18 | `evals/HITO18_PLAN.md` — **CERRADO 2026-10-22 CUMPLE** (§5: 8/8 gates · Score_final **0.9187** · U4′ determinista 0.9519/0.0489 · U7b 0.8725/0.0 · U2 por construcción · 5/8 llamadas · F1=oficial sin intentos fallidos). **El instrumento B-2 es válido por primera vez** — scorer híbrido `M_mov` + juez V/A; umbrales intactos. Artefactos `evals/preflight/{movimiento_b2.py, run_fase2_b2_h18.py}` + enmienda 6 de §11 |
 | Erratas y fracasos declarados | `evals/BLUEPRINT_METRIC_DESIGN.md` — §8.8-§8.13 |
 | Hitos previos | `evals/HITO0.md`, `HITO1.md`, `PLAN_READING.md`, `REPORT_BLIND.md`, `REPORT_COEVOLVE.md` |
 

@@ -13,7 +13,7 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 | **Evidencia** `result_*.json` | 89 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
 | **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
-| **Planes y reportes** `HITO*.md` + specs | 25 | raíz | 18 hitos (`HITO0-2.md` reportes; `HITO3-18_PLAN.md` planes con §0 estado → §5 cierre/veredicto; `HITO18_PLAN.md` está en fase de declaración, sin §5) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
+| **Planes y reportes** `HITO*.md` + specs | 25 | raíz | 18 hitos (`HITO0-2.md` reportes; `HITO3-18_PLAN.md` planes con §0 estado → §5 cierre/veredicto; todos cerrados salvo que se indique) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
 | **Logs** `*.log` | 37 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
 | **Datos** | 9 | `golden_*.jsonl` (datasets gold), `calib_r4_gold.json`, `game_tasks_expanded.yaml` (60 tareas, citado), `CORPUS_LOCK.json` | referenciados por tests/evals → no mover sin barrido |
 
@@ -35,14 +35,15 @@ Decodificador de nombres de la evidencia H17: `result_fase2_b2_h17.json`
 `result_fase2_b2_h17_f1.json` y `_f2.json` = intentos incompletos por
 HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 = stdout de cada intento. Evidencia H18: `result_fase2_b2_h18.json`
-= corrida oficial (veredicto en `HITO18_PLAN.md` §5).
+= corrida oficial F1 (**CUMPLE**, Score_final 0.9187, veredicto en
+`HITO18_PLAN.md` §5); `h18_run.log` = stdout.
 
 ## Decodificador de nombres
 
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO18_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 en curso: §1+§2 ratificados 2026-10-22, aún sin implementar ni §5) |
+| `HITO3_PLAN.md`…`HITO18_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22 — scorer B-2 híbrido válido, Score_final 0.9187) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |

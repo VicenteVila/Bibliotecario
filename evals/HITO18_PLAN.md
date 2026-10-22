@@ -181,3 +181,76 @@ Esta tabla no se toca tras medir (disciplina dura).
 §5 (cierre) se escribe al cerrar; mientras tanto no existe. Evidencia
 previa de referencia: `evals/results/result_fase2_b2_h17.json` (H17) y
 su §5; diagnóstico de movimiento citado en §0 de este plan.
+
+## §5 — Cierre 2026-10-22: **CUMPLE** (8/8 gates · Score_final 0.9187)
+
+Corrida oficial única ejecutada tras la implementación (`63c2176`). El
+endpoint `gemini-3.1-flash-lite` estaba degradado ese día (~50% HTTP 503
+medido antes de lanzar); el diseño H18 fue **inmune**: U4′, U7b, U2, U5 y
+U6 no dependen del juez, y las 4 evaluaciones lógicas que sí lo usan
+(default, default2, U7a con/vacío) completaron con **5 llamadas de 8**
+presupuestadas. **No hubo intento fallido: F1 = corrida oficial.**
+Umbrales intactos; nada se tocó tras medir.
+
+| intento | archivo | resultado | llamadas | tokens | log |
+|---|---|---|---|---|---|
+| **F1 (oficial)** | `evals/results/result_fase2_b2_h18.json` | **CUMPLE** | 5 | 38 335 | `evals/logs/h18_run.log` |
+
+### Veredicto por gate
+
+- **U1 OK** — 15/15 ítems, scores ∈ {0, 0.5, 1}, justificaciones 15/15,
+  1 intento.
+- **U2 OK — por construcción** — prefiltro detectó los 14 frames
+  planos del negro → **0 llamadas**, Score_B2 = 0.0, 10/10 presencias
+  en 0. (Tercera corrida consecutiva: el caucho de H16 está muerto.)
+- **U3 OK** — default vs default2: ΔScore_B2_hib = 0.0, ΔV = 0.0,
+  ΔA = 0.0 (temp 0, reproducible).
+- **U4′ OK — determinista** — `M_mov(default) = 0.9519 ≥ 0.20` ·
+  `Δ(default−idle) = 0.903 ≥ 0.15` · `M_mov(idle) = 0.0489 ≤ 0.15`.
+  Consistente con el diagnóstico de §0 (0.952 / 0.046). **Sin una sola
+  llamada al juez.**
+- **U5 OK** — ρ bajo `evals/` (fuera de EG), 0 apariciones en workspace
+  y en copia.
+- **U6 OK** — BUILD = 1.0 · M_B1 = 0.8333 · **5/8 llamadas**.
+- **U7a OK** — trampa del juez: `Score_B2(con) = 0.675 ≥ 0.5` ·
+  `Score_B2(vacío) = 0.0 ≤ 0` (2 intentos, un reintento consumido).
+- **U7b OK** — trampa de la métrica: `M_mov(mov) = 0.8725 ≥ 0.20` ·
+  `M_mov(estática) = 0.0 ≤ 0.05`. Determinista, 0 llamadas.
+
+### Score publicado (D2 satisfecho: 8/8 gates OK)
+
+```
+S_mov   = clamp(0.9519 / 0.50, 0, 1) = 1.0
+Score_B2 = 0.50·1.0 + 0.25·0.8 (V) + 0.25·0.375 (A) = 0.7937
+Score_final = BUILD(1.0) × (0.15·M_B1(0.8333) + Score_B2(0.7937)) = 0.9187
+```
+
+### Lectura (para el dueño)
+
+**El instrumento B-2 es válido por primera vez.** Lo que H16 y H17 no
+alcanzaron — un scorer Capa B que mida contenido y no caucho — lo cierra
+H18 **cambiando el rol del juez, no sus umbrales**: el juez describe bien
+(V=0.8, A=0.375 sobre el demo real; V=1.0 sobre la trampa pintada) pero
+no detecta acción; `M_mov` sí (19× de separación default/idle). El
+scorer ya no depende de la sensibilidad de un LLM para su gate de
+contenido, ni del endpoint para su gate de movimiento.
+
+**Dos precisiones, sin maquillaje:**
+
+1. `Score_final = 0.9187` es la nota de **una** configuración de arnés
+   sobre **una** tarea (`platformer-juego`) de la suite `D^val`. **No es
+   un resultado de benchmark definitivo**: §10 sigue marcando `Sens(x)`,
+   `D^eval`, Harness Cards y presupuesto como pendientes. Es, dentro del
+   estándar del propio spec (§0), un **diagnóstico de QA con instrumento
+   ya válido**.
+2. `M_mov_ref = 0.50` (el divisor de `S_mov`) está calibrado sobre este
+   demo: da nota plena (1.0) al movimiento actual. Es un número nuevo,
+   ratificado en §2 y **no tocado tras medir**; si la sensibilidad de la
+   nota a demos más débiles importa, se re-calibra en un hito futuro con
+   línea base nueva, nunca re-bajando el umbral de U4′.
+
+**Próximo paso natural** (no parte de este hito): con B-1 y B-2 ambos
+válidos, el bloqueante que queda para una medición definitiva de Capa B
+es `Sens(x)` → re-juzgar a nivel de pregunta → construir `H_aux`
+(`BENCHMARK_SPEC.md` §10.1-§10.2.1). Y la tesis del proyecto —
+`skills = 0` — sigue intacta: esto mejora la **regla**, no el producto.
