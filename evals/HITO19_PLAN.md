@@ -106,6 +106,14 @@ datos. Modelo **fijo** en las cinco.
 
 ### 1.5 Modelo — fijo, con escalada solo por regla pre-declarada
 - Default: **`nvidia/nemotron-3-super-120b-a12b`** (`LLM_PROVIDERS=nvidia`).
+- **Decisión del dueño 2026-10-22 (ANTES de medir)**: el default devuelve
+  **404 persistente** en esta cuenta de NVIDIA (`Function ... Not found for
+  account`, 4/4 intentos; `super-120b` figura en `/v1/models` pero no está
+  desplegado — sondeo de conectividad BUILD, **0 tokens de piloto**). Se usa
+  desde el primer token **`nvidia/nemotron-3-ultra-550b-a55b`**, el modelo de
+  escalada pre-declarado de este apartado. Consecuencia para el resto de la
+  regla: si en G0 el ultra saca **A5 = 0 global** (suelo) → **G0 falla**,
+  decisión del dueño (ya no hay un modelo más fuerte declarado).
 - Escalada en G0: si en las tareas de humo **A5 saca 0 global** (suelo) →
   `nvidia/nemotron-3-ultra-550b-a55b`; si aún 0 → **G0 falla**, decisión del
   dueño. El ultra **no** se usa por defecto (coste).
@@ -159,7 +167,9 @@ gates) · `tasks.py` (specs e ids) · `skills_pack/` (skills congelados) ·
 + `evals/logs/sens_sd_pilot_run.log` (G0: `evals/logs/sens_sd_g0.log`).
 Tests: `tests/test_sens_sd_pilot.py`.
 
-**Variantes (parámetros exactos)** — modelo `nvidia/nemotron-3-super-120b-a12b`,
+**Variantes (parámetros exactos)** — modelo `nvidia/nemotron-3-ultra-550b-a55b`
+*(cambio 2026-10-22 del dueño ANTES de medir: el default `super-120b` da 404
+persistente en la cuenta — ver §1.5)*,
 `LLM_PROVIDERS=nvidia`, `temperature` = 0.2 (default de backend, sin override):
 - **A1** one-shot: 1 llamada, workspace completo en el prompt, salida en
   bloques `###FILE: path ###` (convención de `measure_b1.py`), `max_tokens=8192`.

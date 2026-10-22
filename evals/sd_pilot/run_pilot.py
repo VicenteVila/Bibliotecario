@@ -31,7 +31,7 @@ from pathlib import Path
 
 SD_ROOT = Path(__file__).resolve().parent
 REPO = SD_ROOT.parents[1]
-MODEL = "nvidia/nemotron-3-super-120b-a12b"
+MODEL = "nvidia/nemotron-3-ultra-550b-a55b"  # §1.5: dueño 2026-10-22 antes de medir
 G0_TASKS = ["checkout-rounding", "dsl-parser"]
 TECHO_TOKENS = 3_000_000  # §1.8: techo de la corrida oficial
 STATE_OFICIAL = SD_ROOT / "_run_state_oficial.json"
