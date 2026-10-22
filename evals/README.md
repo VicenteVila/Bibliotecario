@@ -1,6 +1,6 @@
 # `evals/` — qué es cada cosa
 
-74 ficheros en la raíz, más `results/` (89), `logs/` (37) y `preflight/`
+75 ficheros en la raíz, más `results/` (89), `logs/` (37) y `preflight/`
 (159). Esta es la
 clase de cada uno, el decodificador de nombres y las reglas. Los
 **veredictos por hito** no se duplican aquí: viven en la tabla «el Hito N»
@@ -13,7 +13,7 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 | **Evidencia** `result_*.json` | 89 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
 | **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
-| **Planes y reportes** `HITO*.md` + specs | 23 | raíz | 17 hitos (`HITO0-2.md` reportes; `HITO3-16_PLAN.md` planes con §0 estado → §5 cierre/veredicto) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
+| **Planes y reportes** `HITO*.md` + specs | 24 | raíz | 18 hitos (`HITO0-2.md` reportes; `HITO3-17_PLAN.md` planes con §0 estado → §5 cierre/veredicto; `HITO17_PLAN.md` está en fase de declaración, sin §5) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
 | **Logs** `*.log` | 37 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
 | **Datos** | 9 | `golden_*.jsonl` (datasets gold), `calib_r4_gold.json`, `game_tasks_expanded.yaml` (60 tareas, citado), `CORPUS_LOCK.json` | referenciados por tests/evals → no mover sin barrido |
 
@@ -31,7 +31,7 @@ ver §3 de `HITO16_PLAN.md` y §5.2.1/§5.2.2 de `BENCHMARK_SPEC.md`.
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO16_PLAN.md` | plan + cierre del hito N (§5 = veredicto final) |
+| `HITO3_PLAN.md`…`HITO17_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 aún en declaración, sin §5) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |
