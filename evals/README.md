@@ -22,9 +22,11 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 Estructurado por tema (no tocar su organización sin motivo): `suites/` y
 `suites_v2/` (tests de comportamiento B-1), `juez_b2.py` + `rubricas/` (juez
 multimodal B-2 y rúbricas ocultas ρ), `run_fase2_b2.py` (corrida oficial
-U1-U6), `pi_*.py`/`*.gd` (trazas Π y replay), `lint_suites_v2.py`,
-`results/` (evidencia B-1/B-2), `fixtures/`, `scripts/`. Reglas congeladas:
-ver §3 de `HITO16_PLAN.md` y §5.2.1/§5.2.2 de `BENCHMARK_SPEC.md`.
+H16 U1-U6) y `run_fase2_b2_h17.py` + `prefiltro_b2.py` (corrida H17 con la
+enmienda Opción B: prefiltro no-LLM + gate U7), `pi_*.py`/`*.gd` (trazas Π
+y replay), `lint_suites_v2.py`, `results/` (evidencia B-1/B-2),
+`fixtures/`, `scripts/`. Reglas congeladas: ver §3 de `HITO16_PLAN.md`,
+§1.B-§3 de `HITO17_PLAN.md` y §5.2.1/§5.2.2 de `BENCHMARK_SPEC.md`.
 
 ## Decodificador de nombres
 

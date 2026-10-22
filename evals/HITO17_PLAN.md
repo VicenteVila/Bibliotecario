@@ -45,9 +45,47 @@ Tres vías de enmienda, no excluyentes entre sí:
   H16 §3 (modelo + temp) → U3 se re-mide; cambia coste/varianza.
 
 **Decisión del dueño — 2026-10-22: Opción B (prefiltro no-LLM).**
-Registrada en este commit, ANTES de escribir código. Las opciones A y C
-quedan sin elegir para este hito; cualquier combinación posterior exigiría
-nueva decisión del dueño.
+Registrada en el commit de ratificación, ANTES de escribir código. Las
+opciones A y C quedan sin elegir para este hito; cualquier combinación
+posterior exigiría nueva decisión del dueño.
+
+### §1.B — Diseño implementado (declarado en el commit de implementación, ANTES de medir)
+
+**Prefiltro (Opción B).** Regla **sin umbral calibrado**: un frame es
+«sin contenido» si es **color plano** (todos los píxeles idénticos —
+`min == max` por canal); el control negro de U2 (`ffmpeg lavfi
+color=black`) lo cumple exactamente. Un caso se anula **solo si TODOS sus
+frames son planos** → el juez **no se llama (0 llamadas)** y todos los
+ítems salen 0 con la misma forma que un JSON del juez → U2 pasa **por
+construcción**. Se aplica a `default`, `default2`, `idle` y `negro` (los
+reales pasan al juez; los planos se anulan) y el informe por caso
+(`prefiltro`: total, planos, `sin_contenido`, motivo) queda persistido
+en la evidencia. Artefacto: `evals/preflight/prefiltro_b2.py`.
+
+**U7 — trampa sintética (medida SIN prefiltro: al juez crudo).** Dos
+imágenes 1280×720 deterministas con Pillow (sin RNG): fondo plano +
+sprites pintados (suelo, plataforma, avatar, moneda) = `trampa_con`, y el
+mismo fondo sin sprites = `trampa_vacio`. El juez crudo (`PROMPT_B2`
+congelado, temp 0, ≤2 intentos) evalúa cada imagen contra la mini-ρ
+`grounding-trampa.json` (3 ítems D/V/A declarados en este commit; pasa
+el validador congelado de rúbricas). Gate ratificado: `Score_B2(con) ≥
+0.5` **y** `Score_B2(vacío) = 0.0` — un juez caucho falla la segunda.
+La trampa NO pasa por el prefiltro a propósito: su marco vacío debe
+puntuar 0 en el juez, que es lo que U7 mide. Artefactos:
+`evals/preflight/run_fase2_b2_h17.py` + `rubricas/grounding-trampa.json`.
+
+**Salida y coste.** La corrida oficial escribe a
+`evals/results/result_fase2_b2_h17.json`
+(la de H16 `result_fase2_b2.json` es evidencia intocable y **no se pisa**).
+Llamadas ≤10 (U6 reutilizado): default(≤2) + default2(≤2) + idle(≤2) +
+negro(**0** por prefiltro) + U7 con(≤2) + U7 vacío(≤2) = **10 en el peor
+caso**. `Score_final` solo se publica con U1-U7 todos OK (D2 aplicado al
+set completo).
+
+**Lo que esta enmienda NO promete**: U4 sigue midiendo la sensibilidad
+del juez sobre contenido real (default vs idle) — si el juez no
+discrimina, H17 cae en U4 con evidencia y vuelve a decisión del dueño
+(opciones A/C). Nada de umbrales U1-U6 se toca.
 
 ## §2 — Umbrales (RATIFICADOS 2026-10-22 por el dueño — antes de implementar y de medir)
 

@@ -1,0 +1,49 @@
+{
+  "version": "hito17-u7",
+  "tarea": "grounding-trampa",
+  "fuente": "evals/HITO17_PLAN.md §1.B — trampa sintética U7 (Opción B)",
+  "oculta": true,
+  "nota": "Mini-rúbrica declarada H17 para U7 (no es ρ de tarea). Ids B2-* solo bajo evals/ (U5).",
+  "pesos": {"D": 0.35, "V": 0.15, "A": 0.35},
+  "items": [
+    {
+      "id": "B2-D-01",
+      "categoria": "D",
+      "texto": "Presencia de objetos reconocibles en la imagen (sprites de juego: personaje, plataformas, monedas u otros elementos)",
+      "anclajes": {
+        "0": "La imagen está vacia: fondo plano uniforme sin ningun objeto",
+        "0.5": "Se intuyen objetos pero ambiguos, parciales o borrosos",
+        "1": "Objetos de juego claramente visibles y reconocibles"
+      },
+      "aplica": "max",
+      "tope": 1.0,
+      "presencia": true
+    },
+    {
+      "id": "B2-V-01",
+      "categoria": "V",
+      "texto": "Los objetos presentes se distinguen con claridad del fondo",
+      "anclajes": {
+        "0": "No hay objetos que distinguir del fondo plano",
+        "0.5": "Objetos apenas distinguibles del fondo",
+        "1": "Contraste nitido objeto-fondo en toda la imagen"
+      },
+      "aplica": "max",
+      "tope": 1.0,
+      "presencia": true
+    },
+    {
+      "id": "B2-A-01",
+      "categoria": "A",
+      "texto": "La imagen muestra una escena de juego 2D creible (plataforma con actores)",
+      "anclajes": {
+        "0": "No es escena de juego: imagen vacia o sin elementos de juego",
+        "0.5": "Escena parcial o con pocos elementos de juego",
+        "1": "Escena de plataforma completa y creible"
+      },
+      "aplica": "max",
+      "tope": 1.0,
+      "presencia": false
+    }
+  ]
+}

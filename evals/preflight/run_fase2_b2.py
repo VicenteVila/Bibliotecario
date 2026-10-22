@@ -50,18 +50,20 @@ EXTS_TEXTO = (".gd", ".tscn", ".cfg", ".json", ".md", ".txt", ".tres",
 GATES_ESPERADOS = ("U1", "U2", "U3", "U4", "U5", "U6")
 
 
-def gates_todos_ok(gates: dict) -> bool:
-    """True solo si los seis gates U1-U6 existen y están OK."""
-    return all(gates.get(k, {}).get("ok") for k in GATES_ESPERADOS)
+def gates_todos_ok(gates: dict,
+                   esperados: tuple[str, ...] = GATES_ESPERADOS) -> bool:
+    """True solo si todos los gates en `esperados` existen y están OK."""
+    return all(gates.get(k, {}).get("ok") for k in esperados)
 
 
-def calcular_score_final(gates: dict, b1: dict, e_def1: dict):
+def calcular_score_final(gates: dict, b1: dict, e_def1: dict,
+                         esperados: tuple[str, ...] = GATES_ESPERADOS):
     """Score_final solo se publica con todos los gates OK (D2).
 
     Bajo NO CUMPLE un número publicado aquí se lee como nota; el registro
     queda con Score_final=None. El cálculo congelado (fórmula §3) no cambia.
     """
-    if not gates_todos_ok(gates) or e_def1.get("error"):
+    if not gates_todos_ok(gates, esperados) or e_def1.get("error"):
         return None
     return juez_b2.score_completo(
         b1["BUILD"], b1["M_B1"], e_def1.get("Score_B2", 0.0))

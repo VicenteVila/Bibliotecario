@@ -1135,6 +1135,7 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | **§5.2.0 reencuadre**: techo 40 y pesos → **Capa A-bis**, sin tocarlos | sí | ☑ **2026-10-14** |
 | **§5.2.1 scorer Capa B — FASE B-1** (`game_development`) = **tests de comportamiento en Godot** · binario · determinista · **preflight 2026-10-14: 5/5 PASS** | sí | ☑ **2026-10-14** |
 | **§5.2.1 scorer Capa B — FASE B-2** (`game_development`) = replay + juez multimodal (GameCraft) | sí | ☑ **2026-10-21** — *bloqueo resuelto en Hito 15 (`xdotool`, trazas `Π`); ratificación del dueño junto con §2-§3 de `HITO16_PLAN.md`, **antes de la corrida oficial** · **corrida oficial 2026-10-22 → NO CUMPLE** (U1/U3/U5/U6 ✅; **U2 ❌** juez caucho sobre negro puro 0.7762; **U4 ❌** default−idle = 0.0) — umbrales intactos, evidencia y verificación del instrumento en `evals/HITO16_PLAN.md` §5* |
+| **§5.2.1 FASE B-2 enmienda H17 — prefiltro no-LLM (Opción B) + gate U7 de grounding** | sí | ☑ **2026-10-22** — *decisión del dueño junto con §2 de `HITO17_PLAN.md` (opción B + gates U1-U7), **ANTES de implementar y de medir**; diseño en §1.B del plan; salida propia `evals/results/result_fase2_b2_h17.json` (la de H16 intacta); corrida pendiente* |
 | **§5.2.1 fórmula** `Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)` | sí | ☑ **2026-10-14** |
 | **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☑ **2026-10-14** |
 | **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☑ **2026-10-14** |
@@ -1154,8 +1155,10 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 **Última ratificación: 2026-10-15 — scorer B-1 v2 (enm. 2 + ampliación
 A/B/C). Tras ella: enmienda 3 (2026-10-15, bugfix de timing de los checks
 estáticos tras el primer smoke) y enmienda 4 (2026-10-15, `node_exists`
-admite texto de UI) — ambas sin cambio de kinds ni umbrales.** Las enmiendas
-1 y 2 figuran abajo como registro previo a esa ratificación.
+admite texto de UI) — ambas sin cambio de kinds ni umbrales.** Posterior
+a esta sección: fila **FASE B-2 ☑ 2026-10-21** (H16, corrida 2026-10-22
+→ NO CUMPLE) y **enmienda 5 (2026-10-22, H17: prefiltro no-LLM + U7)**.
+Las enmiendas 1 y 2 figuran abajo como registro previo a esa ratificación.
 *(Cualquier cambio futuro tras ratificar se anota aquí con fecha y motivo —
 no se reescribe en silencio.)*
 
@@ -1254,6 +1257,18 @@ reproducible sin controlar la carga de la máquina; el baseline sigue siendo
 | **validación medida** | fixtures de ratificación **intactas**: `v2-fixture` ok **9/9** · roto **1/9** · `v2-compat` **4/4** (idénticos a §11 enm. 2). Micro-juego sintético con **sólo texto** y ningún nombre relevante: `victoria` **PASS** (`texto: '¡Victoria!'`) · `reinicio` **PASS** (`texto: 'Reiniciar'`) · `avatar` ausente sigue **FAIL** — el fallback no inventa nodos inexistentes. |
 | **qué NO cambia** | recuento de kinds (**21 + BUILD**), umbrales, fórmula, `BUILD=0`, suites (los YAML no se tocan), v1 intacto. **Los scores de la serie 3 no se re-escalaron**: los workspaces se perdieron con un borrado total de `/tmp` (declarado aquí); las cifras de §5.2.2.d siguen siendo las medidas con la enmienda 3. |
 | **artefacto** | `evals/preflight/check_suite_v2.gd` — rama `node_exists` + `_find_ui_text()` |
+
+#### Enmienda 5 — *H17: prefiltro no-LLM para frames sin contenido + gate U7 de grounding* · 2026-10-22
+
+| | |
+|---|---|
+| **objeto** | §5.2.1 FASE B-2 — pipeline de la corrida B-2 (Opción B de `HITO17_PLAN.md`); **sin cambio de kinds B-1, sin cambio de fórmula, pesos, anclajes ni umbrales U1-U6** |
+| **antes** | el juez crudo puntuaba TODO caso, incluido el control negro: 14 frames de negro puro (lum 0.000) salieron con `Score_B2` 0.7762 y 10 presencias ≠0 (juez caucho, **U2 ❌ en H16**); no existía ningún gate que midiera el grounding del propio juez |
+| **ahora** | **(a) prefiltro no-LLM**: caso con TODOS los frames de color plano (min==max por canal; sin umbral calibrado) → el juez **no se llama (0 llamadas)** y los ítems salen 0 por construcción → U2 pasa por construcción, con informe `prefiltro` por caso en la evidencia · **(b) gate U7** (nuevo, ratificado en §2 de `HITO17_PLAN.md`): trampa sintética determinista — `trampa_con` (fondo plano + sprites pintados) vs `trampa_vacio` (mismo fondo sin sprites), evaluadas por el juez CRUDO (sin prefiltro) con la mini-ρ `grounding-trampa.json`; exige `Score_B2(con) ≥ 0.5` **y** `Score_B2(vacío) = 0.0` — un juez caucho falla la segunda |
+| **motivo** | H16 cerró **NO CUMPLE** con U2 ❌ (caucho 0.7762 sobre negro) y U4 ❌ (default−idle = 0.0); el dueño eligió la **Opción B** y ratificó §1+§2 el **2026-10-22 ANTES de implementar** (disciplina H17 §4) |
+| **qué NO cambia** | umbrales U1-U6 · pesos `0.15/0.35/0.15/0.35` · fórmula · anclajes {0,0.5,1} · `PROMPT_B2` · modelo · temp 0 · ρ de `platformer-juego` · evidencia de H16 (`evals/results/result_fase2_b2.json` intacta) · presupuesto ≤10 llamadas |
+| **artefactos** | `evals/preflight/prefiltro_b2.py` · `evals/preflight/run_fase2_b2_h17.py` · `evals/preflight/rubricas/grounding-trampa.json` · salida `evals/results/result_fase2_b2_h17.json` |
+| **ratificación** | ☑ **RATIFICADO 2026-10-22** — decisión del dueño (Opción B + §2 completo tal cual) en `evals/HITO17_PLAN.md`, antes de implementar; fila §11 de arriba. **Corrida oficial pendiente** → veredicto en §5 del plan |
 
 ---
 
