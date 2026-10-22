@@ -210,6 +210,42 @@ falló en parseo y su consumo no queda en `usage`) · **llamadas 5/10** (4 casos
 - **EG intacto**: `find workspace -newermt` → 0 ficheros modificados (todas
   las fases trabajan en copias temporales).
 
+### Anexo A — citas literales del juez (análisis posterior; 0 llamadas nuevas)
+
+Extracto textual de `evals/results/result_fase2_b2.json`, ya medido: este
+anexo solo cita lo que el juez respondió y recomputa sobre los frames
+guardados; **no añade llamadas, ni toca gates, ni modifica umbrales**.
+
+**U2 — sobre 14 frames de negro puro (lum 0.000) el juez afirma ver la
+demo completa** (15 ítems ∈ {0, 0.5, 1}, `Score_B2_negro` = 0.7762):
+
+| ítem | score | justificación literal |
+|---|---|---|
+| B2-D-01 | 1.0 | «El avatar se desplaza claramente de izquierda a derecha a lo largo de los frames.» |
+| B2-D-02 | 1.0 | «Se observa un arco de salto completo donde el personaje asciende y desciende sobre las plataformas.» |
+| B2-D-04 | 1.0 | «La cámara sigue el movimiento del jugador a través del escenario.» |
+| B2-D-05 | 1.0 | «Se observa una bandera al final del recorrido que actúa como meta clara.» |
+| B2-D-06 | 1.0 | «Hay monedas claramente visibles distribuidas por el nivel.» |
+
+(Inventario `V` 1.0·1.0·1.0·1.0·0.5 y `A` 1.0·0.5·1.0·1.0 también sobre
+negro: nada de lo citado existe en los frames.)
+
+**U4 — default e idle: dictamen prácticamente idéntico con `Score_B2`
+exactamente igual (0.3096) y `D/V/A` idénticos (0.1667 / 0.8 / 0.375):**
+
+| caso | B2-D-01 | B2-D-02 |
+|---|---|---|
+| default | 0.0 — «El avatar permanece estático en la misma posición horizontal durante todos los frames.» | 0.0 — «No se observa ningún movimiento vertical ni arco de salto en la secuencia.» |
+| idle | 0.0 — «El avatar permanece estático en la misma posición horizontal en todos los frames.» | 0.0 — «No se observa ningún movimiento vertical ni salto en la secuencia.» |
+
+El caso `default` **sí tiene movimiento real** (5,38% de píxeles evolucionan
+frame 0→13 frente a 1,61% de idle; salto medido ~32 px; HUD `Puntos: 0` en
+ambos extremos) y **B-1 sí lo prueba** (`jugador-mueve dx=200` PASS): la
+cadena replay Π → frames → juez no lo transmite o ρ no lo detecta. El
+recálculo `agregar` = valor almacenado (0.3096 exactos) descarta bug de
+agregación. La causa queda para el **Hito 17** (declaración; sin medir
+hasta ratificar).
+
 ### M_B1 (dato; sin umbral en U6)
 
 BUILD=1.0, M=9/11=0.8333: fallan `meta-existe` y `monedas-existen` porque
