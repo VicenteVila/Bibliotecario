@@ -131,3 +131,58 @@ Esta tabla no se toca tras medir (disciplina dura).
 §5 (cierre) se escribe al cerrar; mientras tanto no existe. Evidencia
 previa de referencia: `evals/results/result_fase2_b2.json` (H16) y el
 «Anexo A» de `evals/HITO16_PLAN.md` §5.
+
+## §5 — Cierre 2026-10-22: **NO CUMPLE** (U4 ❌ medido; U7 sin medir por 503 del endpoint)
+
+Corrida oficial ejecutada tras la implementación (`3cc9f0b`). El endpoint
+`gemini-3.1-flash-lite` vía `generativelanguage` estaba degradado ese día
+(~50% HTTP 503 medido con probes de diagnóstico), por lo que hubo **tres
+intentos**; los dos primeros quedaron incompletos por 503 y se conservan
+como evidencia con su coste. El dueño autorizó cada paso (re-corrida tras
+F1; espera + corrida 3 sin tocar harness tras F2). **Umbrales intactos;
+nada se tocó tras medir.**
+
+| intento | archivo | causa del cierre | llamadas | tokens | log |
+|---|---|---|---|---|---|
+| F1 | `evals/results/result_fase2_b2_h17_f1.json` | incompleto: HTTP 503 ×2 en `idle` (→U4 sin medir) y `trampa_vacio` (→U7 sin completar); coste documentado | 7 | 36 554 | `evals/logs/h17_f1_run.log` |
+| F2 | `evals/results/result_fase2_b2_h17_f2.json` | incompleto: HTTP 503 ×2 en `idle`, `trampa_con` y `trampa_vacio`; coste documentado | 9 | 34 736 | `evals/logs/h17_f2_run.log` |
+| **F3 (oficial)** | `evals/results/result_fase2_b2_h17.json` | **NO CUMPLE con gates medidos** (ver abajo) | 8 | 65 314 | `evals/logs/h17_f3_run.log` |
+
+Coste total de los tres intentos: **24 llamadas / 136 604 tokens** del
+juez, más ~10 probes de diagnóstico de infraestructura (8 chat — 5 OK —
+y 2 GET `/models`; sin rúbrica, no cuentan como medición).
+
+### Veredicto por gate (F3)
+
+- **U1 OK** — 15/15 ítems, scores ∈ {0, 0.5, 1}, justificaciones 15/15,
+  intentos ≤2.
+- **U2 OK — por construcción** — el prefiltro detectó los 14 frames
+  planos del negro y **anuló el caso sin llamar al juez** (0 llamadas,
+  Score_B2 = 0.0, 10/10 presencias en 0). El fallo de caucho de H16
+  (0.7762 sobre negro puro) quedó **resuelto por diseño** en los tres
+  intentos.
+- **U3 OK** — default vs default2: ΔScore_B2 = 0.0 ≤ 0.1 (y Δ por
+  categoría 0.0).
+- **U4 ❌ MEDIDO** — `Score_B2(default) = 0.3096 − Score_B2(idle) =
+  0.3096 = 0.0` (exigido ≥0.1). El juez puntuó **igual** la partida real
+  y el juego idle: **sigue sin discriminar contenido**, exactamente como
+  en H16. Este fallo es de medición, no de infraestructura.
+- **U5 OK** — ρ bajo `evals/` (fuera de EG), 0 apariciones en workspace
+  y en copia.
+- **U6 OK** — BUILD = 1.0, M_B1 = 0.8333 (9/11), 8/10 llamadas ≤10.
+- **U7 — SIN MEDIR** — las dos trampas recibieron HTTP 503 ×2 cada una
+  (F1 sí midió `trampa_con`: Score_B2 = 0.675 ≥ 0.5 — el juez ve el
+  contenido pintado). No altera el veredicto: U4 ya es fallo y los gates
+  exigen U1-U7 **todos** OK.
+- **Score_final** no publicado (D2 con el set completo U1-U7).
+
+### Lectura (para el dueño; sin tocar nada ya medido)
+
+La **Opción B cumplió su objetivo puntual**: el prefiltro elimina el
+falso de caucho del negro con **0 llamadas** y U2 pasa por construcción.
+Pero H16 no fallaba solo por caucho: **U4 confirma que el problema de
+fondo es la insensibilidad del juez al contenido real** (0.3096 = 0.3096),
+por lo que el instrumento B-2 **sigue sin validez de contenido** y el
+scorer Capa B no puede declararse válido. Próximos pasos a decisión del
+dueño (sin umbral tocado): opciones A/C de §1 (calibrar umbral del
+prefiltro / replanteo del juez), o replanteo más amplio del juez B-2.

@@ -1,0 +1,302 @@
+{
+  "hito": 17,
+  "tarea": "platformer-juego",
+  "enmienda": "B — prefiltro no-LLM (HITO17_PLAN.md §1.B)",
+  "juez": "gemini-3.1-flash-lite",
+  "temperatura": 0.0,
+  "rubrica": "/mnt/c/Bibliotecario/evals/preflight/rubricas/platformer-juego.json",
+  "BUILD": 1.0,
+  "M_B1": 0.8333,
+  "b1_fila": {
+    "task": "platformer-juego",
+    "m_pass": 10,
+    "m_total": 12,
+    "validation": "FAILED",
+    "build_ok": true,
+    "score": 83.33,
+    "failed": [
+      "meta-existe",
+      "monedas-existen"
+    ],
+    "log": "Godot Engine v4.7.1.stable.official.a13da4feb - https://godotengine.org\n\n=== CAPA B-1 v2 · tarea: platformer-juego ===\n   escena principal: res://main.tscn\n[PASS] build — el proyecto carga en Godot headless — res://main.tscn\n[PASS] jugador-existe — hay un nodo jugador — Player\n[PASS] jugador-fisica — el jugador es CharacterBody2D (física real) — tipo real: CharacterBody2D · esperado CharacterBody2D\n[FAIL] meta-existe — hay un nodo meta/victoria — no encontrado. nombres: [\"Goal\", \"Meta\", \"Finish\", \"Exit\", \"Victoria\", \"Win\", \"goal\"]\n[FAIL] monedas-existen — hay monedas/objetos recogibles — no encontrado. nombres: [\"Coin\", \"Moneda\", \"coin\", \"Oro\", \"Pickable\"]\n[PASS] hud-visible — hay un HUD (CanvasLayer) — CanvasLayer\n[PASS] hud-puntos — el HUD muestra puntos — 'Puntos: 0'\n   nodo bajo prueba: Player @ (100.0, 500.0)\n[PASS] jugador-mueve — el jugador se mueve bajo input de flecha — dx=200.00 px en 45 frames\n   nodo bajo prueba: Player @ (100.0, 500.0)\n[PASS] jugador-salta — el jugador salta bajo ui_accept (espacio) — subida máx 66.33 px\n   nodo bajo prueba: Player @ (100.0, 500.3)\n[PASS] colisiona-y-gravedad — el jugador asienta en el suelo (gravedad + colisión, sin teleport) — is_on_floor=true · descenso 75.0 px\n   nodo bajo prueba: Player @ (100.0, 500.3)\n[PASS] camara-sigue — la cámara sigue al jugador — dist cámara→jugador 0.0 → 0.0\n\n=== M = 9/11 ===\nVALIDATION_FAILED\n"
+  },
+  "evaluaciones": {
+    "default": {
+      "caso": "default",
+      "frames": 14,
+      "secs": 24.7,
+      "intentos": 2,
+      "items": {
+        "B2-D-01": 0.0,
+        "B2-D-02": 0.0,
+        "B2-D-03": 1.0,
+        "B2-D-04": 0.0,
+        "B2-D-05": 0.0,
+        "B2-D-06": 0.0,
+        "B2-V-01": 0.5,
+        "B2-V-02": 1.0,
+        "B2-V-03": 1.0,
+        "B2-V-04": 1.0,
+        "B2-V-05": 1.0,
+        "B2-A-01": 1.0,
+        "B2-A-02": 0.5,
+        "B2-A-03": 0.0,
+        "B2-A-04": 0.0
+      },
+      "justificaciones": {
+        "B2-D-01": "El avatar permanece estático en la misma posición horizontal durante todos los frames.",
+        "B2-D-02": "No se observa ningún movimiento vertical ni arco de salto en la secuencia.",
+        "B2-D-03": "El avatar mantiene un contacto estable y constante sobre la plataforma verde.",
+        "B2-D-04": "La cámara es estática y no acompaña ninguna acción del jugador.",
+        "B2-D-05": "No se observa ningún elemento que represente una meta o fin de nivel.",
+        "B2-D-06": "No hay objetos coleccionables presentes en la escena.",
+        "B2-V-01": "Existe un HUD básico con el texto 'Puntos: 0' en la esquina superior izquierda.",
+        "B2-V-02": "El cuadrado rojo es claramente distinguible como el avatar del jugador.",
+        "B2-V-03": "La plataforma verde es claramente visible como geometría de suelo.",
+        "B2-V-04": "La acción principal no está obstruida por ningún elemento de la interfaz.",
+        "B2-V-05": "La escena contiene sprites renderizados de forma consistente.",
+        "B2-A-01": "Existe una coherencia cromática simple entre el fondo, el avatar y la plataforma.",
+        "B2-A-02": "La composición es básica, limitándose a un fondo, una plataforma y un actor.",
+        "B2-A-03": "No se observa ninguna animación o movimiento en el avatar o la escena.",
+        "B2-A-04": "No hay feedback visual al no realizarse ninguna acción observable."
+      },
+      "usage": {
+        "completion_tokens": 601,
+        "prompt_tokens": 16767,
+        "total_tokens": 17368
+      },
+      "D": 0.1667,
+      "V": 0.8,
+      "A": 0.375,
+      "Score_B2": 0.3096,
+      "prefiltro": {
+        "aplicado": true,
+        "total": 14,
+        "planos": 0,
+        "sin_contenido": false,
+        "motivo": ""
+      }
+    },
+    "default2": {
+      "caso": "default2",
+      "frames": 14,
+      "secs": 10.1,
+      "intentos": 1,
+      "items": {
+        "B2-D-01": 0.0,
+        "B2-D-02": 0.0,
+        "B2-D-03": 1.0,
+        "B2-D-04": 0.0,
+        "B2-D-05": 0.0,
+        "B2-D-06": 0.0,
+        "B2-V-01": 0.5,
+        "B2-V-02": 1.0,
+        "B2-V-03": 1.0,
+        "B2-V-04": 1.0,
+        "B2-V-05": 1.0,
+        "B2-A-01": 1.0,
+        "B2-A-02": 0.5,
+        "B2-A-03": 0.0,
+        "B2-A-04": 0.0
+      },
+      "justificaciones": {
+        "B2-D-01": "El avatar permanece estático en la misma posición horizontal durante todos los frames.",
+        "B2-D-02": "No se observa ningún movimiento vertical ni arco de salto en la secuencia.",
+        "B2-D-03": "El avatar mantiene un contacto estable y constante sobre la plataforma verde.",
+        "B2-D-04": "La cámara es estática y no acompaña ninguna acción del jugador.",
+        "B2-D-05": "No se observa ningún elemento que represente una meta o fin de nivel.",
+        "B2-D-06": "No hay objetos coleccionables presentes en la escena.",
+        "B2-V-01": "Existe un HUD básico con el texto 'Puntos: 0' en la esquina superior izquierda.",
+        "B2-V-02": "El cuadrado rojo es claramente distinguible como el avatar del jugador.",
+        "B2-V-03": "La plataforma verde es claramente visible como geometría de suelo.",
+        "B2-V-04": "La acción principal no está obstruida por ningún elemento de la interfaz.",
+        "B2-V-05": "La escena contiene sprites renderizados de forma consistente.",
+        "B2-A-01": "Existe una coherencia cromática simple entre el fondo, el avatar y la plataforma.",
+        "B2-A-02": "La composición es básica, limitándose a un fondo, una plataforma y un actor.",
+        "B2-A-03": "No se observa ninguna animación o movimiento en el avatar o la escena.",
+        "B2-A-04": "No hay feedback visual al no realizarse ninguna acción observable."
+      },
+      "usage": {
+        "completion_tokens": 601,
+        "prompt_tokens": 16767,
+        "total_tokens": 17368
+      },
+      "D": 0.1667,
+      "V": 0.8,
+      "A": 0.375,
+      "Score_B2": 0.3096,
+      "prefiltro": {
+        "aplicado": true,
+        "total": 14,
+        "planos": 0,
+        "sin_contenido": false,
+        "motivo": ""
+      }
+    },
+    "negro": {
+      "caso": "negro",
+      "frames": 14,
+      "secs": 0.2,
+      "intentos": 0,
+      "items": {
+        "B2-D-01": 0.0,
+        "B2-D-02": 0.0,
+        "B2-D-03": 0.0,
+        "B2-D-04": 0.0,
+        "B2-D-05": 0.0,
+        "B2-D-06": 0.0,
+        "B2-V-01": 0.0,
+        "B2-V-02": 0.0,
+        "B2-V-03": 0.0,
+        "B2-V-04": 0.0,
+        "B2-V-05": 0.0,
+        "B2-A-01": 0.0,
+        "B2-A-02": 0.0,
+        "B2-A-03": 0.0,
+        "B2-A-04": 0.0
+      },
+      "justificaciones": {
+        "B2-D-01": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-D-02": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-D-03": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-D-04": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-D-05": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-D-06": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-V-01": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-V-02": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-V-03": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-V-04": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-V-05": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-A-01": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-A-02": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-A-03": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción",
+        "B2-A-04": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción"
+      },
+      "usage": {},
+      "D": 0.0,
+      "V": 0.0,
+      "A": 0.0,
+      "Score_B2": 0.0,
+      "prefiltro": {
+        "aplicado": true,
+        "total": 14,
+        "planos": 14,
+        "sin_contenido": true,
+        "motivo": "prefiltro: 14/14 frames de color plano (sin contenido) — anulación por construcción"
+      }
+    },
+    "idle": {
+      "caso": "idle",
+      "frames": 26,
+      "secs": 32.2,
+      "intentos": 1,
+      "items": {
+        "B2-D-01": 0.0,
+        "B2-D-02": 0.0,
+        "B2-D-03": 1.0,
+        "B2-D-04": 0.0,
+        "B2-D-05": 0.0,
+        "B2-D-06": 0.0,
+        "B2-V-01": 0.5,
+        "B2-V-02": 1.0,
+        "B2-V-03": 1.0,
+        "B2-V-04": 1.0,
+        "B2-V-05": 0.5,
+        "B2-A-01": 1.0,
+        "B2-A-02": 0.5,
+        "B2-A-03": 0.0,
+        "B2-A-04": 0.0
+      },
+      "justificaciones": {
+        "B2-D-01": "El avatar permanece en la misma posición horizontal en todos los frames observados.",
+        "B2-D-02": "No se observa ningún movimiento vertical ni salto en la secuencia.",
+        "B2-D-03": "El avatar se mantiene estático sobre la plataforma verde sin atravesarla.",
+        "B2-D-04": "La cámara permanece fija y no acompaña ninguna acción del jugador.",
+        "B2-D-05": "No se observa ningún elemento que represente una meta o un objetivo de nivel.",
+        "B2-D-06": "No hay objetos coleccionables presentes en la escena.",
+        "B2-V-01": "El HUD es visible con el texto 'Puntos: 0', pero es extremadamente minimalista.",
+        "B2-V-02": "El cuadrado rojo es claramente distinguible como la entidad jugable.",
+        "B2-V-03": "La plataforma verde es claramente visible como geometría de suelo.",
+        "B2-V-04": "La acción principal no está obstruida por ningún elemento de la UI.",
+        "B2-V-05": "La escena contiene elementos básicos, pero carece de complejidad visual.",
+        "B2-A-01": "Existe una coherencia cromática simple entre el fondo, el avatar y la plataforma.",
+        "B2-A-02": "La composición es básica, limitándose a un fondo, una plataforma y un actor.",
+        "B2-A-03": "No se observa ninguna animación ni movimiento en el avatar o la escena durante el replay.",
+        "B2-A-04": "No hay feedback visual ya que no se realiza ninguna acción durante el replay."
+      },
+      "usage": {
+        "completion_tokens": 611,
+        "prompt_tokens": 29967,
+        "total_tokens": 30578
+      },
+      "D": 0.1667,
+      "V": 0.8,
+      "A": 0.375,
+      "Score_B2": 0.3096,
+      "prefiltro": {
+        "aplicado": true,
+        "total": 26,
+        "planos": 0,
+        "sin_contenido": false,
+        "motivo": ""
+      }
+    },
+    "trampa_con": {
+      "caso": "trampa_con",
+      "error": "HTTP Error 503: Service Unavailable",
+      "intentos": 2,
+      "frames": 1,
+      "secs": 17.4,
+      "usage": {},
+      "prefiltro": {
+        "aplicado": false,
+        "sin_contenido": false
+      }
+    },
+    "trampa_vacio": {
+      "caso": "trampa_vacio",
+      "error": "HTTP Error 503: Service Unavailable",
+      "intentos": 2,
+      "frames": 1,
+      "secs": 20.1,
+      "usage": {},
+      "prefiltro": {
+        "aplicado": false,
+        "sin_contenido": false
+      }
+    }
+  },
+  "Score_final": null,
+  "llamadas": 8,
+  "tokens_total": 65314,
+  "gates": {
+    "U5": {
+      "ok": true,
+      "detalle": "ρ en /mnt/c/Bibliotecario/evals/preflight/rubricas/platformer-juego.json (fuera de EG: True) · workspace hits=0 · copia hits=0"
+    },
+    "U6": {
+      "ok": true,
+      "detalle": "B-1: BUILD=1.0 M_B1=0.8333 · llamadas=8/10 · suite+ruff aparte"
+    },
+    "U1": {
+      "ok": true,
+      "detalle": "15/15 ítems · scores∈{0,0.5,1}=True · justif=15/15 · intentos=2/2"
+    },
+    "U2": {
+      "ok": true,
+      "detalle": "presencia=0: 10/10 · Score_B2_negro=0.0 (≤0.3) · prefiltro activo (anulacion por construccion)"
+    },
+    "U3": {
+      "ok": true,
+      "detalle": "ΔScore_B2=0.0 (≤0.1) · Δcategorías={'D': 0.0, 'V': 0.0, 'A': 0.0} (≤0.15 c/u)"
+    },
+    "U4": {
+      "ok": false,
+      "detalle": "Score_B2(default)=0.3096 − Score_B2(idle)=0.3096 = 0.0 (≥0.1)"
+    },
+    "U7": {
+      "ok": false,
+      "detalle": "trampa con error: con=HTTP Error 503: Service Unavailable · vacio=HTTP Error 503: Service Unavailable"
+    }
+  }
+}

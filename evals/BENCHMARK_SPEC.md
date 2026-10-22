@@ -1135,7 +1135,7 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | **§5.2.0 reencuadre**: techo 40 y pesos → **Capa A-bis**, sin tocarlos | sí | ☑ **2026-10-14** |
 | **§5.2.1 scorer Capa B — FASE B-1** (`game_development`) = **tests de comportamiento en Godot** · binario · determinista · **preflight 2026-10-14: 5/5 PASS** | sí | ☑ **2026-10-14** |
 | **§5.2.1 scorer Capa B — FASE B-2** (`game_development`) = replay + juez multimodal (GameCraft) | sí | ☑ **2026-10-21** — *bloqueo resuelto en Hito 15 (`xdotool`, trazas `Π`); ratificación del dueño junto con §2-§3 de `HITO16_PLAN.md`, **antes de la corrida oficial** · **corrida oficial 2026-10-22 → NO CUMPLE** (U1/U3/U5/U6 ✅; **U2 ❌** juez caucho sobre negro puro 0.7762; **U4 ❌** default−idle = 0.0) — umbrales intactos, evidencia y verificación del instrumento en `evals/HITO16_PLAN.md` §5* |
-| **§5.2.1 FASE B-2 enmienda H17 — prefiltro no-LLM (Opción B) + gate U7 de grounding** | sí | ☑ **2026-10-22** — *decisión del dueño junto con §2 de `HITO17_PLAN.md` (opción B + gates U1-U7), **ANTES de implementar y de medir**; diseño en §1.B del plan; salida propia `evals/results/result_fase2_b2_h17.json` (la de H16 intacta); corrida pendiente* |
+| **§5.2.1 FASE B-2 enmienda H17 — prefiltro no-LLM (Opción B) + gate U7 de grounding** | sí | ☑ **2026-10-22** — *decisión del dueño junto con §2 de `HITO17_PLAN.md` (opción B + gates U1-U7), **ANTES de implementar y de medir**; diseño en §1.B del plan; salida propia `evals/results/result_fase2_b2_h17.json` (la de H16 intacta) · **corrida oficial 2026-10-22 → NO CUMPLE** (U2 ✅ por construcción con prefiltro 0 llamadas; **U4 ❌ medido** Δ=0.0 default−idle; U7 sin medir por 503 del endpoint degradado; F1-F3 documentados con coste en `HITO17_PLAN.md` §5)* |
 | **§5.2.1 fórmula** `Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)` | sí | ☑ **2026-10-14** |
 | **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☑ **2026-10-14** |
 | **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☑ **2026-10-14** |
@@ -1268,7 +1268,7 @@ reproducible sin controlar la carga de la máquina; el baseline sigue siendo
 | **motivo** | H16 cerró **NO CUMPLE** con U2 ❌ (caucho 0.7762 sobre negro) y U4 ❌ (default−idle = 0.0); el dueño eligió la **Opción B** y ratificó §1+§2 el **2026-10-22 ANTES de implementar** (disciplina H17 §4) |
 | **qué NO cambia** | umbrales U1-U6 · pesos `0.15/0.35/0.15/0.35` · fórmula · anclajes {0,0.5,1} · `PROMPT_B2` · modelo · temp 0 · ρ de `platformer-juego` · evidencia de H16 (`evals/results/result_fase2_b2.json` intacta) · presupuesto ≤10 llamadas |
 | **artefactos** | `evals/preflight/prefiltro_b2.py` · `evals/preflight/run_fase2_b2_h17.py` · `evals/preflight/rubricas/grounding-trampa.json` · salida `evals/results/result_fase2_b2_h17.json` |
-| **ratificación** | ☑ **RATIFICADO 2026-10-22** — decisión del dueño (Opción B + §2 completo tal cual) en `evals/HITO17_PLAN.md`, antes de implementar; fila §11 de arriba. **Corrida oficial pendiente** → veredicto en §5 del plan |
+| **ratificación** | ☑ **RATIFICADO 2026-10-22** — decisión del dueño (Opción B + §2 completo tal cual) en `evals/HITO17_PLAN.md`, antes de implementar; fila §11 de arriba. **Corrida 2026-10-22 → NO CUMPLE** (veredicto por gate y coste de F1-F3 en §5 del plan) |
 
 ---
 

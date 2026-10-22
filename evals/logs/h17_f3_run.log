@@ -1,0 +1,21 @@
+U5 ρ oculta: OK — ρ en /mnt/c/Bibliotecario/evals/preflight/rubricas/platformer-juego.json (fuera de EG: True) · workspace hits=0 · copia hits=0
+U6 B-1: BUILD=1.0 M_B1=0.8333
+frames: default …
+  default 14 · idle …
+  idle 26 · negro …
+  negro 14 · trampa U7 …
+  trampa: con (sprites) + vacio (fondo plano)
+
+==================================================================
+HITO17 B-2 etapa 2 (Opcion B) — UMBRALES
+==================================================================
+  U1  OK     15/15 ítems · scores∈{0,0.5,1}=True · justif=15/15 · intentos=2/2
+  U2  OK     presencia=0: 10/10 · Score_B2_negro=0.0 (≤0.3) · prefiltro activo (anulacion por construccion)
+  U3  OK     ΔScore_B2=0.0 (≤0.1) · Δcategorías={'D': 0.0, 'V': 0.0, 'A': 0.0} (≤0.15 c/u)
+  U4  FALLA  Score_B2(default)=0.3096 − Score_B2(idle)=0.3096 = 0.0 (≥0.1)
+  U5  OK     ρ en /mnt/c/Bibliotecario/evals/preflight/rubricas/platformer-juego.json (fuera de EG: True) · workspace hits=0 · copia hits=0
+  U6  OK     B-1: BUILD=1.0 M_B1=0.8333 · llamadas=8/10 · suite+ruff aparte
+  U7  FALLA  trampa con error: con=HTTP Error 503: Service Unavailable · vacio=HTTP Error 503: Service Unavailable
+  llamadas=8 · tokens=65314 · Score_final=None
+  → NO CUMPLE · /mnt/c/Bibliotecario/evals/results/result_fase2_b2_h17.json
+==================================================================

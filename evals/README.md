@@ -27,6 +27,11 @@ enmienda Opción B: prefiltro no-LLM + gate U7), `pi_*.py`/`*.gd` (trazas Π
 y replay), `lint_suites_v2.py`, `results/` (evidencia B-1/B-2),
 `fixtures/`, `scripts/`. Reglas congeladas: ver §3 de `HITO16_PLAN.md`,
 §1.B-§3 de `HITO17_PLAN.md` y §5.2.1/§5.2.2 de `BENCHMARK_SPEC.md`.
+Decodificador de nombres de la evidencia H17: `result_fase2_b2_h17.json`
+= corrida oficial F3 (NO CUMPLE, veredicto en `HITO17_PLAN.md` §5);
+`result_fase2_b2_h17_f1.json` y `_f2.json` = intentos incompletos por
+HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
+= stdout de cada intento.
 
 ## Decodificador de nombres
 
