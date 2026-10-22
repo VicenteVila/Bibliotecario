@@ -31,7 +31,7 @@ ver §3 de `HITO16_PLAN.md` y §5.2.1/§5.2.2 de `BENCHMARK_SPEC.md`.
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO17_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 aún en declaración, sin §5) |
+| `HITO3_PLAN.md`…`HITO17_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 en curso: §2 ratificado 2026-10-22, aún sin §5) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |

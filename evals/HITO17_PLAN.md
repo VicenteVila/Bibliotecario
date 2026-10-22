@@ -1,9 +1,10 @@
 # HITO 17 — PLAN (declaración): grounding del juez B-2
 
-> **DECLARADO 2026-10-22.** Este fichero es una **declaración**, no una
-> medición: todavía no hay código nuevo, ni corridas, ni llamadas al juez.
-> Los umbrales de §2 están **☐ sin ratificar** — el hito no empieza a medir
-> hasta que el dueño ratifique §2 y la opción de §1.
+> **DECLARADO y RATIFICADO 2026-10-22.** El dueño eligió la **Opción B
+> (prefiltro no-LLM)** de §1 y ratificó **§2 completo (U1-U7) tal como está
+> escrito**, ☐→☑, **antes de implementar y antes de medir**. En este momento
+> el hito sigue con **código 0 y llamadas 0 al juez**: esto es la marca de
+> ratificación; §5 (cierre) se escribe al terminar.
 
 ## §0 — Estado y bloqueos medidos
 
@@ -43,20 +44,22 @@ Tres vías de enmienda, no excluyentes entre sí:
   `gemini-*` u otro proveedor vía `Q1_BASE_URL`). Riesgo: rompe el congelado
   H16 §3 (modelo + temp) → U3 se re-mide; cambia coste/varianza.
 
-La decisión (opción o combinación) se declara en un commit **ANTES** de
-escribir código. Sin decisión, este plan no avanza.
+**Decisión del dueño — 2026-10-22: Opción B (prefiltro no-LLM).**
+Registrada en este commit, ANTES de escribir código. Las opciones A y C
+quedan sin elegir para este hito; cualquier combinación posterior exigiría
+nueva decisión del dueño.
 
-## §2 — Umbrales propuestos (☐ sin ratificar — no medir hasta ☑)
+## §2 — Umbrales (RATIFICADOS 2026-10-22 por el dueño — antes de implementar y de medir)
 
-| gate | umbral propuesto | estado |
+| gate | umbral | estado |
 |---|---|---|
-| **U1** juez válido | igual H16: JSON estricto completo, justificaciones no vacías, ≤2 intentos | ☐ sin ratificar |
-| **U2′** anti-caucho (con prefiltro si Opción B) | ítems `presencia:true` = 0 sobre negro **y** `Score_B2_negro ≤ 0.30` | ☐ sin ratificar |
-| **U3** estabilidad | Δ`Score_B2` ≤ 0.10 y Δ por categoría ≤ 0.15, temp 0 | ☐ sin ratificar |
-| **U4′** orden (sensibilidad) | `Score_B2(default) − Score_B2(idle) ≥ 0.10` | ☐ sin ratificar |
-| **U5** ρ oculta | 0 coincidencias de `B2-` en workspace y copia temporal | ☐ sin ratificar |
-| **U6** resto | `BUILD=1` · suite ≥ 360 · ruff · clave-scan · llamadas ≤ 10 | ☐ sin ratificar |
-| **U7** grounding (nuevo, si procede) | trampa sintética: frame con objeto pintado vs su versión borrada → score ≥ 0.5 el primero y 0 la segunda (propuesta; forma final = diseño en §1) | ☐ sin ratificar |
+| **U1** juez válido | igual H16: JSON estricto completo, justificaciones no vacías, ≤2 intentos | ☑ 2026-10-22 |
+| **U2′** anti-caucho (con prefiltro si Opción B) | ítems `presencia:true` = 0 sobre negro **y** `Score_B2_negro ≤ 0.30` | ☑ 2026-10-22 |
+| **U3** estabilidad | Δ`Score_B2` ≤ 0.10 y Δ por categoría ≤ 0.15, temp 0 | ☑ 2026-10-22 |
+| **U4′** orden (sensibilidad) | `Score_B2(default) − Score_B2(idle) ≥ 0.10` | ☑ 2026-10-22 |
+| **U5** ρ oculta | 0 coincidencias de `B2-` en workspace y copia temporal | ☑ 2026-10-22 |
+| **U6** resto | `BUILD=1` · suite ≥ 360 · ruff · clave-scan · llamadas ≤ 10 | ☑ 2026-10-22 |
+| **U7** grounding (nuevo) | trampa sintética: frame con objeto pintado vs su versión borrada → score ≥ 0.5 el primero y 0 la segunda (propuesta; forma final = diseño en §1) | ☑ 2026-10-22 |
 
 Sin ratificación, cualquier corrida que use estos gates **no cuenta**.
 Esta tabla no se toca tras medir (disciplina dura).
@@ -74,9 +77,10 @@ Esta tabla no se toca tras medir (disciplina dura).
 
 ## §4 — Disciplina (sin medir hasta ratificar)
 
-1. Este plan se commitea **como declaración**: código 0, llamadas 0.
-2. El dueño elige opción en §1 y ratifica §2 (☐→☑) — **ANTES** de
-   implementar nada que mida y de cualquier llamada al juez.
+1. ✔ Este plan se commiteó **como declaración** (`10ae417`): código 0,
+   llamadas 0.
+2. ✔ **Ratificación del dueño 2026-10-22** (este commit): opción B en §1 y
+   §2 ☐→☑ — **antes** de implementar y de cualquier llamada al juez.
 3. Solo entonces: implementación + tests puros (suite ≥ 360) + ruff +
    fila §11 de `BENCHMARK_SPEC.md` con los gates ya ratificados →
    corrida oficial única (U1-U7) → §5 con veredicto.
