@@ -1136,6 +1136,7 @@ Esta especificación **no vale nada hasta que se ratifique**, y una vez ratifica
 | **§5.2.1 scorer Capa B — FASE B-1** (`game_development`) = **tests de comportamiento en Godot** · binario · determinista · **preflight 2026-10-14: 5/5 PASS** | sí | ☑ **2026-10-14** |
 | **§5.2.1 scorer Capa B — FASE B-2** (`game_development`) = replay + juez multimodal (GameCraft) | sí | ☑ **2026-10-21** — *bloqueo resuelto en Hito 15 (`xdotool`, trazas `Π`); ratificación del dueño junto con §2-§3 de `HITO16_PLAN.md`, **antes de la corrida oficial** · **corrida oficial 2026-10-22 → NO CUMPLE** (U1/U3/U5/U6 ✅; **U2 ❌** juez caucho sobre negro puro 0.7762; **U4 ❌** default−idle = 0.0) — umbrales intactos, evidencia y verificación del instrumento en `evals/HITO16_PLAN.md` §5* |
 | **§5.2.1 FASE B-2 enmienda H17 — prefiltro no-LLM (Opción B) + gate U7 de grounding** | sí | ☑ **2026-10-22** — *decisión del dueño junto con §2 de `HITO17_PLAN.md` (opción B + gates U1-U7), **ANTES de implementar y de medir**; diseño en §1.B del plan; salida propia `evals/results/result_fase2_b2_h17.json` (la de H16 intacta) · **corrida oficial 2026-10-22 → NO CUMPLE** (U2 ✅ por construcción con prefiltro 0 llamadas; **U4 ❌ medido** Δ=0.0 default−idle; U7 sin medir por 503 del endpoint degradado; F1-F3 documentados con coste en `HITO17_PLAN.md` §5)* |
+| **§5.2.1 FASE B-2 enmienda H18 — scorer híbrido (M_mov determinista + juez V/A)** | sí | ☑ **2026-10-22** — *ratificación del dueño junto con §1-§2 de `HITO18_PLAN.md` (diseño + gates U1-U7 con U4′ de movimiento y U7a/U7b), **ANTES de implementar y de medir**; diagnóstico: el juez reporta ausente un movimiento objetivamente presente (0.952 vs 0.046, 20×) — §0 del plan; salida propia `evals/results/result_fase2_b2_h18.json`; corrida pendiente* |
 | **§5.2.1 fórmula** `Score = BUILD × (0.15·M_B1 + 0.35·D_B2 + 0.15·V_B2 + 0.35·A_B2)` | sí | ☑ **2026-10-14** |
 | **§5.2.1 `BUILD = 0` → nota final = 0** (cero, no techo) | sí | ☑ **2026-10-14** |
 | **§5.2.1 prohibición**: no agregar A-bis y B en una nota | sí | ☑ **2026-10-14** |
@@ -1157,7 +1158,8 @@ A/B/C). Tras ella: enmienda 3 (2026-10-15, bugfix de timing de los checks
 estáticos tras el primer smoke) y enmienda 4 (2026-10-15, `node_exists`
 admite texto de UI) — ambas sin cambio de kinds ni umbrales.** Posterior
 a esta sección: fila **FASE B-2 ☑ 2026-10-21** (H16, corrida 2026-10-22
-→ NO CUMPLE) y **enmienda 5 (2026-10-22, H17: prefiltro no-LLM + U7)**.
+→ NO CUMPLE), **enmienda 5 (2026-10-22, H17: prefiltro no-LLM + U7)** y
+**enmienda 6 (2026-10-22, H18: scorer híbrido M_mov + juez V/A)**.
 Las enmiendas 1 y 2 figuran abajo como registro previo a esa ratificación.
 *(Cualquier cambio futuro tras ratificar se anota aquí con fecha y motivo —
 no se reescribe en silencio.)*
@@ -1269,6 +1271,18 @@ reproducible sin controlar la carga de la máquina; el baseline sigue siendo
 | **qué NO cambia** | umbrales U1-U6 · pesos `0.15/0.35/0.15/0.35` · fórmula · anclajes {0,0.5,1} · `PROMPT_B2` · modelo · temp 0 · ρ de `platformer-juego` · evidencia de H16 (`evals/results/result_fase2_b2.json` intacta) · presupuesto ≤10 llamadas |
 | **artefactos** | `evals/preflight/prefiltro_b2.py` · `evals/preflight/run_fase2_b2_h17.py` · `evals/preflight/rubricas/grounding-trampa.json` · salida `evals/results/result_fase2_b2_h17.json` |
 | **ratificación** | ☑ **RATIFICADO 2026-10-22** — decisión del dueño (Opción B + §2 completo tal cual) en `evals/HITO17_PLAN.md`, antes de implementar; fila §11 de arriba. **Corrida 2026-10-22 → NO CUMPLE** (veredicto por gate y coste de F1-F3 en §5 del plan) |
+
+#### Enmienda 6 — *H18: scorer B-2 híbrido (métrica determinista M_mov + juez V/A)* · 2026-10-22
+
+| | |
+|---|---|
+| **objeto** | §5.2.1 FASE B-2 — definición de `Score_B2` y gates de sensibilidad; **fórmula externa `BUILD × (0.15·M_B1 + Score_B2)`, anclajes, `PROMPT_B2`, modelo, temp 0, ρ, prefiltro y B-1 intactos** |
+| **antes** | `Score_B2 = 0.35·D + 0.15·V + 0.35·A` (todo el juez); **U4 exigía al juez** `Score(default) − Score(idle) ≥ 0.10` → el juez reporta ausente un movimiento objetivamente presente (default 0.952 vs idle 0.046 de Δ entre frames, **20×**, citado en `HITO18_PLAN.md` §0) → U4 ❌ medido en H16 y H17 |
+| **ahora** | **`Score_B2 = 0.50·S_mov + 0.25·V + 0.25·A`**, donde `S_mov = clamp(M_mov(default)/0.50, 0, 1)` y `M_mov` = Δ media absoluta entre frames consecutivos en grises (métrica determinista no-LLM, `evals/preflight/movimiento_b2.py`). El juez solo puntúa **V/A** (los ítems D se registran pero no puntúan). **U4′** determinista: `M_mov(default) ≥ 0.20` y `Δ(default−idle) ≥ 0.15` y `M_mov(idle) ≤ 0.15` (calibrados 3-6× sobre los datos de §0). **U7a** = trampa del juez de H17 intacta; **U7b** = trampa de la métrica (sprite en movimiento ≥0.20 vs estática ≤0.05). Llamadas ≤8 (idle y negro ya no llaman) |
+| **motivo** | H17 cerró **NO CUMPLE** con U4 ❌ medido: el diagnóstico post-mortem (0 llamadas, frames ya evidenciados) demostró que el fallo no es de prompt ni de endpoint sino del rol — los LLM no diffen secuencias de frames |
+| **qué NO cambia** | fórmula externa · anclajes {0,0.5,1} · `PROMPT_B2` · modelo · temp 0 · ρ 15 ítems · prefiltro Opción B (U2 por construcción) · U1/U2/U3/U5 · B-1 · evidencia H16/H17 · disciplina D2 |
+| **artefactos** | `evals/preflight/movimiento_b2.py` · `evals/preflight/run_fase2_b2_h18.py` · `tests/test_movimiento_h18.py` · salida `evals/results/result_fase2_b2_h18.json` |
+| **ratificación** | ☑ **RATIFICADO 2026-10-22** — §1+§2 de `evals/HITO18_PLAN.md` ☑ por el dueño **ANTES de implementar** (commit de ratificación); diseño implementado declarado en §1.B del plan. **Corrida oficial pendiente** → veredicto en §5 |
 
 ---
 

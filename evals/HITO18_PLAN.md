@@ -99,6 +99,40 @@ anclajes, la ρ de `platformer-juego`, el prefiltro, la fórmula externa
 ni B-1. No elimina al juez: le quita únicamente el rol que las
 evidencias de H16-H17 demostraron que no puede cumplir.
 
+### §1.B — Diseño implementado (declarado en el commit de implementación, ANTES de medir)
+
+**`evals/preflight/movimiento_b2.py`.** `m_mov(frames)` = media de
+`|I_{i+1} − I_i|` sobre grises (Pillow `convert("L")`, dtype int16);
+`s_mov(m)` = `clamp(m/0.50, 0, 1)`; `score_b2_hibrido(s, v, a)` =
+`0.50·s + 0.25·v + 0.25·a`. Trampas U7b: `trampas_mov(destino)` genera
+con Pillow (sin RNG) 8 frames 1280×720 de fondo plano con un sprite
+amarillo 64×64 que avanza 40 px/frame y su gemela con el sprite fijo.
+Gates `gate_u4p` y `gate_u7b` con los umbrales ratificados de §2.
+
+**`evals/preflight/run_fase2_b2_h18.py`.** Corrida oficial (salida
+`evals/results/result_fase2_b2_h18.json`; H16/H17 intactos). Reusa de
+H16/H17: gates U1/U2/U5/U6, `_json_suite_runner`, builders de frames,
+`_eval` con prefiltro, `_gate_u5`, trampa U7a (`frames_trampa` +
+`grounding-trampa.json`). Secuencia: U5 → B-1 → frames (default reusa
+H15; idle replaya; negro ffmpeg; trampas Pillow) → **M_mov** (default,
+idle, U7b) → juez solo en default, default2, negro (anulado por
+prefiltro → 0 llamadas) y U7a con/vacío → Score_B2 híbrido con el
+`V`/`A` del juez default → gates U1, U2, U3h (Δhib ≤0.10 y ΔV/A ≤0.15),
+U4 (M_mov), U5, U6 (BUILD + ≤8 llamadas), U7a, U7b. `Score_final` solo
+con U1-U7 todos OK vía `calcular_score_final(..., GATES_H18)` y
+`Score_B2` híbrido. **Idle no llama al juez** (solo aporta frames para
+U4′). Presupuesto real: default(≤2)+default2(≤2)+U7a con(≤2)+vacío(≤2)
+= **8**; negro e idle = 0.
+
+**Tests.** `tests/test_movimiento_h18.py` (11 puros, sin red): M_mov
+estático/alterno/degenerate, trampas U7b separando, clamp de S_mov,
+fórmula híbrida, bordes de U4′/U7b, U3h, set de gates H18 (exige
+U7a+U7b) y `Score_final` con score híbrido. Suite total ≥ 448.
+
+**Lo que §1.B no cambia**: nada de lo ratificado en §1/§2; la corrida
+oficial re-mide todo desde cero. Esta declaración se commitea ANTES de
+cualquier llamada al juez.
+
 ## §2 — Umbrales (RATIFICADOS 2026-10-22 por el dueño — antes de implementar y de medir)
 
 | gate | umbral | calibración (sobre datos ya evidenciados) | estado |
