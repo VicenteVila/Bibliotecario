@@ -292,3 +292,36 @@ def test_evaluar_error_no_reintentable_una_llamada(monkeypatch):
     r = juez_b2.evaluar(RUB, [])
     assert "error" in r and r["intentos"] == 1
     assert len(llamadas) == 1
+
+
+def test_gates_todos_ok_exige_los_seis_gates():
+    """D2: la regla es seis presentes y OK; suelto uno no vale."""
+    ok = {k: {"ok": True, "detalle": "x"} for k in runner.GATES_ESPERADOS}
+    assert runner.gates_todos_ok(ok)
+    assert not runner.gates_todos_ok({})
+    for k in runner.GATES_ESPERADOS:
+        parcial = {kk: dict(v) for kk, v in ok.items()}
+        parcial.pop(k)
+        assert not runner.gates_todos_ok(parcial), k
+    falla = {kk: dict(v) for kk, v in ok.items()}
+    falla["U4"] = {"ok": False, "detalle": "delta=0"}
+    assert not runner.gates_todos_ok(falla)
+
+
+def test_score_final_solo_se_publica_con_todos_los_gates_ok():
+    """D2: bajo NO CUMPLE el registro queda Score_final=None; con los seis
+    gates OK publica la formula congelada §3 sin tocar la fórmula."""
+    ok = {k: {"ok": True, "detalle": ""} for k in runner.GATES_ESPERADOS}
+    b1 = {"BUILD": 1.0, "M_B1": 9 / 11}
+    e_def1 = {"Score_B2": 0.5}
+    esperado = juez_b2.score_completo(1.0, 9 / 11, 0.5)
+    assert runner.calcular_score_final(ok, b1, e_def1) == esperado
+
+    falla = {kk: dict(v) for kk, v in ok.items()}
+    falla["U2"] = {"ok": False, "detalle": "negro puntuado"}
+    assert runner.calcular_score_final(falla, b1, e_def1) is None
+
+    assert runner.calcular_score_final({"U1": ok["U1"]}, b1, e_def1) is None
+
+    assert runner.calcular_score_final(
+        ok, b1, {"error": "503", "Score_B2": 0.0}) is None

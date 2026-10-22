@@ -259,7 +259,10 @@ escribirse).
 0.4346 es **dato** (§1.3 lo reporta siempre); bajo NO CUMPLE no vale como
 nota. Nota de código: `run_fase2_b2` lo publica sin exigir todos los gates
 pese a su comentario («exige todos los gates para publicarlo»); no se modifica
-tras medir — endurecerlo es decisión del dueño.
+tras medir — endurecerlo es decisión del dueño. **Endurecido (D2, decisión
+del dueño posterior al cierre): `Score_final` solo se publica si los seis
+gates están OK (`gates_todos_ok`/`calcular_score_final` en el runner); la
+evidencia medida conserva su 0.4346 intacta.**
 
 ### Riesgos §2 pre-declarados — balance
 

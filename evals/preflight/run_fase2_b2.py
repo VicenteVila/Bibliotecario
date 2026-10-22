@@ -47,6 +47,24 @@ LLAMADAS_MAX = 10
 PREFIJO_IDS = (b"B2-D-", b"B2-V-", b"B2-A-")
 EXTS_TEXTO = (".gd", ".tscn", ".cfg", ".json", ".md", ".txt", ".tres",
               ".import", ".gdshader", ".yaml", ".yml")
+GATES_ESPERADOS = ("U1", "U2", "U3", "U4", "U5", "U6")
+
+
+def gates_todos_ok(gates: dict) -> bool:
+    """True solo si los seis gates U1-U6 existen y están OK."""
+    return all(gates.get(k, {}).get("ok") for k in GATES_ESPERADOS)
+
+
+def calcular_score_final(gates: dict, b1: dict, e_def1: dict):
+    """Score_final solo se publica con todos los gates OK (D2).
+
+    Bajo NO CUMPLE un número publicado aquí se lee como nota; el registro
+    queda con Score_final=None. El cálculo congelado (fórmula §3) no cambia.
+    """
+    if not gates_todos_ok(gates) or e_def1.get("error"):
+        return None
+    return juez_b2.score_completo(
+        b1["BUILD"], b1["M_B1"], e_def1.get("Score_B2", 0.0))
 
 
 def buscar_ids(dir_raiz: Path) -> list[str]:
@@ -312,12 +330,8 @@ def main() -> int:
                        "" if ok6_coste else " EXCEDIDO") +
                    " · suite+ruff aparte"}
 
-    # ---- score final (dato; exige todos los gates para publicarlo)
-    score_final = None
-    if not e_def1.get("error"):
-        score_final = juez_b2.score_completo(
-            b1["BUILD"], b1["M_B1"], e_def1.get("Score_B2", 0.0))
-    registro["Score_final"] = score_final
+    # ---- score final (D2: exige todos los gates para publicarlo)
+    registro["Score_final"] = calcular_score_final(gates, b1, e_def1)
     registro["llamadas"] = llam
     registro["tokens_total"] = sum(tokens)
     registro["gates"] = gates
@@ -329,7 +343,7 @@ def _final(registro: dict, gates: dict, llamadas: list[int],
            tokens: list[int]) -> int:
     OUT_JSON.write_text(json.dumps(registro, ensure_ascii=False, indent=2),
                         encoding="utf-8")
-    todos = all(g.get("ok") for g in gates.values())
+    todos = gates_todos_ok(gates)
     print("\n" + "=" * 66)
     print("HITO16 B-2 etapa 2 — UMBRALES")
     print("=" * 66)
