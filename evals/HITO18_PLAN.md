@@ -1,10 +1,10 @@
-# HITO 18 — PLAN (declaración): scorer B-2 híbrido (métrica determinista + juez V/A)
+# HITO 18 — PLAN: scorer B-2 híbrido (métrica determinista + juez V/A)
 
-> **DECLARADO 2026-10-22 — PENDIENTE DE RATIFICACIÓN (§1 y §2 en ☐).**
-> En este momento el hito tiene **código 0 y llamadas 0 al juez**: esto es
-> la marca de declaración. El dueño debe ratificar §1 y §2 **antes** de
-> implementar y antes de cualquier medición oficial. §5 (cierre) se escribe
-> al terminar.
+> **DECLARADO y RATIFICADO 2026-10-22.** El dueño ratificó **§1 (diseño)
+> y §2 (umbrales U1-U7) tal como están escritos**, ☐→☑, **antes de
+> implementar y antes de cualquier llamada al juez**. En este momento el
+> hito sigue con **código 0 y llamadas 0**: esto es la marca de
+> ratificación; §5 (cierre) se escribe al terminar.
 
 ## §0 — Estado y diagnóstico post-mortem del Hito 17
 
@@ -40,7 +40,7 @@ se declaran aquí a transparencia total; no hubo corrida oculta. Los
 umbrales de §2 se calibran sobre esos números con margen ≥3× y la corrida
 oficial de H18 **re-mide todo desde cero**.
 
-## §1 — Diseño propuesto (B-2 híbrido) — ☐ pendiente de ratificación
+## §1 — Diseño (B-2 híbrido) — RATIFICADO 2026-10-22 por el dueño
 
 **Reparto de roles:**
 
@@ -99,18 +99,18 @@ anclajes, la ρ de `platformer-juego`, el prefiltro, la fórmula externa
 ni B-1. No elimina al juez: le quita únicamente el rol que las
 evidencias de H16-H17 demostraron que no puede cumplir.
 
-## §2 — Umbrales (propuestos — RATIFICAR antes de implementar/medir)
+## §2 — Umbrales (RATIFICADOS 2026-10-22 por el dueño — antes de implementar y de medir)
 
 | gate | umbral | calibración (sobre datos ya evidenciados) | estado |
 |---|---|---|---|
-| **U1** juez válido | igual H17: JSON estricto, justif. no vacías, ≤2 intentos (sobre default y default2) | — | ☐ |
-| **U2** anti-caucho | igual H17: presencias = 0 sobre negro **y** Score ≤ 0.30, por construcción (prefiltro) | — | ☐ |
-| **U3** estabilidad | Δ`Score_B2` ≤ 0.10 y Δ V/A ≤ 0.15 (default vs default2, temp 0) | idéntico a H17 | ☐ |
-| **U4′** movimiento (nuevo) | `M_mov(default) ≥ 0.20` **y** `M_mov(default) − M_mov(idle) ≥ 0.15` **y** `M_mov(idle) ≤ 0.15` | default 0.952 (4.8×), Δ 0.906 (6.0×), idle 0.046 (3.3× de margen) | ☐ |
-| **U5** ρ oculta | igual H17: 0 coincidencias de `B2-` en workspace y copia | — | ☐ |
-| **U6** resto | `BUILD = 1.0` · ruff · suite · llamadas **≤ 8** | H17: 8/10 con idle incluido | ☐ |
-| **U7a** grounding del juez | igual H17: `Score_B2(con) ≥ 0.5` y `Score_B2(vacío) = 0.0` (mini-ρ `grounding-trampa`) | F1 midió con = 0.675 | ☐ |
-| **U7b** trampa de la métrica (nueva) | secuencia sintética con sprite moviéndose: `M_mov ≥ 0.20`; su gemela estática: `M_mov ≤ 0.05` | cálculo a priori: sprite 64×64 moviéndose 40 px/frame → Δ ≈ 1.4; estático → 0 exacto | ☐ |
+| **U1** juez válido | igual H17: JSON estricto, justif. no vacías, ≤2 intentos (sobre default y default2) | — | ☑ 2026-10-22 |
+| **U2** anti-caucho | igual H17: presencias = 0 sobre negro **y** Score ≤ 0.30, por construcción (prefiltro) | — | ☑ 2026-10-22 |
+| **U3** estabilidad | Δ`Score_B2` ≤ 0.10 y Δ V/A ≤ 0.15 (default vs default2, temp 0) | idéntico a H17 | ☑ 2026-10-22 |
+| **U4′** movimiento (nuevo) | `M_mov(default) ≥ 0.20` **y** `M_mov(default) − M_mov(idle) ≥ 0.15` **y** `M_mov(idle) ≤ 0.15` | default 0.952 (4.8×), Δ 0.906 (6.0×), idle 0.046 (3.3× de margen) | ☑ 2026-10-22 |
+| **U5** ρ oculta | igual H17: 0 coincidencias de `B2-` en workspace y copia | — | ☑ 2026-10-22 |
+| **U6** resto | `BUILD = 1.0` · ruff · suite · llamadas **≤ 8** | H17: 8/10 con idle incluido | ☑ 2026-10-22 |
+| **U7a** grounding del juez | igual H17: `Score_B2(con) ≥ 0.5` y `Score_B2(vacío) = 0.0` (mini-ρ `grounding-trampa`) | F1 midió con = 0.675 | ☑ 2026-10-22 |
+| **U7b** trampa de la métrica (nueva) | secuencia sintética con sprite moviéndose: `M_mov ≥ 0.20`; su gemela estática: `M_mov ≤ 0.05` | cálculo a priori: sprite 64×64 moviéndose 40 px/frame → Δ ≈ 1.4; estático → 0 exacto | ☑ 2026-10-22 |
 
 `Score_final` solo se publica con **U1-U7 todos OK** (D2, set completo).
 Sin ratificación de esta tabla, cualquier corrida que la use **no cuenta**.
@@ -123,18 +123,19 @@ Esta tabla no se toca tras medir (disciplina dura).
   `gemini-3.1-flash-lite`, temp 0, viewport 1280×720 a 2 fps, ρ
   `platformer-juego` (15 ítems completos), prefiltro Opción B, evidencia
   intocable, disciplina D2.
-- **Enmienda declarada (pendiente de ratificación junto con §2)**: pesos
-  internos de `Score_B2` — antes `0.35·D + 0.15·V + 0.35·A` (juez);
+- **Enmienda ratificada (2026-10-22, junto con §2)**: pesos internos de
+  `Score_B2` — antes `0.35·D + 0.15·V + 0.35·A` (juez);
   ahora `0.50·S_mov + 0.25·V + 0.25·A` (híbrido). `M_mov_ref = 0.50`
-  es número nuevo. Umbrales U4/U6/U7a/U7b como en §2.
+  es número nuevo. Umbrales U4′/U6/U7a/U7b como en §2.
 - **No congelado**: diseño interno de `movimiento_b2.py`, el runner H18,
   el presupuesto exacto de tests.
 
 ## §4 — Disciplina (sin medir hasta ratificar)
 
-1. Este plan se commitea **como declaración**: código 0, llamadas 0.
-2. **Ratificación del dueño** de §1 y §2 (☐→☑), antes de implementar y
-   antes de cualquier llamada al juez.
+1. Este plan se commiteó **como declaración** (`0825e2e`): código 0,
+   llamadas 0.
+2. ✔ **Ratificación del dueño 2026-10-22**: §1 y §2 ☐→☑ — **antes** de
+   implementar y de cualquier llamada al juez.
 3. Solo entonces: implementación + tests puros (suite ≥ 437) + ruff +
    fila §11 de `BENCHMARK_SPEC.md` (enmienda 6) → **corrida oficial
    única** (U1-U7) → §5 con veredicto.
