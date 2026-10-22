@@ -24,33 +24,33 @@
       "caso": "default",
       "error": "HTTP Error 503: Service Unavailable",
       "frames": 14,
-      "secs": 8.6,
+      "secs": 52.9,
       "usage": {}
     },
     "default2": {
       "caso": "default2",
       "error": "HTTP Error 503: Service Unavailable",
       "frames": 14,
-      "secs": 8.5,
+      "secs": 20.6,
       "usage": {}
     },
     "negro": {
       "caso": "negro",
       "error": "HTTP Error 503: Service Unavailable",
       "frames": 14,
-      "secs": 18.0,
+      "secs": 41.5,
       "usage": {}
     },
     "idle": {
       "caso": "idle",
       "error": "HTTP Error 503: Service Unavailable",
       "frames": 26,
-      "secs": 8.6,
+      "secs": 32.8,
       "usage": {}
     }
   },
   "Score_final": null,
-  "llamadas": 4,
+  "llamadas": 8,
   "tokens_total": 0,
   "gates": {
     "U5": {
@@ -59,7 +59,7 @@
     },
     "U6": {
       "ok": true,
-      "detalle": "B-1: BUILD=1.0 M_B1=0.8333 · llamadas=4/10 · suite+ruff aparte"
+      "detalle": "B-1: BUILD=1.0 M_B1=0.8333 · llamadas=8/10 · suite+ruff aparte"
     },
     "U1": {
       "ok": false,

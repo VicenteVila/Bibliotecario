@@ -209,6 +209,7 @@ def _eval(nombre: str, rubrica: dict, frames: list[Path],
     tokens.append(int(usage.get("total_tokens", 0) or 0))
     if r.get("error"):
         return {"caso": nombre, "error": r["error"],
+                "intentos": r.get("intentos"),
                 "frames": len(frames), "secs": round(time.time() - t0, 1),
                 "usage": usage}
     cats = juez_b2.agregar(r, rubrica)
