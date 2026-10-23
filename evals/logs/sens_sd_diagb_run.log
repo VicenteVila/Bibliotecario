@@ -1,0 +1,18 @@
+[13:30:25] clave NVIDIA: PILOTO (separada de bibliotecario; valor no mostrado)
+[13:30:25] diagnóstico-b §0.3: canal=b max_turns=17 cap_llamada=450000 techo=1500000 celdas=[('A2', 'plugin-registry'), ('A5', 'repo-cache-layer'), ('A5', 'workflow-statemachine')]
+[13:32:58] A2/plugin-registry: score=100.0% turns=6 llm=6 tools=16 writes=2 paro=final tok=21259 153.0s
+[13:34:08] A5/repo-cache-layer: score=100.0% turns=4 llm=4 tools=8 writes=1 paro=final tok=18841 69.5s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[13:38:02] A5/workflow-statemachine: score=100.0% turns=9 llm=9 tools=15 writes=2 paro=final tok=37341 233.9s
+[13:38:02] informe: evals/results/informes_diagb/A2_plugin-registry.md (29 spans)
+[13:38:02] informe: evals/results/informes_diagb/A5_repo-cache-layer.md (17 spans)
+[13:38:02] informe: evals/results/informes_diagb/A5_workflow-statemachine.md (34 spans)
+[13:38:03]   A2_plugin-registry: @16=64.29 @17=100.00 (delta=+35.71 writes=2 factor=0.2297)
+[13:38:03]   A5_repo-cache-layer: @16=41.67 @17=100.00 (delta=+58.33 writes=1 factor=0.1646)
+[13:38:03]   A5_workflow-statemachine: @16=0.00 @17=100.00 (delta=+100.00 writes=2 factor=0.3203)
+[13:38:03] VEREDICTO E1_ACLARA: redactar §1 (17x12, techo recalibrado) para ratificar
+[13:38:03] recalibración: proyección 17x12 = 2042105 tokens (margen 30%) -> COSTE_OK
+[13:38:03] coste diagnóstico-b=77441 tokens (techo 1500000)
+[13:38:03] evidencia: evals/results/result_sens_sd_diagb.json

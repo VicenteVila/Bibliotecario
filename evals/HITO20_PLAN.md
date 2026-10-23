@@ -247,3 +247,50 @@ por enmienda al ratificar §1.
 Declaración → BUILD+tests → corrida+evidencia+cierre §0.3. Evidencia:
 `evals/results/result_sens_sd_diagb.json` + log `sens_sd_diagb_run.log` +
 `evals/sd_pilot/traces_diagb.sqlite` + `_run_state_diagb.json`.
+
+### §0.3 Resultado (CERRADO 2026-10-23 → **E1_ACLARA**)
+
+Corrida única 2026-10-23 13:30-13:38 (~7,5 min), canal b, 17 turnos, 3
+celdas, techo 1,5M. **Coste total: 77.441 tokens** (19 llamadas; sin
+cortes; 0 `infra_error`; sin 429/DNS — la clave PILOTO y el clasificador
+C1 quedaron activos pero no hicieron falta en esta corrida).
+
+| celda | @16 oficial | @17 canal b | Δ | A1 | writes | paro | tok@16 | tok@17 | factor |
+|---|---|---|---|---|---|---|---|---|---|
+| A2_plugin-registry | 64,29 | **100,00** | +35,71 | 82,14 | 2 | final@6 | 92.549 | 21.259 | 0,23 |
+| A5_repo-cache-layer | 41,67 | **100,00** | +58,33 | 100,00 | 1 | final@4 | 114.467 | 18.841 | 0,16 |
+| A5_workflow-statemachine | 0,00 | **100,00** | +100,00 | 100,00 | 2 | final@9 | 116.571 | 37.341 | 0,32 |
+
+**E1 cumplida en las 4 condiciones**: Δ≥+10 en 3/3; writes≥1 en 3/3; sin
+corte ni pendiente creciente (máx 7.293 tok/turno; el cap 18k nunca bindió:
+es guarda, no restricción activa); informes legibles (3/3,
+`evals/results/informes_diagb/`). E2/E3 no aplican. Snapshots: solo
+A5_workflow llegó al turno 8 (`score@8=0.0` → final@9=100) — el mecanismo
+funciona; las otras dos terminaron antes (4 y 6 turnos).
+
+**Lectura técnica (el reverso del diagnóstico §0.1)**: el colapso del
+oficial no era «faltan turnos» ni «faltaba presupuesto»: era el **canal de
+observación**. Con lecturas completas + multi-acción, las celdas leen todo
+lo necesario en 1-2 turnos, escriben y terminan con `final` antes del
+turno 9, con score 100 y **4-6× más baratas**. Los arneses A2/A5 no están
+rotos: estaban ciegos y mancos (2.500 chars por lectura, 1 acción por
+turno).
+
+**Recalibración de coste (§0.3)**: factores 0,23/0,16/0,32 → proyección
+17×12 = **2.042.105 tokens con margen 30 %** (COSTE_OK; 3,4× por debajo
+del techo de 7M). La corrida 17×12 con canal b es viable.
+
+**Consecuencias declaradas**: E1 → se redacta **§1** (17×12 con canal b,
+techo declarado 2,1M, criterio de saturación) para ratificación del dueño.
+C2 (modelo débil) y (c) replanteo quedan sin soporte empírico por ahora.
+Nota honesta para §1: con canal b las celdas terminan antes del turno 12
+→ el criterio emparejado @12 vs @17 daría Δ≈0 por definición (saturación
+trivial = DONE); §1 propondrá una curva distinta (snapshots en turnos
+tempranos 2/4/6/8 sobre las celdas que no terminan, y/o el contraste
+oficial@16 vs b@17 ya medido).
+
+Evidencia: `evals/results/result_sens_sd_diagb.json`, informes
+`evals/results/informes_diagb/` (3 .md), log
+`evals/logs/sens_sd_diagb_run.log`, trazas
+`evals/sd_pilot/traces_diagb.sqlite` + `_run_state_diagb.json`. Commits:
+declaración `4bbe48a`, BUILD `645b063`, evidencia+cierre (este).

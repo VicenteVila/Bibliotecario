@@ -1,0 +1,275 @@
+{
+ "hito": 20,
+ "modo": "diagnostico-b",
+ "fecha": "2026-10-23T13:38:02",
+ "modelo": "nvidia/nemotron-3-ultra-550b-a55b",
+ "canal": "b",
+ "max_turns": 17,
+ "cap_llamada": 450000,
+ "techo_tokens": 1500000,
+ "pares": [
+  {
+   "celda": "A2_plugin-registry",
+   "score16": 64.2857,
+   "score17": 100.0,
+   "a1": 82.1429,
+   "writes": 2,
+   "tokens16": 92549,
+   "tokens17": 21259,
+   "tokens_por_turno": [
+    1014,
+    1250,
+    3804,
+    3839,
+    4059,
+    7293
+   ],
+   "cortada": false,
+   "infra_error": false
+  },
+  {
+   "celda": "A5_repo-cache-layer",
+   "score16": 41.6667,
+   "score17": 100.0,
+   "a1": 100.0,
+   "writes": 1,
+   "tokens16": 114467,
+   "tokens17": 18841,
+   "tokens_por_turno": [
+    2243,
+    2945,
+    6723,
+    6930
+   ],
+   "cortada": false,
+   "infra_error": false
+  },
+  {
+   "celda": "A5_workflow-statemachine",
+   "score16": 0.0,
+   "score17": 100.0,
+   "a1": 100.0,
+   "writes": 2,
+   "tokens16": 116571,
+   "tokens17": 37341,
+   "tokens_por_turno": [
+    1878,
+    3605,
+    3636,
+    3988,
+    4114,
+    4453,
+    4579,
+    4940,
+    6148
+   ],
+   "cortada": false,
+   "infra_error": false
+  }
+ ],
+ "veredicto": {
+  "n_celdas": 3,
+  "n_validas": 3,
+  "n_infra": 0,
+  "celdas": [
+   {
+    "celda": "A2_plugin-registry",
+    "score16": 64.29,
+    "score17": 100.0,
+    "delta": 35.71,
+    "writes": 2,
+    "cortada": false,
+    "pendiente_ok": true,
+    "tokens16": 92549,
+    "tokens17": 21259,
+    "factor": 0.2297,
+    "infra_error": false
+   },
+   {
+    "celda": "A5_repo-cache-layer",
+    "score16": 41.67,
+    "score17": 100.0,
+    "delta": 58.33,
+    "writes": 1,
+    "cortada": false,
+    "pendiente_ok": true,
+    "tokens16": 114467,
+    "tokens17": 18841,
+    "factor": 0.1646,
+    "infra_error": false
+   },
+   {
+    "celda": "A5_workflow-statemachine",
+    "score16": 0.0,
+    "score17": 100.0,
+    "delta": 100.0,
+    "writes": 2,
+    "cortada": false,
+    "pendiente_ok": true,
+    "tokens16": 116571,
+    "tokens17": 37341,
+    "factor": 0.3203,
+    "infra_error": false
+   }
+  ],
+  "informes_ok": true,
+  "e1": {
+   "delta_ge10": true,
+   "writes_ge1": true,
+   "coste_acotado": true,
+   "informes": true
+  },
+  "regla": "E1_ACLARA",
+  "accion": "redactar §1 (17x12, techo recalibrado) para ratificar"
+ },
+ "recalibracion": {
+  "factores": {
+   "A2_plugin-registry": 0.2297,
+   "A5_repo-cache-layer": 0.1646,
+   "A5_workflow-statemachine": 0.3203
+  },
+  "factor_max": 0.3203,
+  "total_12t_sin_margen": 1570850,
+  "margen": 0.3,
+  "proyeccion": 2042105,
+  "techo": 7000000,
+  "cabe": true,
+  "veredicto": "COSTE_OK"
+ },
+ "coste": {
+  "calls": 19,
+  "prompt_tokens": 70964,
+  "completion_tokens": 6477,
+  "total_tokens": 77441
+ },
+ "celdas": {
+  "A2_plugin-registry": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 28,
+    "total": 28
+   },
+   "turns": 6,
+   "max_turns": 17,
+   "canal": "b",
+   "llm_calls": 6,
+   "tool_calls": 16,
+   "invalid_actions": 1,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido",
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 3 < 0\n/tmp/opencode/sd_pilot_diagb/A2_plugin-registry/tests_public/test_resolver.py:19: Assert"
+   ],
+   "final": "Implementación completada. El resolver.py ahora implementa correctamente la resolución topológica de dependencias con orden determinista por prioridad y nombre, detección de dependencias faltantes, y detección de ciclos con reporte según las reglas especificadas. Todos los tests públicos pasan.",
+   "elapsed_s": 153.0,
+   "writes": 2,
+   "snapshots": {},
+   "tokens_por_turno": [
+    1014,
+    1250,
+    3804,
+    3839,
+    4059,
+    7293
+   ],
+   "usage": {
+    "calls": 6,
+    "prompt_tokens": 17300,
+    "completion_tokens": 3959,
+    "total_tokens": 21259
+   }
+  },
+  "A5_repo-cache-layer": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 24,
+    "total": 24
+   },
+   "turns": 4,
+   "max_turns": 17,
+   "canal": "b",
+   "llm_calls": 4,
+   "tool_calls": 8,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [],
+   "final": "Implementación completa de CacheTTL en catalogo/cache.py. Todos los tests públicos pasan (14/14). La implementación cumple el contrato exacto: constructor con validación de capacidad >= 1 y reloj obligatorio; obtener con purga perezosa y LRU (move_to_end); poner con validación ttl > 0, reemplazo que",
+   "elapsed_s": 69.5,
+   "writes": 1,
+   "snapshots": {},
+   "tokens_por_turno": [
+    2243,
+    2945,
+    6723,
+    6930
+   ],
+   "usage": {
+    "calls": 4,
+    "prompt_tokens": 17705,
+    "completion_tokens": 1136,
+    "total_tokens": 18841
+   }
+  },
+  "A5_workflow-statemachine": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 9,
+   "max_turns": 17,
+   "canal": "b",
+   "llm_calls": 9,
+   "tool_calls": 15,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 0 pasan, 0 fallan, 1 errores\n/mnt/c/Bibliotecario/.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n/mnt/c/Bibliotecario/.",
+    "PÚBLICOS: 0 pasan, 0 fallan, 1 errores\n/mnt/c/Bibliotecario/.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n/mnt/c/Bibliotecario/.",
+    "PÚBLICOS: 0 pasan, 0 fallan, 1 errores\n/mnt/c/Bibliotecario/.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n/mnt/c/Bibliotecario/."
+   ],
+   "final": "Implementación completada. El motor StateMachine ahora cumple con el contrato exacto: valida tipos de event y ctx, verifica estados terminales, busca transiciones legales en TRANSITIONS, ejecuta guardas correspondientes desde GUARDS propagando GuardError tal cual, y actualiza el estado solo si todo ",
+   "elapsed_s": 233.9,
+   "writes": 2,
+   "snapshots": {
+    "score@8": 0.0
+   },
+   "tokens_por_turno": [
+    1878,
+    3605,
+    3636,
+    3988,
+    4114,
+    4453,
+    4579,
+    4940,
+    6148
+   ],
+   "usage": {
+    "calls": 9,
+    "prompt_tokens": 35959,
+    "completion_tokens": 1382,
+    "total_tokens": 37341
+   }
+  }
+ },
+ "trazas": "evals/sd_pilot/traces_diagb.sqlite",
+ "informes": "evals/results/informes_diagb",
+ "commits": {
+  "head": "645b0635c0af2978689d6fa77e93c37d845731d8",
+  "dirty": true
+ }
+}
