@@ -502,3 +502,91 @@ veredicto usa ambos números.
 - Tests puros: (a) forzado ignora `final` y para en 17; (b) checkpoint
   dispara parada/continúa según % de celdas; (c) ledger acumula matriz
   + brazo forzado. Puerta completa antes de la corrida.
+
+### §1 Enmienda 2 (pre-registro complementario del dueño 2026-10-23: 3 críticos)
+
+Suplementa §1 y Enmienda 1; no contradice nada de lo anterior.
+
+#### E2-Crítico 1 — Granularidad de «celda» y cap 450k (ACLARADO, sin cambio de cap)
+
+- **Celda = 1 variante × 1 tarea** (confirmado en código:
+  `Cell(variant, task_id, ...)`); la matriz son **60 celdas** (12 tareas ×
+  A1-A5) y el brazo forzado añade **3** (las celdas §0.3 re-corridas).
+- **Corrección de lectura**: 1,47 / 1,24 / 0,95 de la tabla de E1-Ajuste 3
+  son **factores** (tok@17_forzado / tok@16_oficial), no millones. El
+  peor caso **por celda** es ~136.400 / ~142.200 / ~110.900 **tokens**,
+  todos **bajo el cap 450k** con margen 3,2-4,0×. El cap **no trunca el
+  peor caso por celda**; los 6,66-8,1M son el **total de la matriz**
+  (dominio del techo 7M, no del cap). **El cap 450k queda sin cambio.**
+
+#### E2-Crítico 2 — Orden de ejecución, truncamiento y análisis (PRE-REGISTRADO)
+
+- **Orden**: estratificado por variante con **semilla 20261023**: por
+  tercios, cada tercio del orden contiene 4 celdas de cada variante
+  (20 celdas/tercio). El truncamiento no puede concentrar una variante.
+- **Proyección por celda** (para las reglas del 80 %):
+  `proy_celda = PRESUPUESTO_BASE_16[variante] × factor_inyectado`
+  con `FACTORES_INYECTADOS = {A1:1.0, A2:0.2297, A3:0.3203, A4:0.3203,
+  A5:0.3203}` (medidos en §0.3). Brazo forzado: 130.000 tok/celda.
+- **Regla de truncamiento** (la celda en curso, al alcanzar el techo de
+  7M): si su gasto < 80 % de `proy_celda` → **se completa** (overshoot
+  documentado, acotado además por su cap 450k); si ≥ 80 % → **corte
+  mid-cell** con `stopped_by = truncated_by_ceiling`. Celdas no iniciadas
+  cuando el techo queda agotado: `no_ejecutada_por_techo`.
+- **Análisis**: las celdas `truncated_by_ceiling` y
+  `no_ejecutada_por_techo` se **excluyen de E1/E2/E3 y de la saturación
+  primaria** y se reportan aparte. **Tasa de truncamiento >20 % es en sí
+  un resultado** que justifica (c) con independencia del rendimiento.
+
+#### E2-Crítico 3 — Reprompt del brazo forzado (PRE-REGISTRADO)
+
+- **Texto exacto del reprompt** (inyectado por el harness en cada turno
+  tras `final`):
+  «Turno {n}/{total}. Revisa el estado, identifica una mejora concreta
+  pendiente y ejecútala; si no hay ninguna, escribe SIN_MEJORA y explica
+  por qué.»
+- **Clasificación por turno forzado**: `write` si ejecuta ≥1
+  `write_file`; `sin_mejora` si no escribe y la respuesta contiene
+  `SIN_MEJORA` **o** consiste únicamente en reemitir `final`; `otro` en
+  el resto. Ledger por celda: `forced_turns / forced_writes /
+  forced_sin_mejora`.
+- **Regla**: si ≥80 % de los turnos forzados son `sin_mejora` → celda
+  marcada `convergencia_real`; su Δ se interpreta como **saturación
+  genuina**. Si <80 %, Δ mide la mejora real por turnos forzados.
+
+#### E2-Importante 1 — Reconciliación del coste del brazo forzado (0,39M)
+
+0,39M = **suma de las extrapolaciones por celda** de E1-Ajuste 3
+(136,4k + 142,2k + 110,9k = 389,5k). El 11k/turno citado es el **techo
+por turno** bajo CAP 18k (18k prompt + ~2k salida), no la media: la
+media del brazo forzado proyectado es ~6,5-8,3k tok/turno. Misma fórmula
+que el 2,04M (extrapolación de series medidas, con aplanamiento por
+CAP). Se compromete **~0,39M** con este desglose.
+
+#### E2-Importante 2 — Regla de decisión del checkpoint (PRE-REGISTRADA)
+
+Al alcanzar **2.654.737** con **<70 %** de celdas completadas (de las 63
+previstas: 60 matriz + 3 brazo forzado), se evalúa la proyección total
+restante (`acumulado + pendientes×26.181 + forzadas_pendientes×130.000`)
+y se aplica **sin consulta en caliente** (árbol ratificado por el dueño):
+
+| Proyección total | Acción pre-registrada |
+|---|---|
+| ≤ 7M | continuar hasta el techo |
+| 7M – 8,5M | continuar **aceptando truncamiento** (la información de las completadas vale más) |
+| > 8,5M | **reducir matriz**: solo una celda por variante (regla determinista: la tarea de mayor `usage.total_tokens` en H19 oficial para esa variante) + brazo forzado si el presupuesto queda |
+
+≥70 % completadas al llegar al checkpoint → continuar sin drama. El
+brazo forzado (test primario de saturación) se ejecuta **siempre que
+quede presupuesto**; si el techo lo impide → **fallback (i)** declarado
+en E1-Ajuste 1 (§1 mide convergencia, no saturación).
+
+#### Tests exigidos por el dueño (puerta, antes de cualquier corrida)
+
+1. Granularidad del cap: celda sintética del peor caso (~136k) con cap
+   450k llega a 17 turnos sin corte `presupuesto`.
+2. Orden estratificado (semilla, 4×variante/tercio) + regla del 80 %
+   (completar vs `truncated_by_ceiling`).
+3. Reprompt forzado: celda que converge en turno 4 → turnos 5-17
+   producen `write_file` o `SIN_MEJORA` registrado en el ledger;
+   ≥80 % sin_mejora → `convergencia_real`.
