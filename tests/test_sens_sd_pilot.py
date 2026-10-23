@@ -14,9 +14,12 @@ from evals.sd_pilot.run_pilot import (
     DIAG_MAX_TURNS,
     DIAG_TECHO_TOKENS,
     G0_TASKS,
+    PRESUPUESTO_BASE_16,
     TECHO_TOKENS,
     _veredicto_g0,
+    estimar_tokens_celda,
     evaluar_diagnostico,
+    presupuesto_run,
 )
 from evals.sd_pilot.variants import VARIANT_NAMES, VARIANTS
 
@@ -400,3 +403,32 @@ def test_diag_una_sola_celda_nunca_d1():
     ver = evaluar_diagnostico([{"celda": "A2_plugin", "score16": 64.29,
                                 "score32": 45.0, "a1": 82.14}])
     assert ver["regla"] in ("D2_NO_CLARO", "D3_AMBIGUO")
+
+
+# --------------------------------- presupuesto de antemano (dueño 2026-10-23) -
+
+
+def test_presupuesto_modelo_cubico_calibrado():
+    assert estimar_tokens_celda(114_467, 16) == 114_467
+    # A5_repo real @30 = 752.118 tok; el modelo cúbico da ~0.3% de error
+    est = estimar_tokens_celda(114_467, 30)
+    assert abs(est - 752_118) <= 0.01 * 752_118
+
+
+def test_presupuesto_a16_reproduce_la_corrida_oficial():
+    p = presupuesto_run(16, 12, TECHO_TOKENS)
+    # oficial H19: 5.123.036 tokens — la media por variante × 12 tareas la
+    # reproduce (los promedios salen de esa misma corrida)
+    assert abs(p["total"] - 5_123_036) <= 0.01 * 5_123_036
+    assert p["cabe"] and p["veredicto"] == "COSTE_OK"
+    assert p["llamadas_max"] == (1 + 4 * 16) * 12
+
+
+def test_presupuesto_a1_no_escala_y_teche():
+    p32 = presupuesto_run(32, 12, TECHO_TOKENS)
+    assert p32["por_variante"]["A1"] == PRESUPUESTO_BASE_16["A1"]
+    assert p32["por_variante"]["A2"] == estimar_tokens_celda(
+        PRESUPUESTO_BASE_16["A2"], 32)
+    # a 48 turnos la corrida se pasa con creces del techo de 7M
+    p48 = presupuesto_run(48, 12, TECHO_TOKENS)
+    assert not p48["cabe"] and p48["veredicto"] == "EXCEDE_TECHO"

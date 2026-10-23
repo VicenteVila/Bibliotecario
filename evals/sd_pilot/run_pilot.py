@@ -5,7 +5,9 @@ Modos:
   --g0       G0 humo (§1.7 HITO19): 2 tareas x {A1,A5} -> dictámen de arranque.
   --oficial  Corrida oficial ÚNICA de HITO19: 5 variantes x 12 tareas -> gates.
   --diagnostico  Diagnóstico HITO20 §0.1: celdas truncadas con max_turns=32
-             (techo 450k, salidas propias, NO toca nada del oficial).
+             (techo 450k, salidas propios, NO toca nada del oficial).
+  --presupuesto  Coste/turnos de antemano de una corrida (sin LLM); política
+             de claves del dueño 2026-10-23: SIEMPRE presupuestar antes.
   --debug-celda A2:tarea   Una celda suelta, SOLO para BUILD (nunca es evidencia).
 
 Disciplina:
@@ -43,6 +45,14 @@ STATE_OFICIAL = SD_ROOT / "_run_state_oficial.json"
 TRACES_OFICIAL = SD_ROOT / "traces.sqlite"
 TRACES_OTROS = SD_ROOT / "traces_g0.sqlite"
 
+# Presupuesto de antemano (política del dueño 2026-10-23): media de tokens
+# por celda @16 turnos de la corrida oficial H19, y exponente cúbico del
+# historial compuesto (calibrado: A5_repo@16=114k -> @30=752k real; 6.59 =
+# (30/16)^3).
+PRESUPUESTO_BASE_16 = {"A1": 5_479, "A2": 105_545, "A3": 90_278,
+                       "A4": 127_635, "A5": 97_983}
+PRESUPUESTO_EXPONENTE = 3
+
 # Diagnóstico HITO20 §0.1 (declarado 2026-10-23 ANTES de correr)
 DIAG_MAX_TURNS = 32
 DIAG_CELLS: list[tuple[str, str]] = [("A2", "plugin-registry"),
@@ -75,6 +85,14 @@ def _load_env(model: str) -> None:
     os.environ["LLM_PROVIDERS"] = "nvidia"
     os.environ["NVIDIA_MODEL"] = model
     os.environ["NVIDIA_FALLBACK_MODEL"] = model  # modelo fijo, sin mezcla (§1.5)
+    # Política de claves del dueño (2026-10-23): el piloto SIEMPRE su clave,
+    # bibliotecario (app) la principal. Nunca se imprime ningún valor.
+    if os.environ.get("NVIDIA_API_KEY_PILOTO"):
+        os.environ["NVIDIA_API_KEY"] = os.environ["NVIDIA_API_KEY_PILOTO"]
+        log("clave NVIDIA: PILOTO (separada de bibliotecario; valor no mostrado)")
+    else:
+        log("AVISO: falta NVIDIA_API_KEY_PILOTO en .env — este run usa la "
+            "principal compartida con bibliotecario (RPM mezclados)")
 
 
 def _git_head() -> dict:
@@ -326,6 +344,54 @@ def modo_debug_celda(spec: str, model: str) -> int:
     return 0
 
 
+def estimar_tokens_celda(base16: int, max_turns: int) -> int:
+    """Estimación de antemano de tokens por celda con el modelo cúbico.
+
+    `base16 × (max_turns/16)^3` — el historial compuesto hace crecer el
+    prompt de cada turno; calibrado con la corrida oficial H19: A5_repo
+    114.467 tok @16 -> 752.118 tok @30 ((30/16)^3 = 6.59, real 6.57).
+    """
+    return round(base16 * (max_turns / 16) ** PRESUPUESTO_EXPONENTE)
+
+
+def presupuesto_run(max_turns: int, n_tareas: int, techo: int) -> dict:
+    """Coste y turnos de antemano de una corrida completa (5 variantes).
+
+    Política del dueño 2026-10-23: TODA run nueva se presupuesta y declara
+    su techo ANTES de lanzarla. A1 es one-shot: una sola llamada por tarea,
+    no escala con `max_turns`.
+    """
+    por_variante: dict[str, int] = {}
+    llamadas_por_tarea = 0
+    for v, base in PRESUPUESTO_BASE_16.items():
+        if v == "A1":
+            por_variante[v] = base
+            llamadas_por_tarea += 1
+        else:
+            por_variante[v] = estimar_tokens_celda(base, max_turns)
+            llamadas_por_tarea += max_turns
+    total = sum(por_variante.values()) * n_tareas
+    return {"max_turns": max_turns, "n_tareas": n_tareas,
+            "celdas": n_tareas * len(PRESUPUESTO_BASE_16),
+            "por_variante": por_variante,
+            "llamadas_max": llamadas_por_tarea * n_tareas,
+            "total": total, "techo": techo, "cabe": total <= techo,
+            "veredicto": "COSTE_OK" if total <= techo else "EXCEDE_TECHO"}
+
+
+def modo_presupuesto(max_turns: int, n_tareas: int, techo: int) -> int:
+    p = presupuesto_run(max_turns, n_tareas, techo)
+    log(f"presupuesto de antemano: max_turns={max_turns} n_tareas={n_tareas} "
+        f"({p['celdas']} celdas, {p['llamadas_max']} llamadas máx)")
+    for v, tok in p["por_variante"].items():
+        log(f"  {v}: {tok} tok/celda")
+    log(f"  total estimado: {p['total']} tokens · techo {p['techo']} -> "
+        f"{p['veredicto']}")
+    log("modelo cúbico calibrado con H19 (A5@16=114k -> @30=752k); "
+        "declarar este techo en el plan del hito antes de lanzar")
+    return 0 if p["cabe"] else 2
+
+
 def evaluar_diagnostico(pares: list[dict]) -> dict:
     """§0.1 HITO20: reglas D1 -> D2 -> D3, declaradas antes de correr.
 
@@ -448,6 +514,14 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--oficial", action="store_true", help="corrida oficial única")
     ap.add_argument("--diagnostico", action="store_true",
                     help="diagnóstico HITO20 §0.1 (max_turns=32, techo 450k)")
+    ap.add_argument("--presupuesto", action="store_true",
+                    help="coste/turnos de antemano de una corrida (sin LLM)")
+    ap.add_argument("--max-turns", type=int, default=32,
+                    help="turnos previstos (solo con --presupuesto)")
+    ap.add_argument("--n-tareas", type=int, default=12,
+                    help="tareas previstas (solo con --presupuesto)")
+    ap.add_argument("--techo", type=int, default=TECHO_TOKENS,
+                    help="techo de tokens declarado (solo con --presupuesto)")
     ap.add_argument("--debug-celda", metavar="V:tarea", default=None,
                     help="una celda, SOLO BUILD")
     ap.add_argument("--model", default=MODEL)
@@ -457,10 +531,10 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     modos = [bool(args.g0), bool(args.oficial), bool(args.diagnostico),
-             bool(args.debug_celda)]
+             bool(args.presupuesto), bool(args.debug_celda)]
     if sum(modos) != 1:
         ap.error("elige UN modo: --g0 | --oficial | --diagnostico | "
-                 "--debug-celda V:tarea")
+                 "--presupuesto | --debug-celda V:tarea")
 
     if args.g0:
         return modo_g0(args.model)
@@ -468,6 +542,8 @@ def main(argv: list[str] | None = None) -> int:
         return modo_oficial(args.model, args.resume)
     if args.diagnostico:
         return modo_diagnostico(args.model, args.resume)
+    if args.presupuesto:
+        return modo_presupuesto(args.max_turns, args.n_tareas, args.techo)
     return modo_debug_celda(args.debug_celda, args.model)
 
 

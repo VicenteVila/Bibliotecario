@@ -1,7 +1,8 @@
 """Cliente LLM multi-proveedor: Groq → NVIDIA → Gemini, con failover.
 
 - Cada proveedor configurado por env var se añade a la cadena en este orden:
-  GROQ_API_KEY, NVIDIA_API_KEY, GEMINI_API_KEY[_N] (round-robin entre las Gemini).
+  GROQ_API_KEY, NVIDIA_API_KEY, GEMINI_API_KEY (siempre la principal; ver
+  política de claves en config.gemini_api_keys, dueño 2026-10-23).
 - Toda llamada va a /chat/completions estilo OpenAI (Groq y NVIDIA) excepto las
   Gemini (SDK nativo). 401/403 salta de proveedor; 429/503/500 con backoff.
 - Sin proveedor configurado → "" (el pipeline sigue sin LLM).

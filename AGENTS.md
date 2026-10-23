@@ -28,6 +28,13 @@ Orden de lectura recomendado:
   patrón literal `nvapi-` aparece en este propio fichero como ejemplo — por
   eso el scan exige carácter alfanumérico tras el guion; y `grep -c` sin
   coincidencias devuelve exit 1 y rompe cadenas `&&`; usa `;` o `|| true`).
+- **Claves y presupuesto (política del dueño 2026-10-23)**: `NVIDIA_API_KEY` =
+  SIEMPRE bibliotecario (la app); `NVIDIA_API_KEY_PILOTO` = SIEMPRE las corridas
+  de evaluación (`run_pilot.py` la aplica sola y avisa si falta). Gemini: SIEMPRE
+  `GEMINI_API_KEY` (principal; `_2`/`_3` solo si falta la principal, sin
+  rotación). **Antes de cada run nueva**: `evals/sd_pilot/run_pilot.py
+  --presupuesto --max-turns T --n-tareas N --techo TECHO` (turnos y coste de
+  antemano) y declarar el techo en el plan del hito antes de lanzarla.
 - **`EG/`, `EW/`, `TraceForge/` son otros repos/trabajos externos**: en este
   proyecto son **solo lectura**. Todo trabajo con el workspace de Godot se hace
   en copias temporales. Binario: `EG/.tools/godot` (4.7.1.stable). En WSL la

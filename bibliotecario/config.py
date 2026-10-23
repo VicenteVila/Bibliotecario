@@ -54,11 +54,16 @@ def gemini_api_key() -> str | None:
 
 
 def gemini_api_keys() -> list[str]:
-    """Cadena de keys: principal + fallbacks (GEMINI_API_KEY, GEMINI_API_KEY_2, ...)."""
+    """SIEMPRE la misma clave (política del dueño 2026-10-23): se usa
+    `GEMINI_API_KEY` (principal) y nada más, para que cada run consuma una
+    cuota conocida y presupuestable. `_2`/`_3` son reserva manual: solo
+    entran si falta la principal (sin rotación automática)."""
+    principal = os.environ.get("GEMINI_API_KEY")
+    if principal:
+        return [principal]
     keys: list[str] = []
-    for i in range(1, 6):
-        suffix = "" if i == 1 else f"_{i}"
-        v = os.environ.get(f"GEMINI_API_KEY{suffix}")
+    for i in range(2, 6):
+        v = os.environ.get(f"GEMINI_API_KEY_{i}")
         if v and v not in keys:
             keys.append(v)
     return keys
