@@ -42,6 +42,13 @@ _MAX_RAW_IN_HISTORY = 4000
 CANAL_CAP_PROMPT_TOKENS = 18_000
 CANAL_SNAP_TURNS = (8, 12)
 
+# Brazo forzado HITO20 §1 (Enmienda 2, pre-registrado 2026-10-23): texto
+# exacto del reprompt inyectado en cada turno tras `final`.
+REPROMPT_FORZADO = (
+    "Turno {n}/{total}. Revisa el estado, identifica una mejora concreta "
+    "pendiente y ejecútala; si no hay ninguna, escribe SIN_MEJORA y explica "
+    "por qué.")
+
 
 def parse_actions(raw: str) -> list[dict]:
     """Extrae TODAS las acciones JSON (tool/final) del turno (canal b)."""
@@ -133,6 +140,11 @@ class CellResult:
     writes: int = 0
     tokens_por_turno: list[int] = field(default_factory=list)
     snapshots: dict[str, float] = field(default_factory=dict)
+    # Brazo forzado §1 (Enmienda 2): ledger por turno forzado + veredicto.
+    forced_turns: int = 0
+    forced_writes: int = 0
+    forced_sin_mejora: int = 0
+    convergencia_real: bool = False
 
 
 class Cell:
@@ -141,7 +153,9 @@ class Cell:
     def __init__(self, variant: Variant, task_id: str, task_dir: Path,
                  workspace: Path, llm_fn: LLMFn, skills_dir: Path | None = None,
                  tracing: bool = False, canal: str = "oficial",
-                 cell_token_cap: int = 0) -> None:
+                 cell_token_cap: int = 0, force_full_turns: bool = False,
+                 snap_turns: tuple[int, ...] | None = None,
+                 ceiling_watch: tuple[int, int, int] | None = None) -> None:
         self.variant = variant
         self.task_id = task_id
         self.task_dir = task_dir
@@ -150,6 +164,12 @@ class Cell:
         self.tracing = tracing
         self.canal = canal  # "oficial" (H19, intacto) | "b" (§0.3 HITO20)
         self.cell_token_cap = cell_token_cap
+        self.force_full_turns = force_full_turns  # brazo forzado §1
+        self._reprompt_activo = False  # True tras el primer `final` forzado
+        self.snap_turns = tuple(snap_turns or CANAL_SNAP_TURNS)
+        # (tokens_otros, proy_celda, techo_global): corte mid-cell al techo
+        # con la regla del 80 % (§1 Enmienda 2, E2-Crítico 2).
+        self.ceiling_watch = ceiling_watch
         self.result = CellResult(variant=variant.name, task=task_id)
 
         if workspace.exists():
@@ -329,6 +349,30 @@ class Cell:
         p, c = self._usage()
         return (p + c) >= self.cell_token_cap
 
+    def _techo_alcanzado(self) -> bool:
+        """Regla del 80 % (§1 E2-Crítico 2): al cruzar el techo global,
+        la celda en curso se corta SOLO si ya gastó ≥80 % de su
+        proyección; si no, se completa (overshoot documentado)."""
+        if self.ceiling_watch is None:
+            return False
+        otros, proy, techo = self.ceiling_watch
+        p, c = self._usage()
+        cell = p + c
+        if otros + cell < techo:
+            return False
+        return proy <= 0 or cell >= 0.8 * proy
+
+    def _clasificar_turno_forzado(self, raw: str, writes_antes: int) -> None:
+        """§1 E2-Crítico 3: write | sin_mejora (SIN_MEJORA o solo-final) | otro."""
+        self.result.forced_turns += 1
+        if self.result.writes > writes_antes:
+            self.result.forced_writes += 1
+            return
+        acciones = parse_actions(raw)
+        solo_final = bool(acciones) and all("final" in a for a in acciones)
+        if "sin_mejora" in (raw or "").lower() or solo_final:
+            self.result.forced_sin_mejora += 1
+
     def _snapshot(self, turn: int) -> None:
         from evals.sd_pilot import verifier
         snap = verifier.hidden_score(self.workspace, self.task_dir)
@@ -412,16 +456,31 @@ class Cell:
                 tsp.set_output((raw or "")[:_MAX_RAW_IN_HISTORY])
 
             if self.canal == "b":
-                if self._pasar_acciones_b(raw):
-                    return
+                writes_antes = self.result.writes
+                final_found = self._pasar_acciones_b(raw)
+                if self.force_full_turns and self._reprompt_activo:
+                    # todo turno POST-final cuenta en el ledger (E2-Crítico 3)
+                    self._clasificar_turno_forzado(raw, writes_antes)
+                if final_found:
+                    if not self.force_full_turns:
+                        return
+                    # Brazo forzado §1: se ignora `final` y se inyecta el
+                    # reprompt pre-registrado (desde el primer `final`).
+                    self._reprompt_activo = True
+                    if turn < self.variant.max_turns:
+                        self.history.append(REPROMPT_FORZADO.format(
+                            n=turn + 1, total=self.variant.max_turns))
                 if self._cap_excedido():
                     self.result.stopped_by = "presupuesto"
+                    return
+                if self._techo_alcanzado():
+                    self.result.stopped_by = "truncated_by_ceiling"
                     return
                 if (self.regulation is not None
                         and self.regulation.state("cell").budget_exhausted):
                     self.result.stopped_by = "presupuesto"
                     return
-                if turn in CANAL_SNAP_TURNS:
+                if turn in self.snap_turns:
                     self._snapshot(turn)
                 continue
 
@@ -456,7 +515,8 @@ class Cell:
                 self.result.stopped_by = "presupuesto"
                 return
 
-        self.result.stopped_by = "max_turns"
+        self.result.stopped_by = ("max_turns_forzado" if self.force_full_turns
+                                  else "max_turns")
 
     def run(self) -> CellResult:
         if self.tracing:
@@ -482,3 +542,8 @@ class Cell:
             self.result.llm_error = f"{type(e).__name__}: {e}"
             if not self.result.stopped_by:
                 self.result.stopped_by = "error_llm"
+        # §1 E2-Crítico 3: ≥80 % de turnos forzados sin mejora => la
+        # convergencia es real (el agente no tenía nada que hacer).
+        if (self.result.forced_turns
+                and self.result.forced_sin_mejora >= 0.8 * self.result.forced_turns):
+            self.result.convergencia_real = True

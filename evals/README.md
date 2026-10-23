@@ -29,7 +29,7 @@ Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
 | `tasks.py` | `TASK_IDS` (12), ejes de dureza, `lint_tasks()`, `qa_task()` |
 | `verifier.py` | pytest público (herramienta del agente) y oculto (`m_h(x)`) |
 | `sens.py` | Pearson, `Q_h^(−x)`, gates U2-U7, umbrales congelados |
-| `run_pilot.py` | modos `--g0` / `--oficial` / `--diagnostico` (HITO20 §0.1) / `--diagnostico-b` (§0.3, canal b) / `--presupuesto` (coste de antemano) / `--debug-celda` (BUILD) |
+| `run_pilot.py` | modos `--g0` / `--oficial` / `--diagnostico` (HITO20 §0.1) / `--diagnostico-b` (§0.3, canal b) / `--corrida-b` (§1, matriz 17×12 canal b + brazo forzado de saturación; solo tras §1 definitivo ratificado) / `--presupuesto` (coste de antemano) / `--debug-celda` (BUILD) |
 | `observador.py` | informes por celda/turno desde `traces_*.sqlite` (canal de observación §0.3, E1.4) |
 | `trazas_analisis.py` | Parte A reproducible (rachas ATASCADO/PROGRESA, §0.1) — fija el snippet ad-hoc original |
 | `skills_pack/` | 4 skills congelados (idénticos en A4 y A5) |

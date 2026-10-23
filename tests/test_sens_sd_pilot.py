@@ -19,17 +19,31 @@ from evals.sd_pilot.harness import (
     parse_actions,
 )
 from evals.sd_pilot.run_pilot import (
+    CHECKPOINT_TOKENS,
+    CORR_B_CELL_CAP,
+    CORR_B_SEED,
+    CORR_B_TECHO,
     DIAG_MAX_TURNS,
     DIAG_TECHO_TOKENS,
+    FACTORES_INYECTADOS,
     G0_TASKS,
     MARGEN_RECALIBRACION,
+    N_CELLS_PLAN,
     PRESUPUESTO_BASE_16,
+    PROY_CELDA_BASE,
+    PROY_FORZADO_BASE,
     TECHO_TOKENS,
     _veredicto_g0,
+    celdas_reducidas,
+    decidir_checkpoint,
+    decidir_truncamiento,
     estimar_tokens_celda,
     evaluar_diagnostico,
     evaluar_diagnostico_b,
+    evaluar_saturacion_forzado,
+    orden_estratificado,
     presupuesto_run,
+    proy_celda,
     recalibrar_diagnostico_b,
 )
 from evals.sd_pilot.variants import VARIANT_NAMES, VARIANTS
@@ -601,3 +615,161 @@ def test_urllerror_dns_es_retryable_c1():
         "<urlopen error [Errno -3] Temporary failure in name resolution>")
     assert BLLM._classify(e) == "retryable"
     assert BLLM._classify(RuntimeError("connection refused")) == "retryable"
+
+
+# ------------------------ §1 HITO20 (Enmiendas 1-2, BUILD) -----------------
+
+
+def test_brazo_forzado_ignora_final_y_para_en_17(tmp_path):
+    d = mini_task(tmp_path)
+    var = replace(VARIANTS["A2"], max_turns=17)
+    llm = FakeLLM('{"final": "creo que ya esta"}',
+                  '{"tool": "read_file", "args": {"path": "calc.py"}}')
+    cell = Cell(var, d.name, d, tmp_path / "ws", llm, canal="b",
+                force_full_turns=True, snap_turns=(12, 17))
+    res = cell.run()
+    assert res.turns == 17
+    assert res.stopped_by == "max_turns_forzado"
+    assert res.forced_turns >= 1          # turnos tras el primer final
+    assert "score@12" in res.snapshots and "score@17" in res.snapshots
+    # el reprompt pre-registrado se inyecta tras el final
+    assert any("Revisa el estado, identifica una mejora concreta" in h
+               for h in cell.history[1:])
+
+
+def test_brazo_forzado_convergencia_real(tmp_path):
+    """Celda que converge y reemite final: turnos forzados >=80% sin_mejora."""
+    d = mini_task(tmp_path)
+    var = replace(VARIANTS["A2"], max_turns=17)
+    cell = Cell(var, d.name, d, tmp_path / "ws", FakeLLM('{"final": "listo"}'),
+                canal="b", force_full_turns=True, snap_turns=(12, 17))
+    res = cell.run()
+    assert res.forced_turns == 16          # turnos 2..17 forzados
+    assert res.forced_sin_mejora == 16
+    assert res.convergencia_real is True
+
+
+def test_brazo_forzado_sin_convergencia_escribe(tmp_path):
+    d = mini_task(tmp_path)
+    var = replace(VARIANTS["A2"], max_turns=17)
+    llm = FakeLLM('{"tool": "write_file", "args": {"path": "a.py", "content": "1"}},\n'
+                  '{"final": "parcial"}',
+                  '{"tool": "write_file", "args": {"path": "a.py", "content": "2"}}')
+    cell = Cell(var, d.name, d, tmp_path / "ws", llm, canal="b",
+                force_full_turns=True, snap_turns=(12, 17))
+    res = cell.run()
+    assert res.forced_writes >= 1
+    assert res.convergencia_real is False
+
+
+def test_orden_estratificado_semilla():
+    from collections import Counter
+
+    from evals.sd_pilot.tasks import TASK_IDS
+    o = orden_estratificado(CORR_B_SEED)
+    assert len(o) == 60 and len(set(o)) == 60
+    assert set(o) == {(v, t) for v in ("A1", "A2", "A3", "A4", "A5")
+                      for t in TASK_IDS}
+    for tercio in range(3):
+        bloque = o[tercio * 20:(tercio + 1) * 20]
+        assert set(Counter(v for v, _ in bloque).values()) == {4}
+    assert orden_estratificado(CORR_B_SEED) == o        # determinista
+    assert orden_estratificado(CORR_B_SEED + 1) != o    # semilla cambia orden
+
+
+def test_decidir_truncamiento_regla_80():
+    assert decidir_truncamiento(50_000, 100_000) == "completar"   # <80%
+    assert decidir_truncamiento(80_000, 100_000) == "cortar"      # >=80%
+    assert decidir_truncamiento(120_000, 100_000) == "cortar"
+    assert decidir_truncamiento(10, 0) == "completar"             # sin proy
+
+
+def test_techo_alcanzado_regla_80_mid_cell(tmp_path, monkeypatch):
+    d = mini_task(tmp_path)
+    var = replace(VARIANTS["A2"], max_turns=17)
+    # (otros=6.95M, proy=100k, techo=7M): celda con 85k >= 80% -> corta
+    cell = Cell(var, d.name, d, tmp_path / "ws", FakeLLM("sin json"), canal="b",
+                ceiling_watch=(6_950_000, 100_000, 7_000_000))
+    monkeypatch.setattr(Cell, "_usage", staticmethod(lambda: (85_000, 0)))
+    res = cell.run()
+    assert res.stopped_by == "truncated_by_ceiling"
+    # celda con 50k < 80% -> se completa (overshoot permitido)
+    cell2 = Cell(var, d.name, d, tmp_path / "ws2", FakeLLM("sin json"),
+                 canal="b", ceiling_watch=(6_950_000, 100_000, 7_000_000))
+    monkeypatch.setattr(Cell, "_usage", staticmethod(lambda: (50_000, 0)))
+    res2 = cell2.run()
+    assert res2.stopped_by == "max_turns"
+
+
+def test_cap_granularity_peor_caso_136k_no_corta(tmp_path, monkeypatch):
+    """Puerta exigida (Crítico 1): el peor caso por celda (~136k tokens,
+    factor 1.47) NO alcanza el cap 450k y llega a los 17 turnos."""
+    d = mini_task(tmp_path)
+    var = replace(VARIANTS["A2"], max_turns=17)
+    cell = Cell(var, d.name, d, tmp_path / "ws", FakeLLM("sin json"),
+                canal="b", cell_token_cap=CORR_B_CELL_CAP)
+    monkeypatch.setattr(Cell, "_usage", staticmethod(lambda: (120_000, 16_400)))
+    res = cell.run()
+    assert res.turns == 17
+    assert res.stopped_by == "max_turns"   # ni presupuesto ni techo
+
+
+def test_decidir_checkpoint_arbol_pre_registrado():
+    # <=7M -> seguir
+    assert decidir_checkpoint(2_654_737, 0, 0)["branch"] == "seguir"
+    # 7M-8.5M -> truncar
+    r = decidir_checkpoint(2_654_737, 180, 3)
+    assert r["branch"] == "truncar" and 7_000_000 < r["proyeccion"] <= 8_500_000
+    # >8.5M -> reducir
+    r2 = decidir_checkpoint(2_654_737, 240, 3)
+    assert r2["branch"] == "reducir" and r2["proyeccion"] > 8_500_000
+
+
+def test_celdas_reducidas_una_por_variante():
+    import json as _json
+
+    from evals.sd_pilot.run_pilot import RESULT_OFICIAL
+    of = _json.loads(RESULT_OFICIAL.read_text(encoding="utf-8"))
+    red = celdas_reducidas(of)
+    assert len(red) == 5
+    assert {v for v, _ in red} == {"A1", "A2", "A3", "A4", "A5"}
+    for vname, tid in red:
+        key = f"{vname}_{tid}"
+        usos = {k: int(c["usage"]["total_tokens"] or 0)
+                for k, c in of["celdas"].items() if k.startswith(vname + "_")}
+        assert usos[key] == max(usos.values())
+
+
+def test_evaluar_saturacion_delta_positivo_no_satura():
+    pares = [{"celda": "a", "score12": 40.0, "score17": 60.0},
+             {"celda": "b", "score12": 50.0, "score17": 75.0},
+             {"celda": "c", "score12": 30.0, "score17": 55.0}]
+    ver = evaluar_saturacion_forzado(pares)
+    assert ver["regla"] == "NO_SATURA" and ver["ic95"][0] > 0
+
+
+def test_evaluar_saturacion_ceros_satura():
+    pares = [{"celda": f"c{i}", "score12": 100.0, "score17": 100.0,
+              "convergencia_real": True} for i in range(3)]
+    ver = evaluar_saturacion_forzado(pares)
+    assert ver["regla"] == "SATURA" and ver["ic95"][0] <= 0 <= ver["ic95"][1]
+
+
+def test_evaluar_saturacion_n2_fallback_i():
+    ver = evaluar_saturacion_forzado([{"celda": "a", "score12": 1.0, "score17": 9.0},
+                                      {"celda": "b", "score12": 1.0, "score17": 9.0}])
+    assert ver["regla"] == "INSUFICIENTE_FALLBACK_I"
+
+
+def test_constantes_seccion1_cuadran_con_preregistro():
+    assert CHECKPOINT_TOKENS == 2_654_737
+    assert CORR_B_TECHO == 7_000_000 and CORR_B_CELL_CAP == 450_000
+    assert N_CELLS_PLAN == 63 and CORR_B_SEED == 20261023
+    assert PROY_CELDA_BASE == round(1_570_850 / 60)
+    assert FACTORES_INYECTADOS == {"A1": 1.0, "A2": 0.2297, "A3": 0.3203,
+                                   "A4": 0.3203, "A5": 0.3203}
+    # proy_celda por variante = base16 x factor inyectado
+    assert proy_celda("A2") == round(105_545 * 0.2297)
+    assert proy_celda("A1") == PRESUPUESTO_BASE_16["A1"]
+    # brazo forzado: media de las 3 extrapolaciones de E1-Ajuste 3
+    assert PROY_FORZADO_BASE == 130_000

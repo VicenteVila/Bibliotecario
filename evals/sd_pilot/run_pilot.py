@@ -9,6 +9,11 @@ Modos:
   --diagnostico-b  Diagnóstico escalado-b HITO20 §0.3: canal b (lecturas
              completas + multi-acción + cap 18k), 17 turnos, 3 celdas,
              techo 1,5M, tope duro 450k/celda (RATIFICADO 2026-10-23).
+  --corrida-b   §1 HITO20 (Enmiendas 1-2): matriz 17x12 canal b, orden
+             estratificado semilla 20261023, checkpoint 2,65M con árbol
+             pre-registrado, techo 7M, cap 450k/celda, más brazo
+             forzado de saturación (3 celdas §0.3 a 17 turnos sin
+             parada temprana). SOLO tras §1 definitivo ratificado.
   --presupuesto  Coste/turnos de antemano de una corrida (sin LLM); política
              de claves del dueño 2026-10-23: SIEMPRE presupuestar antes.
   --debug-celda A2:tarea   Una celda suelta, SOLO para BUILD (nunca es evidencia).
@@ -84,6 +89,31 @@ INFORMES_DIAGB = REPO / "evals" / "results" / "informes_diagb"
 # (conservador).
 MARGEN_RECALIBRACION = 0.30
 
+# Corrida oficial §1 HITO20 (Enmiendas 1-2, RATIFICADAS 2026-10-23):
+# matriz 17x12 canal b + brazo forzado de saturación. NO se lanza sin el
+# visto bueno del dueño (§1.6).
+CORR_B_MAX_TURNS = 17
+CORR_B_CELL_CAP = 450_000
+CORR_B_TECHO = 7_000_000
+CORR_B_SEED = 20261023
+CORR_B_SNAP_TURNS = (2, 4, 6, 8, 12)   # 12 primario; 2/4/6/8 descriptivos
+CORR_B_SNAP_FORZADO = (12, 17)
+CHECKPOINT_TOKENS = 2_654_737          # proyección 2.042.105 x 1,3
+CHECKPOINT_MIN_COMPLETADAS = 0.70
+CHECKPOINT_UMBRAL_ALTO = 8_500_000
+UMBRAL_CONVERGENCIA_REAL = 0.80
+UMBRAL_TRUNCAMIENTO_RESULTADO = 0.20
+FACTORES_INYECTADOS = {"A1": 1.0, "A2": 0.2297, "A3": 0.3203,
+                       "A4": 0.3203, "A5": 0.3203}
+PROY_CELDA_BASE = 26_181       # 1.570.850 / 60 (§0.3 sin margen)
+PROY_FORZADO_BASE = 130_000    # media extrapolada por celda (E1-Ajuste 3)
+N_CELLS_PLAN = 63              # 60 matriz + 3 brazo forzado
+WS_CORRB = Path("/tmp/opencode/sd_pilot_corrb")
+STATE_CORRB = SD_ROOT / "_run_state_corrb.json"
+TRACES_CORRB = SD_ROOT / "traces_corrb.sqlite"
+RESULT_CORRB = REPO / "evals" / "results" / "result_sens_sd_corridab.json"
+INFORMES_CORRB = REPO / "evals" / "results" / "informes_corridab"
+
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
@@ -141,17 +171,20 @@ def _make_llm():
 def _run_cell(vname: str, tid: str, tracing_db: Path,
               ws_root: Path | None = None,
               variant=None, canal: str = "oficial",
-              cell_token_cap: int = 0) -> dict:
+              cell_token_cap: int = 0, force_full_turns: bool = False,
+              snap_turns: tuple[int, ...] | None = None,
+              ceiling_watch: tuple[int, int, int] | None = None) -> dict:
     """Ejecuta UNA celda completa y devuelve su registro (score incluido).
 
-    `ws_root` y `variant` los usa el diagnóstico (§0.1/§0.3): workspaces
+    `ws_root` y `variant` los usa el diagnóstico (§0.1/§0.3/§1): workspaces
     propios y `max_turns` ampliado. `canal="b"` activa el canal declarado
     en §0.3 (lecturas completas, multi-acción, cap, snapshots); el default
-    "oficial" deja el arnés de H19 intacto.
+    "oficial" deja el arnés de H19 intacto. `force_full_turns` es el brazo
+    forzado §1 (ignora `final`, reprompt pre-registrado).
     """
     from bibliotecario.core import llm as BLLM
     from evals.sd_pilot import verifier
-    from evals.sd_pilot.harness import Cell
+    from evals.sd_pilot.harness import CANAL_SNAP_TURNS, Cell
     from evals.sd_pilot.tasks import task_dir
     from evals.sd_pilot.variants import VARIANTS
 
@@ -168,7 +201,10 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
     try:
         cell = Cell(var, tid, td, ws, _make_llm(),
                     skills_dir=SD_ROOT / "skills_pack", tracing=True,
-                    canal=canal, cell_token_cap=cell_token_cap)
+                    canal=canal, cell_token_cap=cell_token_cap,
+                    force_full_turns=force_full_turns,
+                    snap_turns=snap_turns or CANAL_SNAP_TURNS,
+                    ceiling_watch=ceiling_watch)
         res = cell.run()
     finally:
         traceforge.reset_metadata_context(token)
@@ -186,6 +222,10 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
            "final": res.final[:300], "elapsed_s": elapsed,
            "writes": res.writes, "snapshots": res.snapshots,
            "tokens_por_turno": res.tokens_por_turno,
+           "forced_turns": res.forced_turns, "forced_writes": res.forced_writes,
+           "forced_sin_mejora": res.forced_sin_mejora,
+           "convergencia_real": res.convergencia_real,
+           "force_full_turns": force_full_turns,
            "usage": {k: usage.get(k) for k in
                       ("calls", "prompt_tokens", "completion_tokens", "total_tokens")}}
     log(f"{vname}/{tid}: score={reg['score']}% turns={res.turns} "
@@ -613,6 +653,98 @@ def recalibrar_diagnostico_b(factores: dict[str, float]) -> dict:
                          else "EXCEDE_CONSULTAR"}
 
 
+# ------------------------- §1 HITO20 (Enmiendas 1-2, puras) -----------------
+
+def orden_estratificado(seed: int = CORR_B_SEED) -> list[tuple[str, str]]:
+    """E2-Crítico 2: 60 celdas, 4 de cada variante por tercio, semilla fija."""
+    import random
+
+    from evals.sd_pilot.tasks import TASK_IDS
+    from evals.sd_pilot.variants import VARIANT_NAMES
+    rng = random.Random(seed)
+    orden: list[tuple[str, str]] = []
+    for tercio in range(3):
+        bloque: list[tuple[str, str]] = []
+        for vname in VARIANT_NAMES:
+            slice_t = TASK_IDS[tercio * 4:(tercio + 1) * 4]
+            bloque.extend((vname, t) for t in slice_t)
+        rng.shuffle(bloque)
+        orden.extend(bloque)
+    return orden
+
+
+def proy_celda(vname: str) -> int:
+    """E2-Crítico 2: base oficial H16 x factor inyectado (§0.3)."""
+    return round(PRESUPUESTO_BASE_16[vname] * FACTORES_INYECTADOS[vname])
+
+
+def decidir_truncamiento(tokens_celda: int, proyeccion: int) -> str:
+    """Regla del 80 % (E2-Crítico 2): completar vs cortar mid-cell."""
+    if proyeccion <= 0:
+        return "completar"
+    return "completar" if tokens_celda < 0.8 * proyeccion else "cortar"
+
+
+def decidir_checkpoint(acumulado: int, pend_matrix: int,
+                       pend_forzado: int) -> dict:
+    """Árbol pre-registrado del dueño (E2-Importante 2), sin consulta en
+    caliente: <=7M seguir; 7-8.5M truncar; >8.5M reducir matriz."""
+    proy = (acumulado + pend_matrix * PROY_CELDA_BASE
+            + pend_forzado * PROY_FORZADO_BASE)
+    if proy <= CORR_B_TECHO:
+        branch = "seguir"
+    elif proy <= CHECKPOINT_UMBRAL_ALTO:
+        branch = "truncar"
+    else:
+        branch = "reducir"
+    return {"proyeccion": proy, "branch": branch}
+
+
+def celdas_reducidas(of: dict) -> list[tuple[str, str]]:
+    """E2-Importante 2: una celda por variante = mayor usage.total_tokens
+    en H19 oficial (regla determinista, pre-registrada)."""
+    from evals.sd_pilot.variants import VARIANT_NAMES
+    out: list[tuple[str, str]] = []
+    for vname in VARIANT_NAMES:
+        celdas_v = {k: c for k, c in of["celdas"].items()
+                    if k.startswith(vname + "_")}
+        key = max(celdas_v,
+                  key=lambda k: int(celdas_v[k]["usage"]["total_tokens"] or 0))
+        v_part, tid = key.split("_", 1)
+        out.append((v_part, tid))
+    return out
+
+
+def evaluar_saturacion_forzado(pares: list[dict], semilla: int = CORR_B_SEED,
+                               n_boot: int = 10_000) -> dict:
+    """§1 E1-Ajuste 1: Δ = score@17 − score@12 del brazo forzado,
+    IC95 bootstrap (10k, semilla fija). n<3 → fallback (i)."""
+    deltas = [round(float(p["score17"]) - float(p["score12"]), 4)
+              for p in pares]
+    base = {"n": len(deltas), "deltas": deltas,
+            "celdas": [{"celda": p["celda"],
+                        "score12": round(float(p["score12"]), 2),
+                        "score17": round(float(p["score17"]), 2),
+                        "convergencia_real": bool(p.get("convergencia_real"))}
+                       for p in pares]}
+    if len(deltas) < 3:
+        return {**base, "regla": "INSUFICIENTE_FALLBACK_I",
+                "accion": ("§1 mide convergencia, no saturación; (c) queda "
+                           "pendiente para HITO21 (fallback i, E1-Ajuste 1)")}
+    import random
+    rng = random.Random(semilla)
+    n = len(deltas)
+    medias = sorted(sum(rng.choice(deltas) for _ in range(n)) / n
+                    for _ in range(n_boot))
+    ic_lo = medias[int(0.025 * n_boot)]
+    ic_hi = medias[min(int(0.975 * n_boot), n_boot - 1)]
+    if ic_lo > 0:
+        return {**base, "ic95": [ic_lo, ic_hi], "regla": "NO_SATURA",
+                "accion": "(c) justificado para HITO21 (turnos 12-17 aportan)"}
+    return {**base, "ic95": [ic_lo, ic_hi], "regla": "SATURA",
+            "accion": "(c) cancelado (turnos 12-17 no aportan ni forzados)"}
+
+
 def _generar_informes_diagb() -> bool:
     """Informes del observador para E1.4 (legibilidad declarada)."""
     from evals.sd_pilot import observador
@@ -730,6 +862,213 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
     return 0
 
 
+def _generar_informes_corridab() -> bool:
+    """Informes del observador de la corrida-b (misma E1.4 declarada)."""
+    from evals.sd_pilot import observador
+    spans = observador.cargar_spans(TRACES_CORRB)
+    celdas = observador.agrupar_por_celda(spans)
+    INFORMES_CORRB.mkdir(parents=True, exist_ok=True)
+    ok = True
+    for key, cs in sorted(celdas.items()):
+        out = INFORMES_CORRB / f"{key}.md"
+        out.write_text(observador.informe_celda(key, cs), encoding="utf-8")
+        log(f"informe: {out.relative_to(REPO)} ({len(cs)} spans)")
+        if not out.read_text(encoding="utf-8").strip():
+            ok = False
+    return ok
+
+
+def modo_corrida_b(model: str, resume: bool) -> int:
+    """§1 HITO20: matriz 17x12 canal b (orden estratificado, checkpoint
+    2.65M, techo 7M) + brazo forzado de saturación (Enmiendas 1-2).
+
+    Solo para lanzar tras §1 definitivo ratificado (§1.6); este modo ya
+    incorpora todos los números inyectados del pre-registro.
+    """
+    _load_env(model)
+    if resume and not STATE_CORRB.is_file():
+        log("ERROR: --resume sin estado previo de la corrida-b")
+        return 3
+    if not resume and STATE_CORRB.is_file():
+        log(f"ERROR: ya existe {STATE_CORRB.name}; usa --resume o archiva "
+            "el estado documentándolo.")
+        return 3
+    if not RESULT_OFICIAL.is_file():
+        log("ERROR: falta la evidencia oficial del H19 (comparación @16)")
+        return 3
+    of = json.loads(RESULT_OFICIAL.read_text(encoding="utf-8"))
+
+    import traceforge
+    cells: dict[str, dict] = {}
+    if resume:
+        cells = json.loads(STATE_CORRB.read_text(encoding="utf-8")).get("cells", {})
+        log(f"resume corrida-b: {len(cells)} celdas cargadas")
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_CORRB))
+    else:
+        STATE_CORRB.write_text(json.dumps({"cells": {}}, indent=1), encoding="utf-8")
+        if TRACES_CORRB.exists():
+            TRACES_CORRB.unlink()
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_CORRB))
+
+    from dataclasses import replace as _replace
+
+    from evals.sd_pilot.variants import VARIANTS
+    orden = orden_estratificado()
+    log(f"corrida-b §1: canal=b max_turns={CORR_B_MAX_TURNS} "
+        f"cap_celda={CORR_B_CELL_CAP} techo={CORR_B_TECHO} "
+        f"checkpoint={CHECKPOINT_TOKENS} celdas={len(orden)} "
+        f"semilla={CORR_B_SEED}")
+
+    reducidas: set[str] | None = None
+    checkpoint: dict | None = None
+
+    def _completas() -> int:
+        return sum(1 for c in cells.values()
+                   if c.get("score") is not None
+                   and c.get("estado") not in ("truncated_by_ceiling",
+                                               "no_ejecutada_por_techo"))
+
+    # ---------------- matriz 60 celdas, orden estratificado ----------------
+    for vname, tid in orden:
+        key = f"{vname}_{tid}"
+        if key in cells and (cells[key].get("score") is not None
+                             or cells[key].get("estado")):
+            log(f"{key}: ya registrada, se omite")
+            continue
+        if reducidas is not None and key not in reducidas:
+            cells[key] = {"score": None, "estado": "no_ejecutada_por_techo"}
+            log(f"{key}: NO_EJECUTADA_POR_TECHO (reducción de matriz)")
+            continue
+        acum = _coste(cells)["total_tokens"]
+        proy = proy_celda(vname)
+        if CORR_B_TECHO - acum < 0.8 * proy:
+            cells[key] = {"score": None, "estado": "no_ejecutada_por_techo"}
+            log(f"{key}: NO_EJECUTADA_POR_TECHO (restante {CORR_B_TECHO - acum} "
+                f"< 80% de proy {proy})")
+            continue
+        var = _replace(VARIANTS[vname], max_turns=CORR_B_MAX_TURNS)
+        cells[key] = _run_cell(vname, tid, TRACES_CORRB, ws_root=WS_CORRB,
+                               variant=var, canal="b",
+                               cell_token_cap=CORR_B_CELL_CAP,
+                               snap_turns=CORR_B_SNAP_TURNS,
+                               ceiling_watch=(acum, proy, CORR_B_TECHO))
+        if cells[key]["stopped_by"] == "truncated_by_ceiling":
+            cells[key]["estado"] = "truncated_by_ceiling"
+        STATE_CORRB.write_text(json.dumps({"cells": cells}, ensure_ascii=False,
+                                          indent=1), encoding="utf-8")
+        acum = _coste(cells)["total_tokens"]
+        # Checkpoint (E2-Importante 2): evaluación única, árbol pre-reg.
+        if checkpoint is None and acum >= CHECKPOINT_TOKENS:
+            pend_m = sum(1 for v, t in orden if f"{v}_{t}" not in cells)
+            hechas = _completas()
+            pct = hechas / N_CELLS_PLAN
+            checkpoint = decidir_checkpoint(acum, max(pend_m, 0),
+                                            len(DIAGB_CELLS))
+            log(f"CHECKPOINT {acum} >= {CHECKPOINT_TOKENS}: completadas "
+                f"{hechas}/{N_CELLS_PLAN} ({pct:.0%}) -> proy "
+                f"{checkpoint['proyeccion']} -> branch {checkpoint['branch']}")
+            if pct < CHECKPOINT_MIN_COMPLETADAS and checkpoint["branch"] == "reducir":
+                reducidas = {f"{v}_{t}" for v, t in celdas_reducidas(of)}
+                log(f"CHECKPOINT: reducir matriz a {sorted(reducidas)}")
+        if acum >= CORR_B_TECHO:
+            log(f"TECHO {CORR_B_TECHO} alcanzado tras {key}; resto sin ejecutar")
+            break
+
+    # ---------------- brazo forzado (test primario de saturación) ---------
+    for vname, tid in DIAGB_CELLS:
+        key = f"FORZ_{vname}_{tid}"
+        if key in cells and cells[key].get("score") is not None:
+            continue
+        acum = _coste(cells)["total_tokens"]
+        if CORR_B_TECHO - acum < 0.8 * PROY_FORZADO_BASE:
+            cells[key] = {"score": None, "estado": "no_ejecutada_por_techo"}
+            log(f"{key}: FALLBACK_I (sin presupuesto para el brazo forzado)")
+            continue
+        var = _replace(VARIANTS[vname], max_turns=CORR_B_MAX_TURNS)
+        cells[key] = _run_cell(vname, tid, TRACES_CORRB, ws_root=WS_CORRB,
+                               variant=var, canal="b",
+                               cell_token_cap=CORR_B_CELL_CAP,
+                               force_full_turns=True,
+                               snap_turns=CORR_B_SNAP_FORZADO,
+                               ceiling_watch=(acum, PROY_FORZADO_BASE,
+                                              CORR_B_TECHO))
+        if cells[key]["stopped_by"] == "truncated_by_ceiling":
+            cells[key]["estado"] = "truncated_by_ceiling"
+        STATE_CORRB.write_text(json.dumps({"cells": cells}, ensure_ascii=False,
+                                          indent=1), encoding="utf-8")
+
+    # ---------------- evaluación pre-registrada ---------------------------
+    pares_forzado = []
+    fallback_i = False
+    for vname, tid in DIAGB_CELLS:
+        key = f"FORZ_{vname}_{tid}"
+        c = cells.get(key)
+        if not c or c.get("score") is None or c.get("estado"):
+            fallback_i = True
+            continue
+        snaps = c.get("snapshots") or {}
+        if "score@12" not in snaps or "score@17" not in snaps:
+            fallback_i = True
+            continue
+        pares_forzado.append({"celda": key, "score12": snaps["score@12"],
+                              "score17": snaps["score@17"],
+                              "convergencia_real": c.get("convergencia_real")})
+    saturacion = evaluar_saturacion_forzado(pares_forzado)
+    if fallback_i and saturacion["regla"] != "INSUFICIENTE_FALLBACK_I":
+        saturacion["aviso"] = ("alguna celda forzada quedó incompleta o sin "
+                               "snapshots; leer con fallback (i)")
+    pares_matriz = []
+    for vname, tid in orden:
+        key = f"{vname}_{tid}"
+        c = cells.get(key)
+        if not c or c.get("score") is None:
+            continue
+        tok16 = int(of["celdas"][key]["usage"]["total_tokens"])
+        tok17 = int((c.get("usage") or {}).get("total_tokens") or 0)
+        pares_matriz.append({"celda": key,
+                             "score16": of["celdas"][key]["score"],
+                             "score17": c["score"],
+                             "writes": c.get("writes", 0), "tokens16": tok16,
+                             "tokens17": tok17,
+                             "tokens_por_turno": c.get("tokens_por_turno") or [],
+                             "cortada": bool(c.get("estado")),
+                             "infra_error": bool(c.get("llm_error"))})
+    comparativa = evaluar_diagnostico_b(pares_matriz, informes_ok=True)
+    n_trunc = sum(1 for c in cells.values()
+                  if c.get("estado") in ("truncated_by_ceiling",
+                                         "no_ejecutada_por_techo"))
+    tasa_trunc = n_trunc / N_CELLS_PLAN
+    informes_ok = _generar_informes_corridab()
+    coste = _coste(cells)
+    result = {"hito": 20, "modo": "corrida-b",
+              "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "modelo": model,
+              "canal": "b", "max_turns": CORR_B_MAX_TURNS,
+              "cap_celda": CORR_B_CELL_CAP, "techo_tokens": CORR_B_TECHO,
+              "checkpoint": {"tokens": CHECKPOINT_TOKENS,
+                             **(checkpoint or {"branch": "no_disparado"})},
+              "orden_semilla": CORR_B_SEED,
+              "saturacion": saturacion, "comparativa_canal_b": comparativa,
+              "truncamiento": {"n": n_trunc, "tasa": round(tasa_trunc, 4),
+                               "es_resultado": tasa_trunc > UMBRAL_TRUNCAMIENTO_RESULTADO},
+              "fallback_i": fallback_i,
+              "informes_ok": informes_ok,
+              "coste": coste, "celdas": cells,
+              "trazas": str(TRACES_CORRB.relative_to(REPO)),
+              "informes": str(INFORMES_CORRB.relative_to(REPO)),
+              "commits": _git_head()}
+    RESULT_CORRB.write_text(json.dumps(result, ensure_ascii=False, indent=1),
+                            encoding="utf-8")
+    log(f"SATURACIÓN {saturacion['regla']}: {saturacion['accion']}")
+    log(f"comparativa canal b vs H19: {comparativa['regla']}")
+    log(f"truncamiento: {n_trunc}/{N_CELLS_PLAN} ({tasa_trunc:.0%})"
+        + (" [RESULTADO justifica (c)]" if result["truncamiento"]["es_resultado"]
+           else ""))
+    log(f"coste corrida-b={coste['total_tokens']} tokens "
+        f"(techo {CORR_B_TECHO}, checkpoint {CHECKPOINT_TOKENS})")
+    log(f"evidencia: {RESULT_CORRB.relative_to(REPO)}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Piloto Sens(x) HITO19 / HITO20")
     ap.add_argument("--g0", action="store_true", help="G0 humo (§1.7)")
@@ -738,6 +1077,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="diagnóstico HITO20 §0.1 (max_turns=32, techo 450k)")
     ap.add_argument("--diagnostico-b", action="store_true",
                     help="diagnóstico escalado-b HITO20 §0.3 (canal b, 17 turnos)")
+    ap.add_argument("--corrida-b", action="store_true",
+                    help="§1 HITO20: matriz 17x12 canal b + brazo forzado "
+                         "(solo tras §1 definitivo ratificado)")
     ap.add_argument("--presupuesto", action="store_true",
                     help="coste/turnos de antemano de una corrida (sin LLM)")
     ap.add_argument("--max-turns", type=int, default=32,
@@ -755,11 +1097,12 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     modos = [bool(args.g0), bool(args.oficial), bool(args.diagnostico),
-             bool(args.diagnostico_b), bool(args.presupuesto),
-             bool(args.debug_celda)]
+             bool(args.diagnostico_b), bool(args.corrida_b),
+             bool(args.presupuesto), bool(args.debug_celda)]
     if sum(modos) != 1:
         ap.error("elige UN modo: --g0 | --oficial | --diagnostico | "
-                 "--diagnostico-b | --presupuesto | --debug-celda V:tarea")
+                 "--diagnostico-b | --corrida-b | --presupuesto | "
+                 "--debug-celda V:tarea")
 
     if args.g0:
         return modo_g0(args.model)
@@ -769,6 +1112,8 @@ def main(argv: list[str] | None = None) -> int:
         return modo_diagnostico(args.model, args.resume)
     if args.diagnostico_b:
         return modo_diagnostico_b(args.model, args.resume)
+    if args.corrida_b:
+        return modo_corrida_b(args.model, args.resume)
     if args.presupuesto:
         return modo_presupuesto(args.max_turns, args.n_tareas, args.techo)
     return modo_debug_celda(args.debug_celda, args.model)
