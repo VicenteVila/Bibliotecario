@@ -294,3 +294,110 @@ Evidencia: `evals/results/result_sens_sd_diagb.json`, informes
 `evals/logs/sens_sd_diagb_run.log`, trazas
 `evals/sd_pilot/traces_diagb.sqlite` + `_run_state_diagb.json`. Commits:
 declaración `4bbe48a`, BUILD `645b063`, evidencia+cierre (este).
+
+---
+
+## §1 — Corrida oficial 17×12 con canal b (PLANTILLA CONDICIONAL)
+
+> **Estado**: PLANTILLA DECLARADA 2026-10-23 tras **E1_ACLARA** (§0.3). **No
+> autoriza corrida**: la corrida solo se lanza tras (i) commit de §1
+> definitivo con los números inyectados en §1.3 y (ii) visto bueno del
+> dueño. Los umbrales de §1.1-§1.2 quedan pre-registrados aquí; el techo
+> es una **fórmula derivada**, no un número comprometido.
+
+### §1.0 — De dónde sale el techo (derivation, anti-6,13M)
+
+Las dos proyecciones modelan cosas distintas y esto queda escrito para que
+nadie (incluido el agente dentro de dos semanas) las confunda:
+
+- **6.131.772** (`--presupuesto` cúbico, PRE canal b): supone que TODAS las
+  celdas de bucle gastan los 17 turnos con historial creciente; calibrado
+  en celdas atascadas de H19 + A5_repo@30. Es el techo del arnés VIEJO.
+- **El canal b cuesta MÁS por turno** (medido: A2 serie
+  [1014,1250,3804,3839,4059,**7293**] tok/turno; el oficial de A2
+  promediaba ~5,8k) **pero las celdas convergen y paran**: en §0.3 las 3
+  celdas terminaron con `final` en los turnos **4/6/9** (no 16-17).
+- La proyección de §1 aplica el **factor medido** por celda (§0.3
+  pre-registró la receta antes de correr): `12 × Σ base_oficial(v) ×
+  factor_v`, con factores E1 = 0,2297 (A2) y 0,3203 (máx, A3/A4/A5):
+  **1.570.850** sin margen.
+- **Sesgos declarados** (por eso el techo es fórmula, no número):
+  (a) factores de 3 celdas, y eran las atascadas (más beneficiadas);
+  (b) las bases por variante incluyen celdas que ya terminaban solas y
+  reciben factor de atascada → proyección **conservadora hacia abajo**;
+  (c) celda que no converja y llegue a 17 con canal b ≈ factor 0,66
+  (17 turnos al ritmo medido de A5_workflow), no 0,32.
+
+### §1.1 — Estructura (pre-registrada; no depende de inyección)
+
+- **17 turnos × 12 tareas** congeladas de H19 × 5 variantes A1-A5, **canal
+  b** idéntico al diagnóstico (código congelado en `645b063`: lecturas
+  completas, multi-acción, snapshots).
+- **Toco duro 450.000 tokens por celda** (mid-cell, corta y documenta) y
+  corte entre celdas al techo de §1.3. Celdas cortadas se marcan
+  `cortada` y se excluyen del análisis de saturación primario.
+- **`infra_error`**: mismas reglas que §0.3 (celdas con `llm_error` tras
+  agotar reintentos se excluyen de análisis; no se re-ejecutan).
+- Snapshots: **turno 12** (primario) y **2/4/6/8** (descriptivos, sin
+  test — apoyo visual de la curva).
+
+### §1.2 — Criterio de saturación primario (pre-registrado)
+
+- Par por tarea: `Δ_i = score@12_i − score@final_i` donde `final` es el
+  estado al turno 17 (o el `final` temprano; celda terminada antes del
+  12 → score@12 = score@final → Δ=0). 12 pares.
+- **IC95 bootstrap por remuestreo de pares (10.000 iteraciones, semilla
+  fija 20261023)** sobre la media de Δ.
+- Si el IC95 de la media de Δ es **positivo (excluye 0)** → el agente
+  **NO satura** a 17 → (c) justificado para HITO21; si no → **satura** →
+  (c) cancelado. Un solo test primario; los snapshots 2/4/6/8 no generan
+  hipótesis adicionales (anti falsos positivos por comparaciones
+  múltiples).
+- Nota de lectura declarada: con canal b muchas celdas terminan antes
+  del 12; Δ=0 masivo es saturación por DONE (respuesta legítima), no un
+  bug del criterio.
+
+### §1.3 — Techo (FÓRMULA; los números se inyectan, no se comprometen)
+
+```
+techo_corrida = min(7.000.000 − gastado_HITO20, proyección_17×12 × 1,30)
+proyección_17×12 = 12 × Σ_v base_oficial(v) × factor_v × 1,30
+factor_A1 = 1 (one-shot fijo); factor_A2/A3/A4/A5 = medidos en §0.3
+```
+
+- **Valores inyectados hoy (2026-10-23, tras E1)**: factores
+  A2=0,2297 · A3/A4/A5=0,3203 (máx de las celdas medidas) ·
+  proyección sin margen = **1.570.850** · gastado §0.3 = **77.441** →
+  **techo derivado = 2.042.105**.
+- **Si al inyectar la proyección supera 7M → NO se lanza y se consulta**
+  (regla pre-registrada, §0.3).
+- Este techo se **rederiva al inicio de la corrida oficial** con los
+  valores vigentes de gastado y factores; si difiere del valor de arriba
+  por más del margen, se documenta en el log antes de arrancar.
+
+### §1.4 — Herencias y márgenes
+
+- **Margen 25-30 %** (fijado por el dueño en §0.3): se aplica **30 %**
+  (conservador); la referencia empírica del margen es el 69 % de desvío
+  del §0.1 previo.
+- **Cap por turno 18.000**: **heredado** de §0.3 donde nunca bindió
+  (máx 7.293 tok/turno observado); si la corrida oficial lo bindió de
+  forma recurrente, se documenta y solo se cambia por enmienda declarada
+  ANTES de re-ejecutar celdas afectadas.
+- Canal b y snapshot@12 congelados con el BUILD `645b063`; el canal
+  oficial de H19 permanece intocado.
+
+### §1.5 — Qué NO queda fijado aquí
+
+- **Ningún techo numérico como compromiso** (es derivado de §1.3).
+- Ningún gate de score nuevo (si el dueño quiere gates de la corrida
+  oficial, se declaran en la enmienda de §1 definitivo, antes de medir).
+- Modelo (fijo `ultra-550b` por decisión previa) y B/C2: sin cambios
+  respecto a §0.3 (alcance lateral declarado allí).
+
+### §1.6 — Disciplina
+
+Commit de esta plantilla → inyección de números + visto bueno del dueño →
+corrida única oficial (modo a declarar en §1 definitivo, sobre el patrón
+`--oficial`) → §5 con veredicto de saturación y comparación vs H19
+(descriptiva: la matriz oficial bajo canal b vs la de H19).
