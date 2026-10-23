@@ -115,6 +115,19 @@ def _classify(exc: Exception) -> str:
     code = getattr(exc, "code", None)
     if code == 401 or code == 403 or "401" in s or "403" in s or "API_KEY_INVALID" in s:
         return "invalid"
+    # Fallos de red locales/transitorios (§0.3 HITO20, C1): el DNS caído del
+    # diagnóstico murió sin reintento porque "name resolution" no matcheaba
+    # ningún patrón y clasificaba "other". URLError y errno de red son
+    # transitorios por definición.
+    s_low = s.lower()
+    if (isinstance(exc, urllib.error.URLError)
+            or "name resolution" in s_low or "temporary failure" in s_low
+            or "connection refused" in s_low or "connection reset" in s_low
+            or "network is unreachable" in s_low
+            or "errno -3" in s_low or "errno -101" in s_low
+            or "errno -110" in s_low or "errno -111" in s_low
+            or "errno -104" in s_low):
+        return "retryable"
     # 504 y timeout son transitorios por definición en este endpoint: se vio a
     # NVIDIA devolver 504 en una rafaga durante la eval ciega. Sin esto no
     # entraban en "retryable", no reintentaban y tumba(ban) el proveedor entero.

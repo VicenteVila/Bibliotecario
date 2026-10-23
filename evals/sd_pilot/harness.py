@@ -36,6 +36,34 @@ _MAX_TOOL_OUT = 2500
 _MAX_INLINE = 6000
 _MAX_RAW_IN_HISTORY = 4000
 
+# Canal b HITO20 §0.3 (ratificado 2026-10-23): cap de input por llamada,
+# snapshots de score y multi-acción. El canal "oficial" de H19 NO usa nada
+# de esto (default intacto).
+CANAL_CAP_PROMPT_TOKENS = 18_000
+CANAL_SNAP_TURNS = (8, 12)
+
+
+def parse_actions(raw: str) -> list[dict]:
+    """Extrae TODAS las acciones JSON (tool/final) del turno (canal b)."""
+    acciones: list[dict] = []
+    if not raw:
+        return acciones
+    dec = json.JSONDecoder()
+    i = 0
+    while True:
+        j = raw.find("{", i)
+        if j == -1:
+            break
+        try:
+            obj, end = dec.raw_decode(raw[j:])
+        except ValueError:
+            i = j + 1
+            continue
+        if isinstance(obj, dict) and ("tool" in obj or "final" in obj):
+            acciones.append(obj)
+        i = j + end
+    return acciones
+
 TOOLS_JSON = (
     'Responde SOLO con un objeto JSON de una de estas formas:\n'
     '{"tool": "read_file", "args": {"path": "ruta/relativa.py"}}\n'
@@ -102,6 +130,9 @@ class CellResult:
     stopped_by: str = ""
     llm_error: str = ""
     errors: list[str] = field(default_factory=list)
+    writes: int = 0
+    tokens_por_turno: list[int] = field(default_factory=list)
+    snapshots: dict[str, float] = field(default_factory=dict)
 
 
 class Cell:
@@ -109,13 +140,16 @@ class Cell:
 
     def __init__(self, variant: Variant, task_id: str, task_dir: Path,
                  workspace: Path, llm_fn: LLMFn, skills_dir: Path | None = None,
-                 tracing: bool = False) -> None:
+                 tracing: bool = False, canal: str = "oficial",
+                 cell_token_cap: int = 0) -> None:
         self.variant = variant
         self.task_id = task_id
         self.task_dir = task_dir
         self.workspace = workspace
         self.llm_fn = llm_fn
         self.tracing = tracing
+        self.canal = canal  # "oficial" (H19, intacto) | "b" (§0.3 HITO20)
+        self.cell_token_cap = cell_token_cap
         self.result = CellResult(variant=variant.name, task=task_id)
 
         if workspace.exists():
@@ -186,7 +220,27 @@ class Cell:
         return "\n\n".join(parts)
 
     def _render(self) -> str:
-        prompt = "\n\n".join(self.history)
+        entries = list(self.history)
+        marcador = ""
+        if self.canal == "b":
+            # Cap por turno (§0.3): se poda por antigüedad desde la segunda
+            # entrada; la inicial (TAREA/herramientas) NUNCA se elimina.
+            n_drop = 0
+            chars_drop = 0
+
+            def _coste(text: str) -> int:
+                return len(text) // 4 + 1
+
+            while (len(entries) > 1
+                   and _coste(marcador)
+                   + sum(_coste(e) for e in entries) > CANAL_CAP_PROMPT_TOKENS):
+                drop = entries.pop(1)
+                n_drop += 1
+                chars_drop += len(drop)
+            if n_drop:
+                marcador = (f"[{n_drop} entradas antiguas omitidas por cap de "
+                            f"turno ({chars_drop} chars)]")
+        prompt = "\n\n".join(([marcador] if marcador else []) + entries)
         if self.variant.error_digest and self.errors_recent:
             digest = "ERRORES RECIENTES (no los repitas):\n" + "\n".join(
                 f"- {e}" for e in self.errors_recent)
@@ -212,6 +266,7 @@ class Cell:
                     return "ERROR: content debe ser string", False
                 p.parent.mkdir(parents=True, exist_ok=True)
                 p.write_text(content, encoding="utf-8")
+                self.result.writes += 1
                 return f"OK escrito {args.get('path')} ({len(content)} chars)", True
             if name == "run_tests":
                 res = verifier.public_summary(self.workspace)
@@ -257,13 +312,27 @@ class Cell:
         self.result.llm_calls += 1
         with self._span("llm", {"turn": self.result.turns}) as sp:
             sp.set_input(prompt[:_MAX_RAW_IN_HISTORY])
-            before = self._usage() if self.tracing else (0, 0)
+            before = self._usage()
             out = self.llm_fn(prompt, self.variant.max_tokens)
-            if self.tracing:
-                after = self._usage()
-                sp.set_tokens(after[0] - before[0], after[1] - before[1])
+            after = self._usage()
+            sp.set_tokens(after[0] - before[0], after[1] - before[1])
+            if self.canal == "b":
+                self.result.tokens_por_turno.append(
+                    (after[0] - before[0]) + (after[1] - before[1]))
             sp.set_output((out or "")[:_MAX_RAW_IN_HISTORY])
         return out
+
+    def _cap_excedido(self) -> bool:
+        """Tope duro por celda (§0.3): corte mid-cell documentado."""
+        if not self.cell_token_cap:
+            return False
+        p, c = self._usage()
+        return (p + c) >= self.cell_token_cap
+
+    def _snapshot(self, turn: int) -> None:
+        from evals.sd_pilot import verifier
+        snap = verifier.hidden_score(self.workspace, self.task_dir)
+        self.result.snapshots[f"score@{turn}"] = snap["score"]
 
     def _run_one_shot(self) -> None:
         with self._span("turn", {"turn": 1}) as tsp:
@@ -291,6 +360,40 @@ class Cell:
             self.result.errors.append("one-shot sin bloques ###FILE parseables")
         self.result.stopped_by = "one_shot"
 
+    def _pasar_acciones_b(self, raw: str) -> bool:
+        """Canal b (§0.3): ejecuta todas las acciones del turno; True = final."""
+        acciones = parse_actions(raw)
+        if not acciones:
+            self.result.invalid_actions += 1
+            self.history.append(f"MODELO: {raw[:_MAX_RAW_IN_HISTORY]}")
+            self.history.append("AVISO: respuesta no es un JSON válido con tool/final. "
+                                "Responde SOLO con el JSON.")
+            self._record_action({"tool": "_invalid"}, "JSON invalido", False)
+            return False
+        self.history.append(f"MODELO: {raw[:_MAX_RAW_IN_HISTORY]}")
+        for action in acciones:
+            if "final" in action:
+                self.result.final = str(action.get("final", ""))[:1000]
+                self.result.stopped_by = "final"
+                return True
+            with self._span("tool", {"tool_name": action.get("tool")}) as spt:
+                spt.set_input(json.dumps(action.get("args") or {}, sort_keys=True,
+                                         default=str)[:2000])
+                result, ok = self._exec_tool(action)
+                spt.set_output(result[:2000])
+                if not ok:
+                    spt.set_error(result[:500])
+            self.result.tool_calls += 1
+            if action.get("tool") == "read_file":
+                # lecturas completas (§0.3): el contenido entra íntegro
+                # (hasta _MAX_READ), sin cortar a _MAX_TOOL_OUT
+                self.history.append(f"RESULTADO de read_file:\n{result}")
+            else:
+                self.history.append(
+                    f"RESULTADO de {action.get('tool')}:\n{result[:_MAX_TOOL_OUT]}")
+            self._record_action(action, result, ok)
+        return False
+
     def _run_loop(self) -> None:
         initial = (self._header()
                    + "\n\nFICHEROS DEL PROYECTO (árbol; usa read_file para ver su contenido):\n"
@@ -307,6 +410,21 @@ class Cell:
                 tsp.set_input(prompt[:_MAX_RAW_IN_HISTORY])
                 raw = self._llm(prompt)
                 tsp.set_output((raw or "")[:_MAX_RAW_IN_HISTORY])
+
+            if self.canal == "b":
+                if self._pasar_acciones_b(raw):
+                    return
+                if self._cap_excedido():
+                    self.result.stopped_by = "presupuesto"
+                    return
+                if (self.regulation is not None
+                        and self.regulation.state("cell").budget_exhausted):
+                    self.result.stopped_by = "presupuesto"
+                    return
+                if turn in CANAL_SNAP_TURNS:
+                    self._snapshot(turn)
+                continue
+
             action = parse_action(raw)
 
             if action is None:

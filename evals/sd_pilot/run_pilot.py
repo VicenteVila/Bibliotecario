@@ -5,7 +5,10 @@ Modos:
   --g0       G0 humo (§1.7 HITO19): 2 tareas x {A1,A5} -> dictámen de arranque.
   --oficial  Corrida oficial ÚNICA de HITO19: 5 variantes x 12 tareas -> gates.
   --diagnostico  Diagnóstico HITO20 §0.1: celdas truncadas con max_turns=32
-             (techo 450k, salidas propios, NO toca nada del oficial).
+             (techo 450k, salidas propias, NO toca nada del oficial).
+  --diagnostico-b  Diagnóstico escalado-b HITO20 §0.3: canal b (lecturas
+             completas + multi-acción + cap 18k), 17 turnos, 3 celdas,
+             techo 1,5M, tope duro 450k/celda (RATIFICADO 2026-10-23).
   --presupuesto  Coste/turnos de antemano de una corrida (sin LLM); política
              de claves del dueño 2026-10-23: SIEMPRE presupuestar antes.
   --debug-celda A2:tarea   Una celda suelta, SOLO para BUILD (nunca es evidencia).
@@ -65,6 +68,22 @@ TRACES_DIAG = SD_ROOT / "traces_diag.sqlite"
 RESULT_DIAG = REPO / "evals" / "results" / "result_sens_sd_diag.json"
 RESULT_OFICIAL = REPO / "evals" / "results" / "result_sens_sd_pilot.json"
 
+# Diagnóstico escalado-b HITO20 §0.3 (DECLARADO y ratificado por el dueño
+# 2026-10-23): canal b (lecturas completas + multi-acción + cap 18k),
+# mismas 3 celdas del §0.1, max_turns=17, techo 1,5M, tope duro 450k/celda.
+DIAGB_CELLS: list[tuple[str, str]] = DIAG_CELLS + DIAG_CANDIDATES_EXTRA
+DIAGB_MAX_TURNS = 17
+DIAGB_TECHO_TOKENS = 1_500_000
+DIAGB_CELL_CAP = 450_000
+WS_DIAGB = Path("/tmp/opencode/sd_pilot_diagb")
+STATE_DIAGB = SD_ROOT / "_run_state_diagb.json"
+TRACES_DIAGB = SD_ROOT / "traces_diagb.sqlite"
+RESULT_DIAGB = REPO / "evals" / "results" / "result_sens_sd_diagb.json"
+INFORMES_DIAGB = REPO / "evals" / "results" / "informes_diagb"
+# Margen de recalibración: el dueño fija rango 25-30 %; se aplica 30 %
+# (conservador).
+MARGEN_RECALIBRACION = 0.30
+
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
@@ -121,11 +140,14 @@ def _make_llm():
 
 def _run_cell(vname: str, tid: str, tracing_db: Path,
               ws_root: Path | None = None,
-              variant=None) -> dict:
+              variant=None, canal: str = "oficial",
+              cell_token_cap: int = 0) -> dict:
     """Ejecuta UNA celda completa y devuelve su registro (score incluido).
 
-    `ws_root` y `variant` solo los usa el diagnóstico HITO20 (§0.1): workspaces
-    propios y, opcionalmente, la variante con `max_turns` ampliado.
+    `ws_root` y `variant` los usa el diagnóstico (§0.1/§0.3): workspaces
+    propios y `max_turns` ampliado. `canal="b"` activa el canal declarado
+    en §0.3 (lecturas completas, multi-acción, cap, snapshots); el default
+    "oficial" deja el arnés de H19 intacto.
     """
     from bibliotecario.core import llm as BLLM
     from evals.sd_pilot import verifier
@@ -145,7 +167,8 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
         run_id=f"{vname}_{tid}")[1]
     try:
         cell = Cell(var, tid, td, ws, _make_llm(),
-                    skills_dir=SD_ROOT / "skills_pack", tracing=True)
+                    skills_dir=SD_ROOT / "skills_pack", tracing=True,
+                    canal=canal, cell_token_cap=cell_token_cap)
         res = cell.run()
     finally:
         traceforge.reset_metadata_context(token)
@@ -155,18 +178,20 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
     elapsed = round(time.time() - t0, 1)
     reg = {"score": score["score"], "hidden": {"passed": score["passed"],
            "total": score["total"]}, "turns": res.turns,
-           "max_turns": var.max_turns,
+           "max_turns": var.max_turns, "canal": canal,
            "llm_calls": res.llm_calls, "tool_calls": res.tool_calls,
            "invalid_actions": res.invalid_actions, "pf_fires": res.pf_fires,
            "regulation": res.regulation, "stopped_by": res.stopped_by,
            "llm_error": res.llm_error, "errors": res.errors[:8],
            "final": res.final[:300], "elapsed_s": elapsed,
+           "writes": res.writes, "snapshots": res.snapshots,
+           "tokens_por_turno": res.tokens_por_turno,
            "usage": {k: usage.get(k) for k in
-                     ("calls", "prompt_tokens", "completion_tokens", "total_tokens")}}
+                      ("calls", "prompt_tokens", "completion_tokens", "total_tokens")}}
     log(f"{vname}/{tid}: score={reg['score']}% turns={res.turns} "
-        f"llm={res.llm_calls} tools={res.tool_calls} paro={res.stopped_by} "
-        f"tok={usage.get('total_tokens')} {elapsed}s"
-        + (f" LLM_ERROR={res.llm_error}" if res.llm_error else ""))
+        f"llm={res.llm_calls} tools={res.tool_calls} writes={res.writes} "
+        f"paro={res.stopped_by} tok={usage.get('total_tokens')} {elapsed}s"
+        + (f" LLM_ERROR={reg['llm_error']}" if reg["llm_error"] else ""))
     return reg
 
 
@@ -508,12 +533,211 @@ def modo_diagnostico(model: str, resume: bool) -> int:
     return 0
 
 
+def evaluar_diagnostico_b(pares: list[dict], informes_ok: bool = True) -> dict:
+    """§0.3 HITO20: reglas E1/E2/E3 + infra_error, declaradas antes de correr.
+
+    Cada par: {"celda", "score16", "score17", "writes", "tokens16",
+    "tokens17", "tokens_por_turno", "cortada", "infra_error"}.
+    `infra_error` = llm_error no vacío tras agotar reintentos: excluida de
+    E1/E2; <2 válidas → E3 por infraestructura.
+    """
+    detalles = []
+    for p in pares:
+        tp = p.get("tokens_por_turno") or []
+        if len(tp) >= 10:
+            pendiente_ok = (sum(tp[-5:]) / 5.0) <= (sum(tp[:5]) / 5.0)
+        else:
+            pendiente_ok = True  # celda final corta: coste acotado
+        detalles.append({
+            "celda": p["celda"],
+            "score16": round(p["score16"], 2),
+            "score17": round(p["score17"], 2),
+            "delta": round(p["score17"] - p["score16"], 2),
+            "writes": int(p.get("writes") or 0),
+            "cortada": bool(p.get("cortada")),
+            "pendiente_ok": pendiente_ok,
+            "tokens16": int(p.get("tokens16") or 0),
+            "tokens17": int(p.get("tokens17") or 0),
+            "factor": (round(p["tokens17"] / p["tokens16"], 4)
+                       if p.get("tokens16") else None),
+            "infra_error": bool(p.get("infra_error")),
+        })
+    validas = [d for d in detalles if not d["infra_error"]]
+    base = {"n_celdas": len(pares), "n_validas": len(validas),
+            "n_infra": len(pares) - len(validas), "celdas": detalles,
+            "informes_ok": bool(informes_ok)}
+    if len(validas) < 2:
+        return {**base, "regla": "E3_INFRA",
+                "accion": "consultar al dueño: <2 celdas válidas (infra_error)"}
+    e1_delta = sum(1 for d in validas if d["delta"] >= 10) >= 2
+    e1_writes = sum(1 for d in validas if d["writes"] >= 1) >= 2
+    e1_coste = sum(1 for d in validas
+                   if not d["cortada"] and d["pendiente_ok"]) >= 2
+    base["e1"] = {"delta_ge10": e1_delta, "writes_ge1": e1_writes,
+                  "coste_acotado": e1_coste, "informes": bool(informes_ok)}
+    if e1_delta and e1_writes and e1_coste and informes_ok:
+        return {**base, "regla": "E1_ACLARA",
+                "accion": "redactar §1 (17x12, techo recalibrado) para ratificar"}
+    max_delta = max((d["delta"] for d in validas), default=0.0)
+    if max_delta <= 5 or all(d["writes"] == 0 for d in validas):
+        return {**base, "regla": "E2_NO_ACLARA",
+                "accion": ("c justificado con datos (canal+coste); "
+                           "no corrida 17x12; proponer c al dueño")}
+    return {**base, "regla": "E3_AMBIGUO",
+            "accion": "consultar al dueño con los datos"}
+
+
+def recalibrar_diagnostico_b(factores: dict[str, float]) -> dict:
+    """§0.3: proyección 17x12 con los factores medidos + margen 30 %.
+
+    A1 oficial fijo; A2×factor propio; A5×el peor de sus dos celdas; A3/A4
+    con el máximo global (conservador: no se midieron). Si proyecta >7M →
+    no se lanza y se consulta.
+    """
+    f2 = factores.get("A2_plugin-registry", 0.0)
+    f5 = max(factores.get("A5_repo-cache-layer", 0.0),
+             factores.get("A5_workflow-statemachine", 0.0))
+    fmax = max(factores.values(), default=1.0)
+    por_tarea = (PRESUPUESTO_BASE_16["A1"]
+                 + PRESUPUESTO_BASE_16["A2"] * f2
+                 + PRESUPUESTO_BASE_16["A3"] * fmax
+                 + PRESUPUESTO_BASE_16["A4"] * fmax
+                 + PRESUPUESTO_BASE_16["A5"] * f5)
+    total = por_tarea * 12
+    con_margen = round(total * (1 + MARGEN_RECALIBRACION))
+    return {"factores": factores, "factor_max": fmax,
+            "total_12t_sin_margen": round(total),
+            "margen": MARGEN_RECALIBRACION, "proyeccion": con_margen,
+            "techo": TECHO_TOKENS, "cabe": con_margen <= TECHO_TOKENS,
+            "veredicto": "COSTE_OK" if con_margen <= TECHO_TOKENS
+                         else "EXCEDE_CONSULTAR"}
+
+
+def _generar_informes_diagb() -> bool:
+    """Informes del observador para E1.4 (legibilidad declarada)."""
+    from evals.sd_pilot import observador
+    spans = observador.cargar_spans(TRACES_DIAGB)
+    celdas = observador.agrupar_por_celda(spans)
+    INFORMES_DIAGB.mkdir(parents=True, exist_ok=True)
+    ok = True
+    for key, cs in sorted(celdas.items()):
+        out = INFORMES_DIAGB / f"{key}.md"
+        out.write_text(observador.informe_celda(key, cs), encoding="utf-8")
+        log(f"informe: {out.relative_to(REPO)} ({len(cs)} spans)")
+        if not out.read_text(encoding="utf-8").strip():
+            ok = False
+    return ok
+
+
+def modo_diagnostico_b(model: str, resume: bool) -> int:
+    """Diagnóstico escalado-b HITO20 §0.3: canal b, 17 turnos, 3 celdas."""
+    _load_env(model)
+    if resume and not STATE_DIAGB.is_file():
+        log("ERROR: --resume sin estado previo del diagnóstico-b")
+        return 3
+    if not resume and STATE_DIAGB.is_file():
+        log(f"ERROR: ya existe {STATE_DIAGB.name}; usa --resume o archiva "
+            "el estado documentándolo.")
+        return 3
+    if not RESULT_OFICIAL.is_file():
+        log("ERROR: falta la evidencia oficial del H19 (comparación @16)")
+        return 3
+    of = json.loads(RESULT_OFICIAL.read_text(encoding="utf-8"))
+    a1_scores = of["matriz"]["A1"]
+
+    import traceforge
+    cells: dict[str, dict] = {}
+    if resume:
+        cells = json.loads(STATE_DIAGB.read_text(encoding="utf-8")).get("cells", {})
+        log(f"resume diagnóstico-b: {len(cells)} celdas cargadas")
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAGB))
+    else:
+        STATE_DIAGB.write_text(json.dumps({"cells": {}}, indent=1), encoding="utf-8")
+        if TRACES_DIAGB.exists():
+            TRACES_DIAGB.unlink()
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAGB))
+
+    from evals.sd_pilot.variants import VARIANTS
+    log(f"diagnóstico-b §0.3: canal=b max_turns={DIAGB_MAX_TURNS} "
+        f"cap_llamada={DIAGB_CELL_CAP} techo={DIAGB_TECHO_TOKENS} "
+        f"celdas={DIAGB_CELLS}")
+    for vname, tid in DIAGB_CELLS:
+        key = f"{vname}_{tid}"
+        if key in cells and cells[key].get("score") is not None:
+            log(f"{key}: ya puntuada ({cells[key]['score']}%), se omite")
+            continue
+        acumulado = _coste(cells)["total_tokens"]
+        if acumulado + DIAGB_CELL_CAP > DIAGB_TECHO_TOKENS:
+            log(f"TECHO: {key} no ejecutada (acumulado={acumulado} + "
+                f"{DIAGB_CELL_CAP} > {DIAGB_TECHO_TOKENS})")
+            break
+        var = replace(VARIANTS[vname], max_turns=DIAGB_MAX_TURNS)
+        cells[key] = _run_cell(vname, tid, TRACES_DIAGB, ws_root=WS_DIAGB,
+                               variant=var, canal="b",
+                               cell_token_cap=DIAGB_CELL_CAP)
+        STATE_DIAGB.write_text(json.dumps({"cells": cells}, ensure_ascii=False,
+                                          indent=1), encoding="utf-8")
+        acum = _coste(cells)["total_tokens"]
+        if acum > DIAGB_TECHO_TOKENS:
+            log(f"TECHO EXCEDIDO tras {key}: {acum} > {DIAGB_TECHO_TOKENS}; "
+                "se detiene")
+            break
+
+    informes_ok = _generar_informes_diagb()
+    pares = []
+    factores: dict[str, float] = {}
+    for vname, tid in DIAGB_CELLS:
+        key = f"{vname}_{tid}"
+        c = cells.get(key)
+        if not c or c.get("score") is None:
+            continue
+        tok16 = int(of["celdas"][key]["usage"]["total_tokens"])
+        tok17 = int(c["usage"]["total_tokens"] or 0)
+        if tok16 and tok17:
+            factores[key] = round(tok17 / tok16, 4)
+        pares.append({"celda": key,
+                      "score16": of["celdas"][key]["score"],
+                      "score17": c["score"], "a1": a1_scores[tid],
+                      "writes": c.get("writes", 0), "tokens16": tok16,
+                      "tokens17": tok17,
+                      "tokens_por_turno": c.get("tokens_por_turno") or [],
+                      "cortada": c.get("stopped_by") == "presupuesto",
+                      "infra_error": bool(c.get("llm_error"))})
+    ver = evaluar_diagnostico_b(pares, informes_ok=informes_ok)
+    recal = recalibrar_diagnostico_b(factores)
+    coste = _coste(cells)
+    result = {"hito": 20, "modo": "diagnostico-b",
+              "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "modelo": model,
+              "canal": "b", "max_turns": DIAGB_MAX_TURNS,
+              "cap_llamada": DIAGB_CELL_CAP, "techo_tokens": DIAGB_TECHO_TOKENS,
+              "pares": pares, "veredicto": ver, "recalibracion": recal,
+              "coste": coste, "celdas": cells,
+              "trazas": str(TRACES_DIAGB.relative_to(REPO)),
+              "informes": str(INFORMES_DIAGB.relative_to(REPO)),
+              "commits": _git_head()}
+    RESULT_DIAGB.write_text(json.dumps(result, ensure_ascii=False, indent=1),
+                            encoding="utf-8")
+    for p in pares:
+        log(f"  {p['celda']}: @16={p['score16']:.2f} @17={p['score17']:.2f} "
+            f"(delta={p['score17'] - p['score16']:+.2f} writes={p['writes']} "
+            f"factor={factores.get(p['celda'])})")
+    log(f"VEREDICTO {ver['regla']}: {ver['accion']}")
+    log(f"recalibración: proyección 17x12 = {recal['proyeccion']} tokens "
+        f"(margen {MARGEN_RECALIBRACION:.0%}) -> {recal['veredicto']}")
+    log(f"coste diagnóstico-b={coste['total_tokens']} tokens "
+        f"(techo {DIAGB_TECHO_TOKENS})")
+    log(f"evidencia: {RESULT_DIAGB.relative_to(REPO)}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Piloto Sens(x) HITO19 / HITO20")
     ap.add_argument("--g0", action="store_true", help="G0 humo (§1.7)")
     ap.add_argument("--oficial", action="store_true", help="corrida oficial única")
     ap.add_argument("--diagnostico", action="store_true",
                     help="diagnóstico HITO20 §0.1 (max_turns=32, techo 450k)")
+    ap.add_argument("--diagnostico-b", action="store_true",
+                    help="diagnóstico escalado-b HITO20 §0.3 (canal b, 17 turnos)")
     ap.add_argument("--presupuesto", action="store_true",
                     help="coste/turnos de antemano de una corrida (sin LLM)")
     ap.add_argument("--max-turns", type=int, default=32,
@@ -531,10 +755,11 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     modos = [bool(args.g0), bool(args.oficial), bool(args.diagnostico),
-             bool(args.presupuesto), bool(args.debug_celda)]
+             bool(args.diagnostico_b), bool(args.presupuesto),
+             bool(args.debug_celda)]
     if sum(modos) != 1:
         ap.error("elige UN modo: --g0 | --oficial | --diagnostico | "
-                 "--presupuesto | --debug-celda V:tarea")
+                 "--diagnostico-b | --presupuesto | --debug-celda V:tarea")
 
     if args.g0:
         return modo_g0(args.model)
@@ -542,6 +767,8 @@ def main(argv: list[str] | None = None) -> int:
         return modo_oficial(args.model, args.resume)
     if args.diagnostico:
         return modo_diagnostico(args.model, args.resume)
+    if args.diagnostico_b:
+        return modo_diagnostico_b(args.model, args.resume)
     if args.presupuesto:
         return modo_presupuesto(args.max_turns, args.n_tareas, args.techo)
     return modo_debug_celda(args.debug_celda, args.model)

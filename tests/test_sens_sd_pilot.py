@@ -4,22 +4,33 @@ fixtures y dictámen G0. Sin red: NINGÚN test llama al LLM real.
 from __future__ import annotations
 
 import shutil
+from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 from evals.sd_pilot import sens, tasks, verifier
-from evals.sd_pilot.harness import FILE_BLOCK_RE, Cell, _safe_path, parse_action
+from evals.sd_pilot.harness import (
+    CANAL_CAP_PROMPT_TOKENS,
+    FILE_BLOCK_RE,
+    Cell,
+    _safe_path,
+    parse_action,
+    parse_actions,
+)
 from evals.sd_pilot.run_pilot import (
     DIAG_MAX_TURNS,
     DIAG_TECHO_TOKENS,
     G0_TASKS,
+    MARGEN_RECALIBRACION,
     PRESUPUESTO_BASE_16,
     TECHO_TOKENS,
     _veredicto_g0,
     estimar_tokens_celda,
     evaluar_diagnostico,
+    evaluar_diagnostico_b,
     presupuesto_run,
+    recalibrar_diagnostico_b,
 )
 from evals.sd_pilot.variants import VARIANT_NAMES, VARIANTS
 
@@ -432,3 +443,161 @@ def test_presupuesto_a1_no_escala_y_teche():
     # a 48 turnos la corrida se pasa con creces del techo de 7M
     p48 = presupuesto_run(48, 12, TECHO_TOKENS)
     assert not p48["cabe"] and p48["veredicto"] == "EXCEDE_TECHO"
+
+
+# ------------------------------------------- canal b HITO20 §0.3 (BUILD) ----
+
+
+def test_parse_actions_multiaccion():
+    raw = ('{"tool": "read_file", "args": {"path": "a.py"}}\n'
+           'pienso...\n'
+           '{"tool": "write_file", "args": {"path": "b.py", "content": "x"}}\n'
+           '{"final": "listo"}')
+    accs = parse_actions(raw)
+    assert [a.get("tool") for a in accs] == ["read_file", "write_file", None]
+    assert "final" in accs[-1]  # el objeto {"final"} viaja como acción
+    assert parse_action(raw) == accs[0]  # el oficial sigue con la primera
+
+
+def test_canal_b_preserva_entrada_inicial_bajo_poda(tmp_path):
+    """Puerta de BUILD exigida por el dueño (§0.3): la entrada inicial del
+    historial NUNCA se elimina con el cap por turno, por grande que sea el
+    resto del historial."""
+    d = mini_task(tmp_path)
+    cell = Cell(VARIANTS["A2"], d.name, d, tmp_path / "ws", FakeLLM(),
+                canal="b")
+    inicial = "TAREA INICIAL MUY IMPORTANTE — no me elimines"
+    cell.history = [inicial] + [f"ENTRADA {i} " + "x" * 4000 for i in range(20)]
+    prompt = cell._render()
+    assert inicial in prompt                      # inicial preservada
+    assert "omitidas por cap de turno" in prompt  # la poda ocurrió
+    assert "ENTRADA 19" in prompt                 # las recientes quedan
+    assert "ENTRADA 0 " not in prompt             # las antiguas se podan
+    # el prompt cabe en el cap salvo la inicial (que se conserva pase lo que pase)
+    coste_resto = sum(len(p) for p in prompt.split("\n\n") if p != inicial) // 4
+    assert coste_resto <= CANAL_CAP_PROMPT_TOKENS
+
+
+def test_canal_b_lecturas_completas_vs_oficial(tmp_path):
+    d = mini_task(tmp_path)
+    grande = "contenido " * 400  # 3.600 chars > _MAX_TOOL_OUT (2.500)
+    (d / "workspace" / "grande.txt").write_text(grande, encoding="utf-8")
+    for canal, exigido in (("b", len(grande)), ("oficial", 2500)):
+        cell = Cell(VARIANTS["A2"], d.name, d, tmp_path / f"ws_{canal}",
+                    FakeLLM('{"tool": "read_file", "args": {"path": "grande.txt"}}',
+                            '{"final": "ok"}'),
+                    canal=canal)
+        cell.run()
+        resultado = next(h for h in cell.history if h.startswith("RESULTADO de read_file"))
+        if canal == "b":
+            assert len(resultado) >= exigido  # lectura íntegra (hasta _MAX_READ)
+        else:
+            assert len(resultado) <= exigido + 40  # canal oficial: cortado
+
+
+def test_canal_b_multiaccion_un_turno(tmp_path):
+    d = mini_task(tmp_path)
+    var = replace(VARIANTS["A2"], max_turns=1)
+    raw = ('{"tool": "write_file", "args": {"path": "uno.py", "content": "1"}},\n'
+           '{"tool": "write_file", "args": {"path": "dos.py", "content": "2"}}')
+    cell = Cell(var, d.name, d, tmp_path / "ws", FakeLLM(raw), canal="b")
+    res = cell.run()
+    assert res.tool_calls == 2 and res.writes == 2
+    assert (cell.workspace / "uno.py").is_file()
+    assert (cell.workspace / "dos.py").is_file()
+
+
+def test_canal_b_mid_cell_cap(tmp_path, monkeypatch):
+    d = mini_task(tmp_path)
+    var = replace(VARIANTS["A2"], max_turns=16)
+    cell = Cell(var, d.name, d, tmp_path / "ws",
+                FakeLLM('{"tool": "run_tests"}'), canal="b",
+                cell_token_cap=1000)
+    monkeypatch.setattr(Cell, "_usage", staticmethod(lambda: (800, 300)))
+    res = cell.run()
+    assert res.stopped_by == "presupuesto"  # tope duro por celda, mid-cell
+
+
+def test_canal_b_snapshots_turnos_8_y_12(tmp_path):
+    d = mini_task(tmp_path)
+    var = replace(VARIANTS["A2"], max_turns=8)
+    cell = Cell(var, d.name, d, tmp_path / "ws", FakeLLM("sin json"), canal="b")
+    res = cell.run()
+    assert "score@8" in res.snapshots
+    assert isinstance(res.snapshots["score@8"], float)
+    # el workspace sigue intacto (snapshot en copia, 0 interferencia)
+    assert (cell.workspace / "calc.py").is_file()
+
+
+# --------------------------------- E1/E2/E3 + recalibración (§0.3, puras) ---
+
+
+def _par_b(delta: float, writes: int, infra: bool = False, cortada: bool = False,
+           pendiente: bool = True) -> dict:
+    tp = [1000] * 5 + ([200] * 5 if pendiente else [9000] * 5)
+    return {"celda": f"c{delta}{writes}", "score16": 40.0,
+            "score17": 40.0 + delta, "writes": writes, "tokens16": 100_000,
+            "tokens17": 200_000, "tokens_por_turno": tp,
+            "cortada": cortada, "infra_error": infra}
+
+
+def test_evaluar_b_e1_aclara():
+    pares = [_par_b(12, 2), _par_b(11, 1), _par_b(0, 0)]
+    ver = evaluar_diagnostico_b(pares, informes_ok=True)
+    assert ver["regla"] == "E1_ACLARA"
+    assert ver["n_validas"] == 3
+
+
+def test_evaluar_b_e2_no_aclara_por_delta():
+    ver = evaluar_diagnostico_b([_par_b(0, 1), _par_b(0, 2), _par_b(0, 0)])
+    assert ver["regla"] == "E2_NO_ACLARA"
+
+
+def test_evaluar_b_e2_no_aclara_sin_writes():
+    ver = evaluar_diagnostico_b([_par_b(20, 0), _par_b(15, 0), _par_b(12, 0)])
+    assert ver["regla"] == "E2_NO_ACLARA"
+
+
+def test_evaluar_b_e3_ambiguo():
+    ver = evaluar_diagnostico_b([_par_b(12, 1), _par_b(0, 0), _par_b(0, 0)])
+    assert ver["regla"] == "E3_AMBIGUO"
+
+
+def test_evaluar_b_infra_error_excluye_y_e3():
+    pares = [_par_b(12, 2, infra=True), _par_b(11, 1), _par_b(0, 0)]
+    ver = evaluar_diagnostico_b(pares, informes_ok=True)
+    assert ver["n_validas"] == 2 and ver["n_infra"] == 1
+    assert ver["regla"] in ("E1_ACLARA", "E3_AMBIGUO", "E2_NO_ACLARA")
+    # dos infra → <2 válidas → E3 por infraestructura
+    ver2 = evaluar_diagnostico_b(
+        [_par_b(12, 2, infra=True), _par_b(11, 1, infra=True), _par_b(0, 0)])
+    assert ver2["regla"] == "E3_INFRA"
+
+
+def test_evaluar_b_sin_informes_no_es_e1():
+    ver = evaluar_diagnostico_b([_par_b(12, 2), _par_b(11, 1), _par_b(0, 0)],
+                                informes_ok=False)
+    assert ver["regla"] != "E1_ACLARA"
+
+
+def test_recalibrar_margen_30_y_excede():
+    assert MARGEN_RECALIBRACION == 0.30
+    # factor 1.0 (el canal b costara exacto lo que el oficial) + 30% cabe
+    r = recalibrar_diagnostico_b({"A2_plugin-registry": 1.0,
+                                  "A5_repo-cache-layer": 1.0,
+                                  "A5_workflow-statemachine": 1.0})
+    por_tarea = sum(PRESUPUESTO_BASE_16.values())
+    assert r["proyeccion"] == round(por_tarea * 12 * 1.30)
+    assert r["veredicto"] == "COSTE_OK" and r["cabe"]
+    r_bad = recalibrar_diagnostico_b({"A2_plugin-registry": 2.0})
+    assert r_bad["veredicto"] == "EXCEDE_CONSULTAR" and not r_bad["cabe"]
+
+
+def test_urllerror_dns_es_retryable_c1():
+    import urllib.error
+
+    from bibliotecario.core import llm as BLLM
+    e = urllib.error.URLError(
+        "<urlopen error [Errno -3] Temporary failure in name resolution>")
+    assert BLLM._classify(e) == "retryable"
+    assert BLLM._classify(RuntimeError("connection refused")) == "retryable"
