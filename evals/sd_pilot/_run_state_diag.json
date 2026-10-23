@@ -1,0 +1,62 @@
+{
+ "cells": {
+  "A2_plugin-registry": {
+   "score": 64.2857,
+   "hidden": {
+    "passed": 18,
+    "total": 28
+   },
+   "turns": 6,
+   "max_turns": 32,
+   "llm_calls": 6,
+   "tool_calls": 5,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "error_llm",
+   "llm_error": "URLError: <urlopen error [Errno -3] Temporary failure in name resolution>",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 179.9,
+   "usage": {
+    "calls": 5,
+    "prompt_tokens": 7309,
+    "completion_tokens": 264,
+    "total_tokens": 7573
+   }
+  },
+  "A5_repo-cache-layer": {
+   "score": 41.6667,
+   "hidden": {
+    "passed": 10,
+    "total": 24
+   },
+   "turns": 30,
+   "max_turns": 32,
+   "llm_calls": 30,
+   "tool_calls": 30,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia.",
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia.",
+    "[REGULACIÓN] Presupuesto agotado: responde con lo disponible."
+   ],
+   "stopped_by": "presupuesto",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 10 pasan, 4 fallan, 0 errores\nE   AssertionError: assert 0 == 2\n/tmp/opencode/sd_pilot_diag/A5_repo-cache-layer/tests_public/test_cache_basica.py:46: "
+   ],
+   "final": "",
+   "elapsed_s": 1874.5,
+   "usage": {
+    "calls": 30,
+    "prompt_tokens": 672819,
+    "completion_tokens": 79299,
+    "total_tokens": 752118
+   }
+  }
+ }
+}

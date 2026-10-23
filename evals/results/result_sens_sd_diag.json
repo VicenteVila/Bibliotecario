@@ -1,0 +1,120 @@
+{
+ "hito": 20,
+ "modo": "diagnostico",
+ "fecha": "2026-10-23T09:23:20",
+ "modelo": "nvidia/nemotron-3-ultra-550b-a55b",
+ "max_turns": 32,
+ "techo_tokens": 450000,
+ "pares": [
+  {
+   "celda": "A2_plugin-registry",
+   "score16": 64.2857,
+   "score32": 64.2857,
+   "a1": 82.1429
+  },
+  {
+   "celda": "A5_repo-cache-layer",
+   "score16": 41.6667,
+   "score32": 41.6667,
+   "a1": 100.0
+  }
+ ],
+ "veredicto": {
+  "n_celdas": 2,
+  "celdas": [
+   {
+    "celda": "A2_plugin-registry",
+    "score16": 64.29,
+    "score32": 64.29,
+    "a1": 82.14,
+    "delta": 0.0,
+    "ratio_vs_a1": 0.7826,
+    "cumple_09a1": false
+   },
+   {
+    "celda": "A5_repo-cache-layer",
+    "score16": 41.67,
+    "score32": 41.67,
+    "a1": 100.0,
+    "delta": 0.0,
+    "ratio_vs_a1": 0.4167,
+    "cumple_09a1": false
+   }
+  ],
+  "media_delta": 0.0,
+  "regla": "D2_NO_CLARO",
+  "accion": "consultar al dueño (candidato a B+C1+C2)"
+ },
+ "coste": {
+  "calls": 35,
+  "prompt_tokens": 680128,
+  "completion_tokens": 79563,
+  "total_tokens": 759691
+ },
+ "omitidas_techo": [],
+ "celdas": {
+  "A2_plugin-registry": {
+   "score": 64.2857,
+   "hidden": {
+    "passed": 18,
+    "total": 28
+   },
+   "turns": 6,
+   "max_turns": 32,
+   "llm_calls": 6,
+   "tool_calls": 5,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "error_llm",
+   "llm_error": "URLError: <urlopen error [Errno -3] Temporary failure in name resolution>",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 179.9,
+   "usage": {
+    "calls": 5,
+    "prompt_tokens": 7309,
+    "completion_tokens": 264,
+    "total_tokens": 7573
+   }
+  },
+  "A5_repo-cache-layer": {
+   "score": 41.6667,
+   "hidden": {
+    "passed": 10,
+    "total": 24
+   },
+   "turns": 30,
+   "max_turns": 32,
+   "llm_calls": 30,
+   "tool_calls": 30,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia.",
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia.",
+    "[REGULACIÓN] Presupuesto agotado: responde con lo disponible."
+   ],
+   "stopped_by": "presupuesto",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 10 pasan, 4 fallan, 0 errores\nE   AssertionError: assert 0 == 2\n/tmp/opencode/sd_pilot_diag/A5_repo-cache-layer/tests_public/test_cache_basica.py:46: "
+   ],
+   "final": "",
+   "elapsed_s": 1874.5,
+   "usage": {
+    "calls": 30,
+    "prompt_tokens": 672819,
+    "completion_tokens": 79299,
+    "total_tokens": 752118
+   }
+  }
+ },
+ "trazas": "evals/sd_pilot/traces_diag.sqlite",
+ "commits": {
+  "head": "2b4e9cb434de0a66d6f084452463090c438fd1a4",
+  "dirty": true
+ }
+}

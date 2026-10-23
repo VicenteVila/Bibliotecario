@@ -1,0 +1,17 @@
+[08:49:06] diagnóstico HITO20 §0.1: max_turns=32 techo=450000 celdas=[('A2', 'plugin-registry'), ('A5', 'repo-cache-layer'), ('A5', 'workflow-statemachine')]
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM nvidia failed: <urlopen error [Errno -3] Temporary failure in name resolution>
+[08:52:06] A2/plugin-registry: score=64.2857% turns=6 llm=6 tools=5 paro=error_llm tok=7573 179.9s LLM_ERROR=URLError: <urlopen error [Errno -3] Temporary failure in name resolution>
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+[09:23:20] A5/repo-cache-layer: score=41.6667% turns=30 llm=30 tools=30 paro=presupuesto tok=752118 1874.5s
+[09:23:20] TECHO EXCEDIDO tras A5_repo-cache-layer: 759691 > 450000; se detiene
+[09:23:22]   A2_plugin-registry: @16=64.29 @32=64.29 (A1=82.14, delta=+0.00)
+[09:23:22]   A5_repo-cache-layer: @16=41.67 @32=41.67 (A1=100.00, delta=+0.00)
+[09:23:22] VEREDICTO D2_NO_CLARO: consultar al dueño (candidato a B+C1+C2)
+[09:23:22] coste diagnóstico=759691 tokens (techo 450000)
+[09:23:22] evidencia: evals/results/result_sens_sd_diag.json
