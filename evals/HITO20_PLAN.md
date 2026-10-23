@@ -148,3 +148,102 @@ escalera), **(b)** B+C1+C2+rediseño del canal de observación del bucle
 (lecturas completas / multi-acción por turno — hoy estaría dentro de «arreglar
 la base del bucle»), **(c)** replantear de otra forma. HITO20 no arranca sin
 su decisión.
+
+---
+
+## §0.3 — Diagnóstico escalado-b: protocolo DECLARADO (2026-10-23, ratificado por el dueño)
+
+> Origen: decisión del dueño en `Decisión sobre la escalera HITO20.txt`
+> (b, pero primero como diagnóstico escalado a 3 tareas con cap por turno y
+> criterio de «aclara» pre-registrado; recalibrar coste antes de comprometer
+> 17×12; si b no aclara ni con lecturas completas, c se justifica ya con
+> datos — apuntando al canal de observación y al modelo de coste, no al loop
+> entero). Ratificación del dueño con 4 ajustes: **CAP 18.000**; **margen
+> 25-30 %** (se aplica 30 %, el conservador); **pre-registro de
+> `infra_error`** (celdas que agotan reintentos se excluyen de E1; <2
+> válidas → E3 por infraestructura); **test explícito de preservación de la
+> entrada inicial bajo poda** en la puerta de BUILD.
+
+### Pregunta única
+
+¿Con **lecturas completas + multi-acción por turno + cap por turno**, el
+bucle progresa (escribe y sube score) y su coste por turno queda acotado?
+
+### Celdas y condición
+
+- Las mismas 3 celdas del diagnóstico §0.1 (comparabilidad directa):
+  `A2_plugin-registry` (score@16=64,29 · A1=82,14 · 92.549 tok),
+  `A5_repo-cache-layer` (41,67 · 100,00 · 114.467 tok),
+  `A5_workflow-statemachine` (0,00 · 100,00 · 116.571 tok).
+- `max_turns=17`, modelo `nvidia/nemotron-3-ultra-550b-a55b` (fijo).
+- Condición nueva = **canal b** (BUILD; el canal oficial de H19 queda
+  intacto e intocado):
+  1. **Lecturas completas**: `read_file` entrega hasta `_MAX_READ` (8.000
+     chars) al historial (el oficial corta a `_MAX_TOOL_OUT`=2.500).
+  2. **Multi-acción por turno**: se ejecutan todas las acciones JSON del
+     turno en orden (el oficial solo la primera).
+  3. **Cap por turno**: `CAP_PROMPT_TOKENS=18.000` tokens de input por
+     llamada (estimación chars/4); al excederse, poda por antigüedad las
+     entradas del historial **salvo la inicial**, con marcador
+     `[N entradas antiguas omitidas por cap de turno]`.
+  4. **C1 robustez**: los fallos de red transitorios (URLError / name
+     resolution / 503 …) se clasifican retryable y reintentan con backoff
+     (el A2 del §0.1 murió por DNS sin reintento).
+  5. **Snapshots**: score oculto en los turnos 8 y 12 (copia de workspace +
+     verificador determinista, **0 tokens LLM**) — curva intra-celda.
+  6. **Observabilidad**: `evals/sd_pilot/observador.py` (informe por
+     celda/turno desde las trazas) y el analizador de rachas de la Parte A
+     quedan guardados como herramientas reproducibles.
+- **Techo total 1.500.000 tokens**; **tope duro 450.000 por celda** con
+  corte mid-cell documentado (lección del incidente 759k: cap por llamada +
+  cap por celda, no solo corte entre celdas). Con CAP=18k el techo queda
+  holgado (3 × ~376k ≈ 1,13M + overhead).
+
+### Criterio «aclara» pre-registrado (E1/E2/E3)
+
+`Δscore = score@17(canal b) − score@16_oficial` (misma celda). **Celdas
+`infra_error`** (`llm_error` no vacío tras agotar reintentos):
+**excluidas** del recuento de E1/E2; si quedan **<2 celdas válidas → E3
+por infraestructura** (consulta al dueño; no se concluye nada sobre el
+canal).
+
+- **E1 ACLARA** (las 4, sobre las celdas válidas):
+  1. ≥2/3 con Δscore ≥ **+10**;
+  2. ≥2/3 con **≥1 `write_file`**;
+  3. ≥2/3 sin corte de 450k **y** pendiente de tokens/turno de los últimos
+     5 turnos ≤ media de los primeros 5 (el cap acota; celda que termina
+     `final` antes del turno 10 se considera acotada);
+  4. los 3 informes del observador existen y son legibles.
+- **E2 NO_ACLARA**: ninguna celda con Δ > +5, **o** las válidas todas con
+  0 writes → «c» justificado con datos (canal de observación + modelo de
+  coste, no el loop entero); **no hay corrida 17×12**; se redacta la
+  propuesta de c para ratificación del dueño.
+- **E3 AMBIGUO**: el resto (incluido <2 válidas por `infra_error`) → se
+  para y se consulta.
+
+### Recalibración de coste pre-registrada (antes de comprometer 17×12)
+
+`factor_i = tok@17_canal_b / tok@16_oficial` por celda medida. Proyección
+17×12 = A1 oficial fijo + (A2…A5 oficiales × **el peor factor medido**;
+A3/A4 con el máximo de los factores medidos) ×12, **+30 % de margen**
+(conservador del rango 25-30 % fijado por el dueño). **Si proyecta >7M →
+no se lanza y se consulta al dueño.**
+
+### Saturación (queda para §1)
+
+El diagnóstico **valida el mecanismo de snapshots, no la conclusión de
+saturación, que se decide en §1 con 12 pares** (score@12 vs @17 emparejado
+por tarea, IC95 bootstrap de Δ positivo → no satura → «c» justificado para
+HITO21; si no → satura → «c» cancelado).
+
+### Alcance lateral declarado
+
+Tareas = las 12 congeladas de H19; **B** (tareas endurecidas nuevas) y
+**C2** (modelo débil) **no entran en esta fase**; si se quieren, se añaden
+por enmienda al ratificar §1.
+
+### Disciplina de commits (§4)
+
+Declaración → BUILD+tests → corrida+evidencia+cierre §0.3. Evidencia:
+`evals/results/result_sens_sd_diagb.json` + log `sens_sd_diagb_run.log` +
+`evals/sd_pilot/traces_diagb.sqlite` + `_run_state_diagb.json`.
