@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
-"""Corredor del piloto HITO19 (Sens(x)).
+"""Corredor del piloto HITO19 (Sens(x)) y del diagnóstico HITO20 (§0.1).
 
-Modos (§1.7 del plan):
-  --g0       G0 humo: 2 tareas x {A1,A5} -> dictámen de arranque (BUILD/VENTANA).
-  --oficial  Corrida oficial ÚNICA: 5 variantes x 12 tareas -> matrix -> gates U1-U7.
+Modos:
+  --g0       G0 humo (§1.7 HITO19): 2 tareas x {A1,A5} -> dictámen de arranque.
+  --oficial  Corrida oficial ÚNICA de HITO19: 5 variantes x 12 tareas -> gates.
+  --diagnostico  Diagnóstico HITO20 §0.1: celdas truncadas con max_turns=32
+             (techo 450k, salidas propias, NO toca nada del oficial).
   --debug-celda A2:tarea   Una celda suelta, SOLO para BUILD (nunca es evidencia).
 
 Disciplina:
@@ -18,6 +20,8 @@ Uso (con red y .env en la raíz):
       > evals/logs/sens_sd_g0.log 2>&1
   setsid .venv/bin/python evals/sd_pilot/run_pilot.py --oficial --resume \
       > evals/logs/sens_sd_pilot_run.log 2>&1 < /dev/null &
+  setsid .venv/bin/python evals/sd_pilot/run_pilot.py --diagnostico \
+      > evals/logs/sens_sd_diag_run.log 2>&1 < /dev/null &
 """
 from __future__ import annotations
 
@@ -27,6 +31,7 @@ import os
 import subprocess
 import sys
 import time
+from dataclasses import replace
 from pathlib import Path
 
 SD_ROOT = Path(__file__).resolve().parent
@@ -37,6 +42,18 @@ TECHO_TOKENS = 7_000_000  # §1.8: enmienda 2026-10-22 (dueño, tras G0, N=12 in
 STATE_OFICIAL = SD_ROOT / "_run_state_oficial.json"
 TRACES_OFICIAL = SD_ROOT / "traces.sqlite"
 TRACES_OTROS = SD_ROOT / "traces_g0.sqlite"
+
+# Diagnóstico HITO20 §0.1 (declarado 2026-10-23 ANTES de correr)
+DIAG_MAX_TURNS = 32
+DIAG_CELLS: list[tuple[str, str]] = [("A2", "plugin-registry"),
+                                     ("A5", "repo-cache-layer")]
+DIAG_CANDIDATES_EXTRA: list[tuple[str, str]] = [("A5", "workflow-statemachine")]
+DIAG_TECHO_TOKENS = 450_000
+WS_DIAG = Path("/tmp/opencode/sd_pilot_diag")
+STATE_DIAG = SD_ROOT / "_run_state_diag.json"
+TRACES_DIAG = SD_ROOT / "traces_diag.sqlite"
+RESULT_DIAG = REPO / "evals" / "results" / "result_sens_sd_diag.json"
+RESULT_OFICIAL = REPO / "evals" / "results" / "result_sens_sd_pilot.json"
 
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
@@ -84,8 +101,14 @@ def _make_llm():
     return llm_fn
 
 
-def _run_cell(vname: str, tid: str, tracing_db: Path) -> dict:
-    """Ejecuta UNA celda completa y devuelve su registro (score incluido)."""
+def _run_cell(vname: str, tid: str, tracing_db: Path,
+              ws_root: Path | None = None,
+              variant=None) -> dict:
+    """Ejecuta UNA celda completa y devuelve su registro (score incluido).
+
+    `ws_root` y `variant` solo los usa el diagnóstico HITO20 (§0.1): workspaces
+    propios y, opcionalmente, la variante con `max_turns` ampliado.
+    """
     from bibliotecario.core import llm as BLLM
     from evals.sd_pilot import verifier
     from evals.sd_pilot.harness import Cell
@@ -93,7 +116,8 @@ def _run_cell(vname: str, tid: str, tracing_db: Path) -> dict:
     from evals.sd_pilot.variants import VARIANTS
 
     td = task_dir(tid)
-    ws = Path(f"/tmp/opencode/sd_pilot_runs/{vname}_{tid}")
+    var = variant if variant is not None else VARIANTS[vname]
+    ws = (ws_root or Path("/tmp/opencode/sd_pilot_runs")) / f"{vname}_{tid}"
     BLLM.reset_usage()
     t0 = time.time()
 
@@ -102,7 +126,7 @@ def _run_cell(vname: str, tid: str, tracing_db: Path) -> dict:
         variant=vname, task=tid, model=os.environ.get("NVIDIA_MODEL", ""),
         run_id=f"{vname}_{tid}")[1]
     try:
-        cell = Cell(VARIANTS[vname], tid, td, ws, _make_llm(),
+        cell = Cell(var, tid, td, ws, _make_llm(),
                     skills_dir=SD_ROOT / "skills_pack", tracing=True)
         res = cell.run()
     finally:
@@ -113,6 +137,7 @@ def _run_cell(vname: str, tid: str, tracing_db: Path) -> dict:
     elapsed = round(time.time() - t0, 1)
     reg = {"score": score["score"], "hidden": {"passed": score["passed"],
            "total": score["total"]}, "turns": res.turns,
+           "max_turns": var.max_turns,
            "llm_calls": res.llm_calls, "tool_calls": res.tool_calls,
            "invalid_actions": res.invalid_actions, "pf_fires": res.pf_fires,
            "regulation": res.regulation, "stopped_by": res.stopped_by,
@@ -301,25 +326,148 @@ def modo_debug_celda(spec: str, model: str) -> int:
     return 0
 
 
+def evaluar_diagnostico(pares: list[dict]) -> dict:
+    """§0.1 HITO20: reglas D1 -> D2 -> D3, declaradas antes de correr.
+
+    Cada par: {"celda", "score16", "score32", "a1"}.
+    """
+    detalles = [{"celda": p["celda"], "score16": round(p["score16"], 2),
+                 "score32": round(p["score32"], 2),
+                 "a1": round(p["a1"], 2),
+                 "delta": round(p["score32"] - p["score16"], 2),
+                 "ratio_vs_a1": round(p["score32"] / p["a1"], 4) if p["a1"] else None,
+                 "cumple_09a1": bool(p["score32"] >= 0.9 * p["a1"])}
+                for p in pares]
+    base = {"n_celdas": len(pares), "celdas": detalles}
+    if len(pares) >= 2:
+        cumplen = [d for d in detalles if d["cumple_09a1"]]
+        if len(cumplen) >= 2:
+            return {**base, "regla": "D1_CLARO_C1",
+                    "accion": "lanzar HITO20 = B+C1 (sin acelerador)"}
+    if pares:
+        media_delta = sum(d["delta"] for d in detalles) / len(detalles)
+        base["media_delta"] = round(media_delta, 2)
+        if media_delta < 10:
+            return {**base, "regla": "D2_NO_CLARO",
+                    "accion": "consultar al dueño (candidato a B+C1+C2)"}
+    return {**base, "regla": "D3_AMBIGUO",
+            "accion": "consultar al dueño con datos"}
+
+
+def modo_diagnostico(model: str, resume: bool) -> int:
+    """Diagnóstico HITO20 §0.1: celdas truncadas con max_turns=32."""
+    _load_env(model)
+    if resume and not STATE_DIAG.is_file():
+        log("ERROR: --resume sin estado previo del diagnóstico")
+        return 3
+    if not resume and STATE_DIAG.is_file():
+        log(f"ERROR: ya existe {STATE_DIAG.name}; usa --resume o archiva "
+            "el estado documentándolo.")
+        return 3
+    if not RESULT_OFICIAL.is_file():
+        log("ERROR: falta la evidencia oficial del H19 (comparación @16)")
+        return 3
+    of = json.loads(RESULT_OFICIAL.read_text(encoding="utf-8"))
+    a1_scores = of["matriz"]["A1"]
+    est16 = {k: int(v["usage"]["total_tokens"]) for k, v in of["celdas"].items()}
+
+    import traceforge
+    cells: dict[str, dict] = {}
+    if resume:
+        cells = json.loads(STATE_DIAG.read_text(encoding="utf-8")).get("cells", {})
+        log(f"resume diagnóstico: {len(cells)} celdas cargadas")
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAG))
+    else:
+        STATE_DIAG.write_text(json.dumps({"cells": {}}, indent=1), encoding="utf-8")
+        if TRACES_DIAG.exists():
+            TRACES_DIAG.unlink()
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAG))
+
+    orden = DIAG_CELLS + DIAG_CANDIDATES_EXTRA
+    obligatorias = set(DIAG_CELLS)
+    omitidas: list[str] = []
+    from evals.sd_pilot.variants import VARIANTS
+    log(f"diagnóstico HITO20 §0.1: max_turns={DIAG_MAX_TURNS} techo="
+        f"{DIAG_TECHO_TOKENS} celdas={orden}")
+    for vname, tid in orden:
+        key = f"{vname}_{tid}"
+        if key in cells and cells[key].get("score") is not None:
+            log(f"{key}: ya puntuada ({cells[key]['score']}%), se omite")
+            continue
+        acumulado = _coste(cells)["total_tokens"]
+        est_celda = 2 * est16.get(key, 0)
+        if key not in obligatorias and (
+                acumulado + est_celda > DIAG_TECHO_TOKENS):
+            omitidas.append(key)
+            log(f"{key}: NO_EJECUTADA_TECHO (acumulado={acumulado} + "
+                f"est={est_celda} > {DIAG_TECHO_TOKENS})")
+            continue
+        var = replace(VARIANTS[vname], max_turns=DIAG_MAX_TURNS)
+        cells[key] = _run_cell(vname, tid, TRACES_DIAG, ws_root=WS_DIAG,
+                               variant=var)
+        STATE_DIAG.write_text(json.dumps({"cells": cells}, ensure_ascii=False,
+                                         indent=1), encoding="utf-8")
+        acum = _coste(cells)["total_tokens"]
+        if acum > DIAG_TECHO_TOKENS:
+            log(f"TECHO EXCEDIDO tras {key}: {acum} > {DIAG_TECHO_TOKENS}; "
+                "se detiene")
+            break
+
+    pares = []
+    for vname, tid in orden:
+        key = f"{vname}_{tid}"
+        if key in cells and cells[key].get("score") is not None:
+            pares.append({"celda": key,
+                          "score16": of["celdas"][key]["score"],
+                          "score32": cells[key]["score"],
+                          "a1": a1_scores[tid]})
+    ver = evaluar_diagnostico(pares)
+    coste = _coste(cells)
+    result = {"hito": 20, "modo": "diagnostico",
+              "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "modelo": model,
+              "max_turns": DIAG_MAX_TURNS, "techo_tokens": DIAG_TECHO_TOKENS,
+              "pares": pares, "veredicto": ver, "coste": coste,
+              "omitidas_techo": omitidas, "celdas": cells,
+              "trazas": str(TRACES_DIAG.relative_to(REPO)),
+              "commits": _git_head()}
+    RESULT_DIAG.write_text(json.dumps(result, ensure_ascii=False, indent=1),
+                           encoding="utf-8")
+    for p in pares:
+        log(f"  {p['celda']}: @16={p['score16']:.2f} @32={p['score32']:.2f} "
+            f"(A1={p['a1']:.2f}, delta={p['score32'] - p['score16']:+.2f})")
+    log(f"VEREDICTO {ver['regla']}: {ver['accion']}")
+    log(f"coste diagnóstico={coste['total_tokens']} tokens "
+        f"(techo {DIAG_TECHO_TOKENS})")
+    log(f"evidencia: {RESULT_DIAG.relative_to(REPO)}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Piloto Sens(x) HITO19")
+    ap = argparse.ArgumentParser(description="Piloto Sens(x) HITO19 / HITO20")
     ap.add_argument("--g0", action="store_true", help="G0 humo (§1.7)")
     ap.add_argument("--oficial", action="store_true", help="corrida oficial única")
+    ap.add_argument("--diagnostico", action="store_true",
+                    help="diagnóstico HITO20 §0.1 (max_turns=32, techo 450k)")
     ap.add_argument("--debug-celda", metavar="V:tarea", default=None,
                     help="una celda, SOLO BUILD")
     ap.add_argument("--model", default=MODEL)
     ap.add_argument("--resume", action="store_true",
-                    help="reanudar la corrida oficial desde el estado por celda")
+                    help="reanudar la corrida (oficial o diagnóstico) desde "
+                         "el estado por celda")
     args = ap.parse_args(argv)
 
-    modos = [bool(args.g0), bool(args.oficial), bool(args.debug_celda)]
+    modos = [bool(args.g0), bool(args.oficial), bool(args.diagnostico),
+             bool(args.debug_celda)]
     if sum(modos) != 1:
-        ap.error("elige UN modo: --g0 | --oficial | --debug-celda V:tarea")
+        ap.error("elige UN modo: --g0 | --oficial | --diagnostico | "
+                 "--debug-celda V:tarea")
 
     if args.g0:
         return modo_g0(args.model)
     if args.oficial:
         return modo_oficial(args.model, args.resume)
+    if args.diagnostico:
+        return modo_diagnostico(args.model, args.resume)
     return modo_debug_celda(args.debug_celda, args.model)
 
 

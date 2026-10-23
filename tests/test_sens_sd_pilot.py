@@ -10,7 +10,14 @@ import pytest
 
 from evals.sd_pilot import sens, tasks, verifier
 from evals.sd_pilot.harness import FILE_BLOCK_RE, Cell, _safe_path, parse_action
-from evals.sd_pilot.run_pilot import G0_TASKS, TECHO_TOKENS, _veredicto_g0
+from evals.sd_pilot.run_pilot import (
+    DIAG_MAX_TURNS,
+    DIAG_TECHO_TOKENS,
+    G0_TASKS,
+    TECHO_TOKENS,
+    _veredicto_g0,
+    evaluar_diagnostico,
+)
 from evals.sd_pilot.variants import VARIANT_NAMES, VARIANTS
 
 REPO = Path(__file__).resolve().parents[1]
@@ -352,3 +359,44 @@ def test_variantas_congeladas():
     assert VARIANTS["A5"].use_pfs and VARIANTS["A5"].use_skills
     assert VARIANTS["A5"].use_regulation and VARIANTS["A5"].error_digest
     assert all(not VARIANTS[v].use_regulation for v in ("A1", "A2", "A3", "A4"))
+
+
+# ------------------------------------------- diagnóstico HITO20 (§0.1) ---
+
+
+def test_diag_reglas_declaradas():
+    assert DIAG_MAX_TURNS == 32 and DIAG_TECHO_TOKENS == 450_000
+
+
+def test_diag_d1_dos_celdas_sobre_0_9xa1():
+    pares = [{"celda": "A2_plugin", "score16": 64.29, "score32": 78.0,
+              "a1": 82.14},
+             {"celda": "A5_repo", "score16": 41.67, "score32": 95.0,
+              "a1": 100.0}]
+    ver = evaluar_diagnostico(pares)
+    assert ver["regla"] == "D1_CLARO_C1"
+    assert all(d["cumple_09a1"] for d in ver["celdas"])
+
+
+def test_diag_d2_el_doble_presupuesto_no_mueve():
+    pares = [{"celda": "A2_plugin", "score16": 64.29, "score32": 68.0,
+              "a1": 82.14},
+             {"celda": "A5_repo", "score16": 41.67, "score32": 45.0,
+              "a1": 100.0}]
+    ver = evaluar_diagnostico(pares)
+    assert ver["regla"] == "D2_NO_CLARO" and ver["media_delta"] < 10
+
+
+def test_diag_d3_mejora_pero_sin_dos_sobre_0_9xa1():
+    pares = [{"celda": "A2_plugin", "score16": 64.29, "score32": 80.0,
+              "a1": 82.14},
+             {"celda": "A5_repo", "score16": 41.67, "score32": 75.0,
+              "a1": 100.0}]
+    ver = evaluar_diagnostico(pares)
+    assert ver["regla"] == "D3_AMBIGUO"
+
+
+def test_diag_una_sola_celda_nunca_d1():
+    ver = evaluar_diagnostico([{"celda": "A2_plugin", "score16": 64.29,
+                                "score32": 45.0, "a1": 82.14}])
+    assert ver["regla"] in ("D2_NO_CLARO", "D3_AMBIGUO")

@@ -29,15 +29,18 @@ Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
 | `tasks.py` | `TASK_IDS` (12), ejes de dureza, `lint_tasks()`, `qa_task()` |
 | `verifier.py` | pytest público (herramienta del agente) y oculto (`m_h(x)`) |
 | `sens.py` | Pearson, `Q_h^(−x)`, gates U2-U7, umbrales congelados |
-| `run_pilot.py` | modos `--g0` / `--oficial` / `--debug-celda` (BUILD) |
+| `run_pilot.py` | modos `--g0` / `--oficial` / `--diagnostico` (HITO20 §0.1) / `--debug-celda` (BUILD) |
 | `skills_pack/` | 4 skills congelados (idénticos en A4 y A5) |
 | `sd_tasks/<id>/` | las 12 fixtures: `TASK.md` + `workspace/` + `tests_hidden/` + `reference/` |
 | `traces.sqlite`, `_run_state_oficial.json` | trazas TraceForge y estado por celda de la corrida oficial (reanudable) |
+| `traces_g0.sqlite`, `traces_diag.sqlite`, `_run_state_diag.json` | trazas del G0, del diagnóstico HITO20 y estado por celda del diagnóstico |
 
 Evidencia: `results/result_sens_sd_g0.json` (dictámen G0) y
 `results/result_sens_sd_pilot.json` (corrida oficial) + `logs/sens_sd_g0.log`
-y `logs/sens_sd_pilot_run.log`. Tests: `tests/test_sens_sd_pilot.py` (puros,
-sin LLM).
+y `logs/sens_sd_pilot_run.log`. Diagnóstico HITO20 (§0.1 del plan):
+`results/result_sens_sd_diag_trazas.json` (Parte A, 0 tokens),
+`results/result_sens_sd_diag.json` (Parte B) + `logs/sens_sd_diag_run.log`.
+Tests: `tests/test_sens_sd_pilot.py` (puros, sin LLM).
 
 ## `preflight/` (159 ficheros) — la evaluación **viva**
 
@@ -72,6 +75,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | `result_blind_*`, `result_abst_*` | ensayos ciegos de QA y pruebas de abstención |
 | `result_smoke_*` | humo (coste mínimo, sin umbral) |
 | `result_sens_sd_g0.json`, `result_sens_sd_pilot.json` | G0 humo y corrida oficial del **Hito 19** (`Sens(x)`); su stdout es `logs/sens_sd_g0.log` y `logs/sens_sd_pilot_run.log` |
+| `result_sens_sd_diag_trazas.json`, `result_sens_sd_diag.json` | **Hito 20** §0.1: diagnóstico de celdas truncadas (Parte A 0 tokens, Parte B `max_turns=32`); stdout en `logs/sens_sd_diag_run.log` |
 | `run_<X>.py` → `results/result_<X>.json` + `logs/run_<X>.log` | trío runner → evidencia → stdout del mismo experimento |
 | `*_prev*.json` | corrida anterior conservada antes de repetir (historial, no borrar) |
 
