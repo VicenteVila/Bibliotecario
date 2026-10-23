@@ -1,0 +1,179 @@
+[23:22:53] corrida oficial HITO19: 60 celdas, modelo=nvidia/nemotron-3-ultra-550b-a55b
+[23:23:36] A1/checkout-rounding: score=100.0% turns=1 llm=1 tools=0 paro=one_shot tok=9154 42.7s
+[23:23:56] A1/repo-cache-layer: score=100.0% turns=1 llm=1 tools=0 paro=one_shot tok=7337 20.0s
+[23:25:28] A1/dsl-parser: score=95.6522% turns=1 llm=1 tools=0 paro=one_shot tok=11189 92.1s
+[23:26:01] A1/interval-scheduler: score=100.0% turns=1 llm=1 tools=0 paro=one_shot tok=5152 32.9s
+[23:26:18] A1/seeded-bugs-billing: score=100.0% turns=1 llm=1 tools=0 paro=one_shot tok=4380 17.0s
+[23:26:37] A1/cli-subcommand: score=100.0% turns=1 llm=1 tools=0 paro=one_shot tok=5315 18.9s
+[23:26:58] A1/workflow-statemachine: score=100.0% turns=1 llm=1 tools=0 paro=one_shot tok=2989 21.1s
+[23:27:09] A1/batch-coalescer: score=100.0% turns=1 llm=1 tools=0 paro=one_shot tok=3052 10.7s
+[23:27:21] A1/schema-validator: score=100.0% turns=1 llm=1 tools=0 paro=one_shot tok=3206 12.2s
+[23:27:41] A1/plugin-registry: score=82.1429% turns=1 llm=1 tools=0 paro=one_shot tok=3397 19.7s
+[23:27:56] A1/csv-diff-engine: score=100.0% turns=1 llm=1 tools=0 paro=one_shot tok=4313 15.1s
+[23:28:19] A1/config-migration: score=86.2069% turns=1 llm=1 tools=0 paro=one_shot tok=6260 23.0s
+[23:34:03] A2/checkout-rounding: score=38.1818% turns=16 llm=16 tools=16 paro=max_turns tok=169413 344.0s
+[23:39:15] A2/repo-cache-layer: score=41.6667% turns=16 llm=16 tools=15 paro=max_turns tok=149541 311.8s
+[23:50:04] A2/dsl-parser: score=0.0% turns=16 llm=16 tools=16 paro=max_turns tok=156906 649.5s
+[23:54:34] A2/interval-scheduler: score=56.6667% turns=11 llm=11 tools=10 paro=final tok=63744 269.2s
+[00:06:16] A2/seeded-bugs-billing: score=47.619% turns=16 llm=16 tools=16 paro=max_turns tok=190535 702.5s
+[00:09:34] A2/cli-subcommand: score=100.0% turns=11 llm=11 tools=10 paro=final tok=73962 197.7s
+[00:14:25] A2/workflow-statemachine: score=100.0% turns=13 llm=13 tools=11 paro=final tok=75326 291.0s
+[00:17:00] A2/batch-coalescer: score=100.0% turns=9 llm=9 tools=7 paro=final tok=49037 155.6s
+[00:18:55] A2/schema-validator: score=100.0% turns=6 llm=6 tools=5 paro=final tok=22974 114.8s
+[00:22:10] A2/plugin-registry: score=64.2857% turns=16 llm=16 tools=15 paro=max_turns tok=92549 194.5s
+[00:26:03] A2/csv-diff-engine: score=100.0% turns=15 llm=15 tools=10 paro=final tok=85740 233.7s
+[00:31:38] A2/config-migration: score=37.931% turns=16 llm=16 tools=16 paro=max_turns tok=136811 334.8s
+[00:38:01] A3/checkout-rounding: score=38.1818% turns=16 llm=16 tools=16 paro=max_turns tok=172958 382.5s
+[00:41:48] A3/repo-cache-layer: score=41.6667% turns=16 llm=16 tools=16 paro=max_turns tok=134098 227.5s
+[00:47:26] A3/dsl-parser: score=95.6522% turns=16 llm=16 tools=15 paro=max_turns tok=137980 337.6s
+[00:50:16] A3/interval-scheduler: score=56.6667% turns=15 llm=15 tools=14 paro=final tok=91223 169.7s
+[00:54:09] A3/seeded-bugs-billing: score=100.0% turns=15 llm=15 tools=14 paro=final tok=90986 233.2s
+[00:58:53] A3/cli-subcommand: score=25.5319% turns=16 llm=16 tools=16 paro=max_turns tok=150516 284.0s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[01:03:11] A3/workflow-statemachine: score=100.0% turns=12 llm=12 tools=11 paro=final tok=42805 257.9s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[01:06:51] A3/batch-coalescer: score=100.0% turns=9 llm=9 tools=7 paro=final tok=44094 220.3s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[01:09:28] A3/schema-validator: score=100.0% turns=6 llm=6 tools=5 paro=final tok=15958 157.0s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+[01:14:43] A3/plugin-registry: score=85.7143% turns=13 llm=13 tools=11 paro=final tok=52085 314.6s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[01:20:31] A3/csv-diff-engine: score=100.0% turns=14 llm=14 tools=9 paro=final tok=91728 348.5s
+LLM reintentable nvidia: esperando 30s (2)
+[01:25:13] A3/config-migration: score=72.4138% turns=10 llm=10 tools=9 paro=final tok=58909 281.6s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+[01:33:53] A4/checkout-rounding: score=38.1818% turns=16 llm=16 tools=16 paro=max_turns tok=204156 519.9s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[01:39:07] A4/repo-cache-layer: score=41.6667% turns=16 llm=16 tools=16 paro=max_turns tok=141426 314.4s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[01:47:42] A4/dsl-parser: score=13.0435% turns=16 llm=16 tools=12 paro=max_turns tok=167720 514.5s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[01:53:30] A4/interval-scheduler: score=56.6667% turns=16 llm=16 tools=15 paro=max_turns tok=124164 348.8s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[02:07:29] A4/seeded-bugs-billing: score=47.619% turns=16 llm=16 tools=16 paro=max_turns tok=204800 838.2s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[02:17:48] A4/cli-subcommand: score=25.5319% turns=16 llm=16 tools=16 paro=max_turns tok=182211 618.8s
+LLM reintentable nvidia: esperando 30s (2)
+[02:20:41] A4/workflow-statemachine: score=100.0% turns=8 llm=8 tools=7 paro=final tok=31364 173.8s
+LLM reintentable nvidia: esperando 30s (2)
+[02:25:57] A4/batch-coalescer: score=100.0% turns=9 llm=9 tools=8 paro=final tok=48238 315.5s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+[02:33:22] A4/schema-validator: score=100.0% turns=11 llm=11 tools=10 paro=final tok=56193 445.5s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[02:46:21] A4/plugin-registry: score=100.0% turns=15 llm=15 tools=13 paro=final tok=114068 778.8s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+[02:56:29] A4/csv-diff-engine: score=100.0% turns=16 llm=16 tools=15 paro=final tok=118308 608.2s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[03:08:30] A4/config-migration: score=37.931% turns=16 llm=16 tools=11 paro=max_turns tok=138976 721.0s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[03:18:27] A5/checkout-rounding: score=38.1818% turns=16 llm=16 tools=11 paro=max_turns tok=162924 596.9s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[03:23:20] A5/repo-cache-layer: score=41.6667% turns=16 llm=16 tools=16 paro=max_turns tok=114467 292.7s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM nvidia agotada/sobrecargada, paso a siguiente
+LLM nvidia fallo 1/3, se reintenta (no se aparca: es el unico proveedor)
+[03:33:18] A5/dsl-parser: score=13.0435% turns=7 llm=7 tools=6 paro=error_llm tok=41875 598.4s LLM_ERROR=RuntimeError: todos los proveedores LLM fallaron: nvidia(ok)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[03:39:32] A5/interval-scheduler: score=56.6667% turns=8 llm=8 tools=7 paro=final tok=46235 373.4s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[03:53:45] A5/seeded-bugs-billing: score=47.619% turns=16 llm=16 tools=16 paro=max_turns tok=185609 853.1s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[04:19:59] A5/cli-subcommand: score=25.5319% turns=16 llm=16 tools=16 paro=max_turns tok=219639 1573.8s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[04:31:19] A5/workflow-statemachine: score=0.0% turns=16 llm=16 tools=16 paro=max_turns tok=116571 680.6s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[04:43:58] A5/batch-coalescer: score=100.0% turns=14 llm=14 tools=12 paro=final tok=144447 758.8s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[04:49:23] A5/schema-validator: score=100.0% turns=10 llm=10 tools=9 paro=final tok=46633 324.6s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM nvidia agotada/sobrecargada, paso a siguiente
+LLM nvidia fallo 1/3, se reintenta (no se aparca: es el unico proveedor)
+[04:51:34] A5/plugin-registry: score=64.2857% turns=4 llm=4 tools=3 paro=error_llm tok=5309 131.2s LLM_ERROR=RuntimeError: todos los proveedores LLM fallaron: nvidia(ok)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM nvidia failed: <urlopen error [Errno -3] Temporary failure in name resolution>
+[07:24:19] A5/csv-diff-engine: score=74.0741% turns=16 llm=16 tools=15 paro=error_llm tok=92081 9165.0s LLM_ERROR=URLError: <urlopen error [Errno -3] Temporary failure in name resolution>
+LLM nvidia failed: <urlopen error [Errno -3] Temporary failure in name resolution>
+[07:24:32] A5/config-migration: score=37.931% turns=1 llm=1 tools=0 paro=error_llm tok=0 13.4s LLM_ERROR=URLError: <urlopen error [Errno -3] Temporary failure in name resolution>
+[07:24:34] resultado: evals/results/result_sens_sd_pilot.json
+[07:24:34] Q_h={'A1': 97.0002, 'A2': 65.5292, 'A3': 76.319, 'A4': 63.3867, 'A5': 49.9167} spread=47.0835
+[07:24:34] Sens(x) finitos=10/12 positivos=10/12
+[07:24:34]   gate U1: OK valor=['A1', 'A2', 'A3', 'A4', 'A5']
+[07:24:34]   gate U2: OK valor=60/60
+[07:24:34]   gate U3: OK valor=47.0835
+[07:24:34]   gate U4: OK valor=10/12
+[07:24:34]   gate U5: OK valor=10/12
+[07:24:34]   gate U7: FALLA valor={'media_global': 70.43, 'media_A5': 49.92, 'A5_lt_100': 10}
+[07:24:34] CUMPLE=False coste_total=5123036 tokens (4 celdas con error de LLM)

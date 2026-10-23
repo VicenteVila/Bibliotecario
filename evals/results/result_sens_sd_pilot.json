@@ -1,0 +1,2004 @@
+{
+ "hito": 19,
+ "modo": "oficial",
+ "fecha": "2026-10-23T07:24:32",
+ "modelo": "nvidia/nemotron-3-ultra-550b-a55b",
+ "variantes": {
+  "A1": {
+   "D1_bucle": "one_shot",
+   "D3_tools": false,
+   "D4_memoria_digest": false,
+   "D5_validacion_pfs": false,
+   "D6_orquestacion": false,
+   "D7_skills": false,
+   "regulacion": false
+  },
+  "A2": {
+   "D1_bucle": "loop<16>",
+   "D3_tools": true,
+   "D4_memoria_digest": false,
+   "D5_validacion_pfs": false,
+   "D6_orquestacion": false,
+   "D7_skills": false,
+   "regulacion": false
+  },
+  "A3": {
+   "D1_bucle": "loop<16>",
+   "D3_tools": true,
+   "D4_memoria_digest": false,
+   "D5_validacion_pfs": true,
+   "D6_orquestacion": false,
+   "D7_skills": false,
+   "regulacion": false
+  },
+  "A4": {
+   "D1_bucle": "loop<16>",
+   "D3_tools": true,
+   "D4_memoria_digest": false,
+   "D5_validacion_pfs": true,
+   "D6_orquestacion": false,
+   "D7_skills": true,
+   "regulacion": false
+  },
+  "A5": {
+   "D1_bucle": "loop<16>",
+   "D3_tools": true,
+   "D4_memoria_digest": true,
+   "D5_validacion_pfs": true,
+   "D6_orquestacion": false,
+   "D7_skills": true,
+   "regulacion": true
+  }
+ },
+ "tareas": [
+  "checkout-rounding",
+  "repo-cache-layer",
+  "dsl-parser",
+  "interval-scheduler",
+  "seeded-bugs-billing",
+  "cli-subcommand",
+  "workflow-statemachine",
+  "batch-coalescer",
+  "schema-validator",
+  "plugin-registry",
+  "csv-diff-engine",
+  "config-migration"
+ ],
+ "matriz": {
+  "A1": {
+   "checkout-rounding": 100.0,
+   "repo-cache-layer": 100.0,
+   "dsl-parser": 95.6522,
+   "interval-scheduler": 100.0,
+   "seeded-bugs-billing": 100.0,
+   "cli-subcommand": 100.0,
+   "workflow-statemachine": 100.0,
+   "batch-coalescer": 100.0,
+   "schema-validator": 100.0,
+   "plugin-registry": 82.1429,
+   "csv-diff-engine": 100.0,
+   "config-migration": 86.2069
+  },
+  "A2": {
+   "checkout-rounding": 38.1818,
+   "repo-cache-layer": 41.6667,
+   "dsl-parser": 0.0,
+   "interval-scheduler": 56.6667,
+   "seeded-bugs-billing": 47.619,
+   "cli-subcommand": 100.0,
+   "workflow-statemachine": 100.0,
+   "batch-coalescer": 100.0,
+   "schema-validator": 100.0,
+   "plugin-registry": 64.2857,
+   "csv-diff-engine": 100.0,
+   "config-migration": 37.931
+  },
+  "A3": {
+   "checkout-rounding": 38.1818,
+   "repo-cache-layer": 41.6667,
+   "dsl-parser": 95.6522,
+   "interval-scheduler": 56.6667,
+   "seeded-bugs-billing": 100.0,
+   "cli-subcommand": 25.5319,
+   "workflow-statemachine": 100.0,
+   "batch-coalescer": 100.0,
+   "schema-validator": 100.0,
+   "plugin-registry": 85.7143,
+   "csv-diff-engine": 100.0,
+   "config-migration": 72.4138
+  },
+  "A4": {
+   "checkout-rounding": 38.1818,
+   "repo-cache-layer": 41.6667,
+   "dsl-parser": 13.0435,
+   "interval-scheduler": 56.6667,
+   "seeded-bugs-billing": 47.619,
+   "cli-subcommand": 25.5319,
+   "workflow-statemachine": 100.0,
+   "batch-coalescer": 100.0,
+   "schema-validator": 100.0,
+   "plugin-registry": 100.0,
+   "csv-diff-engine": 100.0,
+   "config-migration": 37.931
+  },
+  "A5": {
+   "checkout-rounding": 38.1818,
+   "repo-cache-layer": 41.6667,
+   "dsl-parser": 13.0435,
+   "interval-scheduler": 56.6667,
+   "seeded-bugs-billing": 47.619,
+   "cli-subcommand": 25.5319,
+   "workflow-statemachine": 0.0,
+   "batch-coalescer": 100.0,
+   "schema-validator": 100.0,
+   "plugin-registry": 64.2857,
+   "csv-diff-engine": 74.0741,
+   "config-migration": 37.931
+  }
+ },
+ "q_h": {
+  "A1": 97.0002,
+  "A2": 65.5292,
+  "A3": 76.319,
+  "A4": 63.3867,
+  "A5": 49.9167
+ },
+ "spread": 47.0835,
+ "sens": {
+  "checkout-rounding": 0.800693,
+  "repo-cache-layer": 0.803637,
+  "dsl-parser": 0.712068,
+  "interval-scheduler": 0.815667,
+  "seeded-bugs-billing": 0.795968,
+  "cli-subcommand": 0.408039,
+  "workflow-statemachine": 0.502618,
+  "batch-coalescer": null,
+  "schema-validator": null,
+  "plugin-registry": 0.259202,
+  "csv-diff-engine": 0.619286,
+  "config-migration": 0.890061
+ },
+ "n_sens_finitos": 10,
+ "n_sens_positivos": 10,
+ "gates": {
+  "U1": {
+   "ok": true,
+   "valor": [
+    "A1",
+    "A2",
+    "A3",
+    "A4",
+    "A5"
+   ],
+   "umbral": "5 variantes congeladas A1-A5"
+  },
+  "U2": {
+   "ok": true,
+   "valor": "60/60",
+   "umbral": "0 huecos",
+   "faltan": []
+  },
+  "U3": {
+   "ok": true,
+   "valor": 47.0835,
+   "umbral": ">= 15.0"
+  },
+  "U4": {
+   "ok": true,
+   "valor": "10/12",
+   "umbral": ">= 6"
+  },
+  "U5": {
+   "ok": true,
+   "valor": "10/12",
+   "umbral": ">= 6"
+  },
+  "U7": {
+   "ok": false,
+   "valor": {
+    "media_global": 70.43,
+    "media_A5": 49.92,
+    "A5_lt_100": 10
+   },
+   "umbral": "media_global<= 60.0, media_A5<= 80.0, A5<100 en >= 8/12"
+  }
+ },
+ "cumple": false,
+ "celdas_llm_error": [
+  "A5_dsl-parser",
+  "A5_plugin-registry",
+  "A5_csv-diff-engine",
+  "A5_config-migration"
+ ],
+ "coste": {
+  "calls": 638,
+  "prompt_tokens": 4400068,
+  "completion_tokens": 722968,
+  "total_tokens": 5123036
+ },
+ "celdas": {
+  "A1_checkout-rounding": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 55,
+    "total": 55
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 42.7,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 6767,
+    "completion_tokens": 2387,
+    "total_tokens": 9154
+   }
+  },
+  "A1_repo-cache-layer": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 24,
+    "total": 24
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 20.0,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 6478,
+    "completion_tokens": 859,
+    "total_tokens": 7337
+   }
+  },
+  "A1_dsl-parser": {
+   "score": 95.6522,
+   "hidden": {
+    "passed": 44,
+    "total": 46
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 92.1,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 5971,
+    "completion_tokens": 5218,
+    "total_tokens": 11189
+   }
+  },
+  "A1_interval-scheduler": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 30,
+    "total": 30
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 32.9,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 3685,
+    "completion_tokens": 1467,
+    "total_tokens": 5152
+   }
+  },
+  "A1_seeded-bugs-billing": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 21,
+    "total": 21
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 17.0,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 3464,
+    "completion_tokens": 916,
+    "total_tokens": 4380
+   }
+  },
+  "A1_cli-subcommand": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 47,
+    "total": 47
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 18.9,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 3934,
+    "completion_tokens": 1381,
+    "total_tokens": 5315
+   }
+  },
+  "A1_workflow-statemachine": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 21.1,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 2582,
+    "completion_tokens": 407,
+    "total_tokens": 2989
+   }
+  },
+  "A1_batch-coalescer": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 10.7,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 2211,
+    "completion_tokens": 841,
+    "total_tokens": 3052
+   }
+  },
+  "A1_schema-validator": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 56,
+    "total": 56
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 12.2,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 2508,
+    "completion_tokens": 698,
+    "total_tokens": 3206
+   }
+  },
+  "A1_plugin-registry": {
+   "score": 82.1429,
+   "hidden": {
+    "passed": 23,
+    "total": 28
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 19.7,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 2470,
+    "completion_tokens": 927,
+    "total_tokens": 3397
+   }
+  },
+  "A1_csv-diff-engine": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 27,
+    "total": 27
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 15.1,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 2986,
+    "completion_tokens": 1327,
+    "total_tokens": 4313
+   }
+  },
+  "A1_config-migration": {
+   "score": 86.2069,
+   "hidden": {
+    "passed": 25,
+    "total": 29
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 23.0,
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 4213,
+    "completion_tokens": 2047,
+    "total_tokens": 6260
+   }
+  },
+  "A2_checkout-rounding": {
+   "score": 38.1818,
+   "hidden": {
+    "passed": 21,
+    "total": 55
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT"
+   ],
+   "final": "",
+   "elapsed_s": 344.0,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 153271,
+    "completion_tokens": 16142,
+    "total_tokens": 169413
+   }
+  },
+  "A2_repo-cache-layer": {
+   "score": 41.6667,
+   "hidden": {
+    "passed": 10,
+    "total": 24
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 15,
+   "invalid_actions": 1,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido"
+   ],
+   "final": "",
+   "elapsed_s": 311.8,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 131313,
+    "completion_tokens": 18228,
+    "total_tokens": 149541
+   }
+  },
+  "A2_dsl-parser": {
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 4
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 0 pasan, 0 fallan, 2 errores\n/mnt/c/Bibliotecario/.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n/mnt/c/Bibliotecario/."
+   ],
+   "final": "",
+   "elapsed_s": 649.5,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 128644,
+    "completion_tokens": 28262,
+    "total_tokens": 156906
+   }
+  },
+  "A2_interval-scheduler": {
+   "score": 56.6667,
+   "hidden": {
+    "passed": 17,
+    "total": 30
+   },
+   "turns": 11,
+   "llm_calls": 11,
+   "tool_calls": 10,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A2_interval-scheduler/tests_public/test_planificacion.py:18",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A2_interval-scheduler/tests_public/test_planificacion.py:18",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A2_interval-scheduler/tests_public/test_planificacion.py:18"
+   ],
+   "final": "Implementación completada. El planificador ahora pasa todos los tests públicos. Se implementaron: validaciones previas (capacidad recursos, IDs duplicados, intervalos invertidos, prioridades negativas), orden de decisión correcto (prioridad desc, inicio asc, duración asc, id asc), semántica semiabie",
+   "elapsed_s": 269.2,
+   "usage": {
+    "calls": 11,
+    "prompt_tokens": 52087,
+    "completion_tokens": 11657,
+    "total_tokens": 63744
+   }
+  },
+  "A2_seeded-bugs-billing": {
+   "score": 47.619,
+   "hidden": {
+    "passed": 10,
+    "total": 21
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A2_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A2_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A2_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A2_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A2_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A2_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as"
+   ],
+   "final": "",
+   "elapsed_s": 702.5,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 168057,
+    "completion_tokens": 22478,
+    "total_tokens": 190535
+   }
+  },
+  "A2_cli-subcommand": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 47,
+    "total": 47
+   },
+   "turns": 11,
+   "llm_calls": 11,
+   "tool_calls": 10,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 4 pasan, 4 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown result kind: 'report'\n/tmp/opencode/sd_pilot_runs/A2_cli-subcommand/stockcli/form"
+   ],
+   "final": "Implementado el subcomando `report` en la CLI de inventario. Se modificaron tres archivos:\n1. `stockcli/parser.py`: Agregado el comando `report` al registro `_SPECS` con flags `--status`, `--min-qty`, `--top` y validaciones correspondientes.\n2. `stockcli/dispatcher.py`: Agregado handler `cmd_report`",
+   "elapsed_s": 197.7,
+   "usage": {
+    "calls": 11,
+    "prompt_tokens": 63085,
+    "completion_tokens": 10877,
+    "total_tokens": 73962
+   }
+  },
+  "A2_workflow-statemachine": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 13,
+   "llm_calls": 13,
+   "tool_calls": 11,
+   "invalid_actions": 1,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido",
+    "PÚBLICOS: 4 pasan, 1 fallan, 0 errores\nE   Failed: DID NOT RAISE GuardError\n/tmp/opencode/sd_pilot_runs/A2_workflow-statemachine/tests_public/test_workflow.py:2",
+    "PÚBLICOS: 4 pasan, 1 fallan, 0 errores\nE   Failed: DID NOT RAISE GuardError\n/tmp/opencode/sd_pilot_runs/A2_workflow-statemachine/tests_public/test_workflow.py:2"
+   ],
+   "final": "Implementación completada. El motor StateMachine en approvalflow/machine.py ahora cumple el contrato exacto: valida tipos de event y ctx, bloquea transiciones desde estados terminales, verifica transiciones legales en TRANSITIONS, ejecuta guardas desde GUARDS propagando GuardError sin cambiar estado",
+   "elapsed_s": 291.0,
+   "usage": {
+    "calls": 13,
+    "prompt_tokens": 61677,
+    "completion_tokens": 13649,
+    "total_tokens": 75326
+   }
+  },
+  "A2_batch-coalescer": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 9,
+   "llm_calls": 9,
+   "tool_calls": 7,
+   "invalid_actions": 1,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido",
+    "PÚBLICOS: 0 pasan, 4 fallan, 0 errores\nE   NotImplementedError: implementa add\n/tmp/opencode/sd_pilot_runs/A2_batch-coalescer/batchkit/coalescer.py:25: NotImple"
+   ],
+   "final": "Implementación completa de BatchCoalescer con todas las validaciones requeridas, lógica de ventana temporal, max_size, poll, flush y pending. Todos los tests públicos (11) y privados (19) pasan correctamente.",
+   "elapsed_s": 155.6,
+   "usage": {
+    "calls": 9,
+    "prompt_tokens": 40842,
+    "completion_tokens": 8195,
+    "total_tokens": 49037
+   }
+  },
+  "A2_schema-validator": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 56,
+    "total": 56
+   },
+   "turns": 6,
+   "llm_calls": 6,
+   "tool_calls": 5,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [],
+   "final": "Implementación completa de `jsonval.validator.validate` que pasa todos los tests públicos. El validador respeta el contrato exacto: usa `paths.py` y `types.py` sin duplicar lógica, genera paths con escaping correcto, valida tipos (bool no es number/integer), enum con igualdad estricta de tipo y valo",
+   "elapsed_s": 114.8,
+   "usage": {
+    "calls": 6,
+    "prompt_tokens": 17777,
+    "completion_tokens": 5197,
+    "total_tokens": 22974
+   }
+  },
+  "A2_plugin-registry": {
+   "score": 64.2857,
+   "hidden": {
+    "passed": 18,
+    "total": 28
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 15,
+   "invalid_actions": 1,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 3 < 0\n/tmp/opencode/sd_pilot_runs/A2_plugin-registry/tests_public/test_resolver.py:19: Asserti",
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 3 < 0\n/tmp/opencode/sd_pilot_runs/A2_plugin-registry/tests_public/test_resolver.py:19: Asserti",
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 3 < 0\n/tmp/opencode/sd_pilot_runs/A2_plugin-registry/tests_public/test_resolver.py:19: Asserti",
+    "JSON invalido",
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 3 < 0\n/tmp/opencode/sd_pilot_runs/A2_plugin-registry/tests_public/test_resolver.py:19: Asserti",
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 3 < 0\n/tmp/opencode/sd_pilot_runs/A2_plugin-registry/tests_public/test_resolver.py:19: Asserti"
+   ],
+   "final": "",
+   "elapsed_s": 194.5,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 82207,
+    "completion_tokens": 10342,
+    "total_tokens": 92549
+   }
+  },
+  "A2_csv-diff-engine": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 27,
+    "total": 27
+   },
+   "turns": 15,
+   "llm_calls": 15,
+   "tool_calls": 10,
+   "invalid_actions": 4,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido"
+   ],
+   "final": "Se han implementado las mejoras requeridas en el motor de diff CSV:\n\n1. **csvdiff/reader.py**: Lector robusto que maneja:\n   - Codificación utf-8-sig (BOM)\n   - Filas en blanco ignoradas (líneas físicas reportadas correctamente)\n   - Detección de columnas duplicadas en cabecera\n   - Validación de co",
+   "elapsed_s": 233.7,
+   "usage": {
+    "calls": 15,
+    "prompt_tokens": 75721,
+    "completion_tokens": 10019,
+    "total_tokens": 85740
+   }
+  },
+  "A2_config-migration": {
+   "score": 37.931,
+   "hidden": {
+    "passed": 11,
+    "total": 29
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 5 pasan, 1 fallan, 0 errores\nE   configmig.errors.UnknownFormatError: formato desconocido para: '/tmp/pytest-of-vicente/pytest-38/test_migracion_toml_",
+    "PÚBLICOS: 5 pasan, 1 fallan, 0 errores\nE   configmig.errors.UnknownFormatError: formato desconocido para: '/tmp/pytest-of-vicente/pytest-39/test_migracion_toml_",
+    "PÚBLICOS: 5 pasan, 1 fallan, 0 errores\nE   configmig.errors.UnknownFormatError: formato desconocido para: '/tmp/pytest-of-vicente/pytest-40/test_migracion_toml_",
+    "PÚBLICOS: 5 pasan, 1 fallan, 0 errores\nE   configmig.errors.UnknownFormatError: formato desconocido para: '/tmp/pytest-of-vicente/pytest-41/test_migracion_toml_",
+    "PÚBLICOS: 5 pasan, 1 fallan, 0 errores\nE   configmig.errors.UnknownFormatError: formato desconocido para: '/tmp/pytest-of-vicente/pytest-42/test_migracion_toml_"
+   ],
+   "final": "",
+   "elapsed_s": 334.8,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 120097,
+    "completion_tokens": 16714,
+    "total_tokens": 136811
+   }
+  },
+  "A3_checkout-rounding": {
+   "score": 38.1818,
+   "hidden": {
+    "passed": 21,
+    "total": 55
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT"
+   ],
+   "final": "",
+   "elapsed_s": 382.5,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 154721,
+    "completion_tokens": 18237,
+    "total_tokens": 172958
+   }
+  },
+  "A3_repo-cache-layer": {
+   "score": 41.6667,
+   "hidden": {
+    "passed": 10,
+    "total": 24
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 10 pasan, 4 fallan, 0 errores\nE   AssertionError: assert 0 == 2\n/tmp/opencode/sd_pilot_runs/A3_repo-cache-layer/tests_public/test_cache_basica.py:46: ",
+    "PÚBLICOS: 10 pasan, 4 fallan, 0 errores\nE   AssertionError: assert 0 == 2\n/tmp/opencode/sd_pilot_runs/A3_repo-cache-layer/tests_public/test_cache_basica.py:46: "
+   ],
+   "final": "",
+   "elapsed_s": 227.5,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 127107,
+    "completion_tokens": 6991,
+    "total_tokens": 134098
+   }
+  },
+  "A3_dsl-parser": {
+   "score": 95.6522,
+   "hidden": {
+    "passed": 44,
+    "total": 46
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 15,
+   "invalid_actions": 1,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido"
+   ],
+   "final": "",
+   "elapsed_s": 337.6,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 115081,
+    "completion_tokens": 22899,
+    "total_tokens": 137980
+   }
+  },
+  "A3_interval-scheduler": {
+   "score": 56.6667,
+   "hidden": {
+    "passed": 17,
+    "total": 30
+   },
+   "turns": 15,
+   "llm_calls": 15,
+   "tool_calls": 14,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A3_interval-scheduler/tests_public/test_planificacion.py:18",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A3_interval-scheduler/tests_public/test_planificacion.py:18",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A3_interval-scheduler/tests_public/test_planificacion.py:18",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A3_interval-scheduler/tests_public/test_planificacion.py:18"
+   ],
+   "final": "Implementación completada. El planificador ahora cumple con todos los requisitos del contrato: validación previa de recursos e intervalos, semántica de intervalos semiabiertos [inicio, fin), ventana de elegibilidad, orden de decisión correcto (prioridad desc, inicio asc, duración asc, id asc), asign",
+   "elapsed_s": 169.7,
+   "usage": {
+    "calls": 15,
+    "prompt_tokens": 82882,
+    "completion_tokens": 8341,
+    "total_tokens": 91223
+   }
+  },
+  "A3_seeded-bugs-billing": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 21,
+    "total": 21
+   },
+   "turns": 15,
+   "llm_calls": 15,
+   "tool_calls": 14,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A3_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 7 pasan, 2 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A3_seeded-bugs-billing/tests_public/test_pipeline.py:20: assert 262 == 263\nE   AssertionError"
+   ],
+   "final": "Se han corregido los 3 defectos en los 3 ficheros correspondientes:\n\n1. **facturacion/totales.py**: Corregida la función `descuento_por_volumen_pct` para usar umbrales inclusivos (>= 5 y >= 10) en lugar de estrictos (> 5 y > 10).\n\n2. **facturacion/impuestos.py**: Corregida la función `iva_cents` par",
+   "elapsed_s": 233.2,
+   "usage": {
+    "calls": 15,
+    "prompt_tokens": 82995,
+    "completion_tokens": 7991,
+    "total_tokens": 90986
+   }
+  },
+  "A3_cli-subcommand": {
+   "score": 25.5319,
+   "hidden": {
+    "passed": 12,
+    "total": 47
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A3_cli-subcommand/stockcli/parser.p",
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A3_cli-subcommand/stockcli/parser.p",
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A3_cli-subcommand/stockcli/parser.p"
+   ],
+   "final": "",
+   "elapsed_s": 284.0,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 134602,
+    "completion_tokens": 15914,
+    "total_tokens": 150516
+   }
+  },
+  "A3_workflow-statemachine": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 12,
+   "llm_calls": 12,
+   "tool_calls": 11,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 4 pasan, 1 fallan, 0 errores\nE   Failed: DID NOT RAISE GuardError\n/tmp/opencode/sd_pilot_runs/A3_workflow-statemachine/tests_public/test_workflow.py:2",
+    "PÚBLICOS: 4 pasan, 1 fallan, 0 errores\nE   Failed: DID NOT RAISE GuardError\n/tmp/opencode/sd_pilot_runs/A3_workflow-statemachine/tests_public/test_workflow.py:2"
+   ],
+   "final": "Implementado `approvalflow.machine.StateMachine` cumpliendo el contrato exacto: validaciones de tipos, estados terminales, tabla de transiciones, ejecución de guardas y propagación de `GuardError`. Tests públicos pasan (5/5).",
+   "elapsed_s": 257.9,
+   "usage": {
+    "calls": 12,
+    "prompt_tokens": 40676,
+    "completion_tokens": 2129,
+    "total_tokens": 42805
+   }
+  },
+  "A3_batch-coalescer": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 9,
+   "llm_calls": 9,
+   "tool_calls": 7,
+   "invalid_actions": 1,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido",
+    "PÚBLICOS: 0 pasan, 4 fallan, 0 errores\nE   NotImplementedError: implementa add\n/tmp/opencode/sd_pilot_runs/A3_batch-coalescer/batchkit/coalescer.py:25: NotImple"
+   ],
+   "final": "Implementación completa de BatchCoalescer con todas las validaciones del constructor, método add con validaciones y lógica de max_size, poll con comprobación de ventana temporal, flush que entrega todo y reinicia estado, y property pending que cuenta items en cola y lote abierto. Todos los tests púb",
+   "elapsed_s": 220.3,
+   "usage": {
+    "calls": 9,
+    "prompt_tokens": 37630,
+    "completion_tokens": 6464,
+    "total_tokens": 44094
+   }
+  },
+  "A3_schema-validator": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 56,
+    "total": 56
+   },
+   "turns": 6,
+   "llm_calls": 6,
+   "tool_calls": 5,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [],
+   "final": "Implementación completa del validador `jsonval.validator.validate` que cumple el contrato exacto. Se ha implementado la validación recursiva con acumulación de errores en orden determinista, usando `paths.py` y `types.py` para paths y tipos. Todos los tests públicos pasan (5/5).",
+   "elapsed_s": 157.0,
+   "usage": {
+    "calls": 6,
+    "prompt_tokens": 14787,
+    "completion_tokens": 1171,
+    "total_tokens": 15958
+   }
+  },
+  "A3_plugin-registry": {
+   "score": 85.7143,
+   "hidden": {
+    "passed": 24,
+    "total": 28
+   },
+   "turns": 13,
+   "llm_calls": 13,
+   "tool_calls": 11,
+   "invalid_actions": 1,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido",
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 3 < 0\n/tmp/opencode/sd_pilot_runs/A3_plugin-registry/tests_public/test_resolver.py:19: Asserti"
+   ],
+   "final": "Implementación completada. El resolver.py ahora implementa correctamente el orden topológico de dependencias con las reglas especificadas: validación de dependencias faltantes, algoritmo de Kahn con cola de prioridad (-priority, name) para orden determinista, detección de ciclos con DFS que empieza ",
+   "elapsed_s": 314.6,
+   "usage": {
+    "calls": 13,
+    "prompt_tokens": 45554,
+    "completion_tokens": 6531,
+    "total_tokens": 52085
+   }
+  },
+  "A3_csv-diff-engine": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 27,
+    "total": 27
+   },
+   "turns": 14,
+   "llm_calls": 14,
+   "tool_calls": 9,
+   "invalid_actions": 4,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido"
+   ],
+   "final": "Se han implementado las mejoras requeridas en el motor de diff CSV:\n\n1. **reader.py**: Lector robusto que maneja:\n   - Codificación utf-8-sig (BOM)\n   - Filas en blanco ignoradas (líneas físicas correctas para errores)\n   - Detección de columnas duplicadas en cabecera\n   - Validación de columnas cla",
+   "elapsed_s": 348.5,
+   "usage": {
+    "calls": 14,
+    "prompt_tokens": 77782,
+    "completion_tokens": 13946,
+    "total_tokens": 91728
+   }
+  },
+  "A3_config-migration": {
+   "score": 72.4138,
+   "hidden": {
+    "passed": 21,
+    "total": 29
+   },
+   "turns": 10,
+   "llm_calls": 10,
+   "tool_calls": 9,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [],
+   "final": "Implementado soporte TOML completo: añadido read_toml en readers.py usando tomllib, write_toml en converters.py con serialización de strings via json.dumps, actualizado migrator.py con SUFFIXES/READERS/WRITERS para .toml, y exportado las nuevas funciones en __init__.py. Todos los 15 tests pasan.",
+   "elapsed_s": 281.6,
+   "usage": {
+    "calls": 10,
+    "prompt_tokens": 47486,
+    "completion_tokens": 11423,
+    "total_tokens": 58909
+   }
+  },
+  "A4_checkout-rounding": {
+   "score": 38.1818,
+   "hidden": {
+    "passed": 21,
+    "total": 55
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT"
+   ],
+   "final": "",
+   "elapsed_s": 519.9,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 181136,
+    "completion_tokens": 23020,
+    "total_tokens": 204156
+   }
+  },
+  "A4_repo-cache-layer": {
+   "score": 41.6667,
+   "hidden": {
+    "passed": 10,
+    "total": 24
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 10 pasan, 4 fallan, 0 errores\nE   AssertionError: assert 0 == 2\n/tmp/opencode/sd_pilot_runs/A4_repo-cache-layer/tests_public/test_cache_basica.py:46: "
+   ],
+   "final": "",
+   "elapsed_s": 314.4,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 137228,
+    "completion_tokens": 4198,
+    "total_tokens": 141426
+   }
+  },
+  "A4_dsl-parser": {
+   "score": 13.0435,
+   "hidden": {
+    "passed": 6,
+    "total": 46
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 12,
+   "invalid_actions": 4,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 5 pasan, 7 fallan, 0 errores\nE   AssertionError: assert 'sintaxis inv...una expresion' == 'error(L1,C4)...in de entrada'\n      - error(L1,C4): se espe",
+    "PÚBLICOS: 5 pasan, 7 fallan, 0 errores\nE   AssertionError: assert 'sintaxis inv...una expresion' == 'error(L1,C4)...in de entrada'\n      - error(L1,C4): se espe",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido"
+   ],
+   "final": "",
+   "elapsed_s": 514.5,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 140401,
+    "completion_tokens": 27319,
+    "total_tokens": 167720
+   }
+  },
+  "A4_interval-scheduler": {
+   "score": 56.6667,
+   "hidden": {
+    "passed": 17,
+    "total": 30
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 15,
+   "invalid_actions": 1,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A4_interval-scheduler/tests_public/test_planificacion.py:18",
+    "JSON invalido",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A4_interval-scheduler/tests_public/test_planificacion.py:18",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A4_interval-scheduler/tests_public/test_planificacion.py:18",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A4_interval-scheduler/tests_public/test_planificacion.py:18",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A4_interval-scheduler/tests_public/test_planificacion.py:18"
+   ],
+   "final": "",
+   "elapsed_s": 348.8,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 109106,
+    "completion_tokens": 15058,
+    "total_tokens": 124164
+   }
+  },
+  "A4_seeded-bugs-billing": {
+   "score": 47.619,
+   "hidden": {
+    "passed": 10,
+    "total": 21
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A4_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A4_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A4_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A4_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A4_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A4_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A4_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A4_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as"
+   ],
+   "final": "",
+   "elapsed_s": 838.2,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 155209,
+    "completion_tokens": 49591,
+    "total_tokens": 204800
+   }
+  },
+  "A4_cli-subcommand": {
+   "score": 25.5319,
+   "hidden": {
+    "passed": 12,
+    "total": 47
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A4_cli-subcommand/stockcli/parser.p",
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A4_cli-subcommand/stockcli/parser.p",
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A4_cli-subcommand/stockcli/parser.p",
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A4_cli-subcommand/stockcli/parser.p",
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A4_cli-subcommand/stockcli/parser.p"
+   ],
+   "final": "",
+   "elapsed_s": 618.8,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 162222,
+    "completion_tokens": 19989,
+    "total_tokens": 182211
+   }
+  },
+  "A4_workflow-statemachine": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 8,
+   "llm_calls": 8,
+   "tool_calls": 7,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [],
+   "final": "Implementado StateMachine en approvalflow/machine.py cumpliendo el contrato exacto: validación de tipos (event str, ctx dict/None), bloqueo en estados terminales, búsqueda en TRANSITIONS, ejecución de guardas desde GUARDS propagando GuardError, y transición atómica solo si todo pasa. Tests públicos ",
+   "elapsed_s": 173.8,
+   "usage": {
+    "calls": 8,
+    "prompt_tokens": 26343,
+    "completion_tokens": 5021,
+    "total_tokens": 31364
+   }
+  },
+  "A4_batch-coalescer": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 9,
+   "llm_calls": 9,
+   "tool_calls": 8,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 0 pasan, 4 fallan, 0 errores\nE   NotImplementedError: implementa add\n/tmp/opencode/sd_pilot_runs/A4_batch-coalescer/batchkit/coalescer.py:25: NotImple"
+   ],
+   "final": "Implementación completa de BatchCoalescer en batchkit/coalescer.py. Todos los tests públicos pasan (4/4). La implementación incluye: validaciones estrictas del constructor (tipos y valores), add() con timestamp efectivo y cierre por max_size, poll() con cierre por ventana temporal (borde incluido), ",
+   "elapsed_s": 315.5,
+   "usage": {
+    "calls": 9,
+    "prompt_tokens": 38520,
+    "completion_tokens": 9718,
+    "total_tokens": 48238
+   }
+  },
+  "A4_schema-validator": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 56,
+    "total": 56
+   },
+   "turns": 11,
+   "llm_calls": 11,
+   "tool_calls": 10,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [],
+   "final": "Implementación completa de jsonval.validator.validate. Todos los tests públicos pasan (5/5). La implementación cumple el contrato exacto: validación de tipo con types.matches, enum con igualdad estricta de tipo y valor, object con required (orden del array), properties, additionalProperties, array c",
+   "elapsed_s": 445.5,
+   "usage": {
+    "calls": 11,
+    "prompt_tokens": 47312,
+    "completion_tokens": 8881,
+    "total_tokens": 56193
+   }
+  },
+  "A4_plugin-registry": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 28,
+    "total": 28
+   },
+   "turns": 15,
+   "llm_calls": 15,
+   "tool_calls": 13,
+   "invalid_actions": 1,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 3 < 0\n/tmp/opencode/sd_pilot_runs/A4_plugin-registry/tests_public/test_resolver.py:19: Asserti",
+    "JSON invalido",
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert 3 < 0\n/tmp/opencode/sd_pilot_runs/A4_plugin-registry/tests_public/test_resolver.py:19: Asserti"
+   ],
+   "final": "Implementación completada. El resolver.py ahora implementa correctamente la resolución topológica de dependencias con prioridad determinística. Todos los tests públicos pasan (7/7).",
+   "elapsed_s": 778.8,
+   "usage": {
+    "calls": 15,
+    "prompt_tokens": 87856,
+    "completion_tokens": 26212,
+    "total_tokens": 114068
+   }
+  },
+  "A4_csv-diff-engine": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 27,
+    "total": 27
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 15,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 4 pasan, 1 fallan, 0 errores\nE   AssertionError: assert {} == {'name': 'title'}\n/tmp/opencode/sd_pilot_runs/A4_csv-diff-engine/tests_public/test_diff."
+   ],
+   "final": "Implementación completa y todos los tests pasan. Se han endurecido el lector (reader.py) y el motor de diff (diff.py) según el contrato:\n\n1. **reader.py**:\n   - Usa encoding `utf-8-sig` para manejar BOM\n   - Ignora filas en blanco (sin celdas o todas vacías)\n   - Detecta columnas duplicadas en cabec",
+   "elapsed_s": 608.2,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 99411,
+    "completion_tokens": 18897,
+    "total_tokens": 118308
+   }
+  },
+  "A4_config-migration": {
+   "score": 37.931,
+   "hidden": {
+    "passed": 11,
+    "total": 29
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 11,
+   "invalid_actions": 5,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 5 pasan, 1 fallan, 0 errores\nE   configmig.errors.UnknownFormatError: formato desconocido para: '/tmp/pytest-of-vicente/pytest-52/test_migracion_toml_",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido",
+    "PÚBLICOS: 5 pasan, 1 fallan, 0 errores\nE   configmig.errors.UnknownFormatError: formato desconocido para: '/tmp/pytest-of-vicente/pytest-53/test_migracion_toml_",
+    "PÚBLICOS: 5 pasan, 1 fallan, 0 errores\nE   configmig.errors.UnknownFormatError: formato desconocido para: '/tmp/pytest-of-vicente/pytest-54/test_migracion_toml_",
+    "PÚBLICOS: 5 pasan, 1 fallan, 0 errores\nE   configmig.errors.UnknownFormatError: formato desconocido para: '/tmp/pytest-of-vicente/pytest-55/test_migracion_toml_"
+   ],
+   "final": "",
+   "elapsed_s": 721.0,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 120949,
+    "completion_tokens": 18027,
+    "total_tokens": 138976
+   }
+  },
+  "A5_checkout-rounding": {
+   "score": 38.1818,
+   "hidden": {
+    "passed": 21,
+    "total": 55
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 11,
+   "invalid_actions": 5,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "JSON invalido",
+    "JSON invalido",
+    "PÚBLICOS: 3 pasan, 5 fallan, 0 errores\nE   AssertionError: assert 'TARIFA x1 @10.50 = 10.50' in ['PEDIDO P-002', '============', 'TARIFA x1 @10.5 = 10.5', 'SUBT",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido"
+   ],
+   "final": "",
+   "elapsed_s": 596.9,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 150656,
+    "completion_tokens": 12268,
+    "total_tokens": 162924
+   }
+  },
+  "A5_repo-cache-layer": {
+   "score": 41.6667,
+   "hidden": {
+    "passed": 10,
+    "total": 24
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia."
+   ],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 10 pasan, 4 fallan, 0 errores\nE   AssertionError: assert 0 == 2\n/tmp/opencode/sd_pilot_runs/A5_repo-cache-layer/tests_public/test_cache_basica.py:46: "
+   ],
+   "final": "",
+   "elapsed_s": 292.7,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 113099,
+    "completion_tokens": 1368,
+    "total_tokens": 114467
+   }
+  },
+  "A5_dsl-parser": {
+   "score": 13.0435,
+   "hidden": {
+    "passed": 6,
+    "total": 46
+   },
+   "turns": 7,
+   "llm_calls": 7,
+   "tool_calls": 6,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "error_llm",
+   "llm_error": "RuntimeError: todos los proveedores LLM fallaron: nvidia(ok)",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 598.4,
+   "usage": {
+    "calls": 6,
+    "prompt_tokens": 29043,
+    "completion_tokens": 12832,
+    "total_tokens": 41875
+   }
+  },
+  "A5_interval-scheduler": {
+   "score": 56.6667,
+   "hidden": {
+    "passed": 17,
+    "total": 30
+   },
+   "turns": 8,
+   "llm_calls": 8,
+   "tool_calls": 7,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 1 == 2\n/tmp/opencode/sd_pilot_runs/A5_interval-scheduler/tests_public/test_planificacion.py:18"
+   ],
+   "final": "Implementación completada y todos los tests públicos pasan. El planificador ahora:\n1. Valida recursos (capacidad >= 1) e intervalos (duplicados, invertidos, prioridad negativa) con mensajes exactos\n2. Filtra intervalos por ventana semiabierta [desde, hasta]\n3. Ordena intervalos elegibles por priorid",
+   "elapsed_s": 373.4,
+   "usage": {
+    "calls": 8,
+    "prompt_tokens": 35315,
+    "completion_tokens": 10920,
+    "total_tokens": 46235
+   }
+  },
+  "A5_seeded-bugs-billing": {
+   "score": 47.619,
+   "hidden": {
+    "passed": 10,
+    "total": 21
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia."
+   ],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A5_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A5_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A5_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A5_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A5_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A5_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as",
+    "PÚBLICOS: 5 pasan, 4 fallan, 0 errores\n/tmp/opencode/sd_pilot_runs/A5_seeded-bugs-billing/tests_public/test_pipeline.py:11: assert 0 == 5\nE   AssertionError: as"
+   ],
+   "final": "",
+   "elapsed_s": 853.1,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 160360,
+    "completion_tokens": 25249,
+    "total_tokens": 185609
+   }
+  },
+  "A5_cli-subcommand": {
+   "score": 25.5319,
+   "hidden": {
+    "passed": 12,
+    "total": 47
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A5_cli-subcommand/stockcli/parser.p",
+    "PÚBLICOS: 1 pasan, 7 fallan, 0 errores\nE   stockcli.errors.UsageError: unknown command: 'report'\n/tmp/opencode/sd_pilot_runs/A5_cli-subcommand/stockcli/parser.p"
+   ],
+   "final": "",
+   "elapsed_s": 1573.8,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 169094,
+    "completion_tokens": 50545,
+    "total_tokens": 219639
+   }
+  },
+  "A5_workflow-statemachine": {
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 2
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 16,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 0 pasan, 0 fallan, 1 errores\n/mnt/c/Bibliotecario/.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n/mnt/c/Bibliotecario/.",
+    "PÚBLICOS: 0 pasan, 0 fallan, 1 errores\n/mnt/c/Bibliotecario/.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n/mnt/c/Bibliotecario/.",
+    "PÚBLICOS: 0 pasan, 0 fallan, 1 errores\n/mnt/c/Bibliotecario/.venv/lib/python3.12/site-packages/_pytest/python.py:508: in importtestmodule\n/mnt/c/Bibliotecario/."
+   ],
+   "final": "",
+   "elapsed_s": 680.6,
+   "usage": {
+    "calls": 16,
+    "prompt_tokens": 90949,
+    "completion_tokens": 25622,
+    "total_tokens": 116571
+   }
+  },
+  "A5_batch-coalescer": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 34,
+    "total": 34
+   },
+   "turns": 14,
+   "llm_calls": 14,
+   "tool_calls": 12,
+   "invalid_actions": 1,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [
+    "PÚBLICOS: 0 pasan, 4 fallan, 0 errores\nE   NotImplementedError: implementa add\n/tmp/opencode/sd_pilot_runs/A5_batch-coalescer/batchkit/coalescer.py:25: NotImple",
+    "JSON invalido",
+    "PÚBLICOS: 0 pasan, 4 fallan, 0 errores\nE   NotImplementedError: implementa add\n/tmp/opencode/sd_pilot_runs/A5_batch-coalescer/batchkit/coalescer.py:25: NotImple",
+    "PÚBLICOS: 0 pasan, 4 fallan, 0 errores\nE   NotImplementedError: implementa add\n/tmp/opencode/sd_pilot_runs/A5_batch-coalescer/batchkit/coalescer.py:25: NotImple"
+   ],
+   "final": "Implementación completa de BatchCoalescer en batchkit/coalescer.py. Todos los tests públicos pasan (16/16). La implementación incluye: validaciones estrictas en constructor y add, gestión de lote abierto con first_ts, cierre por max_size inmediato, poll que cierra por ventana y devuelve lotes listos",
+   "elapsed_s": 758.8,
+   "usage": {
+    "calls": 14,
+    "prompt_tokens": 117892,
+    "completion_tokens": 26555,
+    "total_tokens": 144447
+   }
+  },
+  "A5_schema-validator": {
+   "score": 100.0,
+   "hidden": {
+    "passed": 56,
+    "total": 56
+   },
+   "turns": 10,
+   "llm_calls": 10,
+   "tool_calls": 9,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia."
+   ],
+   "stopped_by": "final",
+   "llm_error": "",
+   "errors": [],
+   "final": "Implementado `jsonval.validator.validate` completo según contrato estricto. Todos los tests públicos pasan (5/5). La implementación respeta: orden de validación (tipo → enum → object/array/string), paths exactos con escaping, mensajes literales, acumulación determinista y parada por nodo al fallar t",
+   "elapsed_s": 324.6,
+   "usage": {
+    "calls": 10,
+    "prompt_tokens": 40896,
+    "completion_tokens": 5737,
+    "total_tokens": 46633
+   }
+  },
+  "A5_plugin-registry": {
+   "score": 64.2857,
+   "hidden": {
+    "passed": 18,
+    "total": 28
+   },
+   "turns": 4,
+   "llm_calls": 4,
+   "tool_calls": 3,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "error_llm",
+   "llm_error": "RuntimeError: todos los proveedores LLM fallaron: nvidia(ok)",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 131.2,
+   "usage": {
+    "calls": 3,
+    "prompt_tokens": 4915,
+    "completion_tokens": 394,
+    "total_tokens": 5309
+   }
+  },
+  "A5_csv-diff-engine": {
+   "score": 74.0741,
+   "hidden": {
+    "passed": 20,
+    "total": 27
+   },
+   "turns": 16,
+   "llm_calls": 16,
+   "tool_calls": 15,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia."
+   ],
+   "stopped_by": "error_llm",
+   "llm_error": "URLError: <urlopen error [Errno -3] Temporary failure in name resolution>",
+   "errors": [
+    "PÚBLICOS: 4 pasan, 1 fallan, 0 errores\nE   AssertionError: assert {} == {'name': 'title'}\n/tmp/opencode/sd_pilot_runs/A5_csv-diff-engine/tests_public/test_diff."
+   ],
+   "final": "",
+   "elapsed_s": 9165.0,
+   "usage": {
+    "calls": 15,
+    "prompt_tokens": 78806,
+    "completion_tokens": 13275,
+    "total_tokens": 92081
+   }
+  },
+  "A5_config-migration": {
+   "score": 37.931,
+   "hidden": {
+    "passed": 11,
+    "total": 29
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "error_llm",
+   "llm_error": "URLError: <urlopen error [Errno -3] Temporary failure in name resolution>",
+   "errors": [],
+   "final": "",
+   "elapsed_s": 13.4,
+   "usage": {
+    "calls": 0,
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "total_tokens": 0
+   }
+  }
+ },
+ "trazas": "evals/sd_pilot/traces.sqlite",
+ "commits": {
+  "head": "83f3cc6640a17cd59d2fb15a9fe830863fd2c9ae",
+  "dirty": true
+ }
+}

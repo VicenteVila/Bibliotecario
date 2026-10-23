@@ -249,3 +249,107 @@ decisión del dueño; umbrales y `Sens` no se tocan.
 §5 (cierre) se escribe al cerrar; mientras tanto no existe. Referencias de
 estado previo: `evals/results/result_fase2_b2_h18.json` (H18 CUMPLE) y la
 corrección de concepto de arnés (docs 6 y 12 del corpus).
+
+## §5 — Cierre 2026-10-23 — **NO CUMPLE con evidencia**
+
+### Veredicto
+
+**NO CUMPLE**: cae el gate **U7** (dificultad). Los demás gates OK y la
+disciplina (U6) se sostiene. Ningún umbral, tarea ni fórmula se toca tras
+medir; la evidencia queda tal cual se midió.
+
+Corrida oficial única: **2026-10-22 23:22 → 2026-10-23 07:24** (8h02m),
+60/60 celdas, **5.123.036 tokens** (techo 7M de enmienda 8; 638 llamadas),
+modelo `nvidia/nemotron-3-ultra-550b-a55b` (enmienda §1.5 del dueño),
+`head` del corredor `83f3cc6`, 1.916 spans TraceForge (60 raíces · 642 turn ·
+642 llm · 572 tool — esquema §1.B intacto). Evidencia:
+`evals/results/result_sens_sd_pilot.json` + `evals/logs/sens_sd_pilot_run.log`
++ `evals/sd_pilot/{traces.sqlite,_run_state_oficial.json}`.
+
+### Gates (§2) — 6/7
+
+| gate | resultado | valor vs umbral |
+|---|---|---|
+| **G0** | ⚠ resuelto por el dueño | ventana **VENTANA_FALLA** (A1 80.73 vs A5 43.64; `A5/dsl-parser=0.0` por SyntaxError no recuperado) + **NO_ARRANCA** (proyección 6,29M/4,19M > 3M) → **enmienda 8** del dueño: techo 3M→7M y ventana aceptada como dato, **antes** de arrancar. Coste G0: **419.151 tokens** (4 celdas), evidencia `result_sens_sd_g0.json` |
+| **U1** `H_aux` | ✅ | 5 variantes congeladas A1-A5, mismo modelo, `max_turns=16` |
+| **U2** matriz | ✅ | 60/60 celdas con `m_h(x)` numérico, 0 huecos |
+| **U3** separación | ✅ | `spread Q_h = 47.08` ≥ 15 |
+| **U4** Sens finito | ✅ | 10/12 ≥ 6 (los 2 no-definibles — `batch-coalescer` y `schema-validator`, todos los arneses a 100, varianza nula — se marcan `None`, **no cuentan como 0**) |
+| **U5** discrimina | ✅ | 10/12 con `Sens(x) > 0` ≥ 6 |
+| **U6** disciplina | ✅ | evaluado aquí (apartado siguiente) |
+| **U7** dificultad | ❌ **FALLA** | `media_global = 70.43 > 60` (❌); `media_A5 = 49.92 ≤ 80` (✅); `A5 < 100` en 10/12 ≥ 8 (✅) |
+
+`CUMPLE = False` en la evidencia.
+
+### U6 — disciplina (proceso; el JSON registra U1-U5 y U7, los gates automáticos)
+
+- Ratificación y umbrales **antes** de medir: §1-§2 el 2026-10-22; enmienda 7
+  (fila §11 + esquema de traza) y enmienda 8 (techo 7M + ventana) **ambas
+  ANTES de la corrida oficial**. ✅
+- `ruff` + `pytest` verdes en **cada** commit (475/475 al cierre; +27 tests del
+  piloto, puros sin LLM). ✅
+- Corrida oficial **una**: un único proceso, `--resume` nunca invocado, estado
+  por celda añadido en orden A1..A5 × las 12 tareas. ✅
+- Sin retoques tras medir: matriz, tareas (QA 12/12) y umbrales intactos;
+  evidencia sin editar. ✅
+- Intentos fallidos documentados con causa y coste (apartado siguiente). ✅
+
+### Sens(x) — resultado (dato, no gate)
+
+`Sens(x)` **sí calculable y positivo en 10/12 tareas** (finitos 10, positivos
+10; ninguno negativo). `Q_h`: A1 97.00 · A3 76.32 · A2 65.53 · A4 63.39 ·
+A5 49.92. El orden inverso a la intuición (el one-shot A1 lidera; los
+subsistemas añadidos no mejoran) **es el hallazgo medido**: los arneses
+difieren mucho (U3=47) y por eso Pearson es informative, pero en este dominio
+con este modelo **más subsistema = peor**.
+
+Sens por tarea: config-migration 0.89 · interval 0.82 · repo-cache 0.80 ·
+checkout 0.80 · seeded-bugs 0.80 · dsl 0.71 · csv-diff 0.62 · workflow 0.50 ·
+cli 0.41 · plugin 0.26 · batch/schema **None** (techo común, varianza nula).
+
+Medias por variante: A1 **97.00** · A2 65.53 · A3 76.32 · A4 63.39 · A5 49.92.
+Paros: A1 12/12 one_shot; A2 6 max_turns/6 final; A3 4/8; A4 7/5;
+A5 5 max_turns · 3 final · **4 error_llm**.
+
+### Por qué cae U7 (y por qué no se arregla aquí)
+
+Ultra-one-shot (A1) resolvió **≥100 en 9 de 12 tareas** (media 97): las
+tareas resultaron **fáciles para el modelo escalado**, no para los arneses
+bucle. Remediarlo exige endurecer tareas = **BUILD posterior** (tareas nuevas
+o modificadas), que solo puede ser un hito nuevo con su ratificación; tocar
+tareas o bajar `media_global ≤ 60` tras medir está prohibido. Es exactamente
+la consecuencia que U7 debía castigar: «necesito buenos agentes» y este
+instrumento dice que aquí no los hizo falta.
+
+### Incidentes y costes (nada se esconde)
+
+1. **Modelo default 404** (2026-10-22, antes de medir): `super-120b` no está
+   desplegado en la cuenta (4/4 intentos, `Function ... Not found for
+   account`; figura en `/v1/models`). Sondeo BUILD = **0 tokens de piloto** →
+   decisión del dueño: ultra-550b desde el primer token (§1.5 anotado).
+2. **G0** (2026-10-22): ventana FALLA + NO_ARRANCA → enmienda 8 del dueño;
+   coste **419.151 tokens**, dictámen completo en `result_sens_sd_g0.json`.
+3. **4 celdas A5 con error de LLM en la corrida** (endpoint degradado de
+   madrugada): `A5_dsl-parser` (7 turnos, 41.875 tok, «todos los proveedores
+   fallaron»), `A5_plugin-registry` (4 turnos, 5.309 tok, ídem),
+   `A5_csv-diff-engine` (16 turnos, 92.081 tok, `URLError` DNS),
+   `A5_config-migration` (1 turno, 0 tok, `URLError` DNS). Sus scores = el
+   baseline del workspace vacío (13.04 / 64.29 / 74.07 / 37.93). **No se
+   re-ejecutaron**: son parte de la corrida única y quedan en
+   `celdas_llm_error`. Coste de esas celdas: **139.265 tokens**. Afectan a la
+   media de A5 a la baja; U3/U5 se reportan **como se midieron** con este
+   sesgo visible.
+4. Reintentos transitorios del endpoint durante toda la corrida (recuperados
+   por `generate(retries=2, strict_fallback)`; visibles en el log).
+
+Coste total del hito: **≈5,54M tokens** (sondeo 0 + G0 0,42M + oficial
+5,12M), todo dentro de lo decidido por el dueño.
+
+### Decisión del dueño
+
+NO CUMPLE queda cerrado con evidencia. Opciones (fuera de este hito, ninguna
+ejecutada): **A)** aceptar el veredicto y archivar el piloto como está ·
+**B)** declarar **HITO20** con tareas endurecidas (BUILD nuevo, mismos gates)
+para atacar U7 · **C)** replantear el diseño (p. ej. dominio donde el bucle
+aporte, o A1 con techo de tokens). Los umbrales de este hito y su matriz
+quedan intactos.
