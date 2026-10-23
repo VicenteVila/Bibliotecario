@@ -401,3 +401,104 @@ Commit de esta plantilla → inyección de números + visto bueno del dueño →
 corrida única oficial (modo a declarar en §1 definitivo, sobre el patrón
 `--oficial`) → §5 con veredicto de saturación y comparación vs H19
 (descriptiva: la matriz oficial bajo canal b vs la de H19).
+
+### §1 Enmienda 1 (ratificada por el dueño 2026-10-23: 3 ajustes + menor)
+
+La plantilla §1 queda **ratificada con enmienda**; esta sección **suprime y
+sustituye** §1.2 y §1.3 íntegramente. §1.0, §1.1, §1.4, §1.5 y §1.6
+siguen en pie salvo donde se indique.
+
+#### E1-Ajuste 1 — La saturación se mide con brazo de turnos forzados, no con @12 vs @17 natural
+
+Se **suprime** el test primario @12 vs @17 sobre celdas con parada
+natural: con convergencia temprana (final@4/6/9) ese test daría Δ=0 **por
+construcción** (el agente paró, no saturó) y cancelaría (c) por un
+artefacto del diseño. En su lugar:
+
+- **Brazo forzado (ii)**: las **3 celdas del diagnóstico §0.3**
+  (A2_plugin-registry, A5_repo-cache-layer, A5_workflow-statemachine)
+  se re-corren con canal b y **parada temprana desactivada** (se ignora
+  `final`; si el agente declara DONE, el harness le reprompta «continúa:
+  revisa y mejora») hasta el **turno 17**. Coste estimado con los ritmos
+  medidos: 111-142k tok/celda → **~0,39M** (coincide con el ~0,5M
+  estimado por el dueño).
+- **Test primario de saturación** (solo brazo forzado): `Δ_i =
+  score@17_forzado − score@12_forzado` emparejado por celda (**n=3**);
+  IC95 bootstrap (10.000, semilla 20261023). **Positivo (excluye 0) →
+  NO satura → (c) justificado HITO21**; incluye 0 o negativo → **satura
+  (turnos 12-17 no aportan ni forzados) → (c) cancelado**. Caveat
+  pre-registrado: n=3 da potencia limitada; el veredicto se lee con la
+  desviación por celda visible en la evidencia, no solo con el IC.
+- **Fallback (i)**: si el checkpoint (E1-Ajuste 2) obliga a parar antes
+  de completar el brazo forzado, §1 se cierra declarando explícitamente
+  que **mide convergencia, no saturación**, y la pregunta de (c) queda
+  para HITO21 con otro diseño (no se cancela (c) por falta de dato).
+- Los snapshots 2/4/6/8 de la matriz principal quedan **descriptivos**
+  (apoyo visual de la curva), sin hipótesis ni test.
+
+#### E1-Ajuste 2 — Techo duro 7M con checkpoint en 2,65M (se suprime el corte a 2,04M)
+
+Se **suprime** `techo_corrida = min(7M − gastado, proyección×1,3)` como
+corte de corrida. Queda:
+
+- **Techo duro global: 7.000.000 tokens** (pool HITO20; gastado §0.3 =
+  77.441 descontado del ledger).
+- **Checkpoint: 2.654.737 tokens** (= proyección recalibrada 2.042.105 ×
+  1,3). Al alcanzarlo: **si <70 % de celdas completadas → se PARA y se
+  consulta al dueño**; si ≥70 % → se continúa hasta 7M.
+- **Tope por celda 450k** (mid-cell) permanece: protege contra celda
+  desbocada, no contra el total (60 celdas × 450k = 27M teóricos; el 7M
+  es el que acota).
+- Si la corrida completa bajo 7M: se documenta la desviación vs
+  proyección. Si se corta en 7M: **hallazgo fuerte** (el modelo de coste
+  falla por factor ≥1,3; ver E1-Ajuste 3). La corrida NO se amplía jamás
+  sin enmienda.
+
+#### E1-Ajuste 3 — Derivación del peor caso (corrige y RETRACTA el 0,66 anterior)
+
+El 0,66 citado en §1.0(c) era una extrapolación **sin fundamento**; se
+retracta y se sustituye por esta derivación, hecha sobre las series
+medidas de §0.3 (coste/turno creciente + aplanamiento por el **CAP
+18k**, que limita el prompt a 18k tok ≈ máx ~20k tok/turno):
+
+| celda (§0.3) | tok reales (turnos usados) | extrap. a 17 (crecimiento +0,7-0,9k/turno, techo ~11k) | vs su @16 oficial | factor peor caso |
+|---|---|---|---|---|
+| A2_plugin-registry | 21.259 (6) | ~136.400 | 92.549 | **1,47** |
+| A5_repo-cache-layer | 18.841 (4) | ~142.200 | 114.467 | **1,24** |
+| A5_workflow-statemachine | 37.341 (9) | ~110.900 | 116.571 | **0,95** |
+
+- **Efecto del CAP, declarado**: sin poda, el historial crecería sin
+  cota y los turnos 10-17 superarían los 20k tok/turno (factor ≫2); el
+  CAP 18k es la pieza que aplana el crecimiento y deja el peor caso en
+  0,95-1,47. Es el motivo de que el upper bound sea verificable.
+- **Proyección superior de la matriz completa** (factor 1,0-1,22 según
+  la media de la tabla): **6,66M-8,1M con margen**, es decir, el peor
+  caso **puede exceder 7M**. E1-Ajuste 2 existe exactamente para esto:
+  o se completa bajo 7M (y se documenta la desviación del modelo), o se
+  corta en 7M como hallazgo. El escenario «4,42M» derivado del 0,66
+  queda anulado.
+- Los factores 0,16-0,32 de §1.3 inyectados siguen siendo los del caso
+  **convergente** (medido); los de esta tabla son el caso **no
+  convergente** (extrapolado). La corrida distingue ambos registrando
+  por celda: turnos usados, paro (`final`/`max_turns`/`cortada`) y
+  coste total — la comparación de esos tres campos con esta tabla es el
+  test empírico del modelo de coste.
+
+#### E1-Ajuste menor — Score absoluto de convergencia junto al Δ
+
+El score absoluto al que converge cada celda se registra y se lee
+**junto al Δ** (E1 y saturación): Δ≥+10 con score final 15 no es lo
+mismo que Δ≥+10 con score final 100. Los informes de observador y el
+`result_*.json` ya lo contienen; queda explícito que la lectura del
+veredicto usa ambos números.
+
+#### Impacto en BUILD (pre-registrado antes de la corrida)
+
+- Modo **brazo forzado** en harness/run_pilot (ignorar `final`,
+  reprompt de continuación, snapshots @12/@17, ledger compartido con la
+  matriz principal para el checkpoint).
+- Lógica de **checkpoint 2.654.737** con regla 70 % y parada
+  documentada.
+- Tests puros: (a) forzado ignora `final` y para en 17; (b) checkpoint
+  dispara parada/continúa según % de celdas; (c) ledger acumula matriz
+  + brazo forzado. Puerta completa antes de la corrida.
