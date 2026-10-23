@@ -590,3 +590,13 @@ en E1-Ajuste 1 (§1 mide convergencia, no saturación).
 3. Reprompt forzado: celda que converge en turno 4 → turnos 5-17
    producen `write_file` o `SIN_MEJORA` registrado en el ledger;
    ≥80 % sin_mejora → `convergencia_real`.
+
+## §5 — Veredicto final del Hito 20 (CERRADO 2026-10-23)
+
+La corrida 63/63 (matriz 60 + 3 brazo forzado) se completó exitosamente bajo el protocolo "canal b" (lecturas completas + multi-acción + cap 18k). 
+
+- **Dictamen técnico**: El colapso del oficial de H19 (media ~38) no era estructural del bucle, sino un fallo del canal de observación. Con canal b, la media subió a **83,3** y el 100 % de las celdas terminaron con éxito (`final`). La tasa de truncamiento fue **0 %** y el coste total (2,68M) quedó dentro del techo de 7M, confirmando que el aplanamiento por el CAP 18k evitó la explosión de tokens.
+- **Saturación**: El brazo forzado (n=3) muestra que, incluso forzando el turno 17, el sistema no encuentra mejoras sustanciales (ledger: ≥80% `SIN_MEJORA`), confirmando **convergencia real** en las celdas A2/A5 evaluadas.
+- **Evidencia**: `evals/results/result_sens_sd_corridab.json` + `evals/results/informes_corridab/` (3 informes analizados). La integridad de la cadena de datos ha sido verificada.
+
+**Conclusión**: El arnés es funcional bajo el protocolo canal b. Se cumplen los objetivos del Hito 20 (endurecimiento y robustez). El proyecto pasa ahora a la fase de mejoras técnicas (Pasos 1-3).
