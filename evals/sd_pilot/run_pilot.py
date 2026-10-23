@@ -1055,7 +1055,8 @@ def modo_corrida_b(model: str, resume: bool) -> int:
               "coste": coste, "celdas": cells,
               "trazas": str(TRACES_CORRB.relative_to(REPO)),
               "informes": str(INFORMES_CORRB.relative_to(REPO)),
-              "commits": _git_head()}
+              "commits": _git_head(),
+              "git_head_start": "3e620212eb9819187c6ab45ff0d37437737e4f7d"}
     RESULT_CORRB.write_text(json.dumps(result, ensure_ascii=False, indent=1),
                             encoding="utf-8")
     log(f"SATURACIÓN {saturacion['regla']}: {saturacion['accion']}")
