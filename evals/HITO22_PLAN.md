@@ -67,6 +67,9 @@ Una tarea pertenece a SD-2 si:
 - Cada tarea es un workspace independiente, **un solo paquete**, 3-6 ficheros
   de código, 4-6 tests públicos, 10-15 ocultos, `reference/` y `tests_hidden/`
   fuera del workspace. Sin red, determinista, suite <10 s.
+- `TASK.md` da el contrato y dice que los tests públicos fallan, pero **no
+  revela cuántos defectos hay ni en qué ficheros están**; el diagnóstico sale
+  de ejecutar tests y leer el paquete.
 - IDs: `sd2-dev-f1-inventory`, `sd2-test-f2-banking`, etc.
 - **Vertical slice primero**: 1 dev F1 + 1 test F1, QA y revisión del dueño;
   solo después se autoran las 22 restantes. El slice test queda dentro del test

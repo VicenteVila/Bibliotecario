@@ -3,10 +3,9 @@
 ## Rol
 
 Mantienes el paquete `inventory` de un almacén. El stock disponible se calcula
-restando las reservas activas no caducadas. El paquete contiene **exactamente
-3 defectos, en 3 ficheros distintos**: `stock.py`, `reservations.py` y
-`alerts.py`. Los tests públicos de `tests_public/` fallan ahora y muestran
-parte del comportamiento incorrecto.
+restando las reservas activas no caducadas. El paquete contiene defectos en el
+código. Los tests públicos de `tests_public/` fallan ahora y muestran parte del
+comportamiento incorrecto.
 
 ## Requisito
 

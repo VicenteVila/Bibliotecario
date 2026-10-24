@@ -3,9 +3,8 @@
 ## Rol
 
 Mantienes el paquete `ledger` de un banco. Los movimientos se registran como
-asientos; solo los `"posted"` afectan al saldo. El paquete contiene
-**exactamente 3 defectos, en 3 ficheros distintos**: `fees.py`, `posting.py`
-y `reports.py`. Los tests públicos de `tests_public/` fallan ahora y muestran
+asientos; solo los `"posted"` afectan al saldo. El paquete contiene defectos
+en el código. Los tests públicos de `tests_public/` fallan ahora y muestran
 parte del comportamiento incorrecto.
 
 ## Requisito
