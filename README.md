@@ -53,8 +53,10 @@ API.implement("Task-CoEvolve", "validar mi agente")
 ## Tests
 
 ```bash
-python -m pytest tests/ -q   # 513 tests
-ruff check bibliotecario evals tests scripts
+python -m pytest tests/ -q   # 521 tests
+python -m pytest tests/ -q --cov=bibliotecario   # baseline 78.94% (2026-10-24)
+ruff check bibliotecario tests evals/sd_pilot/*.py evals/corpus_lock.py scripts
+python scripts/scan_secrets.py   # 0 coincidencias antes de commitear
 ```
 
 ## Evaluación

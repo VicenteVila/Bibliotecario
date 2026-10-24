@@ -21,6 +21,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "pytest>=8.0",
+    "pytest-cov>=5.0",
     # Fijado: una version nueva de ruff trae reglas nuevas (v0.17 anadio EXE001) y
     # CI pasa a fallar con un codigo que en local pasa. Local y CI miden lo mismo.
     "ruff==0.16.8",
@@ -53,3 +54,10 @@ line-length = 99
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["bibliotecario"]
+
+[tool.coverage.report]
+show_missing = true
+fail_under = 78

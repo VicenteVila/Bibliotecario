@@ -27,11 +27,16 @@ jobs:
         run: python -m pip install -e ".[dev]"
 
       - name: ruff
-        run: python -m ruff check .
+        run: >-
+          python -m ruff check bibliotecario tests evals/sd_pilot/*.py
+          evals/corpus_lock.py scripts
+
+      - name: secretos
+        run: python scripts/scan_secrets.py
 
       # `python -m pytest` (no el binario `pytest`): evals/ no es un paquete
       # instalado, así que necesita el cwd en sys.path.
-      - name: pytest
-        run: python -m pytest -q
+      - name: pytest + cobertura
+        run: python -m pytest -q --cov=bibliotecario --cov-report=term
         env:
           PYTHONPATH: .
