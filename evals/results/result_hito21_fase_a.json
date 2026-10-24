@@ -1,0 +1,74 @@
+{
+  "hito": 21,
+  "fase": "A_offline",
+  "fecha": "2026-10-24T19:26:47",
+  "tokens": 0,
+  "trazas": "evals/sd_pilot/traces_corrb.sqlite",
+  "turnos": 369,
+  "turnos_con_base": 257,
+  "recuperadas": 19,
+  "g0a_idempotencia": {
+    "diferencias": 0,
+    "pasa": true
+  },
+  "g0b_recuperacion": {
+    "pasa": true,
+    "celdas": {
+      "A4_dsl-parser": {
+        "turnos": 17,
+        "base_vacia": 15,
+        "recuperadas": 15,
+        "rutas": [
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py",
+          "mini_dsl/tokens.py"
+        ],
+        "diffs": 0,
+        "ruta_esperada": "mini_dsl/tokens.py",
+        "rutas_ok": true
+      },
+      "A2_checkout-rounding": {
+        "turnos": 17,
+        "base_vacia": 15,
+        "recuperadas": 1,
+        "rutas": [
+          "checkout/redondeo.py"
+        ],
+        "diffs": 0,
+        "ruta_esperada": "checkout/redondeo.py",
+        "rutas_ok": true
+      },
+      "A3_checkout-rounding": {
+        "turnos": 17,
+        "base_vacia": 13,
+        "recuperadas": 0,
+        "rutas": [],
+        "diffs": 0,
+        "ruta_esperada": null,
+        "rutas_ok": false
+      },
+      "A5_plugin-registry": {
+        "turnos": 17,
+        "base_vacia": 13,
+        "recuperadas": 0,
+        "rutas": [],
+        "diffs": 0,
+        "ruta_esperada": null,
+        "rutas_ok": false
+      }
+    }
+  },
+  "pasa": true
+}

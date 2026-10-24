@@ -116,6 +116,30 @@ RESULT_CORRB = REPO / "evals" / "results" / "result_sens_sd_corridab.json"
 INFORMES_CORRB = REPO / "evals" / "results" / "informes_corridab"
 HEARTBEAT_CORRB = SD_ROOT / "_heartbeat_corrb.json"
 
+# HITO21 (RATIFICADO 2026-10-24): 4 residuales + 4 controles, canal b3,
+# techo 1,8M. Controles congelados antes de medir (score=100 y writes>0 en b2).
+H21_RESIDUALES: list[tuple[str, str]] = [("A2", "checkout-rounding"),
+                                         ("A3", "checkout-rounding"),
+                                         ("A4", "dsl-parser"),
+                                         ("A5", "plugin-registry")]
+H21_CONTROLES: list[tuple[str, str]] = [("A2", "plugin-registry"),
+                                        ("A3", "plugin-registry"),
+                                        ("A4", "interval-scheduler"),
+                                        ("A5", "batch-coalescer")]
+H21_CELLS = H21_RESIDUALES + H21_CONTROLES
+H21_MAX_TURNS = 17
+H21_CELL_CAP = 450_000
+H21_TECHO = 1_800_000
+H21_G2_MIN = 10.0
+H21_G3_MAX_CAIDA = 5.0
+WS_H21 = Path("/tmp/opencode/sd_pilot_h21")
+STATE_H21 = SD_ROOT / "_run_state_h21.json"
+TRACES_H21 = SD_ROOT / "traces_h21.sqlite"
+RESULT_H21 = REPO / "evals" / "results" / "result_hito21.json"
+RESULT_FASE_A = REPO / "evals" / "results" / "result_hito21_fase_a.json"
+INFORMES_H21 = REPO / "evals" / "results" / "informes_hito21"
+HEARTBEAT_H21 = SD_ROOT / "_heartbeat_h21.json"
+
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
@@ -904,6 +928,146 @@ def _generar_informes_corridab() -> bool:
     return ok
 
 
+
+def evaluar_hito21(cells: dict[str, dict], b2: dict) -> dict:
+    """Gates G1-G6 de HITO21 §3.2, congelados antes de medir."""
+    base = b2.get("celdas", {})
+    res = [cells.get(f"{v}_{t}") for v, t in H21_RESIDUALES]
+    scores = [c.get("score") for c in res if c]
+    scores_b2 = [base.get(f"{v}_{t}", {}).get("score") for v, t in H21_RESIDUALES]
+    g1_n = sum(1 for c in res if c and (c.get("writes") or 0) > 0
+               and c.get("stopped_by") != "max_turns")
+    media = sum(scores) / len(scores) if scores and all(x is not None for x in scores) else None
+    media_b2 = (sum(scores_b2) / len(scores_b2)
+                if scores_b2 and all(x is not None for x in scores_b2) else None)
+    delta = (media - media_b2) if media is not None and media_b2 is not None else None
+    caidas = {}
+    for v, t in H21_CONTROLES:
+        key = f"{v}_{t}"
+        nuevo = (cells.get(key) or {}).get("score")
+        viejo = base.get(key, {}).get("score")
+        caidas[key] = (nuevo - viejo) if nuevo is not None and viejo is not None else None
+    trunc = sum(1 for c in cells.values()
+                if c.get("estado") or c.get("stopped_by") == "truncated_by_ceiling")
+    coste = _coste(cells)["total_tokens"]
+    from evals.sd_pilot.harness import CANAL_B_VERSION
+    gates = {
+        "G1_residuales_escriben": {"n": g1_n, "pasa": g1_n >= 2},
+        "G2_mejora_media": {"media": media, "media_b2": media_b2,
+                            "delta": delta, "pasa": delta is not None and delta >= H21_G2_MIN},
+        "G3_sin_regresion_controles": {"caidas": caidas,
+                                       "pasa": all(d is not None and d >= -H21_G3_MAX_CAIDA
+                                                   for d in caidas.values())},
+        "G4_sin_truncamiento": {"n": trunc, "pasa": trunc == 0},
+        "G5_techo": {"coste": coste, "techo": H21_TECHO, "pasa": coste <= H21_TECHO},
+        "G6_evidencia": {"canal_b_version": CANAL_B_VERSION,
+                         "pasa": CANAL_B_VERSION == "b3"},
+    }
+    return {"gates": gates, "pasa": all(g["pasa"] for g in gates.values()),
+            "residuales": [f"{v}_{t}" for v, t in H21_RESIDUALES],
+            "controles": [f"{v}_{t}" for v, t in H21_CONTROLES]}
+
+
+def _generar_informes_h21() -> bool:
+    from evals.sd_pilot import observador
+    from evals.sd_pilot.io_atomico import escribir_texto_atomico
+    spans = observador.cargar_spans(TRACES_H21)
+    por_celda = observador.agrupar_por_celda(spans)
+    INFORMES_H21.mkdir(parents=True, exist_ok=True)
+    ok = True
+    for key, cs in sorted(por_celda.items()):
+        out = INFORMES_H21 / f"{key}.md"
+        escribir_texto_atomico(out, observador.informe_celda(key, cs))
+        if not out.read_text(encoding="utf-8").strip():
+            ok = False
+    return ok
+
+
+def modo_hito21(model: str, resume: bool) -> int:
+    """HITO21: 8 celdas (4 residuales + 4 controles), canal b3, techo 1,8M."""
+    _load_env(model)
+    if resume and not STATE_H21.is_file():
+        log("ERROR: --resume sin estado previo de HITO21")
+        return 3
+    if not resume and STATE_H21.is_file():
+        log(f"ERROR: ya existe {STATE_H21.name}; usa --resume o archiva "
+            "el estado documentandolo.")
+        return 3
+    if not RESULT_CORRB.is_file():
+        log("ERROR: falta la evidencia b2 de HITO20 §1")
+        return 3
+    b2 = json.loads(RESULT_CORRB.read_text(encoding="utf-8"))
+    fase_a = json.loads(RESULT_FASE_A.read_text(encoding="utf-8")) if RESULT_FASE_A.is_file() else {}
+    if not fase_a.get("pasa"):
+        log("ERROR: Fase A offline no pasa; no se corre (§3.1)")
+        return 3
+
+    import traceforge
+    cells: dict[str, dict] = {}
+    if resume:
+        st = json.loads(STATE_H21.read_text(encoding="utf-8"))
+        cells = st.get("cells", {})
+        head_inicio = st.get("git_head_start") or _git_head()
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_H21))
+        log(f"resume HITO21: {len(cells)} celdas cargadas")
+    else:
+        head_inicio = _git_head()
+        _write_json(STATE_H21, {"cells": {}, "git_head_start": head_inicio})
+        if HEARTBEAT_H21.exists():
+            HEARTBEAT_H21.unlink()
+        if TRACES_H21.exists():
+            TRACES_H21.unlink()
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_H21))
+
+    from dataclasses import replace as _replace
+
+    from evals.sd_pilot.harness import CANAL_B_VERSION
+    from evals.sd_pilot.variants import VARIANTS
+    log(f"HITO21: canal={CANAL_B_VERSION} max_turns={H21_MAX_TURNS} "
+        f"cap={H21_CELL_CAP} techo={H21_TECHO} celdas={len(H21_CELLS)}")
+
+    for vname, tid in H21_CELLS:
+        key = f"{vname}_{tid}"
+        if key in cells and cells[key].get("score") is not None:
+            continue
+        acum = _coste(cells)["total_tokens"]
+        if acum >= H21_TECHO:
+            cells[key] = {"score": None, "estado": "no_ejecutada_por_techo"}
+            log(f"{key}: FALLBACK (techo alcanzado)")
+            continue
+        var = _replace(VARIANTS[vname], max_turns=H21_MAX_TURNS)
+        cells[key] = _run_cell(vname, tid, TRACES_H21, ws_root=WS_H21,
+                               variant=var, canal="b",
+                               cell_token_cap=H21_CELL_CAP,
+                               snap_turns=(),
+                               heartbeat_path=HEARTBEAT_H21)
+        if cells[key].get("stopped_by") == "truncated_by_ceiling":
+            cells[key]["estado"] = "truncated_by_ceiling"
+        _write_json(STATE_H21, {"cells": cells, "git_head_start": head_inicio})
+
+    informes_ok = _generar_informes_h21()
+    ev = evaluar_hito21(cells, b2)
+    coste = _coste(cells)
+    result = {"hito": 21, "modo": "hito21",
+              "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "modelo": model,
+              "canal": "b", "canal_b_version": CANAL_B_VERSION,
+              "git_head_start": head_inicio, "max_turns": H21_MAX_TURNS,
+              "cap_celda": H21_CELL_CAP, "techo_tokens": H21_TECHO,
+              "fase_a": fase_a, "gates": ev["gates"], "pasa": ev["pasa"],
+              "residuales": ev["residuales"], "controles": ev["controles"],
+              "informes_ok": informes_ok, "coste": coste, "celdas": cells,
+              "trazas": str(TRACES_H21.relative_to(REPO)),
+              "informes": str(INFORMES_H21.relative_to(REPO)),
+              "commits": _git_head()}
+    _write_json(RESULT_H21, result)
+    for name, gate in ev["gates"].items():
+        log(f"{name}: {'PASA' if gate['pasa'] else 'FALLA'} {gate}")
+    log(f"coste HITO21={coste['total_tokens']} tokens (techo {H21_TECHO})")
+    log(f"veredicto: {'CUMPLE' if ev['pasa'] else 'NO CUMPLE'}")
+    log(f"evidencia: {RESULT_H21.relative_to(REPO)}")
+    return 0
+
+
 def modo_corrida_b(model: str, resume: bool) -> int:
     """§1 HITO20: matriz 17x12 canal b (orden estratificado, checkpoint
     2.65M, techo 7M) + brazo forzado de saturación (Enmiendas 1-2).
@@ -1120,6 +1284,8 @@ def main(argv: list[str] | None = None) -> int:
                     help="diagnóstico HITO20 §0.1 (max_turns=32, techo 450k)")
     ap.add_argument("--diagnostico-b", action="store_true",
                     help="diagnóstico escalado-b HITO20 §0.3 (canal b, 17 turnos)")
+    ap.add_argument("--hito21", action="store_true",
+                    help="HITO21: 4 residuales + 4 controles, canal b3, techo 1,8M")
     ap.add_argument("--corrida-b", action="store_true",
                     help="§1 HITO20: matriz 17x12 canal b + brazo forzado "
                          "(solo tras §1 definitivo ratificado)")
@@ -1140,11 +1306,11 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
 
     modos = [bool(args.g0), bool(args.oficial), bool(args.diagnostico),
-             bool(args.diagnostico_b), bool(args.corrida_b),
+             bool(args.diagnostico_b), bool(args.hito21), bool(args.corrida_b),
              bool(args.presupuesto), bool(args.debug_celda)]
     if sum(modos) != 1:
         ap.error("elige UN modo: --g0 | --oficial | --diagnostico | "
-                 "--diagnostico-b | --corrida-b | --presupuesto | "
+                 "--diagnostico-b | --hito21 | --corrida-b | --presupuesto | "
                  "--debug-celda V:tarea")
 
     if args.g0:
@@ -1155,6 +1321,8 @@ def main(argv: list[str] | None = None) -> int:
         return modo_diagnostico(args.model, args.resume)
     if args.diagnostico_b:
         return modo_diagnostico_b(args.model, args.resume)
+    if args.hito21:
+        return modo_hito21(args.model, args.resume)
     if args.corrida_b:
         return modo_corrida_b(args.model, args.resume)
     if args.presupuesto:

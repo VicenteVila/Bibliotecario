@@ -29,7 +29,9 @@ Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
 | `tasks.py` | `TASK_IDS` (12), ejes de dureza, `lint_tasks()`, `qa_task()` |
 | `verifier.py` | pytest público (herramienta del agente) y oculto (`m_h(x)`) |
 | `sens.py` | Pearson, `Q_h^(−x)`, gates U2-U7, umbrales congelados |
-| `run_pilot.py` | modos `--g0` / `--oficial` / `--diagnostico` (HITO20 §0.1) / `--diagnostico-b` (§0.3, canal b) / `--corrida-b` (§1, matriz 17×12 canal b + brazo forzado de saturación; solo tras §1 definitivo ratificado) / `--presupuesto` (coste de antemano) / `--debug-celda` (BUILD) |
+| `run_pilot.py` | modos `--g0` / `--oficial` / `--diagnostico` (HITO20 §0.1) / `--diagnostico-b` (§0.3, canal b) / `--corrida-b` (§1, matriz 17×12 canal b + brazo forzado) / `--hito21` (4 residuales + 4 controles, canal b3, techo 1,8M) / `--presupuesto` / `--debug-celda` (BUILD) |
+| `parse_tolerante.py` | HITO21 Fase A: recuperación acotada de `write_file` con triples comillas; idempotente si el JSON ya es válido |
+| `fase_a_offline.py` | HITO21 Fase A: replay 0-tokens sobre `traces_corrb.sqlite` → `results/result_hito21_fase_a.json` |
 | `observador.py` | informes por celda/turno desde `traces_*.sqlite` (canal de observación §0.3, E1.4) |
 | `trazas_analisis.py` | Parte A reproducible (rachas ATASCADO/PROGRESA, §0.1) — fija el snippet ad-hoc original |
 | `skills_pack/` | 4 skills congelados (idénticos en A4 y A5) |
@@ -42,7 +44,9 @@ Evidencia: `results/result_sens_sd_g0.json` (dictámen G0) y
 y `logs/sens_sd_pilot_run.log`. Diagnóstico HITO20 (§0.1 del plan):
 `results/result_sens_sd_diag_trazas.json` (Parte A, 0 tokens),
 `results/result_sens_sd_diag.json` (Parte B) + `logs/sens_sd_diag_run.log`.
-Tests: `tests/test_sens_sd_pilot.py` (puros, sin LLM).
+HITO21: `results/result_hito21_fase_a.json` (Fase A offline) y
+`results/result_hito21.json` (corrida b3). Tests: `tests/test_sens_sd_pilot.py`
+(puros, sin LLM).
 
 ## `preflight/` (159 ficheros) — la evaluación **viva**
 

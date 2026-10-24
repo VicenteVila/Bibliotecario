@@ -1,9 +1,10 @@
 # HITO21 — Límite del canal b: diagnóstico y corrección del parseo JSON
 
-> **Estado: BORRADOR, NO RATIFICADO.** No ejecutar ninguna corrida hasta que el
-> dueño ratifique §3 (gates) y §4 (techo). Este plan nace de un análisis
-> **offline de la evidencia del HITO20 §1** (0 tokens), no de una medición
-> nueva.
+> **Estado: RATIFICADO 2026-10-24 por el dueño** (respuesta «sí» en sesión):
+> techo **1.800.000 tokens** y gates §3 congelados antes de medir. El diseño de
+> b3 se congela en §3.2 **después de la Fase A offline** y antes de lanzar.
+> Este plan nace de un análisis **offline de la evidencia del HITO20 §1**
+> (0 tokens), no de una medición nueva.
 
 ## §0 — Estado y alcance
 
@@ -64,16 +65,28 @@ saltos/comillas), con estas condiciones:
   recuperación de acción, no calidad del fichero).
 - Si G0-A o G0-B fallan → **no se corre**; se pasa a la opción de prompt.
 
+**Resultado Fase A (2026-10-24, 0 tokens; evidencia
+`evals/results/result_hito21_fase_a.json`): PASA.**
+G0-A: 369 turnos replayados, 257 con acciones base, **0 diferencias**.
+G0-B: `A4_dsl-parser` **15/15** recuperadas (`mini_dsl/tokens.py`) y
+`A2_checkout-rounding` **1/1** (`checkout/redondeo.py`). `A3` y `A5` no son
+recuperables desde la traza almacenada (13 turnos cada una con salida cortada
+a 4.000 chars; el raw completo no se guardó).
+
 ### §3.2 Fase B — corrida mínima (solo si Fase A pasa)
 
-Brazo único **b3** (bump de `CANAL_B_VERSION` + enmienda): parser tolerante
-y/o recordatorio explícito de formato, decidido en Fase A. Celdas:
+Brazo único **b3** (bump de `CANAL_B_VERSION` + enmienda), **congelado tras
+Fase A**: (i) parser tolerante solo si el parser base devuelve 0 acciones
+(recupera `"content": """…"""`), y (ii) recordatorio anti-bucle a partir
+del turno 6 sin escrituras (exige `write_file` con contenido completo y avisa
+de que el contenido debe ser string JSON, sin triples comillas). No cambia
+el prompt base ni los tools; solo añade avisos cuando ya hay atasco. Celdas:
 
 - 4 residuales (`A2_checkout-rounding`, `A3_checkout-rounding`,
   `A4_dsl-parser`, `A5_plugin-registry`).
-- 4 controles ya resueltas, una por variante, elegidas por semilla
-  pre-registrada antes de mirar resultados (p.ej. `A2_plugin-registry`,
-  `A3_plugin-registry`, `A4_interval-scheduler`, `A5_batch-coalescer`).
+- 4 controles ya resueltas y **congeladas antes de medir** (todas con
+  `score=100` y `writes>0` en b2): `A2_plugin-registry`,
+  `A3_plugin-registry`, `A4_interval-scheduler`, `A5_batch-coalescer`.
 
 Gates (intactos tras medir):
 
@@ -90,9 +103,9 @@ nueva); si falla G1/G2 → `NO CUMPLE` con causa; si falla G3 → revisar parser
 
 ## §4 — Disciplina y presupuesto
 
-- **Techo propuesto: 1.800.000 tokens** (8 celdas; proyección: 4 residuales
-  ~919k según b2 + 4 controles ~600k = ~1,52M; margen 18 %). El dueño debe
-  ratificarlo **antes** de lanzar; no se amplía a mitad de corrida.
+- **Techo ratificado: 1.800.000 tokens** (8 celdas; proyección: 4 residuales
+  ~919k según b2 + 4 controles ~600k = ~1,52M; margen 18 %). **No se amplía a
+  mitad de corrida.**
 - Modelo fijo `nvidia/nemotron-3-ultra-550b-a55b`; clave `NVIDIA_API_KEY_PILOTO`.
 - `b3` solo se compara intra-versión; la comparación con b2 es diagnóstica,
   no causal. b1 queda congelado como evidencia histórica.

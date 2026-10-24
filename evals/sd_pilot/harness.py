@@ -42,11 +42,12 @@ _MAX_RAW_IN_HISTORY = 4000
 CANAL_CAP_PROMPT_TOKENS = 18_000
 CANAL_SNAP_TURNS = (8, 12)
 
-# Version del canal b. b1 = evidencia HITO20 §0.3/§1; b2 = anade el marcador
-# de truncado en read_file. Subir version + enmienda ratificada si cambia
-# cualquiera de los elementos congelados: TOOLS_JSON, REPROMPT_FORZADO,
-# CANAL_CAP_PROMPT_TOKENS, _MAX_READ o este marcador (tests dorados).
-CANAL_B_VERSION = "b2"
+# Version del canal b. b1 = evidencia HITO20 §0.3/§1; b2 = marcador de
+# truncado en read_file; b3 = parser tolerante + avisos anti-bucle HITO21.
+# Subir version + enmienda ratificada si cambia cualquiera de los elementos
+# congelados: TOOLS_JSON, REPROMPT_FORZADO, CANAL_CAP_PROMPT_TOKENS,
+# _MAX_READ o los avisos de b3 (tests dorados).
+CANAL_B_VERSION = "b3"
 
 # Brazo forzado HITO20 §1 (Enmienda 2, pre-registrado 2026-10-23): texto
 # exacto del reprompt inyectado en cada turno tras `final`.
@@ -76,6 +77,13 @@ def parse_actions(raw: str) -> list[dict]:
             acciones.append(obj)
         i = j + end
     return acciones
+
+NUDGE_SIN_ESCRITURA_TURNO = 6
+NUDGE_SIN_ESCRITURA = (
+    "AVISO: no has escrito ningún fichero todavía. Usa write_file con el "
+    "contenido COMPLETO del fichero; el contenido debe ser una cadena JSON "
+    "con saltos de línea escapados (\\n) y sin comillas triples."
+)
 
 TOOLS_JSON = (
     'Responde SOLO con un objeto JSON de una de estas formas:\n'
@@ -173,7 +181,7 @@ class Cell:
         self.cell_token_cap = cell_token_cap
         self.force_full_turns = force_full_turns  # brazo forzado §1
         self._reprompt_activo = False  # True tras el primer `final` forzado
-        self.snap_turns = tuple(snap_turns or CANAL_SNAP_TURNS)
+        self.snap_turns = tuple(CANAL_SNAP_TURNS if snap_turns is None else snap_turns)
         # (tokens_otros, proy_celda, techo_global): corte mid-cell al techo
         # con la regla del 80 % (§1 Enmienda 2, E2-Crítico 2).
         self.ceiling_watch = ceiling_watch
@@ -432,12 +440,21 @@ class Cell:
 
     def _pasar_acciones_b(self, raw: str) -> bool:
         """Canal b (§0.3): ejecuta todas las acciones del turno; True = final."""
-        acciones = parse_actions(raw)
+        if CANAL_B_VERSION >= "b3":
+            from evals.sd_pilot.parse_tolerante import parse_actions_tolerante
+            acciones = parse_actions_tolerante(raw)
+        else:
+            acciones = parse_actions(raw)
         if not acciones:
             self.result.invalid_actions += 1
             self.history.append(f"MODELO: {raw[:_MAX_RAW_IN_HISTORY]}")
-            self.history.append("AVISO: respuesta no es un JSON válido con tool/final. "
-                                "Responde SOLO con el JSON.")
+            if CANAL_B_VERSION >= "b3":
+                self.history.append("AVISO: JSON inválido. El contenido de write_file "
+                                    "debe ser una cadena JSON con saltos \\n escapados; "
+                                    "NO uses comillas triples. Responde SOLO con JSON.")
+            else:
+                self.history.append("AVISO: respuesta no es un JSON válido con tool/final. "
+                                    "Responde SOLO con el JSON.")
             self._record_action({"tool": "_invalid"}, "JSON invalido", False)
             return False
         self.history.append(f"MODELO: {raw[:_MAX_RAW_IN_HISTORY]}")
@@ -462,6 +479,9 @@ class Cell:
                 self.history.append(
                     f"RESULTADO de {action.get('tool')}:\n{result[:_MAX_TOOL_OUT]}")
             self._record_action(action, result, ok)
+        if (CANAL_B_VERSION >= "b3" and self.result.writes == 0
+                and self.result.turns >= NUDGE_SIN_ESCRITURA_TURNO):
+            self.history.append(NUDGE_SIN_ESCRITURA)
         return False
 
     def _run_loop(self) -> None:

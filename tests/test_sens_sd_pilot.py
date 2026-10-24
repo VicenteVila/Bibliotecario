@@ -18,6 +18,7 @@ from evals.sd_pilot.harness import (
     parse_action,
     parse_actions,
 )
+from evals.sd_pilot.parse_tolerante import parse_actions_tolerante
 from evals.sd_pilot.run_pilot import (
     CHECKPOINT_TOKENS,
     CORR_B_CELL_CAP,
@@ -27,6 +28,9 @@ from evals.sd_pilot.run_pilot import (
     DIAG_TECHO_TOKENS,
     FACTORES_INYECTADOS,
     G0_TASKS,
+    H21_CONTROLES,
+    H21_RESIDUALES,
+    H21_TECHO,
     MARGEN_RECALIBRACION,
     N_CELLS_PLAN,
     PRESUPUESTO_BASE_16,
@@ -40,6 +44,7 @@ from evals.sd_pilot.run_pilot import (
     estimar_tokens_celda,
     evaluar_diagnostico,
     evaluar_diagnostico_b,
+    evaluar_hito21,
     evaluar_saturacion_forzado,
     orden_estratificado,
     presupuesto_run,
@@ -803,7 +808,7 @@ def test_canal_b_version_y_prompt_dorado():
 
     from evals.sd_pilot import harness
 
-    assert harness.CANAL_B_VERSION == "b2"
+    assert harness.CANAL_B_VERSION == "b3"
     assert hashlib.sha256(harness.TOOLS_JSON.encode()).hexdigest() == (
         "21ce7483eb262f51a0f0d55d20d3a8c96b138f7f9cbe3bb8c96cbd34e8040a5c")
     assert hashlib.sha256(harness.REPROMPT_FORZADO.encode()).hexdigest() == (
@@ -835,3 +840,82 @@ def test_canal_b_marca_truncado_y_oficial_no(tmp_path):
         cell.run()
         resultado = next(h for h in cell.history if h.startswith("RESULTADO de read_file"))
         assert (marca in resultado) is esperado
+
+
+def test_parser_tolerante_recupera_triples_y_es_idempotente():
+    raw = ('{"tool": "write_file", "args": {"path": "mini_dsl/tokens.py", '
+           '"content": """x = 1\n"""}}')
+    acts = parse_actions_tolerante(raw)
+    assert len(acts) == 1 and acts[0]["tool"] == "write_file"
+    assert acts[0]["args"]["path"] == "mini_dsl/tokens.py"
+    assert "x = 1" in acts[0]["args"]["content"]
+    valido = '{"tool": "read_file", "args": {"path": "calc.py"}}'
+    assert parse_actions_tolerante(valido) == parse_actions(valido)
+
+
+def test_parser_tolerante_no_inventa_si_falta_cierre():
+    assert parse_actions_tolerante(
+        '{"tool": "write_file", "args": {"path": "x.py", "content": """sin cierre'
+    ) == []
+
+
+def test_canal_b3_ejecuta_write_con_triples(tmp_path):
+    d = mini_task(tmp_path)
+    raw = ('{"tool": "write_file", "args": {"path": "calc.py", '
+           '"content": """def add(a, b):\n    return a + b\n"""}}')
+    cell = Cell(VARIANTS["A2"], d.name, d, tmp_path / "ws",
+                FakeLLM(raw, '{"final": "ok"}'), canal="b")
+    cell.run()
+    assert cell.result.writes == 1
+    assert "a + b" in (cell.workspace / "calc.py").read_text(encoding="utf-8")
+
+
+def test_canal_b3_avisa_si_no_hay_escrituras(tmp_path):
+    d = mini_task(tmp_path)
+    llm = FakeLLM('{"tool": "read_file", "args": {"path": "calc.py"}}')
+    var = replace(VARIANTS["A2"], max_turns=8)
+    Cell(var, d.name, d, tmp_path / "ws", llm, canal="b").run()
+    assert any("no has escrito ningún fichero" in p for p in llm.prompts[6:])
+    llm_of = FakeLLM('{"tool": "read_file", "args": {"path": "calc.py"}}')
+    var_of = replace(VARIANTS["A2"], max_turns=8)
+    Cell(var_of, d.name, d, tmp_path / "ws_of", llm_of, canal="oficial").run()
+    assert not any("no has escrito ningún fichero" in p for p in llm_of.prompts)
+
+
+def _celdas_h21(res_scores, ctl_scores, writes=1, stopped="final"):
+    cells = {}
+    for (v, t), sc in zip(H21_RESIDUALES, res_scores):
+        cells[f"{v}_{t}"] = {"score": sc, "writes": writes,
+                             "stopped_by": stopped,
+                             "usage": {"total_tokens": 1000}}
+    for (v, t), sc in zip(H21_CONTROLES, ctl_scores):
+        cells[f"{v}_{t}"] = {"score": sc, "writes": 1,
+                             "stopped_by": "final",
+                             "usage": {"total_tokens": 1000}}
+    return cells
+
+
+def _b2_h21():
+    base = {}
+    for (v, t), sc in zip(H21_RESIDUALES, (38.18, 38.18, 13.04, 64.29)):
+        base[f"{v}_{t}"] = {"score": sc}
+    for v, t in H21_CONTROLES:
+        base[f"{v}_{t}"] = {"score": 100.0}
+    return {"celdas": base}
+
+
+def test_evaluar_hito21_pasa_con_mejora_y_sin_regresion():
+    cells = _celdas_h21((90, 90, 90, 90), (100, 100, 100, 100))
+    ev = evaluar_hito21(cells, _b2_h21())
+    assert ev["pasa"] and all(g["pasa"] for g in ev["gates"].values())
+    assert ev["gates"]["G5_techo"]["coste"] == 8000 < H21_TECHO
+
+
+def test_evaluar_hito21_falla_sin_escrituras_o_con_regresion():
+    cells = _celdas_h21((20, 20, 5, 30), (90, 90, 90, 90),
+                        writes=0, stopped="max_turns")
+    ev = evaluar_hito21(cells, _b2_h21())
+    assert not ev["pasa"]
+    assert not ev["gates"]["G1_residuales_escriben"]["pasa"]
+    assert not ev["gates"]["G2_mejora_media"]["pasa"]
+    assert not ev["gates"]["G3_sin_regresion_controles"]["pasa"]
