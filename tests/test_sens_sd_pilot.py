@@ -803,10 +803,35 @@ def test_canal_b_version_y_prompt_dorado():
 
     from evals.sd_pilot import harness
 
-    assert harness.CANAL_B_VERSION == "b1"
+    assert harness.CANAL_B_VERSION == "b2"
     assert hashlib.sha256(harness.TOOLS_JSON.encode()).hexdigest() == (
         "21ce7483eb262f51a0f0d55d20d3a8c96b138f7f9cbe3bb8c96cbd34e8040a5c")
     assert hashlib.sha256(harness.REPROMPT_FORZADO.encode()).hexdigest() == (
         "08e1cc08ab930dfb05e8d12e3f3921d80600f68841b8c8e0913cdb690d1247ca")
     assert harness.CANAL_CAP_PROMPT_TOKENS == 18_000
     assert harness._MAX_READ == 8_000
+
+
+def test_heartbeat_por_turno_incluye_el_ultimo(tmp_path):
+    d = mini_task(tmp_path)
+    latidos = []
+    cell = Cell(VARIANTS["A2"], d.name, d, tmp_path / "ws",
+                FakeLLM('{"final": "listo"}'), canal="b",
+                on_turn=latidos.append)
+    cell.run()
+    assert latidos and latidos[-1]["turn"] == 1
+    assert latidos[-1]["tokens"] >= 0 and latidos[-1]["stopped_by"] == "final"
+
+
+def test_canal_b_marca_truncado_y_oficial_no(tmp_path):
+    d = mini_task(tmp_path)
+    grande = "x" * 9000
+    (d / "workspace" / "grande.txt").write_text(grande, encoding="utf-8")
+    marca = "[TRUNCADO a 8000 chars de 9000]"
+    for canal, esperado in (("b", True), ("oficial", False)):
+        cell = Cell(VARIANTS["A2"], d.name, d, tmp_path / f"ws_{canal}",
+                    FakeLLM('{"tool": "read_file", "args": {"path": "grande.txt"}}',
+                            '{"final": "ok"}'), canal=canal)
+        cell.run()
+        resultado = next(h for h in cell.history if h.startswith("RESULTADO de read_file"))
+        assert (marca in resultado) is esperado

@@ -67,3 +67,6 @@ logs/
 # Paper ajeno, fuera del repo aunque no lleve extension
 Documentos/HarnessDev Can LLMs Create and Evolve Their Own Agent Harness
 Documentos/
+
+# Heartbeat efimero de corridas (no es evidencia)
+evals/sd_pilot/_heartbeat_*.json

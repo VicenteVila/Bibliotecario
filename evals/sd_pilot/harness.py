@@ -42,10 +42,11 @@ _MAX_RAW_IN_HISTORY = 4000
 CANAL_CAP_PROMPT_TOKENS = 18_000
 CANAL_SNAP_TURNS = (8, 12)
 
-# Version del canal b (HITO20 §1). Subir a "b2" + enmienda ratificada si
-# cambia cualquiera de los elementos congelados: TOOLS_JSON, REPROMPT_FORZADO,
-# CANAL_CAP_PROMPT_TOKENS o _MAX_READ (tests dorados en test_sens_sd_pilot).
-CANAL_B_VERSION = "b1"
+# Version del canal b. b1 = evidencia HITO20 §0.3/§1; b2 = anade el marcador
+# de truncado en read_file. Subir version + enmienda ratificada si cambia
+# cualquiera de los elementos congelados: TOOLS_JSON, REPROMPT_FORZADO,
+# CANAL_CAP_PROMPT_TOKENS, _MAX_READ o este marcador (tests dorados).
+CANAL_B_VERSION = "b2"
 
 # Brazo forzado HITO20 §1 (Enmienda 2, pre-registrado 2026-10-23): texto
 # exacto del reprompt inyectado en cada turno tras `final`.
@@ -160,7 +161,8 @@ class Cell:
                  tracing: bool = False, canal: str = "oficial",
                  cell_token_cap: int = 0, force_full_turns: bool = False,
                  snap_turns: tuple[int, ...] | None = None,
-                 ceiling_watch: tuple[int, int, int] | None = None) -> None:
+                 ceiling_watch: tuple[int, int, int] | None = None,
+                 on_turn: Callable[[dict], None] | None = None) -> None:
         self.variant = variant
         self.task_id = task_id
         self.task_dir = task_dir
@@ -175,6 +177,7 @@ class Cell:
         # (tokens_otros, proy_celda, techo_global): corte mid-cell al techo
         # con la regla del 80 % (§1 Enmienda 2, E2-Crítico 2).
         self.ceiling_watch = ceiling_watch
+        self.on_turn = on_turn  # heartbeat opcional (no altera el canal)
         self.result = CellResult(variant=variant.name, task=task_id)
 
         if workspace.exists():
@@ -211,6 +214,19 @@ class Cell:
         from bibliotecario.core import llm as BLLM
         tot = BLLM.usage_totals()
         return int(tot.get("prompt_tokens") or 0), int(tot.get("completion_tokens") or 0)
+
+    def _latido(self, turn: int) -> None:
+        """Heartbeat por turno (observabilidad; nunca tumba la celda)."""
+        if self.on_turn is None:
+            return
+        p, c = self._usage()
+        try:
+            self.on_turn({"turn": turn, "tokens": p + c,
+                          "writes": self.result.writes,
+                          "tool_calls": self.result.tool_calls,
+                          "stopped_by": self.result.stopped_by})
+        except Exception as e:
+            self.result.errors.append(f"heartbeat: {e}")
 
     # ---------- observación (Iobs/C) ----------
 
@@ -282,7 +298,12 @@ class Cell:
                 p = _safe_path(self.workspace, str(args.get("path", "")))
                 if not p.is_file():
                     return f"ERROR: no existe {args.get('path')}", False
-                content = p.read_text(encoding="utf-8", errors="replace")[:_MAX_READ]
+                content = p.read_text(encoding="utf-8", errors="replace")
+                if self.canal == "b" and len(content) > _MAX_READ:
+                    content = (content[:_MAX_READ]
+                               + f"\n[TRUNCADO a {_MAX_READ} chars de {len(content)}]")
+                else:
+                    content = content[:_MAX_READ]
                 return f"CONTENIDO de {args.get('path')}:\n{content}", True
             if name == "write_file":
                 p = _safe_path(self.workspace, str(args.get("path", "")))
@@ -468,6 +489,7 @@ class Cell:
                     self._clasificar_turno_forzado(raw, writes_antes)
                 if final_found:
                     if not self.force_full_turns:
+                        self._latido(turn)
                         return
                     # Brazo forzado §1: se ignora `final` y se inyecta el
                     # reprompt pre-registrado (desde el primer `final`).
@@ -477,16 +499,20 @@ class Cell:
                             n=turn + 1, total=self.variant.max_turns))
                 if self._cap_excedido():
                     self.result.stopped_by = "presupuesto"
+                    self._latido(turn)
                     return
                 if self._techo_alcanzado():
                     self.result.stopped_by = "truncated_by_ceiling"
+                    self._latido(turn)
                     return
                 if (self.regulation is not None
                         and self.regulation.state("cell").budget_exhausted):
                     self.result.stopped_by = "presupuesto"
+                    self._latido(turn)
                     return
                 if turn in self.snap_turns:
                     self._snapshot(turn)
+                self._latido(turn)
                 continue
 
             action = parse_action(raw)
@@ -502,6 +528,7 @@ class Cell:
             if "final" in action:
                 self.result.final = str(action.get("final", ""))[:1000]
                 self.result.stopped_by = "final"
+                self._latido(turn)
                 return
 
             with self._span("tool", {"tool_name": action.get("tool")}) as spt:
@@ -518,6 +545,7 @@ class Cell:
 
             if self.regulation is not None and self.regulation.state("cell").budget_exhausted:
                 self.result.stopped_by = "presupuesto"
+                self._latido(turn)
                 return
 
         self.result.stopped_by = ("max_turns_forzado" if self.force_full_turns

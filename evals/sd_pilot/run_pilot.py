@@ -85,6 +85,7 @@ STATE_DIAGB = SD_ROOT / "_run_state_diagb.json"
 TRACES_DIAGB = SD_ROOT / "traces_diagb.sqlite"
 RESULT_DIAGB = REPO / "evals" / "results" / "result_sens_sd_diagb.json"
 INFORMES_DIAGB = REPO / "evals" / "results" / "informes_diagb"
+HEARTBEAT_DIAGB = SD_ROOT / "_heartbeat_diagb.json"
 # Margen de recalibración: el dueño fija rango 25-30 %; se aplica 30 %
 # (conservador).
 MARGEN_RECALIBRACION = 0.30
@@ -113,6 +114,7 @@ STATE_CORRB = SD_ROOT / "_run_state_corrb.json"
 TRACES_CORRB = SD_ROOT / "traces_corrb.sqlite"
 RESULT_CORRB = REPO / "evals" / "results" / "result_sens_sd_corridab.json"
 INFORMES_CORRB = REPO / "evals" / "results" / "informes_corridab"
+HEARTBEAT_CORRB = SD_ROOT / "_heartbeat_corrb.json"
 
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
@@ -179,7 +181,8 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
               variant=None, canal: str = "oficial",
               cell_token_cap: int = 0, force_full_turns: bool = False,
               snap_turns: tuple[int, ...] | None = None,
-              ceiling_watch: tuple[int, int, int] | None = None) -> dict:
+              ceiling_watch: tuple[int, int, int] | None = None,
+              heartbeat_path: Path | None = None) -> dict:
     """Ejecuta UNA celda completa y devuelve su registro (score incluido).
 
     `ws_root` y `variant` los usa el diagnóstico (§0.1/§0.3/§1): workspaces
@@ -199,6 +202,16 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
     ws = (ws_root or Path("/tmp/opencode/sd_pilot_runs")) / f"{vname}_{tid}"
     BLLM.reset_usage()
     t0 = time.time()
+
+    def _on_turn(info: dict) -> None:
+        if heartbeat_path is None:
+            return
+        try:
+            _write_json(heartbeat_path, {
+                "celda": f"{vname}_{tid}", "forzado": force_full_turns,
+                "actualizado": time.strftime("%Y-%m-%dT%H:%M:%S"), **info})
+        except OSError as e:
+            log(f"heartbeat: no se pudo escribir {heartbeat_path.name}: {e}")
 
     import traceforge
     token = traceforge.set_metadata_context(
@@ -793,6 +806,8 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
     else:
         head_inicio = _git_head()
         _write_json(STATE_DIAGB, {"cells": {}, "git_head_start": head_inicio})
+        if HEARTBEAT_DIAGB.exists():
+            HEARTBEAT_DIAGB.unlink()
         if TRACES_DIAGB.exists():
             TRACES_DIAGB.unlink()
         traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAGB))
@@ -816,7 +831,8 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
         var = replace(VARIANTS[vname], max_turns=DIAGB_MAX_TURNS)
         cells[key] = _run_cell(vname, tid, TRACES_DIAGB, ws_root=WS_DIAGB,
                                variant=var, canal="b",
-                               cell_token_cap=DIAGB_CELL_CAP)
+                               cell_token_cap=DIAGB_CELL_CAP,
+                               heartbeat_path=HEARTBEAT_DIAGB)
         _write_json(STATE_DIAGB, {"cells": cells, "git_head_start": head_inicio})
         acum = _coste(cells)["total_tokens"]
         if acum > DIAGB_TECHO_TOKENS:
@@ -919,6 +935,8 @@ def modo_corrida_b(model: str, resume: bool) -> int:
     else:
         head_inicio = _git_head()
         _write_json(STATE_CORRB, {"cells": {}, "git_head_start": head_inicio})
+        if HEARTBEAT_CORRB.exists():
+            HEARTBEAT_CORRB.unlink()
         if TRACES_CORRB.exists():
             TRACES_CORRB.unlink()
         traceforge.configure(collector="sqlite", db_path=str(TRACES_CORRB))
@@ -966,7 +984,8 @@ def modo_corrida_b(model: str, resume: bool) -> int:
                                variant=var, canal="b",
                                cell_token_cap=CORR_B_CELL_CAP,
                                snap_turns=CORR_B_SNAP_TURNS,
-                               ceiling_watch=(acum, proy, CORR_B_TECHO))
+                               ceiling_watch=(acum, proy, CORR_B_TECHO),
+                               heartbeat_path=HEARTBEAT_CORRB)
         if cells[key]["stopped_by"] == "truncated_by_ceiling":
             cells[key]["estado"] = "truncated_by_ceiling"
         _write_json(STATE_CORRB, {"cells": cells, "git_head_start": head_inicio})
@@ -1005,10 +1024,21 @@ def modo_corrida_b(model: str, resume: bool) -> int:
                                force_full_turns=True,
                                snap_turns=CORR_B_SNAP_FORZADO,
                                ceiling_watch=(acum, PROY_FORZADO_BASE,
-                                              CORR_B_TECHO))
+                                              CORR_B_TECHO),
+                               heartbeat_path=HEARTBEAT_CORRB)
         if cells[key]["stopped_by"] == "truncated_by_ceiling":
             cells[key]["estado"] = "truncated_by_ceiling"
         _write_json(STATE_CORRB, {"cells": cells, "git_head_start": head_inicio})
+        acum = _coste(cells)["total_tokens"]
+        if checkpoint is None and acum >= CHECKPOINT_TOKENS:
+            pend_f = sum(1 for vv, tt in DIAGB_CELLS
+                         if f"FORZ_{vv}_{tt}" not in cells)
+            hechas = _completas()
+            checkpoint = decidir_checkpoint(acum, 0, max(pend_f, 0))
+            log(f"CHECKPOINT (brazo forzado) {acum} >= {CHECKPOINT_TOKENS}: "
+                f"completadas {hechas}/{N_CELLS_PLAN} "
+                f"({hechas / N_CELLS_PLAN:.0%}) -> proy "
+                f"{checkpoint['proyeccion']} -> branch {checkpoint['branch']}")
 
     # ---------------- evaluación pre-registrada ---------------------------
     pares_forzado = []
