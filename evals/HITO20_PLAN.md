@@ -808,10 +808,32 @@ BUILD (`result_b_build_qa.json`) se conserva como evidencia; no se borra.
   aborto, no resultado oficial), `evals/sd_pilot/_run_state_b.json`,
   `evals/sd_pilot/traces_b.sqlite`, `evals/logs/sens_sd_b_run.log`. El
   `result_sens_sd_b.json` **no existe** y no debe crearse a mano.
-- **Contabilidad**: H20 acumula 2.686.674 + 626.036 = **3.312.710 tokens**
-  (47,3 % de 7M); quedan 3.687.290. No se autoriza otra corrida B con este
-  diseño.
+- **Contabilidad**: H20 acumula 77.441 (§0.3) + 2.686.674 (§1) + 626.036
+  (§6 B) = **3.390.151 tokens** (48,4 % de 7M); quedan **3.609.849**. No se
+  autoriza otra corrida B con este diseño.
 - **Siguiente decisión (dueño)**: (a) cerrar H20 con B no viable; (b)
   rediseñar B más barato (p. ej. `max_turns=12`, tareas de un solo paquete
   endurecidas, o menos variantes con enmienda de umbrales) y declarar nuevo
   techo; (c) otra alternativa. **Nada de esto está autorizado todavía.**
+
+## §7 — Cierre de HITO20 (2026-10-24): NO CUMPLE
+
+**Veredicto**: HITO20 **CERRADO NO CUMPLE**. No se alcanza el objetivo de
+reducir la saturación/U7 con el presupuesto y el diseño disponibles.
+
+- **§1 (canal b2)**: matriz 17×12 completa, 2.686.674 tok, media **82,47**
+  (H19 70,43; Δ +12,04), **SATURA**; 4 celdas `max_turns` con 0 escrituras.
+  El canal b2 mejora la media frente a @16 pero **no** evita la saturación.
+- **§6 (B)**: BUILD 12/12 QA y modo `--b` implementados; corrida **abortada**
+  por coste tras 3/60 celdas y 626.036 tok (extrapolación ~12M > 4,2M). A1
+  sigue en 100 en la tarea combinada; B1 falla y B2/B3/B4 no se evalúan.
+- **C1**: los reintentos/robustez de b2 quedan medidos en §1; no bastan para
+  U7. No hay C2 (no autorizado).
+- **Coste H20**: 77.441 (§0.3) + 2.686.674 (§1) + 626.036 (§6 B) =
+  **3.390.151** de 7.000.000 (48,4 %); quedan **3.609.849** no gastados.
+  No se autoriza otra corrida H20.
+- **Evidencia**: `result_sens_sd_corridab.json` (§1),
+  `result_sens_sd_b_abort.json` + `_run_state_b.json` + `traces_b.sqlite`
+  + `logs/sens_sd_b_run.log` (§6). No existe `result_sens_sd_b.json`.
+- **Siguiente**: decisión del dueño sobre un hito nuevo (H22) o replanteo;
+  H20 no se reabre con el mismo diseño.

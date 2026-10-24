@@ -68,13 +68,15 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Plan Hito 17 | `evals/HITO17_PLAN.md` — **CERRADO 2026-10-22 NO CUMPLE** (§5: U2 ✅ por construcción con prefiltro; U4 ❌ medido Δ=0.0; U7 sin medir por 503; F1-F3 con coste; ratificación y umbrales intactos) |
 | Plan Hito 18 | `evals/HITO18_PLAN.md` — **CERRADO 2026-10-22 CUMPLE** (§5: 8/8 gates · Score_final **0.9187** · U4′ determinista 0.9519/0.0489 · U7b 0.8725/0.0 · U2 por construcción · 5/8 llamadas · F1=oficial sin intentos fallidos). **El instrumento B-2 es válido por primera vez** — scorer híbrido `M_mov` + juez V/A; umbrales intactos. Artefactos `evals/preflight/{movimiento_b2.py, run_fase2_b2_h18.py}` + enmienda 6 de §11 |
 | Plan Hito 19 | `evals/HITO19_PLAN.md` — **CERRADO 2026-10-23 NO CUMPLE** (§5: piloto `Sens(x)` en `software_development` con arnés mínimo A1-A5 · U1-U6 ✅, **U7 ❌** `media_global 70.43 > 60` · `Sens(x)` >0 en 10/12 (dato) · 5,12M tokens · 4 celdas A5 con error de endpoint sin re-ejecutar · enmiendas 7-8 + modelo ultra ANTES de medir). Artefactos `evals/sd_pilot/` + enmiendas 7-8 de §11 |
-| Plan Hito 20 | `evals/HITO20_PLAN.md` — **§1 CERRADO 2026-10-24** (matriz 17×12 canal b + brazo forzado: 2.686.674 tok, media 82,47 vs 70,43, Δ+12,04, **E1_ACLARA**, **SATURA**); **§6 B ABORTADO 2026-10-24 — NO VIABLE POR COSTE** (12 tareas `*-b` multi-paquete, BUILD+QA 12/12, modo `--b`; 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; sin `result_sens_sd_b.json`; errata §5 declarada) |
+| Plan Hito 20 | `evals/HITO20_PLAN.md` — **CERRADO 2026-10-24 NO CUMPLE** (§7): §1 matriz 17×12 canal b + brazo forzado (2.686.674 tok, media 82,47 vs 70,43, Δ+12,04, **E1_ACLARA**, **SATURA**); §6 B **ABORTADO — NO VIABLE POR COSTE** (12 tareas `*-b` multi-paquete, BUILD+QA 12/12, modo `--b`; 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; sin `result_sens_sd_b.json`); C1 medido en §1, insuficiente; 3.390.151 de 7M gastados (incl. §0.3 77.441) |
 | Plan Hito 21 | `evals/HITO21_PLAN.md` — **CERRADO 2026-10-24 NO CUMPLE** (§5: b3 8 celdas, 596.343 tok, **G1/G2/G4/G5/G6 ✅, G3 ❌**; residuales 72,28 vs 38,42 pero controles A2_plugin −35,7 y A4_interval −43,3; **b3 no adoptado**, default vuelve a b2; heartbeat roto corregido post-run) |
 | Erratas y fracasos declarados | `evals/BLUEPRINT_METRIC_DESIGN.md` — §8.8-§8.13 |
 | Hitos previos | `evals/HITO0.md`, `HITO1.md`, `PLAN_READING.md`, `REPORT_BLIND.md`, `REPORT_COEVOLVE.md` |
 
 ### Estado del piloto de agentes — *(2026-10-24)*
 
+- **HITO20 CERRADO NO CUMPLE (2026-10-24)**: §1 SATURA y §6 B no viable
+  por coste; no se alcanza U7. Detalle en §7 del plan.
 - **HITO20 §1 cerrado** con evidencia `evals/results/result_sens_sd_corridab.json`
   (trazas de 6,7 MB en `evals/sd_pilot/traces_corrb.sqlite`): 63/63 celdas,
   **2.686.674 tokens**, 0 truncadas, media 82,47 (H19 70,43; Δ medio +12,04) →
