@@ -14,6 +14,7 @@ LLM_PROVIDERS=nvidia (§1.5).
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 from collections import deque
@@ -43,11 +44,13 @@ CANAL_CAP_PROMPT_TOKENS = 18_000
 CANAL_SNAP_TURNS = (8, 12)
 
 # Version del canal b. b1 = evidencia HITO20 §0.3/§1; b2 = marcador de
-# truncado en read_file; b3 = parser tolerante + avisos anti-bucle HITO21.
+# truncado en read_file (default adoptado); b3 = parser tolerante + avisos
+# anti-bucle de HITO21 (experimental, NO adoptado: ver HITO21_PLAN §5).
+# Se puede forzar b3 con BIBLIOTECARIO_CANAL_B_VERSION=b3 para reproducir.
 # Subir version + enmienda ratificada si cambia cualquiera de los elementos
 # congelados: TOOLS_JSON, REPROMPT_FORZADO, CANAL_CAP_PROMPT_TOKENS,
 # _MAX_READ o los avisos de b3 (tests dorados).
-CANAL_B_VERSION = "b3"
+CANAL_B_VERSION = os.environ.get("BIBLIOTECARIO_CANAL_B_VERSION", "b2")
 
 # Brazo forzado HITO20 §1 (Enmienda 2, pre-registrado 2026-10-23): texto
 # exacto del reprompt inyectado en cada turno tras `final`.

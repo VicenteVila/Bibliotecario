@@ -114,5 +114,63 @@ nueva); si falla G1/G2 → `NO CUMPLE` con causa; si falla G3 → revisar parser
 
 ## §5 — Cierre
 
-Pendiente. Se rellenará con resultados, gates y veredicto; los umbrales de §3
-no se tocan tras medir.
+**Corrida 2026-10-24 19:34–20:08 (8/8 celdas, 66 llamadas LLM, 33 min).**
+Coste **596.343 tokens** (prompt 517.262 + completion 79.081) = **33,1 %**
+del techo de 1.800.000. Evidencia: `evals/results/result_hito21.json`,
+`evals/results/informes_hito21/*.md`, `evals/sd_pilot/traces_h21.sqlite`,
+`evals/sd_pilot/_run_state_h21.json`, `evals/logs/hito21_run.log`.
+
+| celda | tipo | b2 | b3 | Δ | turnos | writes | parada | inválidas | tokens |
+|---|---|---|---|---|---|---|---|---|---|
+| `A2_checkout-rounding` | residual | 38,1818 | **0,0** | −38,1818 | 8 | 5 | `final` | 0 | 103.720 |
+| `A3_checkout-rounding` | residual | 38,1818 | **100,0** | +61,8182 | 8 | 5 | `final` | 0 | 105.566 |
+| `A4_dsl-parser` | residual | 13,0435 | **89,1304** | +76,0869 | 7 | 8 | `final` | 0 | 87.608 |
+| `A5_plugin-registry` | residual | 64,2857 | **100,0** | +35,7143 | 3 | 1 | `final` | 0 | 9.325 |
+| `A2_plugin-registry` | control | 100,0 | **64,2857** | **−35,7143** | 17 | 0 | `max_turns` | 12 | 152.310 |
+| `A3_plugin-registry` | control | 100,0 | 100,0 | 0,0 | 15 | 1 | `final` | 8 | 102.481 |
+| `A4_interval-scheduler` | control | 100,0 | **56,6667** | **−43,3333** | 4 | 0 | `final` | 0 | 21.724 |
+| `A5_batch-coalescer` | control | 100,0 | 97,0588 | −2,9412 | 4 | 1 | `final` | 0 | 13.609 |
+
+Gates (§3.2, sin tocar):
+
+- **G1 PASA**: 4/4 residuales con `writes>0` y parada `final`.
+- **G2 PASA**: media residual **72,2826** vs 38,4232 → **Δ +33,8594**.
+- **G3 FALLA**: caídas A2_plugin **−35,7143**, A4_interval **−43,3333**,
+  A5_batch −2,9412; solo A3_plugin se mantiene. Umbral −5 superado por dos
+  controles.
+- **G4 PASA**: 0 `truncated_by_ceiling`; **G5 PASA**: 596.343 ≤ 1.800.000;
+  **G6 PASA**: las 8 celdas registran `canal_b_version="b3"`.
+
+**Veredicto: NO CUMPLE** (falla G3, causa única y suficiente). b3 **no se
+adopta**: `CANAL_B_VERSION` vuelve a **b2** por defecto; `--hito21` fuerza b3
+solo para reproducir esta evidencia (`BIBLIOTECARIO_CANAL_B_VERSION=b3`).
+La Fase B no reemplaza a b2 ni habilita medición nueva con b3.
+
+### Lectura
+
+- El parser/aviso **desbloquea 3 de 4 residuales** (A3 +61,8; A4 +76,1;
+  A5 +35,7), con 4/4 escribiendo y parando en `final`, y un coste muy por
+  debajo del techo. A4 pasa de 15 acciones inválidas a 0 y A5 de 13 a 0.
+- Pero **A2_checkout cae a 0,0** pese a escribir 5 veces: produce código que
+  no pasa los tests ocultos; el objetivo “escribir” no equivale a “resolver”.
+- La regresión de controles es heterogénea: A4_interval cae 43,3 puntos en
+  **4 turnos y 0 writes** (el aviso anti-bucle empieza en el turno 6) y con
+  **0 acciones inválidas**, así que **no puede atribuirse al nudge**; apunta a
+  varianza del modelo o a otro efecto de b3. A2_plugin sí llega a 17 turnos
+  con 0 writes y 12 inválidas (nudge activo): posible interacción, no aislada.
+- **n=1 por celda y b3 empaqueta parser+nudge**: no hay atribución causal.
+  Lo que sí queda medido es el veredicto global: el paquete b3 no es seguro
+  para producción bajo el gate pre-registrado.
+- Incidencia de proceso: `_run_cell` no pasaba `on_turn` a `Cell`, por lo que
+  **no se escribió `_heartbeat_h21.json`** (el resto de evidencia sí). Se
+  corrigió tras la corrida y se añadió test de regresión; también se corrigió
+  `snap_turns or …`, que ignoraba `snap_turns=()`. Ninguno de los dos afecta
+  a scores ni a tokens (solo observabilidad/snapshots locales).
+
+### Siguiente (no ratificado)
+
+HITO22 debería **aislar parser y nudge** (brazo parser-solo vs nudge-solo),
+repetir controles **n≥2** para separar varianza de efecto, y mantener A2 como
+caso de calidad (escribir no basta). Requiere plan y techo nuevos; no se lanza
+con el techo de este hito.
+

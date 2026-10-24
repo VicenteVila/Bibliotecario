@@ -69,6 +69,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Plan Hito 18 | `evals/HITO18_PLAN.md` — **CERRADO 2026-10-22 CUMPLE** (§5: 8/8 gates · Score_final **0.9187** · U4′ determinista 0.9519/0.0489 · U7b 0.8725/0.0 · U2 por construcción · 5/8 llamadas · F1=oficial sin intentos fallidos). **El instrumento B-2 es válido por primera vez** — scorer híbrido `M_mov` + juez V/A; umbrales intactos. Artefactos `evals/preflight/{movimiento_b2.py, run_fase2_b2_h18.py}` + enmienda 6 de §11 |
 | Plan Hito 19 | `evals/HITO19_PLAN.md` — **CERRADO 2026-10-23 NO CUMPLE** (§5: piloto `Sens(x)` en `software_development` con arnés mínimo A1-A5 · U1-U6 ✅, **U7 ❌** `media_global 70.43 > 60` · `Sens(x)` >0 en 10/12 (dato) · 5,12M tokens · 4 celdas A5 con error de endpoint sin re-ejecutar · enmiendas 7-8 + modelo ultra ANTES de medir). Artefactos `evals/sd_pilot/` + enmiendas 7-8 de §11 |
 | Plan Hito 20 | `evals/HITO20_PLAN.md` — **§1 CERRADO 2026-10-24** (matriz 17×12 canal b + brazo forzado: 2.686.674 tok, media 82,47 vs 70,43, Δ+12,04, **E1_ACLARA**, **SATURA**; **B+C1 pendientes**; errata §5 declarada) |
+| Plan Hito 21 | `evals/HITO21_PLAN.md` — **CERRADO 2026-10-24 NO CUMPLE** (§5: b3 8 celdas, 596.343 tok, **G1/G2/G4/G5/G6 ✅, G3 ❌**; residuales 72,28 vs 38,42 pero controles A2_plugin −35,7 y A4_interval −43,3; **b3 no adoptado**, default vuelve a b2; heartbeat roto corregido post-run) |
 | Erratas y fracasos declarados | `evals/BLUEPRINT_METRIC_DESIGN.md` — §8.8-§8.13 |
 | Hitos previos | `evals/HITO0.md`, `HITO1.md`, `PLAN_READING.md`, `REPORT_BLIND.md`, `REPORT_COEVOLVE.md` |
 
@@ -81,20 +82,24 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
   42 `final`, 12 `one_shot`, 4 `max_turns`, 3 `max_turns_forzado`,
   2 `error_llm`. El checkpoint 2.654.737 no se evaluó en el brazo forzado:
   **corregido en Paso 2**.
-- **Límite medido del canal b — 4 celdas `max_turns` sin escrituras**:
-  `A2_checkout-rounding` y `A3_checkout-rounding` (0 writes; 16/21 lecturas +
-  14/13 `run_tests`: bucle conductual sin intentar escribir) · `A4_dsl-parser`
-  (15 acciones inválidas; emite `"content": """…` con comillas triples →
-  JSON inválido, bucle determinista) · `A5_plugin-registry` (13 inválidas; 7
-  lecturas; contenido grande mal formado). **No es un fallo único**: dos
-  modos distintos (formato JSON vs conducta). Diagnóstico offline, 0 tokens;
-  candidato a **HITO21** con techo ratificado antes de medir.
+- **HITO21 cerrado NO CUMPLE (2026-10-24)**: corrida b3 de 8 celdas
+  (4 residuales + 4 controles), **596.343 tokens** (33,1 % del techo 1,8M).
+  G1 ✅ 4/4 escriben y paran en `final`; G2 ✅ media residual 72,28 vs 38,42
+  (Δ+33,86; A3 100, A4 89,13, A5 100; **A2_checkout 0,0** pese a 5 writes);
+  G4/G5/G6 ✅; **G3 ❌**: A2_plugin 100→64,29 (17 turnos, 0 writes, 12
+  inválidas) y A4_interval 100→56,67 (4 turnos, 0 writes, 0 inválidas;
+  el nudge empieza en turno 6 → no atribuible a él), A5_batch 97,06.
+  **b3 no se adopta** (default `CANAL_B_VERSION=b2`; `--hito21` fuerza b3
+  solo para reproducir). n=1 y b3 empaqueta parser+nudge: sin atribución
+  causal. Incidencia: `_run_cell` no pasaba `on_turn` → sin heartbeat en la
+  corrida; corregido + test. Evidencia `evals/results/result_hito21.json`,
+  `results/informes_hito21/`, `traces_h21.sqlite`, `logs/hito21_run.log`.
 - **Endurecimiento Paso 1-2**: escrituras atómicas
   (`evals/sd_pilot/io_atomico.py`), `git_head_start` real por corrida,
   `CANAL_B_VERSION` **b2** (marcador de truncado en `read_file` + hash dorado),
   heartbeat por turno y checkpoint también en el brazo forzado,
   `scripts/scan_secrets.py` en la puerta/CI, cobertura **78,94 %**
-  (`fail_under=78`) y **521 tests**. El canal b1 de §1 queda como evidencia
+  (`fail_under=78`) y **528 tests**. El canal b1 de §1 queda como evidencia
   histórica: comparaciones solo intra-versión.
 
 

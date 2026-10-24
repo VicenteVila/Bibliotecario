@@ -13,7 +13,7 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 | **Evidencia** `result_*.json` | 89 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
 | **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
-| **Planes y reportes** `HITO*.md` + specs | 27 | raíz | 21 hitos (`HITO0-2.md` reportes; `HITO3-21_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 con **§1 cerrado** y B+C1 pendientes; HITO21 **BORRADOR** sin ratificar) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
+| **Planes y reportes** `HITO*.md` + specs | 27 | raíz | 21 hitos (`HITO0-2.md` reportes; `HITO3-21_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 con **§1 cerrado** y B+C1 pendientes; HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
 | **Logs** `*.log` | 37 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
 | **Datos** | 9 | `golden_*.jsonl` (datasets gold), `calib_r4_gold.json`, `game_tasks_expanded.yaml` (60 tareas, citado), `CORPUS_LOCK.json` | referenciados por tests/evals → no mover sin barrido |
 
@@ -29,7 +29,7 @@ Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
 | `tasks.py` | `TASK_IDS` (12), ejes de dureza, `lint_tasks()`, `qa_task()` |
 | `verifier.py` | pytest público (herramienta del agente) y oculto (`m_h(x)`) |
 | `sens.py` | Pearson, `Q_h^(−x)`, gates U2-U7, umbrales congelados |
-| `run_pilot.py` | modos `--g0` / `--oficial` / `--diagnostico` (HITO20 §0.1) / `--diagnostico-b` (§0.3, canal b) / `--corrida-b` (§1, matriz 17×12 canal b + brazo forzado) / `--hito21` (4 residuales + 4 controles, canal b3, techo 1,8M) / `--presupuesto` / `--debug-celda` (BUILD) |
+| `run_pilot.py` | modos `--g0` / `--oficial` / `--diagnostico` (HITO20 §0.1) / `--diagnostico-b` (§0.3, canal b) / `--corrida-b` (§1, matriz 17×12 canal b + brazo forzado) / `--hito21` (4 residuales + 4 controles, canal b3 experimental para reproducir HITO21, techo 1,8M) / `--presupuesto` / `--debug-celda` (BUILD) |
 | `parse_tolerante.py` | HITO21 Fase A: recuperación acotada de `write_file` con triples comillas; idempotente si el JSON ya es válido |
 | `fase_a_offline.py` | HITO21 Fase A: replay 0-tokens sobre `traces_corrb.sqlite` → `results/result_hito21_fase_a.json` |
 | `observador.py` | informes por celda/turno desde `traces_*.sqlite` (canal de observación §0.3, E1.4) |
@@ -38,14 +38,16 @@ Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
 | `sd_tasks/<id>/` | las 12 fixtures: `TASK.md` + `workspace/` + `tests_hidden/` + `reference/` |
 | `traces.sqlite`, `_run_state_oficial.json` | trazas TraceForge y estado por celda de la corrida oficial (reanudable) |
 | `traces_g0.sqlite`, `traces_diag.sqlite`, `_run_state_diag.json` | trazas del G0, del diagnóstico HITO20 y estado por celda del diagnóstico |
+| `traces_h21.sqlite`, `_run_state_h21.json` | trazas y estado de la corrida b3 de HITO21 (8 celdas) |
 
 Evidencia: `results/result_sens_sd_g0.json` (dictámen G0) y
 `results/result_sens_sd_pilot.json` (corrida oficial) + `logs/sens_sd_g0.log`
 y `logs/sens_sd_pilot_run.log`. Diagnóstico HITO20 (§0.1 del plan):
 `results/result_sens_sd_diag_trazas.json` (Parte A, 0 tokens),
 `results/result_sens_sd_diag.json` (Parte B) + `logs/sens_sd_diag_run.log`.
-HITO21: `results/result_hito21_fase_a.json` (Fase A offline) y
-`results/result_hito21.json` (corrida b3). Tests: `tests/test_sens_sd_pilot.py`
+HITO21: `results/result_hito21_fase_a.json` (Fase A offline),
+`results/result_hito21.json` + `results/informes_hito21/` (corrida b3,
+cerrada NO CUMPLE por G3; b3 no adoptado). Tests: `tests/test_sens_sd_pilot.py`
 (puros, sin LLM).
 
 ## `preflight/` (159 ficheros) — la evaluación **viva**
@@ -74,7 +76,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO21_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **§1 cerrado 2026-10-24** — canal b + SATURA, B+C1 pendientes; H21 **BORRADOR** — límite del canal b, pendiente de ratificar techo) |
+| `HITO3_PLAN.md`…`HITO21_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **§1 cerrado 2026-10-24** — canal b + SATURA, B+C1 pendientes; H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |

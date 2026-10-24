@@ -217,7 +217,7 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
     """
     from bibliotecario.core import llm as BLLM
     from evals.sd_pilot import verifier
-    from evals.sd_pilot.harness import CANAL_B_VERSION, CANAL_SNAP_TURNS, Cell
+    from evals.sd_pilot.harness import CANAL_B_VERSION, Cell
     from evals.sd_pilot.tasks import task_dir
     from evals.sd_pilot.variants import VARIANTS
 
@@ -246,8 +246,8 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
                     skills_dir=SD_ROOT / "skills_pack", tracing=True,
                     canal=canal, cell_token_cap=cell_token_cap,
                     force_full_turns=force_full_turns,
-                    snap_turns=snap_turns or CANAL_SNAP_TURNS,
-                    ceiling_watch=ceiling_watch)
+                    snap_turns=snap_turns,
+                    ceiling_watch=ceiling_watch, on_turn=_on_turn)
         res = cell.run()
     finally:
         traceforge.reset_metadata_context(token)
@@ -950,7 +950,8 @@ def evaluar_hito21(cells: dict[str, dict], b2: dict) -> dict:
     trunc = sum(1 for c in cells.values()
                 if c.get("estado") or c.get("stopped_by") == "truncated_by_ceiling")
     coste = _coste(cells)["total_tokens"]
-    from evals.sd_pilot.harness import CANAL_B_VERSION
+    versiones = {c.get("canal_b_version") for c in cells.values()}
+    evidencia_b3 = bool(cells) and versiones == {"b3"}
     gates = {
         "G1_residuales_escriben": {"n": g1_n, "pasa": g1_n >= 2},
         "G2_mejora_media": {"media": media, "media_b2": media_b2,
@@ -960,8 +961,9 @@ def evaluar_hito21(cells: dict[str, dict], b2: dict) -> dict:
                                                    for d in caidas.values())},
         "G4_sin_truncamiento": {"n": trunc, "pasa": trunc == 0},
         "G5_techo": {"coste": coste, "techo": H21_TECHO, "pasa": coste <= H21_TECHO},
-        "G6_evidencia": {"canal_b_version": CANAL_B_VERSION,
-                         "pasa": CANAL_B_VERSION == "b3"},
+        "G6_evidencia": {"canal_b_version": "b3" if evidencia_b3
+                         else sorted(str(v) for v in versiones),
+                         "pasa": evidencia_b3},
     }
     return {"gates": gates, "pasa": all(g["pasa"] for g in gates.values()),
             "residuales": [f"{v}_{t}" for v, t in H21_RESIDUALES],
@@ -1001,6 +1003,10 @@ def modo_hito21(model: str, resume: bool) -> int:
     if not fase_a.get("pasa"):
         log("ERROR: Fase A offline no pasa; no se corre (§3.1)")
         return 3
+
+    os.environ["BIBLIOTECARIO_CANAL_B_VERSION"] = "b3"
+    import evals.sd_pilot.harness as _harness
+    _harness.CANAL_B_VERSION = "b3"
 
     import traceforge
     cells: dict[str, dict] = {}

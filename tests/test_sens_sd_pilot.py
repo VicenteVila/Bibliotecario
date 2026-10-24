@@ -808,7 +808,7 @@ def test_canal_b_version_y_prompt_dorado():
 
     from evals.sd_pilot import harness
 
-    assert harness.CANAL_B_VERSION == "b3"
+    assert harness.CANAL_B_VERSION == "b2"
     assert hashlib.sha256(harness.TOOLS_JSON.encode()).hexdigest() == (
         "21ce7483eb262f51a0f0d55d20d3a8c96b138f7f9cbe3bb8c96cbd34e8040a5c")
     assert hashlib.sha256(harness.REPROMPT_FORZADO.encode()).hexdigest() == (
@@ -859,7 +859,9 @@ def test_parser_tolerante_no_inventa_si_falta_cierre():
     ) == []
 
 
-def test_canal_b3_ejecuta_write_con_triples(tmp_path):
+def test_canal_b3_ejecuta_write_con_triples(tmp_path, monkeypatch):
+    from evals.sd_pilot import harness
+    monkeypatch.setattr(harness, "CANAL_B_VERSION", "b3")
     d = mini_task(tmp_path)
     raw = ('{"tool": "write_file", "args": {"path": "calc.py", '
            '"content": """def add(a, b):\n    return a + b\n"""}}')
@@ -870,7 +872,9 @@ def test_canal_b3_ejecuta_write_con_triples(tmp_path):
     assert "a + b" in (cell.workspace / "calc.py").read_text(encoding="utf-8")
 
 
-def test_canal_b3_avisa_si_no_hay_escrituras(tmp_path):
+def test_canal_b3_avisa_si_no_hay_escrituras(tmp_path, monkeypatch):
+    from evals.sd_pilot import harness
+    monkeypatch.setattr(harness, "CANAL_B_VERSION", "b3")
     d = mini_task(tmp_path)
     llm = FakeLLM('{"tool": "read_file", "args": {"path": "calc.py"}}')
     var = replace(VARIANTS["A2"], max_turns=8)
@@ -887,10 +891,12 @@ def _celdas_h21(res_scores, ctl_scores, writes=1, stopped="final"):
     for (v, t), sc in zip(H21_RESIDUALES, res_scores):
         cells[f"{v}_{t}"] = {"score": sc, "writes": writes,
                              "stopped_by": stopped,
+                             "canal_b_version": "b3",
                              "usage": {"total_tokens": 1000}}
     for (v, t), sc in zip(H21_CONTROLES, ctl_scores):
         cells[f"{v}_{t}"] = {"score": sc, "writes": 1,
                              "stopped_by": "final",
+                             "canal_b_version": "b3",
                              "usage": {"total_tokens": 1000}}
     return cells
 
@@ -919,3 +925,42 @@ def test_evaluar_hito21_falla_sin_escrituras_o_con_regresion():
     assert not ev["gates"]["G1_residuales_escriben"]["pasa"]
     assert not ev["gates"]["G2_mejora_media"]["pasa"]
     assert not ev["gates"]["G3_sin_regresion_controles"]["pasa"]
+
+
+def test_run_cell_wirea_on_turn_y_escribe_heartbeat(tmp_path, monkeypatch):
+    import json
+    import types
+
+    import evals.sd_pilot.run_pilot as RP
+    from evals.sd_pilot import harness
+
+    visto = {}
+
+    class FakeCell:
+        def __init__(self, *args, **kwargs):
+            visto.update(kwargs)
+            self.on_turn = kwargs.get("on_turn")
+            self.result = types.SimpleNamespace(
+                turns=1, llm_calls=1, tool_calls=0, invalid_actions=0,
+                pf_fires=0, regulation=None, stopped_by="final",
+                llm_error="", errors=[], final="", writes=1, snapshots=[],
+                tokens_por_turno=[], forced_turns=0, forced_writes=0,
+                forced_sin_mejora=0, convergencia_real=None)
+
+        def run(self):
+            if self.on_turn:
+                self.on_turn({"turno": 1, "writes": 1})
+            return self.result
+
+    monkeypatch.setattr(harness, "Cell", FakeCell)
+    monkeypatch.setattr(verifier, "hidden_score",
+                        lambda ws, td: {"score": 100.0, "passed": 1,
+                                        "total": 1})
+    hb = tmp_path / "hb.json"
+    reg = RP._run_cell("A2", "checkout/redondeo", tmp_path / "t.sqlite",
+                       ws_root=tmp_path / "ws", canal="b",
+                       snap_turns=(), heartbeat_path=hb)
+    dato = json.loads(hb.read_text(encoding="utf-8"))
+    assert dato["celda"] == "A2_checkout/redondeo" and dato["turno"] == 1
+    assert visto["snap_turns"] == ()
+    assert reg["score"] == 100.0
