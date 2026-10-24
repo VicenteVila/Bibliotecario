@@ -13,7 +13,7 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 | **Evidencia** `result_*.json` | 89 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
 | **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
-| **Planes y reportes** `HITO*.md` + specs | 27 | raíz | 21 hitos (`HITO0-2.md` reportes; `HITO3-21_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 con **§1 cerrado** y B+C1 pendientes; HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
+| **Planes y reportes** `HITO*.md` + specs | 27 | raíz | 21 hitos (`HITO0-2.md` reportes; `HITO3-21_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 con **§1 cerrado** y **§6 B abortado NO VIABLE POR COSTE**; HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
 | **Logs** `*.log` | 37 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
 | **Datos** | 9 | `golden_*.jsonl` (datasets gold), `calib_r4_gold.json`, `game_tasks_expanded.yaml` (60 tareas, citado), `CORPUS_LOCK.json` | referenciados por tests/evals → no mover sin barrido |
 
@@ -40,6 +40,7 @@ Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
 | `traces.sqlite`, `_run_state_oficial.json` | trazas TraceForge y estado por celda de la corrida oficial (reanudable) |
 | `traces_g0.sqlite`, `traces_diag.sqlite`, `_run_state_diag.json` | trazas del G0, del diagnóstico HITO20 y estado por celda del diagnóstico |
 | `traces_h21.sqlite`, `_run_state_h21.json` | trazas y estado de la corrida b3 de HITO21 (8 celdas) |
+| `traces_b.sqlite`, `_run_state_b.json` | trazas y estado del intento B de HITO20 §6 (abortado en 3/60 celdas; no reanudar) |
 
 Evidencia: `results/result_sens_sd_g0.json` (dictámen G0) y
 `results/result_sens_sd_pilot.json` (corrida oficial) + `logs/sens_sd_g0.log`
@@ -48,8 +49,10 @@ y `logs/sens_sd_pilot_run.log`. Diagnóstico HITO20 (§0.1 del plan):
 `results/result_sens_sd_diag.json` (Parte B) + `logs/sens_sd_diag_run.log`.
 HITO21: `results/result_hito21_fase_a.json` (Fase A offline),
 `results/result_hito21.json` + `results/informes_hito21/` (corrida b3,
-cerrada NO CUMPLE por G3; b3 no adoptado). HITO20 §6 B (BUILD, sin corrida):
-`results/result_b_build_qa.json` (12/12 referencia 100 %, vacío <100 %).
+cerrada NO CUMPLE por G3; b3 no adoptado). HITO20 §6 B (BUILD + intento abortado): `results/result_b_build_qa.json`
+(12/12 referencia 100 %, vacío <100 %) y
+`results/result_sens_sd_b_abort.json` (3/60 celdas, 626.036 tok,
+extrapolación ~12M; no es resultado oficial).
 Tests: `tests/test_sens_sd_pilot.py` (puros, sin LLM).
 
 ## `preflight/` (159 ficheros) — la evaluación **viva**
@@ -78,7 +81,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO21_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **§1 cerrado 2026-10-24** — canal b + SATURA; **§6 B RATIFICADO** (12 multi-paquete, BUILD 12/12 QA, modo `--b`, corrida pendiente); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2) |
+| `HITO3_PLAN.md`…`HITO21_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **§1 cerrado 2026-10-24** — canal b + SATURA; **§6 B ABORTADO 2026-10-24 NO VIABLE POR COSTE** (3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; BUILD 12/12 QA y modo `--b` quedan como artefactos); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |
@@ -86,7 +89,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | `result_smoke_*` | humo (coste mínimo, sin umbral) |
 | `result_sens_sd_g0.json`, `result_sens_sd_pilot.json` | G0 humo y corrida oficial del **Hito 19** (`Sens(x)`); su stdout es `logs/sens_sd_g0.log` y `logs/sens_sd_pilot_run.log` |
 | `result_sens_sd_diag_trazas.json`, `result_sens_sd_diag.json` | **Hito 20** §0.1: diagnóstico de celdas truncadas (Parte A 0 tokens, Parte B `max_turns=32`); stdout en `logs/sens_sd_diag_run.log` |
-| `result_sens_sd_corridab.json`, `result_b_build_qa.json` | **Hito 20** §1 (matriz canal b, SATURA) y §6 B (QA de BUILD 0 tokens de las 12 tareas multi-paquete; no es corrida) |
+| `result_sens_sd_corridab.json`, `result_b_build_qa.json`, `result_sens_sd_b_abort.json` | **Hito 20** §1 (matriz canal b, SATURA), §6 B (QA de BUILD 0 tokens) y §6 B (aborto por coste: 3/60 celdas, 626.036 tok; no es resultado oficial) |
 | `run_<X>.py` → `results/result_<X>.json` + `logs/run_<X>.log` | trío runner → evidencia → stdout del mismo experimento |
 | `*_prev*.json` | corrida anterior conservada antes de repetir (historial, no borrar) |
 

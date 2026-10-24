@@ -68,7 +68,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Plan Hito 17 | `evals/HITO17_PLAN.md` — **CERRADO 2026-10-22 NO CUMPLE** (§5: U2 ✅ por construcción con prefiltro; U4 ❌ medido Δ=0.0; U7 sin medir por 503; F1-F3 con coste; ratificación y umbrales intactos) |
 | Plan Hito 18 | `evals/HITO18_PLAN.md` — **CERRADO 2026-10-22 CUMPLE** (§5: 8/8 gates · Score_final **0.9187** · U4′ determinista 0.9519/0.0489 · U7b 0.8725/0.0 · U2 por construcción · 5/8 llamadas · F1=oficial sin intentos fallidos). **El instrumento B-2 es válido por primera vez** — scorer híbrido `M_mov` + juez V/A; umbrales intactos. Artefactos `evals/preflight/{movimiento_b2.py, run_fase2_b2_h18.py}` + enmienda 6 de §11 |
 | Plan Hito 19 | `evals/HITO19_PLAN.md` — **CERRADO 2026-10-23 NO CUMPLE** (§5: piloto `Sens(x)` en `software_development` con arnés mínimo A1-A5 · U1-U6 ✅, **U7 ❌** `media_global 70.43 > 60` · `Sens(x)` >0 en 10/12 (dato) · 5,12M tokens · 4 celdas A5 con error de endpoint sin re-ejecutar · enmiendas 7-8 + modelo ultra ANTES de medir). Artefactos `evals/sd_pilot/` + enmiendas 7-8 de §11 |
-| Plan Hito 20 | `evals/HITO20_PLAN.md` — **§1 CERRADO 2026-10-24** (matriz 17×12 canal b + brazo forzado: 2.686.674 tok, media 82,47 vs 70,43, Δ+12,04, **E1_ACLARA**, **SATURA**); **§6 B RATIFICADO 2026-10-24** (12 tareas `*-b` multi-paquete, BUILD+QA 12/12, modo `--b` implementado, proyección 4.141.020 ≤ techo 4,2M; corrida pendiente; errata §5 declarada) |
+| Plan Hito 20 | `evals/HITO20_PLAN.md` — **§1 CERRADO 2026-10-24** (matriz 17×12 canal b + brazo forzado: 2.686.674 tok, media 82,47 vs 70,43, Δ+12,04, **E1_ACLARA**, **SATURA**); **§6 B ABORTADO 2026-10-24 — NO VIABLE POR COSTE** (12 tareas `*-b` multi-paquete, BUILD+QA 12/12, modo `--b`; 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; sin `result_sens_sd_b.json`; errata §5 declarada) |
 | Plan Hito 21 | `evals/HITO21_PLAN.md` — **CERRADO 2026-10-24 NO CUMPLE** (§5: b3 8 celdas, 596.343 tok, **G1/G2/G4/G5/G6 ✅, G3 ❌**; residuales 72,28 vs 38,42 pero controles A2_plugin −35,7 y A4_interval −43,3; **b3 no adoptado**, default vuelve a b2; heartbeat roto corregido post-run) |
 | Erratas y fracasos declarados | `evals/BLUEPRINT_METRIC_DESIGN.md` — §8.8-§8.13 |
 | Hitos previos | `evals/HITO0.md`, `HITO1.md`, `PLAN_READING.md`, `REPORT_BLIND.md`, `REPORT_COEVOLVE.md` |
@@ -89,9 +89,13 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
   referencia sin fallos, 12/12 vacío falla ≥1 público y <100 % ocultos;
   evidencia `evals/results/result_b_build_qa.json`. **Limitación**: cada
   dominio aparece dos veces (tareas correlacionadas). Plan `HITO20_PLAN.md`
-  §6 **RATIFICADO 2026-10-24**: N=12, 60 celdas, canal b2, techo 4,2M;
-  modo `--b` implementado y proyección 4.141.020 ≤ 4,2M. **No se lanzó
-  ninguna celda** todavía.
+  §6 **ABORTADO 2026-10-24 — NO VIABLE POR COSTE**: N=12, 60 celdas, canal
+  b2, techo 4,2M; modo `--b` implementado, pero la corrida se detuvo en
+  **3/60 celdas y 626.036 tok** (A1 16.447/100 · A2 303.687/39,24/max_turns ·
+  A3 305.902/93,67/max_turns). Extrapolación ~12M; B1/B4 fallan, sin
+  `result_sens_sd_b.json`. Evidencia de aborto:
+  `evals/results/result_sens_sd_b_abort.json` + `_run_state_b.json` +
+  `traces_b.sqlite` + `logs/sens_sd_b_run.log`. **No reanudar.**
 - **HITO21 cerrado NO CUMPLE (2026-10-24)**: corrida b3 de 8 celdas
   (4 residuales + 4 controles), **596.343 tokens** (33,1 % del techo 1,8M).
   G1 ✅ 4/4 escriben y paran en `final`; G2 ✅ media residual 72,28 vs 38,42

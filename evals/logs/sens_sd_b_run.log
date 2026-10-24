@@ -1,0 +1,5 @@
+[21:17:03] clave NVIDIA: PILOTO (separada de bibliotecario; valor no mostrado)
+[21:17:06] B §6: canal=b2 max_turns=17 cap=450000 techo=4200000 celdas=60
+[21:18:04] A1/checkout-rounding-repo-cache-layer-b: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=16447 58.6s
+[21:26:14] A2/checkout-rounding-repo-cache-layer-b: score=39.2405% turns=17 llm=17 tools=41 writes=0 paro=max_turns tok=303687 489.8s
+[21:34:53] A3/checkout-rounding-repo-cache-layer-b: score=93.6709% turns=17 llm=17 tools=106 writes=21 paro=max_turns tok=305902 519.0s

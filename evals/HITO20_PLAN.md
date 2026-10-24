@@ -661,11 +661,12 @@ Evidencia: `evals/results/result_sens_sd_corridab.json` +
 
 ## §6 — B (tareas endurecidas): BUILD y protocolo (RATIFICADO 2026-10-24)
 
-> **Estado**: RATIFICADO por el dueño el 2026-10-24: **12 tareas B
-> multi-paquete, N=12, techo 4.200.000**. El BUILD está validado (QA de
-> referencia, 0 tokens LLM) y el modo B está implementado; **aún no se ha
-> ejecutado ninguna celda**. La corrida única se lanza tras el commit de
-> este §6 y de la implementación.
+> **Estado**: **ABORTADO 2026-10-24 — NO VIABLE POR COSTE**. El dueño
+> ratificó 12 tareas B multi-paquete, N=12 y techo 4.200.000. El BUILD y el
+> modo B se validaron, pero la corrida se detuvo tras **3/60 celdas y
+> 626.036 tokens**: el coste real extrapola a ~12M, muy por encima del techo.
+> No hay `result_sens_sd_b.json` ni Score oficial; el intento queda
+> documentado en §6.7. No reanudar.
 
 ### §6.0 — Qué pregunta B y por qué ahora
 
@@ -784,9 +785,33 @@ BUILD (`result_b_build_qa.json`) se conserva como evidencia; no se borra.
    snapshots@12, estado/trazas/informes B y evaluador B0-B5. Tests puros
    de `evaluar_b`/`presupuesto_b` (sin LLM): verdes.
 3. Proyección B inyectada: **HECHA** (§6.4, 4.141.020 ≤ 4,2M).
-4. Corrida única: **PENDIENTE**. Primera ejecución (crea estado):
-   `setsid .venv/bin/python evals/sd_pilot/run_pilot.py --b
-   > evals/logs/sens_sd_b_run.log 2>&1 < /dev/null &`
-   Reanudación (solo celdas ya puntuadas):
-   `setsid .venv/bin/python evals/sd_pilot/run_pilot.py --b --resume
-   >> evals/logs/sens_sd_b_run.log 2>&1 < /dev/null &`
+4. Corrida única: **ABORTADA** 2026-10-24 tras 3/60 celdas; ver §6.7.
+   No reanudar (`--b --resume`).
+
+
+### §6.7 — Intento B abortado (2026-10-24): NO VIABLE POR COSTE
+
+**Decisión del dueño**: abortar y documentar, sin gastar el resto del techo.
+
+- **Ejecutado**: 3/60 celdas, **626.036 tokens** (A1 16.447 · A2 303.687 ·
+  A3 305.902). A2 y A3 alcanzaron `max_turns=17`; A2 hizo **0 escrituras** y
+  A3 **21**. Scores: A1 **100** (one-shot), A2 **39,24**, A3 **93,67**.
+- **Causa**: el alcance multi-paquete dispara lecturas/escrituras por celda
+  (~304-306k en A2/A3). La proyección de §6.4 (4.141.020) queda invalidada;
+  extrapolación ~12M para 60 celdas. A1 sigue resolviendo la tarea combinada
+  al 100 %, así que B tampoco muestra evidencia de bajar U7 por dificultad.
+- **Gates**: B0 **PASA** (QA BUILD 12/12); B1 **FALLA** (3/60); B2/B3 **no
+  evaluados** (matriz incompleta); B4 **FALLA** por extrapolación (coste
+  medido 626.036, techo 4.200.000); B5 b2 en las 3 celdas. No hay veredicto
+  de score ni `CUMPLE`.
+- **Evidencia**: `evals/results/result_sens_sd_b_abort.json` (registro de
+  aborto, no resultado oficial), `evals/sd_pilot/_run_state_b.json`,
+  `evals/sd_pilot/traces_b.sqlite`, `evals/logs/sens_sd_b_run.log`. El
+  `result_sens_sd_b.json` **no existe** y no debe crearse a mano.
+- **Contabilidad**: H20 acumula 2.686.674 + 626.036 = **3.312.710 tokens**
+  (47,3 % de 7M); quedan 3.687.290. No se autoriza otra corrida B con este
+  diseño.
+- **Siguiente decisión (dueño)**: (a) cerrar H20 con B no viable; (b)
+  rediseñar B más barato (p. ej. `max_turns=12`, tareas de un solo paquete
+  endurecidas, o menos variantes con enmienda de umbrales) y declarar nuevo
+  techo; (c) otra alternativa. **Nada de esto está autorizado todavía.**
