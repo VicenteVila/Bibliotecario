@@ -1,0 +1,19 @@
+[19:34:32] clave NVIDIA: PILOTO (separada de bibliotecario; valor no mostrado)
+[19:34:34] HITO21: canal=b3 max_turns=17 cap=450000 techo=1800000 celdas=8
+[19:39:52] A2/checkout-rounding: score=0.0% turns=8 llm=8 tools=28 writes=5 paro=final tok=103720 317.7s
+[19:44:26] A3/checkout-rounding: score=100.0% turns=8 llm=8 tools=21 writes=5 paro=final tok=105566 274.4s
+[19:53:18] A4/dsl-parser: score=89.1304% turns=7 llm=7 tools=23 writes=8 paro=final tok=87608 531.9s
+[19:53:51] A5/plugin-registry: score=100.0% turns=3 llm=3 tools=9 writes=1 paro=final tok=9325 32.4s
+[20:00:20] A2/plugin-registry: score=64.2857% turns=17 llm=17 tools=15 writes=0 paro=max_turns tok=152310 389.4s
+[20:05:32] A3/plugin-registry: score=100.0% turns=15 llm=15 tools=10 writes=1 paro=final tok=102481 312.4s
+[20:06:58] A4/interval-scheduler: score=56.6667% turns=4 llm=4 tools=8 writes=0 paro=final tok=21724 86.0s
+[20:07:59] A5/batch-coalescer: score=97.0588% turns=4 llm=4 tools=7 writes=1 paro=final tok=13609 60.4s
+[20:08:00] G1_residuales_escriben: PASA {'n': 4, 'pasa': True}
+[20:08:00] G2_mejora_media: PASA {'media': 72.2826, 'media_b2': 38.4232, 'delta': 33.8594, 'pasa': True}
+[20:08:00] G3_sin_regresion_controles: FALLA {'caidas': {'A2_plugin-registry': -35.714299999999994, 'A3_plugin-registry': 0.0, 'A4_interval-scheduler': -43.3333, 'A5_batch-coalescer': -2.941199999999995}, 'pasa': False}
+[20:08:00] G4_sin_truncamiento: PASA {'n': 0, 'pasa': True}
+[20:08:00] G5_techo: PASA {'coste': 596343, 'techo': 1800000, 'pasa': True}
+[20:08:00] G6_evidencia: PASA {'canal_b_version': 'b3', 'pasa': True}
+[20:08:00] coste HITO21=596343 tokens (techo 1800000)
+[20:08:00] veredicto: NO CUMPLE
+[20:08:00] evidencia: evals/results/result_hito21.json
