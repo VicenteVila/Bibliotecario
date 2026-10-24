@@ -591,12 +591,70 @@ en E1-Ajuste 1 (§1 mide convergencia, no saturación).
    producen `write_file` o `SIN_MEJORA` registrado en el ledger;
    ≥80 % sin_mejora → `convergencia_real`.
 
-## §5 — Veredicto final del Hito 20 (CERRADO 2026-10-23)
+## §5 — Veredicto de la fase §1 (CERRADO 2026-10-24; corrige la primera redacción)
 
-La corrida 63/63 (matriz 60 + 3 brazo forzado) se completó exitosamente bajo el protocolo "canal b" (lecturas completas + multi-acción + cap 18k). 
+> **Errata declarada**: la primera versión de este §5 (commit `3e62021`)
+> afirmaba «100 % de las celdas terminaron con `final`» y «≥80 % SIN_MEJORA
+> en las tres celdas forzadas». **Ninguna de las dos se sostiene contra
+> `result_sens_sd_corridab.json`**; se corrigen aquí con las cifras
+> verificadas. La evidencia no se toca.
 
-- **Dictamen técnico**: El colapso del oficial de H19 (media ~38) no era estructural del bucle, sino un fallo del canal de observación. Con canal b, la media subió a **83,3** y el 100 % de las celdas terminaron con éxito (`final`). La tasa de truncamiento fue **0 %** y el coste total (2,68M) quedó dentro del techo de 7M, confirmando que el aplanamiento por el CAP 18k evitó la explosión de tokens.
-- **Saturación**: El brazo forzado (n=3) muestra que, incluso forzando el turno 17, el sistema no encuentra mejoras sustanciales (ledger: ≥80% `SIN_MEJORA`), confirmando **convergencia real** en las celdas A2/A5 evaluadas.
-- **Evidencia**: `evals/results/result_sens_sd_corridab.json` + `evals/results/informes_corridab/` (3 informes analizados). La integridad de la cadena de datos ha sido verificada.
+**Alcance**: esta fase cierra §1 (matriz 17×12 con canal b + brazo forzado).
+**No** cierra HITO20 completo: **B (tareas endurecidas) no se ejecutó** en
+esta fase (§0.3, alcance lateral declarado).
 
-**Conclusión**: El arnés es funcional bajo el protocolo canal b. Se cumplen los objetivos del Hito 20 (endurecimiento y robustez). El proyecto pasa ahora a la fase de mejoras técnicas (Pasos 1-3).
+### Corrida
+
+- 63/63 celdas (60 matriz + 3 forzadas); **2.686.674 tokens** (38,4 % del
+  techo de 7M; 387 llamadas). Desviación vs proyección 2.042.105: **+31,6 %**
+  (justo por encima del margen del 30 %; el upper bound 6,66-8,1M no ocurrió).
+- **Truncamiento: 0/63**. Checkpoint 2.654.737: **no disparado**; el cruce
+  ocurrió durante el brazo forzado, después de que la matriz ya estuviera
+  completa (≥70 % → la regla pre-registrada habría dicho «continuar»). El
+  chequeo solo se evalúa tras celdas de matriz: **hallazgo de proceso** para
+  el Paso 2 (heartbeat/checkpoint también en el brazo forzado).
+- Paradas: **42 `final` · 12 `one_shot` (A1) · 4 `max_turns` · 3
+  `max_turns_forzado` · 2 `error_llm`**. La afirmación «100 % final» era falsa.
+- `infra_error`: `A2_dsl-parser` (score 13,04) y `A2_cli-subcommand` (25,53),
+  ambos «todos los proveedores LLM fallaron»; excluidos del análisis, no
+  re-ejecutados (§1.1).
+
+### Matriz (60 celdas comparables)
+
+- Media **82,47** (H19: 70,43); Δ medio vs @16 oficial **+12,04**; 19 celdas
+  con Δ≥+10; 3 con Δ<0. E1 se cumple sobre 58 válidas → **E1_ACLARA**.
+- Por variante: A1 **98,49** · A2 **76,92** · A3 **83,72** · A4 **73,99** ·
+  A5 **79,25**. Las 12 A1 son one-shot; las 48 restantes siguen el bucle
+  canal b (media ~78,5).
+- **24 celdas con 0 escrituras**: las 12 A1 por diseño + **12 no-A1**
+  (4 `max_turns` + 8 que pararon con `final`). El canal b no elimina el
+  modo «leer y no escribir» en todas las celdas.
+
+### Saturación (test primario pre-registrado)
+
+- Brazo forzado n=3: `score@12 = score@17 = 100` en las tres celdas;
+  **Δ = [0,0,0]**; IC95 bootstrap **[0,0]** → **SATURA** (por regla
+  pre-registrada: (c) cancelado).
+- Ledger: A5_repo-cache-layer 10/10 `sin_mejora` y A5_workflow-statemachine
+  13/13 → `convergencia_real`; **A2_plugin-registry 6/13 (46 %), no
+  convergencia_real** (sus 7 turnos «otro» no produjeron ninguna escritura
+  forzada). `forced_writes = 0` en las tres.
+- **Caveat de techo**: las tres ya estaban a 100 en el turno 12; Δ=0 mide
+  ausencia de mejora posible, no necesariamente agotamiento del bucle. La
+  regla pre-registrada manda SATURA igualmente; n=3 y sin headroom quedan
+  declarados.
+
+### Residuales y veredicto
+
+- **4 celdas `max_turns` con 0 escrituras** (A2_checkout-rounding 311.323 tok ·
+  A3_checkout-rounding 327.999 · A4_dsl-parser 140.406 · A5_plugin-registry
+  140.179) son el límite medido del canal b: la mejora no es universal.
+- **Veredicto**: §1 **CERRADO**; saturación = SATURA → (c) cancelado como
+  justificación general, con el residual de 4 celdas anotado para HITO21.
+  El coste quedó bajo techo y la comparativa es E1_ACLARA. **HITO20 (B+C1)
+  sigue pendiente**: esta fase fue el diagnóstico/canal, no el endurecimiento.
+
+Evidencia: `evals/results/result_sens_sd_corridab.json` +
+`evals/results/informes_corridab/` (63 .md), log
+`evals/logs/sens_sd_corridab_run.log`, trazas
+`evals/sd_pilot/traces_corrb.sqlite` y estado `_run_state_corrb.json`.
