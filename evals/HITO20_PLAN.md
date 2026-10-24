@@ -800,10 +800,10 @@ BUILD (`result_b_build_qa.json`) se conserva como evidencia; no se borra.
   (~304-306k en A2/A3). La proyección de §6.4 (4.141.020) queda invalidada;
   extrapolación ~12M para 60 celdas. A1 sigue resolviendo la tarea combinada
   al 100 %, así que B tampoco muestra evidencia de bajar U7 por dificultad.
-- **Gates**: B0 **PASA** (QA BUILD 12/12); B1 **FALLA** (3/60); B2/B3 **no
-  evaluados** (matriz incompleta); B4 **FALLA** por extrapolación (coste
-  medido 626.036, techo 4.200.000); B5 b2 en las 3 celdas. No hay veredicto
-  de score ni `CUMPLE`.
+- **Gates**: B0 **PASA** (QA BUILD 12/12); B1 **FALLA** (3/60); B2/B3/B4
+  **NO EVALUADOS** (matriz incompleta: el coste medido 626.036 no representa
+  las 60 celdas; la extrapolación ~12M indica que B4 no se cumpliría); B5 b2
+  en las 3 celdas. No hay veredicto de score ni `CUMPLE`.
 - **Evidencia**: `evals/results/result_sens_sd_b_abort.json` (registro de
   aborto, no resultado oficial), `evals/sd_pilot/_run_state_b.json`,
   `evals/sd_pilot/traces_b.sqlite`, `evals/logs/sens_sd_b_run.log`. El

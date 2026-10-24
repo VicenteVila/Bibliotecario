@@ -22,7 +22,7 @@
  "proyeccion_previa": 4141020,
  "extrapolacion": "~12M (3 celdas, 626.036 tok)",
  "causa": "A2/A3 alcanzan max_turns con ~304-306k tok/celda; el alcance multi-paquete multiplica lecturas/escrituras y el techo 4,2M no permite 60 celdas. A1 sigue en 100 (one-shot resuelve la tarea combinada).",
- "gates": "B0 PASA (QA BUILD); B1 FALLA (3/60); B2/B3 no evaluados; B4 FALLA por extrapolacion; B5 b2 en las 3 celdas.",
+ "gates": "B0 PASA (QA BUILD); B1 FALLA (3/60); B2/B3/B4 NO EVALUADOS (matriz incompleta; 626.036 medidos no representan 60 celdas; extrapolacion ~12M indica que B4 no se cumpliria); B5 b2 en las 3 celdas.",
  "celdas": {
   "A1_checkout-rounding-repo-cache-layer-b": {
    "score": 100.0,

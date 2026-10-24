@@ -92,8 +92,8 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
   §6 **ABORTADO 2026-10-24 — NO VIABLE POR COSTE**: N=12, 60 celdas, canal
   b2, techo 4,2M; modo `--b` implementado, pero la corrida se detuvo en
   **3/60 celdas y 626.036 tok** (A1 16.447/100 · A2 303.687/39,24/max_turns ·
-  A3 305.902/93,67/max_turns). Extrapolación ~12M; B1/B4 fallan, sin
-  `result_sens_sd_b.json`. Evidencia de aborto:
+  A3 305.902/93,67/max_turns). Extrapolación ~12M; B1 falla y B2/B3/B4
+  quedan no evaluados, sin `result_sens_sd_b.json`. Evidencia de aborto:
   `evals/results/result_sens_sd_b_abort.json` + `_run_state_b.json` +
   `traces_b.sqlite` + `logs/sens_sd_b_run.log`. **No reanudar.**
 - **HITO21 cerrado NO CUMPLE (2026-10-24)**: corrida b3 de 8 celdas
