@@ -74,6 +74,9 @@ def main(argv: list[str] | None = None) -> int:
                     default=REPO / "evals" / "results" / "informes_diagb",
                     help="directorio de salida (un .md por celda)")
     args = ap.parse_args(argv)
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from evals.sd_pilot.io_atomico import escribir_texto_atomico
 
     if not args.db.is_file():
         print(f"ERROR: no existe {args.db}", file=sys.stderr)
@@ -83,7 +86,7 @@ def main(argv: list[str] | None = None) -> int:
     args.out_dir.mkdir(parents=True, exist_ok=True)
     for key, cs in sorted(celdas.items()):
         out = args.out_dir / f"{key}.md"
-        out.write_text(informe_celda(key, cs), encoding="utf-8")
+        escribir_texto_atomico(out, informe_celda(key, cs))
         print(f"informe: {out.relative_to(REPO)} ({len(cs)} spans)")
     return 0
 

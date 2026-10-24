@@ -773,3 +773,40 @@ def test_constantes_seccion1_cuadran_con_preregistro():
     assert proy_celda("A1") == PRESUPUESTO_BASE_16["A1"]
     # brazo forzado: media de las 3 extrapolaciones de E1-Ajuste 3
     assert PROY_FORZADO_BASE == 130_000
+
+
+def test_escritura_atomica_escribe_y_no_deja_temporales(tmp_path):
+    from evals.sd_pilot.io_atomico import escribir_texto_atomico
+    dest = tmp_path / "estado.json"
+    escribir_texto_atomico(dest, '{"a": 1}')
+    assert dest.read_text(encoding="utf-8") == '{"a": 1}'
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_escritura_atomica_fallo_no_corrompe_destino(tmp_path, monkeypatch):
+    from evals.sd_pilot import io_atomico
+    dest = tmp_path / "estado.json"
+    dest.write_text("viejo", encoding="utf-8")
+
+    def _boom(*args, **kwargs):
+        raise OSError("disco lleno")
+
+    monkeypatch.setattr(io_atomico.os, "replace", _boom)
+    with pytest.raises(OSError):
+        io_atomico.escribir_texto_atomico(dest, "nuevo")
+    assert dest.read_text(encoding="utf-8") == "viejo"
+    assert not list(tmp_path.glob(".*.tmp"))
+
+
+def test_canal_b_version_y_prompt_dorado():
+    import hashlib
+
+    from evals.sd_pilot import harness
+
+    assert harness.CANAL_B_VERSION == "b1"
+    assert hashlib.sha256(harness.TOOLS_JSON.encode()).hexdigest() == (
+        "21ce7483eb262f51a0f0d55d20d3a8c96b138f7f9cbe3bb8c96cbd34e8040a5c")
+    assert hashlib.sha256(harness.REPROMPT_FORZADO.encode()).hexdigest() == (
+        "08e1cc08ab930dfb05e8d12e3f3921d80600f68841b8c8e0913cdb690d1247ca")
+    assert harness.CANAL_CAP_PROMPT_TOKENS == 18_000
+    assert harness._MAX_READ == 8_000

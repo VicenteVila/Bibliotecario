@@ -49,7 +49,7 @@ Orden de lectura recomendado:
 
 ```bash
 .venv/bin/python -m ruff check bibliotecario tests evals/corpus_lock.py
-.venv/bin/python -m pytest tests/ -q          # ~425 tests, ~2 min
+.venv/bin/python -m pytest tests/ -q          # 513 tests, ~2.5 min
 .venv/bin/python evals/preflight/lint_suites_v2.py   # si se toca preflight/
 .venv/bin/python evals/corpus_lock.py check          # si se tocó el corpus
 ```

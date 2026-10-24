@@ -42,6 +42,11 @@ _MAX_RAW_IN_HISTORY = 4000
 CANAL_CAP_PROMPT_TOKENS = 18_000
 CANAL_SNAP_TURNS = (8, 12)
 
+# Version del canal b (HITO20 §1). Subir a "b2" + enmienda ratificada si
+# cambia cualquiera de los elementos congelados: TOOLS_JSON, REPROMPT_FORZADO,
+# CANAL_CAP_PROMPT_TOKENS o _MAX_READ (tests dorados en test_sens_sd_pilot).
+CANAL_B_VERSION = "b1"
+
 # Brazo forzado HITO20 §1 (Enmienda 2, pre-registrado 2026-10-23): texto
 # exacto del reprompt inyectado en cada turno tras `final`.
 REPROMPT_FORZADO = (

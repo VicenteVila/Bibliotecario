@@ -31,6 +31,7 @@ Gemini, PFs cableados al loop.
 /usr/bin/python3 -m venv ~/.venvs/bibliotecario
 ~/.venvs/bibliotecario/bin/python -m pip install -e ".[dev]"
 printf 'GEMINI_API_KEY=...\n' > .env && chmod 600 .env   # nunca se commitea
+# En WSL sobre /mnt/c el chmod es inerte (drvfs); la proteccion real es .gitignore
 bibliotecario repl
 ```
 
@@ -52,7 +53,7 @@ API.implement("Task-CoEvolve", "validar mi agente")
 ## Tests
 
 ```bash
-python -m pytest tests/ -q   # 195 tests
+python -m pytest tests/ -q   # 513 tests
 ruff check bibliotecario evals tests scripts
 ```
 

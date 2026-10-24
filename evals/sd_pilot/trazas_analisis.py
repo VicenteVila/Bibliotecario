@@ -82,6 +82,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path,
                     default=REPO / "evals" / "results" / "result_sens_sd_trazas_repro.json")
     args = ap.parse_args(argv)
+    if str(REPO) not in sys.path:
+        sys.path.insert(0, str(REPO))
+    from evals.sd_pilot.io_atomico import escribir_texto_atomico
 
     of = json.loads(args.result_oficial.read_text(encoding="utf-8"))
     celdas_out = {}
@@ -92,8 +95,7 @@ def main(argv: list[str] | None = None) -> int:
         celdas_out[key] = info
     out = {"fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "regla": REGLA,
            "celdas": celdas_out}
-    args.out.write_text(json.dumps(out, ensure_ascii=False, indent=1),
-                        encoding="utf-8")
+    escribir_texto_atomico(args.out, json.dumps(out, ensure_ascii=False, indent=1))
     n_at = sum(1 for c in celdas_out.values() if c["clasificacion"] == "ATASCADO")
     print(f"analizador: {args.out.relative_to(REPO)} "
           f"({len(celdas_out)} celdas, {n_at} ATASCADO)")

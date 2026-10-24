@@ -156,6 +156,12 @@ def _git_head() -> dict:
             "dirty": bool(_sh("status", "--porcelain"))}
 
 
+def _write_json(path: Path, obj) -> None:
+    """Persiste JSON de estado/evidencia de forma atomica."""
+    from evals.sd_pilot.io_atomico import escribir_texto_atomico
+    escribir_texto_atomico(path, json.dumps(obj, ensure_ascii=False, indent=1))
+
+
 def _make_llm():
     from bibliotecario.core import llm as BLLM
 
@@ -184,7 +190,7 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
     """
     from bibliotecario.core import llm as BLLM
     from evals.sd_pilot import verifier
-    from evals.sd_pilot.harness import CANAL_SNAP_TURNS, Cell
+    from evals.sd_pilot.harness import CANAL_B_VERSION, CANAL_SNAP_TURNS, Cell
     from evals.sd_pilot.tasks import task_dir
     from evals.sd_pilot.variants import VARIANTS
 
@@ -215,6 +221,7 @@ def _run_cell(vname: str, tid: str, tracing_db: Path,
     reg = {"score": score["score"], "hidden": {"passed": score["passed"],
            "total": score["total"]}, "turns": res.turns,
            "max_turns": var.max_turns, "canal": canal,
+           "canal_b_version": CANAL_B_VERSION if canal == "b" else None,
            "llm_calls": res.llm_calls, "tool_calls": res.tool_calls,
            "invalid_actions": res.invalid_actions, "pf_fires": res.pf_fires,
            "regulation": res.regulation, "stopped_by": res.stopped_by,
@@ -259,8 +266,7 @@ def _run_many(pairs: list[tuple[str, str]], tracing_db: Path,
             cells[key] = _run_cell(vname, tid, tracing_db)
             if state_path:
                 state["cells"] = cells
-                state_path.write_text(json.dumps(state, ensure_ascii=False, indent=1),
-                                      encoding="utf-8")
+                _write_json(state_path, state)
         matrix.setdefault(vname, {})[tid] = float(cells[key]["score"])
     return {"matrix": matrix, "cells": cells}
 
@@ -318,7 +324,7 @@ def modo_g0(model: str) -> int:
               "modelo": model, "tareas": G0_TASKS, "matriz": run["matrix"],
               "dictamen": ver, "celdas": run["cells"], "commits": _git_head()}
     out = REPO / "evals" / "results" / "result_sens_sd_g0.json"
-    out.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
+    _write_json(out, result)
     log(f"DICTAMEN G0: ventana={ver['ventana']} coste={ver['coste']} "
         f"(proj60={ver['proyeccion_60']}, techo={TECHO_TOKENS}) "
         f"n_final={ver['n_final']} arranca={ver['arranca_oficial']}")
@@ -337,7 +343,7 @@ def modo_oficial(model: str, resume: bool) -> int:
             "Usa --resume (misma corrida) o archiva el estado documentándolo.")
         return 3
     else:
-        STATE_OFICIAL.write_text(json.dumps({"cells": {}}, indent=1), encoding="utf-8")
+        _write_json(STATE_OFICIAL, {"cells": {}})
         if TRACES_OFICIAL.exists():
             TRACES_OFICIAL.unlink()  # corrida fresca: trazas propias, sin mezcla
 
@@ -386,7 +392,7 @@ def _emit_resultado(model: str, matrix: dict, cells: dict) -> None:
         "commits": _git_head(),
     }
     out = REPO / "evals" / "results" / "result_sens_sd_pilot.json"
-    out.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
+    _write_json(out, result)
     log(f"resultado: {out.relative_to(REPO)}")
     log(f"Q_h={r['q_h']} spread={r['spread']}")
     log(f"Sens(x) finitos={r['n_finitos']}/12 positivos={r['n_positivos']}/12")
@@ -509,7 +515,7 @@ def modo_diagnostico(model: str, resume: bool) -> int:
         log(f"resume diagnóstico: {len(cells)} celdas cargadas")
         traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAG))
     else:
-        STATE_DIAG.write_text(json.dumps({"cells": {}}, indent=1), encoding="utf-8")
+        _write_json(STATE_DIAG, {"cells": {}})
         if TRACES_DIAG.exists():
             TRACES_DIAG.unlink()
         traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAG))
@@ -536,8 +542,7 @@ def modo_diagnostico(model: str, resume: bool) -> int:
         var = replace(VARIANTS[vname], max_turns=DIAG_MAX_TURNS)
         cells[key] = _run_cell(vname, tid, TRACES_DIAG, ws_root=WS_DIAG,
                                variant=var)
-        STATE_DIAG.write_text(json.dumps({"cells": cells}, ensure_ascii=False,
-                                         indent=1), encoding="utf-8")
+        _write_json(STATE_DIAG, {"cells": cells})
         acum = _coste(cells)["total_tokens"]
         if acum > DIAG_TECHO_TOKENS:
             log(f"TECHO EXCEDIDO tras {key}: {acum} > {DIAG_TECHO_TOKENS}; "
@@ -561,8 +566,7 @@ def modo_diagnostico(model: str, resume: bool) -> int:
               "omitidas_techo": omitidas, "celdas": cells,
               "trazas": str(TRACES_DIAG.relative_to(REPO)),
               "commits": _git_head()}
-    RESULT_DIAG.write_text(json.dumps(result, ensure_ascii=False, indent=1),
-                           encoding="utf-8")
+    _write_json(RESULT_DIAG, result)
     for p in pares:
         log(f"  {p['celda']}: @16={p['score16']:.2f} @32={p['score32']:.2f} "
             f"(A1={p['a1']:.2f}, delta={p['score32'] - p['score16']:+.2f})")
@@ -748,13 +752,14 @@ def evaluar_saturacion_forzado(pares: list[dict], semilla: int = CORR_B_SEED,
 def _generar_informes_diagb() -> bool:
     """Informes del observador para E1.4 (legibilidad declarada)."""
     from evals.sd_pilot import observador
+    from evals.sd_pilot.io_atomico import escribir_texto_atomico
     spans = observador.cargar_spans(TRACES_DIAGB)
     celdas = observador.agrupar_por_celda(spans)
     INFORMES_DIAGB.mkdir(parents=True, exist_ok=True)
     ok = True
     for key, cs in sorted(celdas.items()):
         out = INFORMES_DIAGB / f"{key}.md"
-        out.write_text(observador.informe_celda(key, cs), encoding="utf-8")
+        escribir_texto_atomico(out, observador.informe_celda(key, cs))
         log(f"informe: {out.relative_to(REPO)} ({len(cs)} spans)")
         if not out.read_text(encoding="utf-8").strip():
             ok = False
@@ -784,13 +789,15 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
         log(f"resume diagnóstico-b: {len(cells)} celdas cargadas")
         traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAGB))
     else:
-        STATE_DIAGB.write_text(json.dumps({"cells": {}}, indent=1), encoding="utf-8")
+        _write_json(STATE_DIAGB, {"cells": {}})
         if TRACES_DIAGB.exists():
             TRACES_DIAGB.unlink()
         traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAGB))
 
+    from evals.sd_pilot.harness import CANAL_B_VERSION
     from evals.sd_pilot.variants import VARIANTS
-    log(f"diagnóstico-b §0.3: canal=b max_turns={DIAGB_MAX_TURNS} "
+    log(f"diagnóstico-b §0.3: canal=b version={CANAL_B_VERSION} "
+        f"max_turns={DIAGB_MAX_TURNS} "
         f"cap_llamada={DIAGB_CELL_CAP} techo={DIAGB_TECHO_TOKENS} "
         f"celdas={DIAGB_CELLS}")
     for vname, tid in DIAGB_CELLS:
@@ -807,8 +814,7 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
         cells[key] = _run_cell(vname, tid, TRACES_DIAGB, ws_root=WS_DIAGB,
                                variant=var, canal="b",
                                cell_token_cap=DIAGB_CELL_CAP)
-        STATE_DIAGB.write_text(json.dumps({"cells": cells}, ensure_ascii=False,
-                                          indent=1), encoding="utf-8")
+        _write_json(STATE_DIAGB, {"cells": cells})
         acum = _coste(cells)["total_tokens"]
         if acum > DIAGB_TECHO_TOKENS:
             log(f"TECHO EXCEDIDO tras {key}: {acum} > {DIAGB_TECHO_TOKENS}; "
@@ -840,15 +846,15 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
     coste = _coste(cells)
     result = {"hito": 20, "modo": "diagnostico-b",
               "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "modelo": model,
-              "canal": "b", "max_turns": DIAGB_MAX_TURNS,
+              "canal": "b", "canal_b_version": CANAL_B_VERSION,
+              "max_turns": DIAGB_MAX_TURNS,
               "cap_llamada": DIAGB_CELL_CAP, "techo_tokens": DIAGB_TECHO_TOKENS,
               "pares": pares, "veredicto": ver, "recalibracion": recal,
               "coste": coste, "celdas": cells,
               "trazas": str(TRACES_DIAGB.relative_to(REPO)),
               "informes": str(INFORMES_DIAGB.relative_to(REPO)),
               "commits": _git_head()}
-    RESULT_DIAGB.write_text(json.dumps(result, ensure_ascii=False, indent=1),
-                            encoding="utf-8")
+    _write_json(RESULT_DIAGB, result)
     for p in pares:
         log(f"  {p['celda']}: @16={p['score16']:.2f} @17={p['score17']:.2f} "
             f"(delta={p['score17'] - p['score16']:+.2f} writes={p['writes']} "
@@ -865,13 +871,14 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
 def _generar_informes_corridab() -> bool:
     """Informes del observador de la corrida-b (misma E1.4 declarada)."""
     from evals.sd_pilot import observador
+    from evals.sd_pilot.io_atomico import escribir_texto_atomico
     spans = observador.cargar_spans(TRACES_CORRB)
     celdas = observador.agrupar_por_celda(spans)
     INFORMES_CORRB.mkdir(parents=True, exist_ok=True)
     ok = True
     for key, cs in sorted(celdas.items()):
         out = INFORMES_CORRB / f"{key}.md"
-        out.write_text(observador.informe_celda(key, cs), encoding="utf-8")
+        escribir_texto_atomico(out, observador.informe_celda(key, cs))
         log(f"informe: {out.relative_to(REPO)} ({len(cs)} spans)")
         if not out.read_text(encoding="utf-8").strip():
             ok = False
@@ -905,16 +912,18 @@ def modo_corrida_b(model: str, resume: bool) -> int:
         log(f"resume corrida-b: {len(cells)} celdas cargadas")
         traceforge.configure(collector="sqlite", db_path=str(TRACES_CORRB))
     else:
-        STATE_CORRB.write_text(json.dumps({"cells": {}}, indent=1), encoding="utf-8")
+        _write_json(STATE_CORRB, {"cells": {}})
         if TRACES_CORRB.exists():
             TRACES_CORRB.unlink()
         traceforge.configure(collector="sqlite", db_path=str(TRACES_CORRB))
 
     from dataclasses import replace as _replace
 
+    from evals.sd_pilot.harness import CANAL_B_VERSION
     from evals.sd_pilot.variants import VARIANTS
     orden = orden_estratificado()
-    log(f"corrida-b §1: canal=b max_turns={CORR_B_MAX_TURNS} "
+    log(f"corrida-b §1: canal=b version={CANAL_B_VERSION} "
+        f"max_turns={CORR_B_MAX_TURNS} "
         f"cap_celda={CORR_B_CELL_CAP} techo={CORR_B_TECHO} "
         f"checkpoint={CHECKPOINT_TOKENS} celdas={len(orden)} "
         f"semilla={CORR_B_SEED}")
@@ -954,8 +963,7 @@ def modo_corrida_b(model: str, resume: bool) -> int:
                                ceiling_watch=(acum, proy, CORR_B_TECHO))
         if cells[key]["stopped_by"] == "truncated_by_ceiling":
             cells[key]["estado"] = "truncated_by_ceiling"
-        STATE_CORRB.write_text(json.dumps({"cells": cells}, ensure_ascii=False,
-                                          indent=1), encoding="utf-8")
+        _write_json(STATE_CORRB, {"cells": cells})
         acum = _coste(cells)["total_tokens"]
         # Checkpoint (E2-Importante 2): evaluación única, árbol pre-reg.
         if checkpoint is None and acum >= CHECKPOINT_TOKENS:
@@ -994,8 +1002,7 @@ def modo_corrida_b(model: str, resume: bool) -> int:
                                               CORR_B_TECHO))
         if cells[key]["stopped_by"] == "truncated_by_ceiling":
             cells[key]["estado"] = "truncated_by_ceiling"
-        STATE_CORRB.write_text(json.dumps({"cells": cells}, ensure_ascii=False,
-                                          indent=1), encoding="utf-8")
+        _write_json(STATE_CORRB, {"cells": cells})
 
     # ---------------- evaluación pre-registrada ---------------------------
     pares_forzado = []
@@ -1042,7 +1049,8 @@ def modo_corrida_b(model: str, resume: bool) -> int:
     coste = _coste(cells)
     result = {"hito": 20, "modo": "corrida-b",
               "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "modelo": model,
-              "canal": "b", "max_turns": CORR_B_MAX_TURNS,
+              "canal": "b", "canal_b_version": CANAL_B_VERSION,
+              "max_turns": CORR_B_MAX_TURNS,
               "cap_celda": CORR_B_CELL_CAP, "techo_tokens": CORR_B_TECHO,
               "checkpoint": {"tokens": CHECKPOINT_TOKENS,
                              **(checkpoint or {"branch": "no_disparado"})},
@@ -1057,8 +1065,7 @@ def modo_corrida_b(model: str, resume: bool) -> int:
               "informes": str(INFORMES_CORRB.relative_to(REPO)),
               "commits": _git_head(),
               "git_head_start": "3e620212eb9819187c6ab45ff0d37437737e4f7d"}
-    RESULT_CORRB.write_text(json.dumps(result, ensure_ascii=False, indent=1),
-                            encoding="utf-8")
+    _write_json(RESULT_CORRB, result)
     log(f"SATURACIÓN {saturacion['regla']}: {saturacion['accion']}")
     log(f"comparativa canal b vs H19: {comparativa['regla']}")
     log(f"truncamiento: {n_trunc}/{N_CELLS_PLAN} ({tasa_trunc:.0%})"
