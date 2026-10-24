@@ -90,8 +90,11 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
   inválidas) y A4_interval 100→56,67 (4 turnos, 0 writes, 0 inválidas;
   el nudge empieza en turno 6 → no atribuible a él), A5_batch 97,06.
   **b3 no se adopta** (default `CANAL_B_VERSION=b2`; `--hito21` fuerza b3
-  solo para reproducir). n=1 y b3 empaqueta parser+nudge: sin atribución
-  causal. Incidencia: `_run_cell` no pasaba `on_turn` → sin heartbeat en la
+  solo para reproducir). **Triage §6 (0 tokens)**: A2_plugin 12/12 inválidas
+  son una llave `}` ausente (aviso b3 engañoso; reparado offline 96,43);
+  A2_checkout 5/5 writes no compilan (parser tolerante ejecuta contenido
+  inválido; gate de sintaxis lo evitaría); A4_interval sin mecanismos b3
+  activos → varianza. n=1: G3 mezcla causas accionables y varianza. Incidencia: `_run_cell` no pasaba `on_turn` → sin heartbeat en la
   corrida; corregido + test. Evidencia `evals/results/result_hito21.json`,
   `results/informes_hito21/`, `traces_h21.sqlite`, `logs/hito21_run.log`.
 - **Endurecimiento Paso 1-2**: escrituras atómicas

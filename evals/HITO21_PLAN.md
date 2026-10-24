@@ -174,3 +174,38 @@ repetir controles **n≥2** para separar varianza de efecto, y mantener A2 como
 caso de calidad (escribir no basta). Requiere plan y techo nuevos; no se lanza
 con el techo de este hito.
 
+
+
+## §6 — Triage post-cierre (0 tokens, 2026-10-24)
+
+Objetivo: separar causa accionable de varianza **sin tocar la evidencia ni el
+veredicto §5**. Método reproducible: decodificar la salida de los spans
+`turn` (viene serializada como string JSON), replay con `parse_actions()` /
+`parse_actions_tolerante()`, probar reparaciones acotadas y compilar el
+contenido con `compile(..., "exec")`; para A2_plugin se ejecutó además el
+verificador oculto sobre el contenido reparado (pytest local, 0 LLM).
+
+| celda | hallazgo | causa |
+|---|---|---|
+| `A2_plugin-registry` | **12/12** turnos inválidos de b3 son un `write_file` al que le falta **una sola llave final** (`"}`); `raw + "}"` parsea en 12/12 y el contenido **compila**. El aviso b3 habla de saltos/comillas triples, no de la llave que falta; el modelo repite el mismo error. En b2 hubo 1 inválido con el mismo patrón y el aviso genérico llevó a un write válido. | **aviso específico engañoso** (no el parser). Contenido reparado offline: hidden **96,43** (27/28) vs 64,29 de b3 y 100 de b2. |
+| `A2_checkout-rounding` | los **5/5** ficheros escritos por b3 dan `SyntaxError` en línea 1: falta la **apertura del docstring de módulo** (`"""`); base y parser tolerante los aceptaron. b2 escribió 0 y conservó 38,18. | **parser tolerante ejecuta contenido no compilable**: convierte un no-write en un write destructivo. Un gate de sintaxis antes de escribir lo habría rechazado. |
+| `A4_interval-scheduler` | b3: 4 turnos, **0 inválidas**, 0 writes, `final`. No se activó ningún mecanismo b3 (ni aviso ni nudge: el nudge empieza en turno 6). | **varianza del modelo**, no atribuible a b3 con la evidencia disponible; el recorte de traza a 4.000 chars impide ver el output completo de los turnos 2/4. |
+| `A5_batch-coalescer` | −2,94 (dentro de G3); 1 write válido y 7 tools. | varianza menor. |
+
+Conclusión del triage: el fallo de G3 no es un bloque monolítico. Hay **dos
+causas accionables** (aviso que no diagnostica la llave que falta; parser que
+acepta contenido Python inválido) y **una de varianza** (A4_interval). El
+veredicto §5 sigue siendo **NO CUMPLE** y b3 no se adopta; esto solo informa
+el diseño de un HITO22, que requerirá plan y techo nuevos antes de medir.
+
+Diseño candidato para HITO22 (no ratificado, no ejecutado):
+
+1. Reparar la llave exterior ausente **solo** si el JSON reparado parsea y el
+   contenido compila; en otro caso, no inventar.
+2. Gate de sintaxis para `write_file` a `.py`: si `compile()` falla, no
+   escribir y devolver el error al modelo (evita el 0 de A2_checkout y
+   conserva el 38,18 base).
+3. Sustituir el aviso específico por uno **basado en el error real** de
+   `json.JSONDecodeError` (llave/coma vs string vs delimitador).
+4. Controles con **n≥2** para separar varianza; A2_checkout entra como caso
+   de calidad, no solo de “escribir”.
