@@ -9,6 +9,8 @@ Modos:
   --diagnostico-b  Diagnóstico escalado-b HITO20 §0.3: canal b (lecturas
              completas + multi-acción + cap 18k), 17 turnos, 3 celdas,
              techo 1,5M, tope duro 450k/celda (RATIFICADO 2026-10-23).
+  --b           §6 HITO20: 12 tareas *-b multi-paquete, canal b2, 60 celdas,
+             techo 4,2M (RATIFICADO 2026-10-24; sin brazo forzado).
   --corrida-b   §1 HITO20 (Enmiendas 1-2): matriz 17x12 canal b, orden
              estratificado semilla 20261023, checkpoint 2,65M con árbol
              pre-registrado, techo 7M, cap 450k/celda, más brazo
@@ -139,6 +141,30 @@ RESULT_H21 = REPO / "evals" / "results" / "result_hito21.json"
 RESULT_FASE_A = REPO / "evals" / "results" / "result_hito21_fase_a.json"
 INFORMES_H21 = REPO / "evals" / "results" / "informes_hito21"
 HEARTBEAT_H21 = SD_ROOT / "_heartbeat_h21.json"
+
+# HITO20 §6 B (RATIFICADO por el dueño 2026-10-24): 12 tareas *-b
+# multi-paquete, 60 celdas, canal b2, max_turns=17, cap 450k/celda, techo
+# 4,2M. Sin brazo forzado: B mide U7, no saturación forzada.
+B_MAX_TURNS = 17
+B_CELL_CAP = 450_000
+B_TECHO = 4_200_000
+B_SNAP_TURNS = (12,)
+B_PROY_CELDA = 70_000
+# Proyección B (pre-registrada §6.4): base medida de la matriz b2 H20 §1
+# (tok/celda por variante) x factor de alcance 1,35 x margen 1,30. El
+# modelo cúbico de --presupuesto NO se usa en B: H20 §1 midió que sobreestima
+# (6,1M) porque las celdas b2 convergen y paran.
+PRESUPUESTO_B_BASE_B2 = {"A1": 5_469, "A2": 47_182, "A3": 67_491,
+                         "A4": 34_763, "A5": 41_725}
+B_SCOPE_FACTOR = 1.35
+B_MARGEN = 1.30
+WS_B = Path("/tmp/opencode/sd_pilot_b")
+STATE_B = SD_ROOT / "_run_state_b.json"
+TRACES_B = SD_ROOT / "traces_b.sqlite"
+RESULT_B = REPO / "evals" / "results" / "result_sens_sd_b.json"
+INFORMES_B = REPO / "evals" / "results" / "informes_b"
+HEARTBEAT_B = SD_ROOT / "_heartbeat_b.json"
+QA_B = REPO / "evals" / "results" / "result_b_build_qa.json"
 
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
@@ -487,7 +513,29 @@ def presupuesto_run(max_turns: int, n_tareas: int, techo: int) -> dict:
             "veredicto": "COSTE_OK" if total <= techo else "EXCEDE_TECHO"}
 
 
-def modo_presupuesto(max_turns: int, n_tareas: int, techo: int) -> int:
+def presupuesto_b(n_tareas: int, techo: int) -> dict:
+    """Proyección B §6.4: base b2 x alcance 1,35 x margen 1,30."""
+    por_variante = {v: round(base * B_SCOPE_FACTOR * B_MARGEN)
+                    for v, base in PRESUPUESTO_B_BASE_B2.items()}
+    total = sum(por_variante.values()) * n_tareas
+    return {"n_tareas": n_tareas, "celdas": n_tareas * len(por_variante),
+            "por_variante": por_variante,
+            "total": total, "techo": techo, "cabe": total <= techo,
+            "veredicto": "COSTE_OK" if total <= techo else "EXCEDE_TECHO",
+            "factores": {"alcance": B_SCOPE_FACTOR, "margen": B_MARGEN}}
+
+
+def modo_presupuesto(max_turns: int, n_tareas: int, techo: int,
+                     base_b2: bool = False) -> int:
+    if base_b2:
+        p = presupuesto_b(n_tareas, techo)
+        log(f"presupuesto B de antemano: n_tareas={n_tareas} "
+            f"({p['celdas']} celdas)")
+        for v, tok in p["por_variante"].items():
+            log(f"  {v}: {tok} tok/celda (base b2 x alcance x margen)")
+        log(f"  total estimado: {p['total']} tokens · techo {p['techo']} -> "
+            f"{p['veredicto']}")
+        return 0 if p["cabe"] else 2
     p = presupuesto_run(max_turns, n_tareas, techo)
     log(f"presupuesto de antemano: max_turns={max_turns} n_tareas={n_tareas} "
         f"({p['celdas']} celdas, {p['llamadas_max']} llamadas máx)")
@@ -1282,6 +1330,189 @@ def modo_corrida_b(model: str, resume: bool) -> int:
     return 0
 
 
+def evaluar_b(cells: dict[str, dict], r: dict, qa_ok: bool) -> dict:
+    """Gates B0-B5 de HITO20 §6.3, congelados antes de medir B."""
+    from evals.sd_pilot.tasks import B_TASK_IDS
+    from evals.sd_pilot.variants import VARIANT_NAMES
+
+    n_plan = len(B_TASK_IDS) * len(VARIANT_NAMES)
+    completas = 0
+    truncadas = 0
+    llm_errors: list[str] = []
+    for t in B_TASK_IDS:
+        for v in VARIANT_NAMES:
+            key = f"{v}_{t}"
+            c = cells.get(key) or {}
+            if c.get("score") is not None and not c.get("estado"):
+                completas += 1
+            if c.get("estado"):
+                truncadas += 1
+            if c.get("llm_error"):
+                llm_errors.append(key)
+    coste = _coste(cells)["total_tokens"]
+    versiones = {c.get("canal_b_version") for c in cells.values()
+                 if c.get("score") is not None}
+    canales = {c.get("canal") for c in cells.values()
+               if c.get("score") is not None}
+    b0 = qa_ok
+    b1 = completas == n_plan and not llm_errors and truncadas == 0
+    b2 = all(r["gates"][u]["ok"] for u in ("U3", "U4", "U5"))
+    b3 = bool(r["gates"]["U7"]["ok"])
+    b4 = coste <= B_TECHO
+    b5 = (bool(cells) and canales == {"b"} and versiones == {"b2"}
+          and len(cells) >= n_plan)
+    gates = {
+        "B0_BUILD_QA": {"pasa": b0, "qa": qa_ok,
+                        "umbral": "12/12 QA de BUILD (result_b_build_qa.json)"},
+        "B1_completitud": {"pasa": b1, "completas": completas,
+                           "plan": n_plan, "truncadas": truncadas,
+                           "llm_error": llm_errors[:20],
+                           "umbral": "60/60, sin truncar, sin llm_error"},
+        "B2_sens": {"pasa": b2,
+                    "U3": r["gates"]["U3"], "U4": r["gates"]["U4"],
+                    "U5": r["gates"]["U5"],
+                    "umbral": "U3/U4/U5 con umbrales H19 sin tocar"},
+        "B3_u7": {"pasa": b3, "U7": r["gates"]["U7"],
+                  "umbral": "media_global<=60, media_A5<=80, A5<100>=8/12"},
+        "B4_techo": {"pasa": b4, "coste": coste, "techo": B_TECHO,
+                     "umbral": f"<= {B_TECHO}"},
+        "B5_canal": {"pasa": b5, "canales": sorted(str(x) for x in canales),
+                     "canal_b_version": sorted(str(x) for x in versiones),
+                     "umbral": "canal b2 en las 60 celdas"},
+    }
+    return {"gates": gates, "pasa": all(g["pasa"] for g in gates.values())}
+
+
+def _generar_informes_b() -> bool:
+    from evals.sd_pilot import observador
+    from evals.sd_pilot.io_atomico import escribir_texto_atomico
+    spans = observador.cargar_spans(TRACES_B)
+    celdas = observador.agrupar_por_celda(spans)
+    INFORMES_B.mkdir(parents=True, exist_ok=True)
+    ok = True
+    for key, cs in sorted(celdas.items()):
+        out = INFORMES_B / f"{key}.md"
+        escribir_texto_atomico(out, observador.informe_celda(key, cs))
+        log(f"informe: {out.relative_to(REPO)} ({len(cs)} spans)")
+        if not out.read_text(encoding="utf-8").strip():
+            ok = False
+    return ok
+
+
+def modo_b(model: str, resume: bool) -> int:
+    """HITO20 §6 B: 12 tareas *-b x 5 variantes, canal b2, techo 4,2M.
+
+    Sin brazo forzado. Orden task-major (tarea x A1-A5) para que un corte
+    de techo deje tareas completas; B1 exige 60/60 de todos modos.
+    """
+    _load_env(model)
+    if resume and not STATE_B.is_file():
+        log("ERROR: --resume sin estado previo de B")
+        return 3
+    if not resume and STATE_B.is_file():
+        log(f"ERROR: ya existe {STATE_B.name}; usa --resume o archiva "
+            "el estado documentándolo.")
+        return 3
+
+    from evals.sd_pilot.tasks import B_TASK_IDS, lint_tasks
+    problems = lint_tasks(B_TASK_IDS)
+    if problems:
+        log(f"ABORTADO: lint de tareas B con problemas: {problems}")
+        return 3
+    qa_ok = False
+    if QA_B.is_file():
+        try:
+            qa_ok = bool(json.loads(QA_B.read_text(encoding="utf-8")).get("ok"))
+        except (OSError, ValueError):
+            qa_ok = False
+    if not qa_ok:
+        log(f"ABORTADO: falta QA de BUILD válido en {QA_B.name}")
+        return 3
+
+    # B se define en b2: no heredar un b3 de entorno/pruebas previas.
+    os.environ["BIBLIOTECARIO_CANAL_B_VERSION"] = "b2"
+    import evals.sd_pilot.harness as _harness
+    _harness.CANAL_B_VERSION = "b2"
+
+    import traceforge
+    cells: dict[str, dict] = {}
+    if resume:
+        st = json.loads(STATE_B.read_text(encoding="utf-8"))
+        cells = st.get("cells", {})
+        head_inicio = st.get("git_head_start") or _git_head()
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_B))
+        log(f"resume B: {len(cells)} celdas cargadas")
+    else:
+        head_inicio = _git_head()
+        _write_json(STATE_B, {"cells": {}, "git_head_start": head_inicio})
+        if HEARTBEAT_B.exists():
+            HEARTBEAT_B.unlink()
+        if TRACES_B.exists():
+            TRACES_B.unlink()
+        traceforge.configure(collector="sqlite", db_path=str(TRACES_B))
+
+    from dataclasses import replace as _replace
+
+    from evals.sd_pilot.harness import CANAL_B_VERSION
+    from evals.sd_pilot.variants import VARIANT_NAMES, VARIANTS
+    pares = [(v, t) for t in B_TASK_IDS for v in VARIANT_NAMES]
+    log(f"B §6: canal={CANAL_B_VERSION} max_turns={B_MAX_TURNS} "
+        f"cap={B_CELL_CAP} techo={B_TECHO} celdas={len(pares)}")
+
+    for vname, tid in pares:
+        key = f"{vname}_{tid}"
+        if key in cells:
+            continue
+        acum = _coste(cells)["total_tokens"]
+        if acum >= B_TECHO:
+            cells[key] = {"score": None, "estado": "no_ejecutada_por_techo"}
+            log(f"{key}: NO_EJECUTADA_POR_TECHO (acum={acum})")
+            _write_json(STATE_B, {"cells": cells, "git_head_start": head_inicio})
+            continue
+        var = _replace(VARIANTS[vname], max_turns=B_MAX_TURNS)
+        cells[key] = _run_cell(vname, tid, TRACES_B, ws_root=WS_B,
+                               variant=var, canal="b",
+                               cell_token_cap=B_CELL_CAP,
+                               snap_turns=B_SNAP_TURNS,
+                               ceiling_watch=(acum, B_PROY_CELDA, B_TECHO),
+                               heartbeat_path=HEARTBEAT_B)
+        if cells[key].get("stopped_by") == "truncated_by_ceiling":
+            cells[key]["estado"] = "truncated_by_ceiling"
+        _write_json(STATE_B, {"cells": cells, "git_head_start": head_inicio})
+
+    matrix: dict[str, dict[str, float]] = {}
+    for vname, tid in pares:
+        c = cells.get(f"{vname}_{tid}") or {}
+        if c.get("score") is not None:
+            matrix.setdefault(vname, {})[tid] = float(c["score"])
+    from evals.sd_pilot import sens
+    r = sens.compute(matrix, B_TASK_IDS, VARIANT_NAMES)
+    informes_ok = _generar_informes_b()
+    ev = evaluar_b(cells, r, qa_ok)
+    coste = _coste(cells)
+    result = {"hito": 20, "modo": "b",
+              "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "modelo": model,
+              "canal": "b", "canal_b_version": CANAL_B_VERSION,
+              "git_head_start": head_inicio, "max_turns": B_MAX_TURNS,
+              "cap_celda": B_CELL_CAP, "techo_tokens": B_TECHO,
+              "tareas": B_TASK_IDS, "variantes": list(VARIANT_NAMES),
+              "matriz": matrix, "q_h": r["q_h"], "spread": r["spread"],
+              "sens": r["sens"], "n_sens_finitos": r["n_finitos"],
+              "n_sens_positivos": r["n_positivos"],
+              "gates": ev["gates"], "pasa": ev["pasa"],
+              "informes_ok": informes_ok, "coste": coste, "celdas": cells,
+              "trazas": str(TRACES_B.relative_to(REPO)),
+              "informes": str(INFORMES_B.relative_to(REPO)),
+              "commits": _git_head()}
+    _write_json(RESULT_B, result)
+    for name, gate in ev["gates"].items():
+        log(f"{name}: {'PASA' if gate['pasa'] else 'FALLA'} {gate}")
+    log(f"coste B={coste['total_tokens']} tokens (techo {B_TECHO})")
+    log(f"veredicto B: {'CUMPLE' if ev['pasa'] else 'NO CUMPLE'}")
+    log(f"evidencia: {RESULT_B.relative_to(REPO)}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Piloto Sens(x) HITO19 / HITO20")
     ap.add_argument("--g0", action="store_true", help="G0 humo (§1.7)")
@@ -1295,6 +1526,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--corrida-b", action="store_true",
                     help="§1 HITO20: matriz 17x12 canal b + brazo forzado "
                          "(solo tras §1 definitivo ratificado)")
+    ap.add_argument("--b", action="store_true",
+                    help="§6 HITO20: 12 tareas *-b multi-paquete, canal b2, "
+                         "techo 4,2M (ratificado 2026-10-24)")
     ap.add_argument("--presupuesto", action="store_true",
                     help="coste/turnos de antemano de una corrida (sin LLM)")
     ap.add_argument("--max-turns", type=int, default=32,
@@ -1303,6 +1537,9 @@ def main(argv: list[str] | None = None) -> int:
                     help="tareas previstas (solo con --presupuesto)")
     ap.add_argument("--techo", type=int, default=TECHO_TOKENS,
                     help="techo de tokens declarado (solo con --presupuesto)")
+    ap.add_argument("--base-b2", action="store_true",
+                    help="proyección de B §6 (base b2 x alcance x margen); "
+                         "solo con --presupuesto")
     ap.add_argument("--debug-celda", metavar="V:tarea", default=None,
                     help="una celda, SOLO BUILD")
     ap.add_argument("--model", default=MODEL)
@@ -1313,11 +1550,11 @@ def main(argv: list[str] | None = None) -> int:
 
     modos = [bool(args.g0), bool(args.oficial), bool(args.diagnostico),
              bool(args.diagnostico_b), bool(args.hito21), bool(args.corrida_b),
-             bool(args.presupuesto), bool(args.debug_celda)]
+             bool(args.b), bool(args.presupuesto), bool(args.debug_celda)]
     if sum(modos) != 1:
         ap.error("elige UN modo: --g0 | --oficial | --diagnostico | "
-                 "--diagnostico-b | --hito21 | --corrida-b | --presupuesto | "
-                 "--debug-celda V:tarea")
+                 "--diagnostico-b | --hito21 | --corrida-b | --b | "
+                 "--presupuesto | --debug-celda V:tarea")
 
     if args.g0:
         return modo_g0(args.model)
@@ -1331,8 +1568,11 @@ def main(argv: list[str] | None = None) -> int:
         return modo_hito21(args.model, args.resume)
     if args.corrida_b:
         return modo_corrida_b(args.model, args.resume)
+    if args.b:
+        return modo_b(args.model, args.resume)
     if args.presupuesto:
-        return modo_presupuesto(args.max_turns, args.n_tareas, args.techo)
+        return modo_presupuesto(args.max_turns, args.n_tareas, args.techo,
+                                base_b2=args.base_b2)
     return modo_debug_celda(args.debug_celda, args.model)
 
 

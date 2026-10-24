@@ -26,16 +26,17 @@ Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
 |---|---|
 | `harness.py` | bucle observe-reason-act + herramientas (`read_file`/`write_file`/`run_tests`), PFs, regulación, skills, trazas |
 | `variants.py` | `VARIANTS` A1-A5 (parámetros congelados) |
-| `tasks.py` | `TASK_IDS` (12), ejes de dureza, `lint_tasks()`, `qa_task()` |
+| `tasks.py` | `TASK_IDS` (12 H19) + `B_TASK_IDS`/`B_TASK_AXES` (12 B, multi-paquete), ejes de dureza, `lint_tasks()`, `qa_task()` |
+| `build_b_tasks.py` | HITO20 §6: genera las 12 tareas B copiando/prefijando dos fixtures H19 (idempotente; no toca las originales) y ejecuta QA |
 | `verifier.py` | pytest público (herramienta del agente) y oculto (`m_h(x)`) |
 | `sens.py` | Pearson, `Q_h^(−x)`, gates U2-U7, umbrales congelados |
-| `run_pilot.py` | modos `--g0` / `--oficial` / `--diagnostico` (HITO20 §0.1) / `--diagnostico-b` (§0.3, canal b) / `--corrida-b` (§1, matriz 17×12 canal b + brazo forzado) / `--hito21` (4 residuales + 4 controles, canal b3 experimental para reproducir HITO21, techo 1,8M) / `--presupuesto` / `--debug-celda` (BUILD) |
+| `run_pilot.py` | modos `--g0` / `--oficial` / `--diagnostico` (HITO20 §0.1) / `--diagnostico-b` (§0.3, canal b) / `--corrida-b` (§1, matriz 17×12 canal b + brazo forzado) / `--hito21` (4 residuales + 4 controles, canal b3 experimental para reproducir HITO21, techo 1,8M) / `--b` (§6, 12 tareas *-b, canal b2, techo 4,2M) / `--presupuesto` (con `--base-b2` para B) / `--debug-celda` (BUILD) |
 | `parse_tolerante.py` | HITO21 Fase A: recuperación acotada de `write_file` con triples comillas; idempotente si el JSON ya es válido |
 | `fase_a_offline.py` | HITO21 Fase A: replay 0-tokens sobre `traces_corrb.sqlite` → `results/result_hito21_fase_a.json` |
 | `observador.py` | informes por celda/turno desde `traces_*.sqlite` (canal de observación §0.3, E1.4) |
 | `trazas_analisis.py` | Parte A reproducible (rachas ATASCADO/PROGRESA, §0.1) — fija el snippet ad-hoc original |
 | `skills_pack/` | 4 skills congelados (idénticos en A4 y A5) |
-| `sd_tasks/<id>/` | las 12 fixtures: `TASK.md` + `workspace/` + `tests_hidden/` + `reference/` |
+| `sd_tasks/<id>/` | las 12 fixtures H19 y las 12 `*-b` de H20 §6: `TASK.md` + `workspace/` + `tests_hidden/` + `reference/` |
 | `traces.sqlite`, `_run_state_oficial.json` | trazas TraceForge y estado por celda de la corrida oficial (reanudable) |
 | `traces_g0.sqlite`, `traces_diag.sqlite`, `_run_state_diag.json` | trazas del G0, del diagnóstico HITO20 y estado por celda del diagnóstico |
 | `traces_h21.sqlite`, `_run_state_h21.json` | trazas y estado de la corrida b3 de HITO21 (8 celdas) |
@@ -47,8 +48,9 @@ y `logs/sens_sd_pilot_run.log`. Diagnóstico HITO20 (§0.1 del plan):
 `results/result_sens_sd_diag.json` (Parte B) + `logs/sens_sd_diag_run.log`.
 HITO21: `results/result_hito21_fase_a.json` (Fase A offline),
 `results/result_hito21.json` + `results/informes_hito21/` (corrida b3,
-cerrada NO CUMPLE por G3; b3 no adoptado). Tests: `tests/test_sens_sd_pilot.py`
-(puros, sin LLM).
+cerrada NO CUMPLE por G3; b3 no adoptado). HITO20 §6 B (BUILD, sin corrida):
+`results/result_b_build_qa.json` (12/12 referencia 100 %, vacío <100 %).
+Tests: `tests/test_sens_sd_pilot.py` (puros, sin LLM).
 
 ## `preflight/` (159 ficheros) — la evaluación **viva**
 
@@ -76,7 +78,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO21_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **§1 cerrado 2026-10-24** — canal b + SATURA, B+C1 pendientes; H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2) |
+| `HITO3_PLAN.md`…`HITO21_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **§1 cerrado 2026-10-24** — canal b + SATURA; **§6 B RATIFICADO** (12 multi-paquete, BUILD 12/12 QA, modo `--b`, corrida pendiente); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |
@@ -84,6 +86,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | `result_smoke_*` | humo (coste mínimo, sin umbral) |
 | `result_sens_sd_g0.json`, `result_sens_sd_pilot.json` | G0 humo y corrida oficial del **Hito 19** (`Sens(x)`); su stdout es `logs/sens_sd_g0.log` y `logs/sens_sd_pilot_run.log` |
 | `result_sens_sd_diag_trazas.json`, `result_sens_sd_diag.json` | **Hito 20** §0.1: diagnóstico de celdas truncadas (Parte A 0 tokens, Parte B `max_turns=32`); stdout en `logs/sens_sd_diag_run.log` |
+| `result_sens_sd_corridab.json`, `result_b_build_qa.json` | **Hito 20** §1 (matriz canal b, SATURA) y §6 B (QA de BUILD 0 tokens de las 12 tareas multi-paquete; no es corrida) |
 | `run_<X>.py` → `results/result_<X>.json` + `logs/run_<X>.log` | trío runner → evidencia → stdout del mismo experimento |
 | `*_prev*.json` | corrida anterior conservada antes de repetir (historial, no borrar) |
 

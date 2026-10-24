@@ -20,6 +20,7 @@ from evals.sd_pilot.harness import (
 )
 from evals.sd_pilot.parse_tolerante import parse_actions_tolerante
 from evals.sd_pilot.run_pilot import (
+    B_TECHO,
     CHECKPOINT_TOKENS,
     CORR_B_CELL_CAP,
     CORR_B_SEED,
@@ -42,11 +43,13 @@ from evals.sd_pilot.run_pilot import (
     decidir_checkpoint,
     decidir_truncamiento,
     estimar_tokens_celda,
+    evaluar_b,
     evaluar_diagnostico,
     evaluar_diagnostico_b,
     evaluar_hito21,
     evaluar_saturacion_forzado,
     orden_estratificado,
+    presupuesto_b,
     presupuesto_run,
     proy_celda,
     recalibrar_diagnostico_b,
@@ -329,6 +332,53 @@ def test_public_summary_informativo(tmp_path):
 def test_lint_de_las_12_tareas_congeladas():
     assert len(tasks.TASK_IDS) == 12
     assert tasks.lint_tasks() == []
+
+
+def test_lint_de_las_12_tareas_b():
+    assert len(tasks.B_TASK_IDS) == 12
+    assert len(set(tasks.B_TASK_IDS)) == 12
+    assert tasks.lint_tasks(tasks.B_TASK_IDS) == []
+    for tid in tasks.B_TASK_IDS:
+        assert "multi-paquete" in tasks.B_TASK_AXES[tid]
+
+
+def test_b_qa_build_evidencia():
+    import json
+    ruta = REPO / "evals" / "results" / "result_b_build_qa.json"
+    data = json.loads(ruta.read_text(encoding="utf-8"))
+    assert data["ok"] is True
+    assert len(data["tareas"]) == 12
+    assert all(t["ref_score"] == 100.0 for t in data["tareas"])
+
+
+def test_evaluar_b_pasa_y_detecta_corte():
+    from evals.sd_pilot import sens
+    from evals.sd_pilot.variants import VARIANT_NAMES
+    cells = {}
+    matrix = {}
+    for i, t in enumerate(tasks.B_TASK_IDS):
+        for j, v in enumerate(VARIANT_NAMES):
+            score = 20.0 + i + j * 10.0
+            cells[f"{v}_{t}"] = {
+                "score": score, "canal": "b", "canal_b_version": "b2",
+                "usage": {"total_tokens": 1000},
+            }
+            matrix.setdefault(v, {})[t] = score
+    r = sens.compute(matrix, tasks.B_TASK_IDS, VARIANT_NAMES)
+    ev = evaluar_b(cells, r, True)
+    assert ev["pasa"] is True
+    assert ev["gates"]["B1_completitud"]["completas"] == 60
+    cells["A1_" + tasks.B_TASK_IDS[0]]["estado"] = "truncated_by_ceiling"
+    ev2 = evaluar_b(cells, r, True)
+    assert ev2["pasa"] is False
+    assert ev2["gates"]["B1_completitud"]["pasa"] is False
+    cells["A1_" + tasks.B_TASK_IDS[0]]["canal_b_version"] = "b3"
+    ev3 = evaluar_b(cells, r, True)
+    assert ev3["gates"]["B5_canal"]["pasa"] is False
+    assert B_TECHO == 4_200_000
+    p = presupuesto_b(12, B_TECHO)
+    assert p["cabe"] is True
+    assert p["total"] == 4_141_020
 
 
 def test_skills_pack_presente_y_congelado():

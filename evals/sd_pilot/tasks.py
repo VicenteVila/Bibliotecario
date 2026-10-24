@@ -42,6 +42,33 @@ TASK_AXES: dict[str, tuple[str, ...]] = {
     "config-migration": ("multi-fichero", "contrato", "limites-ocultos"),
 }
 
+# B (HITO20): tareas endurecidas por alcance multi-paquete. Cada tarea B
+# combina dos fixtures congeladas de H19 en un monorepo; los originales no
+# se tocan. Se mantiene N=12 para no cambiar los umbrales de Sens(x).
+B_DOMAINS = [
+    "checkout-rounding",
+    "repo-cache-layer",
+    "dsl-parser",
+    "interval-scheduler",
+    "seeded-bugs-billing",
+    "cli-subcommand",
+    "workflow-statemachine",
+    "batch-coalescer",
+    "schema-validator",
+    "plugin-registry",
+    "csv-diff-engine",
+    "config-migration",
+]
+B_TASK_IDS = [
+    f"{B_DOMAINS[i]}-{B_DOMAINS[(i + 1) % len(B_DOMAINS)]}-b"
+    for i in range(len(B_DOMAINS))
+]
+B_TASK_AXES: dict[str, tuple[str, ...]] = {}
+for _i, _tid in enumerate(B_TASK_IDS):
+    _a = TASK_AXES[B_DOMAINS[_i]]
+    _b = TASK_AXES[B_DOMAINS[(_i + 1) % len(B_DOMAINS)]]
+    B_TASK_AXES[_tid] = tuple(dict.fromkeys((*_a, *_b, "multi-paquete")))
+
 PUBLIC_TESTS_MIN = 4
 HIDDEN_TESTS_MIN = 10
 WORKSPACE_PY_MIN = 3
@@ -96,7 +123,7 @@ def lint_tasks(task_ids: list[str] | None = None) -> list[str]:
             problems.append(f"{tid}: {n_hid} tests ocultos (<{HIDDEN_TESTS_MIN})")
         if not (d / "reference").is_dir() or not any((d / "reference").rglob("*.py")):
             problems.append(f"{tid}: reference/ vacío o ausente")
-        axes = TASK_AXES.get(tid, ())
+        axes = TASK_AXES.get(tid, B_TASK_AXES.get(tid, ()))
         if len(axes) < 2:
             problems.append(f"{tid}: ejes de dureza <2 declarados")
     return problems
@@ -139,5 +166,5 @@ def qa_task(task_id: str) -> dict:
     return out
 
 
-def qa_all() -> list[dict]:
-    return [qa_task(tid) for tid in TASK_IDS]
+def qa_all(task_ids: list[str] | None = None) -> list[dict]:
+    return [qa_task(tid) for tid in (task_ids or TASK_IDS)]

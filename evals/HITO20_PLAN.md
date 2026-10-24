@@ -658,3 +658,135 @@ Evidencia: `evals/results/result_sens_sd_corridab.json` +
 `evals/results/informes_corridab/` (63 .md), log
 `evals/logs/sens_sd_corridab_run.log`, trazas
 `evals/sd_pilot/traces_corrb.sqlite` y estado `_run_state_corrb.json`.
+
+## §6 — B (tareas endurecidas): BUILD y protocolo (RATIFICADO 2026-10-24)
+
+> **Estado**: RATIFICADO por el dueño el 2026-10-24: **12 tareas B
+> multi-paquete, N=12, techo 4.200.000**. El BUILD está validado (QA de
+> referencia, 0 tokens LLM) y el modo B está implementado; **aún no se ha
+> ejecutado ninguna celda**. La corrida única se lanza tras el commit de
+> este §6 y de la implementación.
+
+### §6.0 — Qué pregunta B y por qué ahora
+
+HITO21 midió que el canal b2 no basta: **G3 falló** y la media global subió
+(72,28 vs 38,42 base) porque tres tareas se saturaron. HITO20 §1 midió que
+con las tareas de H19 el agente **satura** (SATURA, IC95 [0,0]). B no repite
+esas preguntas: mide si **tareas de mayor alcance** (dos paquetes por tarea,
+mismo contrato congelado) bajan la saturación y la media global por debajo
+del umbral U7. C1 (reintentos/robustez del canal b) ya está activo en b2; B
+no cambia C1.
+
+### §6.1 — Set de tareas (12, N=12)
+
+Cada tarea B es un **monorepo con dos fixtures congeladas de H19**. No se
+edita ningún original de H19: se copian workspace, reference, tests públicos
+y tests ocultos; los tests se prefijan para evitar colisiones. El eje de
+endurecimiento declarado es **`multi-paquete`** (alcance): el agente debe
+satisfacer ambos contratos, no solo uno. La lista de pares es un ciclo:
+
+| # | tarea B | paquete A | paquete B |
+|---|---|---|---|
+| 1 | `checkout-rounding-repo-cache-layer-b` | checkout-rounding | repo-cache-layer |
+| 2 | `repo-cache-layer-dsl-parser-b` | repo-cache-layer | dsl-parser |
+| 3 | `dsl-parser-interval-scheduler-b` | dsl-parser | interval-scheduler |
+| 4 | `interval-scheduler-seeded-bugs-billing-b` | interval-scheduler | seeded-bugs-billing |
+| 5 | `seeded-bugs-billing-cli-subcommand-b` | seeded-bugs-billing | cli-subcommand |
+| 6 | `cli-subcommand-workflow-statemachine-b` | cli-subcommand | workflow-statemachine |
+| 7 | `workflow-statemachine-batch-coalescer-b` | workflow-statemachine | batch-coalescer |
+| 8 | `batch-coalescer-schema-validator-b` | batch-coalescer | schema-validator |
+| 9 | `schema-validator-plugin-registry-b` | schema-validator | plugin-registry |
+| 10 | `plugin-registry-csv-diff-engine-b` | plugin-registry | csv-diff-engine |
+| 11 | `csv-diff-engine-config-migration-b` | csv-diff-engine | config-migration |
+| 12 | `config-migration-checkout-rounding-b` | config-migration | checkout-rounding |
+
+**Limitación declarada**: cada dominio aparece dos veces (una como paquete A
+y otra como B), así que las 12 tareas B **no son independientes** entre sí.
+B mide el efecto de duplicar alcance, no 12 dominios nuevos; `Sens(x)` se
+calcula igual (12 tareas), pero la lectura de Q_h debe tenerlo en cuenta.
+Si el dueño quiere dominios independientes, este set se sustituye antes de
+la corrida y se rehace el BUILD.
+
+### §6.2 — BUILD y QA (0 tokens LLM)
+
+- Generador reproducible: `evals/sd_pilot/build_b_tasks.py` (idempotente;
+  copia y prefija tests; no toca H19).
+- Registro: `B_TASK_IDS`/`B_TASK_AXES` en `evals/sd_pilot/tasks.py`; las 12
+  tareas de H19 siguen intactas.
+- QA ejecutado: `lint_tasks(B_TASK_IDS) == []`; **12/12 referencia = 100 %
+  ocultos**; **12/12 referencia pasa todos los públicos** (0 fallos); **12/12
+  workspace vacío falla ≥1 público** y **<100 % ocultos** (mínimo 22,06,
+  máximo 69,09). Evidencia: `evals/results/result_b_build_qa.json`.
+- El QA de BUILD no es una corrida ni produce Score; solo certifica que la
+  referencia y el suelo están bien construidos.
+
+### §6.3 — Matriz y gates (pre-registrados; N=12)
+
+- **60 celdas** = 12 tareas B × 5 variantes A1-A5; `max_turns=17`; **canal
+  b2** (el default adoptado; **no b3**); sin brazo forzado (B no mide
+  saturación forzada, mide U7). Orden **task-major** (tarea × A1-A5): si el
+  techo corta, deja tareas completas.
+- Cap por celda **450.000 tokens** (mid-cell, corta y documenta); corte entre
+  celdas al techo de §6.4. Snapshots en turno 12 (descriptivo).
+- **B0 BUILD**: §6.2 completo (12/12 QA) — ya cumplido.
+- **B1 completitud**: 60/60 celdas puntuadas, sin `llm_error`, sin celdas
+  cortadas ni no ejecutadas. Cualquier corte o error hace **B1 falla**; B2/B3
+  se reportan pero quedan **no concluyentes**. No se excluye ninguna celda:
+  los umbrales U3/U4/U5/U7 están fijados sobre 12 tareas y no se reescalan.
+- **B2 Sens(x)**: U3 spread ≥15; U4 finitos ≥6/12; U5 positivos ≥6/12
+  (umbrales de H19, **sin tocar**).
+- **B3 U7 (primario)**: `media_global ≤ 60`; `media_A5 ≤ 80`;
+  `a5_below_100 ≥ 8/12`. Es el mismo U7 de H19; N=12 permite reutilizarlo
+  sin reescalar.
+- **B4 coste**: total ≤ **4.200.000 tokens**; si la proyección B de §6.4
+  supera el techo, **no se lanza**.
+- **B5 canal**: las 60 celdas declaran `canal=b2` y `canal_b_version=b2`
+  (ninguna b3).
+
+**Lectura primaria**: si B3 pasa, B reduce la saturación medida por U7 en
+este set; si falla, B **no** la reduce y el dueño decide C2/cierre. B2 es
+condición de medida (si falla, no hay Sens válida). No se reinterpreta
+`Score_final` como nota si B1/B4/B5 fallan.
+
+### §6.4 — Techo y proyección
+
+- Techo duro de B: **4.200.000 tokens** (ratificado por el dueño
+  2026-10-24), dentro del remanente de H20
+  (7.000.000 − 2.686.674 = 4.313.326).
+- Proyección B pre-registrada: `12 × Σ_v base_b2(v) × 1,35 × 1,30`, con
+  `base_b2` = media medida en H20 §1 (A1 5.469 · A2 47.182 · A3 67.491 ·
+  A4 34.763 · A5 41.725 tok/celda), factor de alcance **1,35** y margen
+  **1,30**. Resultado: **4.141.020** ≤ 4.200.000 (margen 58.980).
+- El modelo cúbico de `--presupuesto` **no se usa en B**: H20 §1 midió que
+  sobreestima (6,1M) porque las celdas b2 convergen y paran. Comando:
+  `run_pilot.py --presupuesto --base-b2 --max-turns 17 --n-tareas 12
+  --techo 4200000` -> `COSTE_OK`.
+- **Riesgo declarado**: el margen es estrecho (1,4 % del techo); si el coste
+  real supera 4,2M, B1/B4 fallan y no hay veredicto de score. No se amplía
+  el techo tras medir sin enmienda del dueño.
+- Evidencia esperada: `evals/results/result_sens_sd_b.json`,
+  `evals/results/informes_b/`, `evals/logs/sens_sd_b_run.log`,
+  `evals/sd_pilot/traces_b.sqlite`, `_run_state_b.json`.
+
+### §6.5 — Disciplina
+
+Commit del BUILD + §6 → ratificación (HECHA 2026-10-24) → implementación
+del modo B + tests (HECHA) → proyección inyectada (HECHA) → corrida única →
+cierre de §6 con veredicto.
+Los originales de H19 y los umbrales de `sens.py` no se tocan. El QA de
+BUILD (`result_b_build_qa.json`) se conserva como evidencia; no se borra.
+
+### §6.6 — Estado de implementación
+
+1. Ratificación del dueño: **HECHA** 2026-10-24 (12 multi-paquete, 4,2M).
+2. Modo B en `run_pilot.py` (`--b`): **HECHO**; matriz
+   `B_TASK_IDS × VARIANT_NAMES`, canal b2, `max_turns=17`, cap 450k,
+   snapshots@12, estado/trazas/informes B y evaluador B0-B5. Tests puros
+   de `evaluar_b`/`presupuesto_b` (sin LLM): verdes.
+3. Proyección B inyectada: **HECHA** (§6.4, 4.141.020 ≤ 4,2M).
+4. Corrida única: **PENDIENTE**. Primera ejecución (crea estado):
+   `setsid .venv/bin/python evals/sd_pilot/run_pilot.py --b
+   > evals/logs/sens_sd_b_run.log 2>&1 < /dev/null &`
+   Reanudación (solo celdas ya puntuadas):
+   `setsid .venv/bin/python evals/sd_pilot/run_pilot.py --b --resume
+   >> evals/logs/sens_sd_b_run.log 2>&1 < /dev/null &`
