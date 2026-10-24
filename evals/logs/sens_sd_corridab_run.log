@@ -1,0 +1,225 @@
+[14:35:23] clave NVIDIA: PILOTO (separada de bibliotecario; valor no mostrado)
+[14:35:24] corrida-b §1: canal=b max_turns=17 cap_celda=450000 techo=7000000 checkpoint=2654737 celdas=60 semilla=20261023
+LLM reintentable nvidia: esperando 30s (2)
+[14:39:28] A4/checkout-rounding: score=38.1818% turns=5 llm=5 tools=20 writes=0 paro=final tok=52369 244.1s
+LLM reintentable nvidia: esperando 30s (2)
+[14:47:49] A3/dsl-parser: score=95.6522% turns=13 llm=13 tools=24 writes=8 paro=final tok=123962 501.0s
+[14:55:20] A5/dsl-parser: score=100.0% turns=6 llm=6 tools=15 writes=5 paro=final tok=63240 450.8s
+[14:56:21] A4/repo-cache-layer: score=100.0% turns=3 llm=3 tools=14 writes=1 paro=final tok=19519 61.2s
+[15:00:12] A4/interval-scheduler: score=100.0% turns=5 llm=5 tools=8 writes=1 paro=final tok=30872 231.1s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[15:04:39] A4/dsl-parser: score=13.0435% turns=17 llm=17 tools=11 writes=0 paro=max_turns tok=140406 266.5s
+[15:07:18] A1/dsl-parser: score=95.6522% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=11377 159.3s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[15:25:43] A2/checkout-rounding: score=38.1818% turns=17 llm=17 tools=30 writes=0 paro=max_turns tok=311323 1105.1s
+[15:26:39] A1/interval-scheduler: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=4995 56.1s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[15:30:13] A5/checkout-rounding: score=47.2727% turns=5 llm=5 tools=16 writes=6 paro=final tok=42651 213.9s
+[15:31:15] A1/repo-cache-layer: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=7326 61.5s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[15:33:42] A5/repo-cache-layer: score=100.0% turns=7 llm=7 tools=13 writes=1 paro=final tok=39572 146.9s
+[15:35:26] A1/checkout-rounding: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=9179 104.3s
+[15:36:24] A2/repo-cache-layer: score=100.0% turns=4 llm=4 tools=8 writes=1 paro=final tok=17386 57.7s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[15:40:59] A3/repo-cache-layer: score=41.6667% turns=7 llm=7 tools=19 writes=0 paro=final tok=56724 275.2s
+[15:45:38] A2/interval-scheduler: score=56.6667% turns=6 llm=6 tools=9 writes=0 paro=final tok=39370 279.4s
+LLM reintentable nvidia: esperando 30s (2)
+[15:53:35] A3/interval-scheduler: score=56.6667% turns=8 llm=8 tools=7 writes=0 paro=final tok=64273 477.2s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM nvidia agotada/sobrecargada, paso a siguiente
+LLM nvidia fallo 1/3, se reintenta (no se aparca: es el unico proveedor)
+[15:58:02] A2/dsl-parser: score=13.0435% turns=6 llm=6 tools=10 writes=0 paro=error_llm tok=25997 266.6s LLM_ERROR=RuntimeError: todos los proveedores LLM fallaron: nvidia(ok)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[16:03:36] A5/interval-scheduler: score=56.6667% turns=6 llm=6 tools=14 writes=0 paro=final tok=43047 334.0s
+LLM reintentable nvidia: esperando 30s (2)
+[16:23:46] A3/checkout-rounding: score=38.1818% turns=17 llm=17 tools=34 writes=0 paro=max_turns tok=327999 1209.5s
+LLM reintentable nvidia: esperando 30s (2)
+[16:28:36] A3/seeded-bugs-billing: score=100.0% turns=10 llm=10 tools=11 writes=3 paro=final tok=52156 290.7s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM nvidia agotada/sobrecargada, paso a siguiente
+LLM nvidia fallo 1/3, se reintenta (no se aparca: es el unico proveedor)
+[16:30:05] A2/cli-subcommand: score=25.5319% turns=3 llm=3 tools=2 writes=0 paro=error_llm tok=3751 88.4s LLM_ERROR=RuntimeError: todos los proveedores LLM fallaron: nvidia(ok)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[16:32:55] A3/batch-coalescer: score=100.0% turns=6 llm=6 tools=7 writes=1 paro=final tok=22479 170.5s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[16:39:19] A3/workflow-statemachine: score=100.0% turns=16 llm=16 tools=12 writes=1 paro=final tok=60111 383.5s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[16:41:27] A1/batch-coalescer: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=3107 127.9s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[16:43:28] A4/workflow-statemachine: score=0.0% turns=5 llm=5 tools=9 writes=1 paro=final tok=17222 121.6s
+[16:45:38] A5/batch-coalescer: score=100.0% turns=6 llm=6 tools=8 writes=1 paro=final tok=25305 129.4s
+[16:47:49] A5/cli-subcommand: score=100.0% turns=5 llm=5 tools=13 writes=3 paro=final tok=26922 131.3s
+LLM reintentable nvidia: esperando 30s (2)
+[16:50:23] A5/seeded-bugs-billing: score=100.0% turns=4 llm=4 tools=14 writes=3 paro=final tok=11870 154.2s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[16:53:00] A4/batch-coalescer: score=100.0% turns=5 llm=5 tools=7 writes=1 paro=final tok=19502 156.9s
+[16:53:17] A1/workflow-statemachine: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=2989 17.0s
+LLM reintentable nvidia: esperando 30s (2)
+[16:56:29] A2/workflow-statemachine: score=100.0% turns=7 llm=7 tools=12 writes=1 paro=final tok=26337 192.2s
+LLM reintentable nvidia: esperando 30s (2)
+[16:58:22] A3/cli-subcommand: score=100.0% turns=5 llm=5 tools=12 writes=3 paro=final tok=24474 112.9s
+LLM reintentable nvidia: esperando 30s (2)
+[17:00:09] A4/cli-subcommand: score=100.0% turns=3 llm=3 tools=13 writes=3 paro=final tok=14830 106.7s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+[17:04:32] A2/batch-coalescer: score=100.0% turns=5 llm=5 tools=9 writes=1 paro=final tok=17668 263.4s
+LLM reintentable nvidia: esperando 30s (2)
+[17:07:58] A2/seeded-bugs-billing: score=100.0% turns=8 llm=8 tools=11 writes=3 paro=final tok=37913 205.3s
+LLM reintentable nvidia: esperando 30s (2)
+[17:09:07] A1/seeded-bugs-billing: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=4380 69.5s
+LLM reintentable nvidia: esperando 30s (2)
+[17:14:34] A4/seeded-bugs-billing: score=100.0% turns=6 llm=6 tools=14 writes=3 paro=final tok=28736 327.3s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[17:21:38] A5/workflow-statemachine: score=0.0% turns=5 llm=5 tools=9 writes=1 paro=final tok=17733 423.4s
+[17:21:57] A1/cli-subcommand: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=5311 19.6s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[17:35:56] A5/plugin-registry: score=64.2857% turns=17 llm=17 tools=7 writes=0 paro=max_turns tok=140179 839.0s
+LLM reintentable nvidia: esperando 30s (2)
+[17:39:06] A5/config-migration: score=82.7586% turns=5 llm=5 tools=13 writes=4 paro=final tok=30000 189.6s
+[17:40:58] A2/config-migration: score=89.6552% turns=7 llm=7 tools=14 writes=5 paro=final tok=32530 112.2s
+LLM reintentable nvidia: esperando 30s (2)
+[17:44:35] A2/plugin-registry: score=100.0% turns=8 llm=8 tools=17 writes=1 paro=final tok=25929 216.7s
+[17:45:40] A2/csv-diff-engine: score=100.0% turns=4 llm=4 tools=10 writes=2 paro=final tok=15683 65.2s
+[17:46:46] A2/schema-validator: score=100.0% turns=4 llm=4 tools=7 writes=1 paro=final tok=12291 66.0s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[17:49:49] A3/config-migration: score=72.4138% turns=5 llm=5 tools=13 writes=4 paro=final tok=22783 182.5s
+LLM reintentable nvidia: esperando 30s (2)
+[17:52:17] A1/config-migration: score=86.2069% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=6260 147.8s
+LLM reintentable nvidia: esperando 30s (2)
+[17:55:14] A3/plugin-registry: score=100.0% turns=8 llm=8 tools=12 writes=1 paro=final tok=22627 177.5s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+[17:59:38] A4/config-migration: score=72.4138% turns=6 llm=6 tools=21 writes=4 paro=final tok=47569 264.4s
+[18:00:35] A1/csv-diff-engine: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=4418 56.7s
+[18:02:46] A3/csv-diff-engine: score=100.0% turns=5 llm=5 tools=14 writes=2 paro=final tok=23633 131.1s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[18:04:35] A4/schema-validator: score=100.0% turns=3 llm=3 tools=6 writes=1 paro=final tok=9823 109.0s
+[18:08:51] A4/csv-diff-engine: score=100.0% turns=4 llm=4 tools=18 writes=3 paro=final tok=21543 255.9s
+[18:10:31] A4/plugin-registry: score=64.2857% turns=4 llm=4 tools=9 writes=0 paro=final tok=14766 100.2s
+[18:11:06] A5/schema-validator: score=100.0% turns=3 llm=3 tools=7 writes=1 paro=final tok=10012 34.2s
+[18:11:51] A3/schema-validator: score=100.0% turns=3 llm=3 tools=7 writes=1 paro=final tok=8667 45.2s
+LLM reintentable nvidia: esperando 30s (2)
+[18:12:53] A1/schema-validator: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=3188 62.4s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[18:16:37] A5/csv-diff-engine: score=100.0% turns=9 llm=9 tools=14 writes=2 paro=final tok=50174 224.2s
+[18:16:51] A1/plugin-registry: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=3104 14.0s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[18:24:32] A2/plugin-registry: score=100.0% turns=17 llm=17 tools=18 writes=1 paro=max_turns_forzado tok=83746 460.7s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+[18:35:08] A5/repo-cache-layer: score=100.0% turns=17 llm=17 tools=17 writes=1 paro=max_turns_forzado tok=166087 635.7s
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (2)
+LLM reintentable nvidia: esperando 30s (1)
+[18:43:00] A5/workflow-statemachine: score=100.0% turns=17 llm=17 tools=7 writes=1 paro=max_turns_forzado tok=77279 472.3s
+[18:43:01] informe: evals/results/informes_corridab/A1_batch-coalescer.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_checkout-rounding.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_cli-subcommand.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_config-migration.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_csv-diff-engine.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_dsl-parser.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_interval-scheduler.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_plugin-registry.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_repo-cache-layer.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_schema-validator.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_seeded-bugs-billing.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A1_workflow-statemachine.md (3 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_batch-coalescer.md (20 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_checkout-rounding.md (65 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_cli-subcommand.md (9 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_config-migration.md (29 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_csv-diff-engine.md (19 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_dsl-parser.md (23 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_interval-scheduler.md (22 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_plugin-registry.md (87 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_repo-cache-layer.md (17 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_schema-validator.md (16 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_seeded-bugs-billing.md (28 spans)
+[18:43:01] informe: evals/results/informes_corridab/A2_workflow-statemachine.md (27 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_batch-coalescer.md (20 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_checkout-rounding.md (69 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_cli-subcommand.md (23 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_config-migration.md (24 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_csv-diff-engine.md (25 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_dsl-parser.md (51 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_interval-scheduler.md (24 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_plugin-registry.md (29 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_repo-cache-layer.md (34 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_schema-validator.md (14 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_seeded-bugs-billing.md (32 spans)
+[18:43:01] informe: evals/results/informes_corridab/A3_workflow-statemachine.md (45 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_batch-coalescer.md (18 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_checkout-rounding.md (31 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_cli-subcommand.md (20 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_config-migration.md (34 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_csv-diff-engine.md (27 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_dsl-parser.md (46 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_interval-scheduler.md (19 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_plugin-registry.md (18 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_repo-cache-layer.md (21 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_schema-validator.md (13 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_seeded-bugs-billing.md (27 spans)
+[18:43:01] informe: evals/results/informes_corridab/A4_workflow-statemachine.md (20 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_batch-coalescer.md (21 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_checkout-rounding.md (27 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_cli-subcommand.md (24 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_config-migration.md (24 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_csv-diff-engine.md (33 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_dsl-parser.md (28 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_interval-scheduler.md (27 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_plugin-registry.md (42 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_repo-cache-layer.md (80 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_schema-validator.md (14 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_seeded-bugs-billing.md (23 spans)
+[18:43:01] informe: evals/results/informes_corridab/A5_workflow-statemachine.md (62 spans)
+[18:43:02] SATURACIÓN SATURA: (c) cancelado (turnos 12-17 no aportan ni forzados)
+[18:43:02] comparativa canal b vs H19: E1_ACLARA
+[18:43:02] truncamiento: 0/63 (0%)
+[18:43:02] coste corrida-b=2686674 tokens (techo 7000000, checkpoint 2654737)
+[18:43:02] evidencia: evals/results/result_sens_sd_corridab.json
