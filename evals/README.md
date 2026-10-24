@@ -1,7 +1,7 @@
 # `evals/` — qué es cada cosa
 
-75 ficheros en la raíz, más `results/` (89), `logs/` (37) y `preflight/`
-(159). Esta es la
+80 ficheros en la raíz, más `results/` (103), `logs/` (48) y `preflight/`
+(186). Esta es la
 clase de cada uno, el decodificador de nombres y las reglas. Los
 **veredictos por hito** no se duplican aquí: viven en la tabla «el Hito N»
 de `CONOCIMIENTO.md` §8 (fuente única).
@@ -10,11 +10,11 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 
 | clase | n | dónde | qué es | regla |
 |---|---|---|---|---|
-| **Evidencia** `result_*.json` | 89 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
+| **Evidencia** `result_*.json` | 103 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
 | **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
-| **Planes y reportes** `HITO*.md` + specs | 27 | raíz | 21 hitos (`HITO0-2.md` reportes; `HITO3-21_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 **CERRADO NO CUMPLE** (§1 SATURA; §6 B abortado NO VIABLE POR COSTE); HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
-| **Logs** `*.log` | 37 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
+| **Planes y reportes** `HITO*.md` + specs | 29 | raíz | 23 hitos (`HITO0-2.md` reportes; `HITO3-22_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 **CERRADO NO CUMPLE** (§1 SATURA; §6 B abortado NO VIABLE POR COSTE); HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado; HITO22 **BORRADOR NO RATIFICADO**: SD-2, sin código ni corrida) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
+| **Logs** `*.log` | 48 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
 | **Datos** | 9 | `golden_*.jsonl` (datasets gold), `calib_r4_gold.json`, `game_tasks_expanded.yaml` (60 tareas, citado), `CORPUS_LOCK.json` | referenciados por tests/evals → no mover sin barrido |
 
 ## `sd_pilot/` — piloto `Sens(x)` (Hito 19, dominio `software_development`)
@@ -81,7 +81,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO21_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **CERRADO 2026-10-24 NO CUMPLE** (§1 SATURA; §6 B **ABORTADO NO VIABLE POR COSTE**: 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; BUILD 12/12 QA y modo `--b` quedan como artefactos); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2) |
+| `HITO3_PLAN.md`…`HITO22_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **CERRADO 2026-10-24 NO CUMPLE** (§1 SATURA; §6 B **ABORTADO NO VIABLE POR COSTE**: 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; BUILD 12/12 QA y modo `--b` quedan como artefactos); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2; H22 **BORRADOR NO RATIFICADO** — SD-2, sin código ni corrida) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |
