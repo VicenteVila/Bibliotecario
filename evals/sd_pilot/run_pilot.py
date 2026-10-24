@@ -785,11 +785,14 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
     import traceforge
     cells: dict[str, dict] = {}
     if resume:
-        cells = json.loads(STATE_DIAGB.read_text(encoding="utf-8")).get("cells", {})
+        st = json.loads(STATE_DIAGB.read_text(encoding="utf-8"))
+        cells = st.get("cells", {})
+        head_inicio = st.get("git_head_start") or _git_head()
         log(f"resume diagnóstico-b: {len(cells)} celdas cargadas")
         traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAGB))
     else:
-        _write_json(STATE_DIAGB, {"cells": {}})
+        head_inicio = _git_head()
+        _write_json(STATE_DIAGB, {"cells": {}, "git_head_start": head_inicio})
         if TRACES_DIAGB.exists():
             TRACES_DIAGB.unlink()
         traceforge.configure(collector="sqlite", db_path=str(TRACES_DIAGB))
@@ -814,7 +817,7 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
         cells[key] = _run_cell(vname, tid, TRACES_DIAGB, ws_root=WS_DIAGB,
                                variant=var, canal="b",
                                cell_token_cap=DIAGB_CELL_CAP)
-        _write_json(STATE_DIAGB, {"cells": cells})
+        _write_json(STATE_DIAGB, {"cells": cells, "git_head_start": head_inicio})
         acum = _coste(cells)["total_tokens"]
         if acum > DIAGB_TECHO_TOKENS:
             log(f"TECHO EXCEDIDO tras {key}: {acum} > {DIAGB_TECHO_TOKENS}; "
@@ -847,7 +850,7 @@ def modo_diagnostico_b(model: str, resume: bool) -> int:
     result = {"hito": 20, "modo": "diagnostico-b",
               "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "modelo": model,
               "canal": "b", "canal_b_version": CANAL_B_VERSION,
-              "max_turns": DIAGB_MAX_TURNS,
+              "git_head_start": head_inicio, "max_turns": DIAGB_MAX_TURNS,
               "cap_llamada": DIAGB_CELL_CAP, "techo_tokens": DIAGB_TECHO_TOKENS,
               "pares": pares, "veredicto": ver, "recalibracion": recal,
               "coste": coste, "celdas": cells,
@@ -908,11 +911,14 @@ def modo_corrida_b(model: str, resume: bool) -> int:
     import traceforge
     cells: dict[str, dict] = {}
     if resume:
-        cells = json.loads(STATE_CORRB.read_text(encoding="utf-8")).get("cells", {})
+        st = json.loads(STATE_CORRB.read_text(encoding="utf-8"))
+        cells = st.get("cells", {})
+        head_inicio = st.get("git_head_start") or _git_head()
         log(f"resume corrida-b: {len(cells)} celdas cargadas")
         traceforge.configure(collector="sqlite", db_path=str(TRACES_CORRB))
     else:
-        _write_json(STATE_CORRB, {"cells": {}})
+        head_inicio = _git_head()
+        _write_json(STATE_CORRB, {"cells": {}, "git_head_start": head_inicio})
         if TRACES_CORRB.exists():
             TRACES_CORRB.unlink()
         traceforge.configure(collector="sqlite", db_path=str(TRACES_CORRB))
@@ -963,7 +969,7 @@ def modo_corrida_b(model: str, resume: bool) -> int:
                                ceiling_watch=(acum, proy, CORR_B_TECHO))
         if cells[key]["stopped_by"] == "truncated_by_ceiling":
             cells[key]["estado"] = "truncated_by_ceiling"
-        _write_json(STATE_CORRB, {"cells": cells})
+        _write_json(STATE_CORRB, {"cells": cells, "git_head_start": head_inicio})
         acum = _coste(cells)["total_tokens"]
         # Checkpoint (E2-Importante 2): evaluación única, árbol pre-reg.
         if checkpoint is None and acum >= CHECKPOINT_TOKENS:
@@ -1002,7 +1008,7 @@ def modo_corrida_b(model: str, resume: bool) -> int:
                                               CORR_B_TECHO))
         if cells[key]["stopped_by"] == "truncated_by_ceiling":
             cells[key]["estado"] = "truncated_by_ceiling"
-        _write_json(STATE_CORRB, {"cells": cells})
+        _write_json(STATE_CORRB, {"cells": cells, "git_head_start": head_inicio})
 
     # ---------------- evaluación pre-registrada ---------------------------
     pares_forzado = []
@@ -1050,7 +1056,7 @@ def modo_corrida_b(model: str, resume: bool) -> int:
     result = {"hito": 20, "modo": "corrida-b",
               "fecha": time.strftime("%Y-%m-%dT%H:%M:%S"), "modelo": model,
               "canal": "b", "canal_b_version": CANAL_B_VERSION,
-              "max_turns": CORR_B_MAX_TURNS,
+              "git_head_start": head_inicio, "max_turns": CORR_B_MAX_TURNS,
               "cap_celda": CORR_B_CELL_CAP, "techo_tokens": CORR_B_TECHO,
               "checkpoint": {"tokens": CHECKPOINT_TOKENS,
                              **(checkpoint or {"branch": "no_disparado"})},
@@ -1063,8 +1069,7 @@ def modo_corrida_b(model: str, resume: bool) -> int:
               "coste": coste, "celdas": cells,
               "trazas": str(TRACES_CORRB.relative_to(REPO)),
               "informes": str(INFORMES_CORRB.relative_to(REPO)),
-              "commits": _git_head(),
-              "git_head_start": "3e620212eb9819187c6ab45ff0d37437737e4f7d"}
+              "commits": _git_head()}
     _write_json(RESULT_CORRB, result)
     log(f"SATURACIÓN {saturacion['regla']}: {saturacion['accion']}")
     log(f"comparativa canal b vs H19: {comparativa['regla']}")
