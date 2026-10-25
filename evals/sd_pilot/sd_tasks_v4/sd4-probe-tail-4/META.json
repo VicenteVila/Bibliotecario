@@ -1,0 +1,7 @@
+{
+  "id": "sd4-probe-tail-4",
+  "family": "F2",
+  "version": 1,
+  "probe": true,
+  "descripcion": "Cola larga: línea final incompleta y datos tras 6.000 chars."
+}

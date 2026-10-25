@@ -72,6 +72,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Plan Hito 21 | `evals/HITO21_PLAN.md` — **CERRADO 2026-10-24 NO CUMPLE** (§5: b3 8 celdas, 596.343 tok, **G1/G2/G4/G5/G6 ✅, G3 ❌**; residuales 72,28 vs 38,42 pero controles A2_plugin −35,7 y A4_interval −43,3; **b3 no adoptado**, default vuelve a b2; heartbeat roto corregido post-run) |
 | Plan Hito 22 | `evals/HITO22_PLAN.md` — **CERRADO 2026-10-25 NO CUMPLE** (§7: SD-2 BUILD 24/24 QA y lock; calibración dev parada por **C2 imposible** — A1=100 en 5/5 medidas, 9/24 celdas, 213.859 tok; oficial no ejecutado; sin editar tareas) |
 | Plan Hito 23 | `evals/HITO23_PLAN.md` — **CERRADO 2026-10-25 NO CUMPLE** (§9: probe SD-3 3 tareas × A1/A5, 6/6 celdas, **P2/P3 rojos**, P1/P4/P5 verdes; 194.453 tok; A1 breadth 0 por corte one-shot, A5 breadth 0 writes; runtime/contract A1=A5=100; no se construyen 24 tareas) |
+| Plan Hito 24 | `evals/HITO24_PLAN.md` — **EN CURSO** (SD-4 cola larga: 3 tareas probe × A1/A5, cola incompleta fuera del inline de 6.000 y dentro de la lectura de 8.000; QA 0 LLM 3/3; proyección 226.437 tok, techo 250.000 pendiente de ratificación; gates R1-R6 sin medir) |
 | Erratas y fracasos declarados | `evals/BLUEPRINT_METRIC_DESIGN.md` — §8.8-§8.13 |
 | Hitos previos | `evals/HITO0.md`, `HITO1.md`, `PLAN_READING.md`, `REPORT_BLIND.md`, `REPORT_COEVOLVE.md` |
 
@@ -133,12 +134,19 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
   Evidencia `evals/results/result_sd3_probe.json`, `logs/sd3_probe.log`,
   `traces_sd3_probe.sqlite`, `_run_state_sd3_probe.json` y
   `SD3_PROBE_LOCK.json`.
+- **HITO24 EN CURSO (SD-4, 2026-10-25)**: constructo de cola larga; 3
+  tareas desechables (`tail-2`, `tail-4`, `tail-24`), 7.569 chars/módulo y
+  línea rota en 7.548; A1 inline 6.000 no la ve, A5 lee 8.000 y puede
+  corregirla. QA 0 LLM: 3/3 referencia 100 %, workspace 0 %, públicos de
+  referencia verdes y workspace con error de importación. Lock
+  `SD4_PROBE_LOCK.json`; proyección 226.437 tok y techo 250.000 pendiente
+  de ratificación. Sin llamadas LLM, sin `result_sd4_probe.json`, sin Fase 2.
 - **Endurecimiento Paso 1-2**: escrituras atómicas
   (`evals/sd_pilot/io_atomico.py`), `git_head_start` real por corrida,
   `CANAL_B_VERSION` **b2** (marcador de truncado en `read_file` + hash dorado),
   heartbeat por turno y checkpoint también en el brazo forzado,
   `scripts/scan_secrets.py` en la puerta/CI, cobertura **78,94 %**
-  (`fail_under=78`) y **549 tests**. El canal b1 de §1 queda como evidencia
+  (`fail_under=78`) y **558 tests**. El canal b1 de §1 queda como evidencia
   histórica: comparaciones solo intra-versión.
 
 
