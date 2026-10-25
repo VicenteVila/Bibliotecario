@@ -1,6 +1,6 @@
 # HITO24 — SD-4: constructo de cola larga (probe)
 
-Estado: **EN CURSO — probe diseñado; presupuesto pendiente de ratificación**.
+Estado: **EN CURSO — probe congelado; presupuesto ratificado 2026-10-25**.
 Fecha de diseño: 2026-10-25. Este plan es contrato: sus gates se ratifican
 antes de medir y no se tocan después.
 
@@ -47,15 +47,15 @@ para elegir tareas por el resultado de A1/A5. Los tres IDs son el probe
 completo y desechable. La Fase 2 (24 tareas dev/test) no existe hasta que
 R1-R6 pasen.
 
-## 3. Presupuesto (pendiente de ratificación)
+## 3. Presupuesto (ratificado 2026-10-25)
 
 - Modelo: `nvidia/nemotron-3-ultra-550b-a55b`.
 - Probe: 3 tareas × {A1, A5} = **6 celdas**.
 - A1: one-shot, sin herramientas.
 - A5: `max_turns=16`, cap por celda **70.000**, canal **b2**.
 - Proyección conservadora: A1 5.479 + A5 70.000 por tarea → **226.437**.
-- **Techo solicitado: 250.000 tokens**; si la proyección no cabe, el runner
-  aborta antes de llamar al LLM.
+- **Techo ratificado por el dueño: 250.000 tokens** (2026-10-25); si la
+  proyección no cabe, el runner aborta antes de llamar al LLM.
 - No se reutiliza el techo de H22/H23. Este plan no autoriza Fase 2 ni el
   oficial: solo el probe.
 
@@ -107,5 +107,5 @@ observada en A1/A5.
 
 Diseño y QA locales hechos sin LLM: 3/3 tareas con referencia 100, workspace
 0, públicos de referencia verdes y públicos del workspace con error de
-importación (la cola rota). Falta la ratificación del techo de 250.000 y el
-commit de congelación antes de lanzar `--probe`.
+importación (la cola rota). El dueño ratificó el techo de 250.000 el 2026-10-25. Probe, gates y tareas
+están congelados en el commit `d6481dc`; listo para lanzar `--probe`.
