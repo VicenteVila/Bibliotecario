@@ -1,0 +1,373 @@
+{
+  "hito": "H22",
+  "fase": "BUILD",
+  "created_utc": "2026-10-24T20:58:01.264901+00:00",
+  "model_calls": 0,
+  "task_count": 24,
+  "all_ok": true,
+  "lock": "SD2_LOCK.json",
+  "lock_sha256": "d702ac80ffc9d4f8e43088dd19e669e5cde39dfdebe2a9c7022532f4d6812609",
+  "lock_problems": [],
+  "tasks": [
+    {
+      "task": "sd2-dev-f1-inventory",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 17,
+      "ref_public": {
+        "passed": 7,
+        "failed": 0
+      },
+      "empty_score": 64.7059,
+      "empty_public": {
+        "passed": 4,
+        "failed": 3
+      }
+    },
+    {
+      "task": "sd2-dev-f2-inventory",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 11,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 63.6364,
+      "empty_public": {
+        "passed": 3,
+        "failed": 3
+      }
+    },
+    {
+      "task": "sd2-dev-f3-inventory",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 11,
+      "ref_public": {
+        "passed": 5,
+        "failed": 0
+      },
+      "empty_score": 0.0,
+      "empty_public": {
+        "passed": 0,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-dev-f1-reservations",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 50.0,
+      "empty_public": {
+        "passed": 3,
+        "failed": 3
+      }
+    },
+    {
+      "task": "sd2-dev-f2-reservations",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 41.6667,
+      "empty_public": {
+        "passed": 3,
+        "failed": 3
+      }
+    },
+    {
+      "task": "sd2-dev-f3-reservations",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 10,
+      "ref_public": {
+        "passed": 5,
+        "failed": 0
+      },
+      "empty_score": 0.0,
+      "empty_public": {
+        "passed": 0,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-dev-f1-payroll",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 25.0,
+      "empty_public": {
+        "passed": 3,
+        "failed": 3
+      }
+    },
+    {
+      "task": "sd2-dev-f2-payroll",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 0.0,
+      "empty_public": {
+        "passed": 2,
+        "failed": 4
+      }
+    },
+    {
+      "task": "sd2-dev-f3-payroll",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 10,
+      "ref_public": {
+        "passed": 5,
+        "failed": 0
+      },
+      "empty_score": 0.0,
+      "empty_public": {
+        "passed": 0,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-dev-f1-routing",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 8.3333,
+      "empty_public": {
+        "passed": 1,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-dev-f2-routing",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 8.3333,
+      "empty_public": {
+        "passed": 1,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-dev-f3-routing",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 10,
+      "ref_public": {
+        "passed": 5,
+        "failed": 0
+      },
+      "empty_score": 0.0,
+      "empty_public": {
+        "passed": 0,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-test-f1-banking",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 17,
+      "ref_public": {
+        "passed": 10,
+        "failed": 0
+      },
+      "empty_score": 64.7059,
+      "empty_public": {
+        "passed": 6,
+        "failed": 4
+      }
+    },
+    {
+      "task": "sd2-test-f2-banking",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 10,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 40.0,
+      "empty_public": {
+        "passed": 3,
+        "failed": 3
+      }
+    },
+    {
+      "task": "sd2-test-f3-banking",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 10,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 0.0,
+      "empty_public": {
+        "passed": 0,
+        "failed": 6
+      }
+    },
+    {
+      "task": "sd2-test-f1-healthcare",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 50.0,
+      "empty_public": {
+        "passed": 4,
+        "failed": 2
+      }
+    },
+    {
+      "task": "sd2-test-f2-healthcare",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 50.0,
+      "empty_public": {
+        "passed": 4,
+        "failed": 2
+      }
+    },
+    {
+      "task": "sd2-test-f3-healthcare",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 10,
+      "ref_public": {
+        "passed": 5,
+        "failed": 0
+      },
+      "empty_score": 0.0,
+      "empty_public": {
+        "passed": 0,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-test-f1-logistics",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 50.0,
+      "empty_public": {
+        "passed": 1,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-test-f2-logistics",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 50.0,
+      "empty_public": {
+        "passed": 1,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-test-f3-logistics",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 10,
+      "ref_public": {
+        "passed": 5,
+        "failed": 0
+      },
+      "empty_score": 0.0,
+      "empty_public": {
+        "passed": 0,
+        "failed": 5
+      }
+    },
+    {
+      "task": "sd2-test-f1-media",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 58.3333,
+      "empty_public": {
+        "passed": 3,
+        "failed": 3
+      }
+    },
+    {
+      "task": "sd2-test-f2-media",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 12,
+      "ref_public": {
+        "passed": 6,
+        "failed": 0
+      },
+      "empty_score": 75.0,
+      "empty_public": {
+        "passed": 4,
+        "failed": 2
+      }
+    },
+    {
+      "task": "sd2-test-f3-media",
+      "ok": true,
+      "ref_score": 100.0,
+      "ref_total": 10,
+      "ref_public": {
+        "passed": 5,
+        "failed": 0
+      },
+      "empty_score": 0.0,
+      "empty_public": {
+        "passed": 0,
+        "failed": 5
+      }
+    }
+  ]
+}

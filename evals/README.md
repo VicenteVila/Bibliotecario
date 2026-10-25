@@ -13,7 +13,7 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 | **Evidencia** `result_*.json` | 103 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
 | **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
-| **Planes y reportes** `HITO*.md` + specs | 29 | raíz | 23 hitos (`HITO0-2.md` reportes; `HITO3-22_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 **CERRADO NO CUMPLE** (§1 SATURA; §6 B abortado NO VIABLE POR COSTE); HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado; HITO22 **RATIFICADO 2026-10-24**: SD-2; vertical slice QA 2/2, pendiente de revisión; sin calibración ni corrida) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
+| **Planes y reportes** `HITO*.md` + specs | 29 | raíz | 23 hitos (`HITO0-2.md` reportes; `HITO3-22_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 **CERRADO NO CUMPLE** (§1 SATURA; §6 B abortado NO VIABLE POR COSTE); HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado; HITO22 **RATIFICADO 2026-10-24**: SD-2; BUILD 24/24 QA, lock y test congelado; pendiente calibración y corrida) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
 | **Logs** `*.log` | 48 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
 | **Datos** | 9 | `golden_*.jsonl` (datasets gold), `calib_r4_gold.json`, `game_tasks_expanded.yaml` (60 tareas, citado), `CORPUS_LOCK.json` | referenciados por tests/evals → no mover sin barrido |
 
@@ -27,8 +27,9 @@ Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
 | `harness.py` | bucle observe-reason-act + herramientas (`read_file`/`write_file`/`run_tests`), PFs, regulación, skills, trazas |
 | `variants.py` | `VARIANTS` A1-A5 (parámetros congelados) |
 | `tasks.py` | `TASK_IDS` (12 H19) + `B_TASK_IDS`/`B_TASK_AXES` (12 B, multi-paquete), ejes de dureza, `lint_tasks()`, `qa_task()` |
-| `sd2_tasks.py` | HITO22 (SD-2): IDs dev/test del vertical slice, ejes, `lint_tasks()` y `qa_task()`; no toca H19 |
-| `sd_tasks_v2/<id>/` | HITO22 vertical slice: `sd2-dev-f1-inventory` y `sd2-test-f1-banking`; el test queda pendiente de congelación/calibración |
+| `sd2_tasks.py` | HITO22 (SD-2): 24 IDs (12 dev/12 test), familias, dominios, ejes, `lint_tasks()`, `qa_task()` y `verify_lock()`; no toca H19 |
+| `sd_tasks_v2/<id>/` | HITO22 BUILD: 24 tareas (8 F1, 8 F2, 8 F3; 4 dominios dev + 4 test), QA 24/24; test congelado en `SD2_LOCK.json` |
+| `SD2_LOCK.json` | HITO22: SHA-256 de los ficheros de las 24 tareas y del split; el runner debe verificar antes de calibrar/oficial |
 | `build_b_tasks.py` | HITO20 §6: genera las 12 tareas B copiando/prefijando dos fixtures H19 (idempotente; no toca las originales) y ejecuta QA |
 | `verifier.py` | pytest público (herramienta del agente) y oculto (`m_h(x)`) |
 | `sens.py` | Pearson, `Q_h^(−x)`, gates U2-U7, umbrales congelados |
@@ -55,8 +56,10 @@ cerrada NO CUMPLE por G3; b3 no adoptado). HITO20 §6 B (BUILD + intento abortad
 (12/12 referencia 100 %, vacío <100 %) y
 `results/result_sens_sd_b_abort.json` (3/60 celdas, 626.036 tok,
 extrapolación ~12M; no es resultado oficial).
+HITO22 BUILD: `results/result_sd2_build_qa.json` (24/24 referencia 100 %,
+vacío <100 %, 0 llamadas LLM) y `sd_pilot/SD2_LOCK.json`.
 Tests: `tests/test_sens_sd_pilot.py` (puros, sin LLM) y `tests/test_sd2.py`
-(vertical slice H22: lint + QA 2/2, sin LLM).
+(BUILD H22: split 12/12, 8×F1/F2/F3, lint, QA 24/24 y lock, sin LLM).
 
 ## `preflight/` (159 ficheros) — la evaluación **viva**
 
@@ -84,7 +87,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO22_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **CERRADO 2026-10-24 NO CUMPLE** (§1 SATURA; §6 B **ABORTADO NO VIABLE POR COSTE**: 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; BUILD 12/12 QA y modo `--b` quedan como artefactos); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2; H22 **RATIFICADO 2026-10-24** — SD-2; vertical slice QA 2/2, pendiente de revisión; sin calibración ni corrida) |
+| `HITO3_PLAN.md`…`HITO22_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **CERRADO 2026-10-24 NO CUMPLE** (§1 SATURA; §6 B **ABORTADO NO VIABLE POR COSTE**: 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; BUILD 12/12 QA y modo `--b` quedan como artefactos); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2; H22 **RATIFICADO 2026-10-24** — SD-2; BUILD 24/24 QA, lock y test congelado; pendiente calibración y corrida) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |
