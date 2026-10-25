@@ -1,0 +1,370 @@
+{
+ "hito": 24,
+ "modo": "probe",
+ "fecha": "2026-10-25T22:45:02",
+ "modelo": "nvidia/nemotron-3-ultra-550b-a55b",
+ "tareas": [
+  "sd4-probe-tail-2",
+  "sd4-probe-tail-4",
+  "sd4-probe-tail-24"
+ ],
+ "variantes": [
+  "A1",
+  "A5"
+ ],
+ "max_turns": 16,
+ "cap_por_celda": 70000,
+ "techo": 250000,
+ "presupuesto": {
+  "max_turns": 16,
+  "n_tareas": 3,
+  "variantes": [
+   "A1",
+   "A5"
+  ],
+  "celdas": 6,
+  "por_variante": {
+   "A1": 5479,
+   "A5": 70000
+  },
+  "total": 226437,
+  "techo": 250000,
+  "cabe": true,
+  "veredicto": "COSTE_OK"
+ },
+ "qa": [
+  {
+   "task": "sd4-probe-tail-2",
+   "ok": true,
+   "ref_score": 100.0,
+   "ref_total": 22,
+   "ref_public": {
+    "passed": 2,
+    "failed": 0,
+    "errors": 0
+   },
+   "empty_score": 0.0,
+   "empty_public": {
+    "passed": 0,
+    "failed": 0,
+    "errors": 2
+   }
+  },
+  {
+   "task": "sd4-probe-tail-4",
+   "ok": true,
+   "ref_score": 100.0,
+   "ref_total": 44,
+   "ref_public": {
+    "passed": 4,
+    "failed": 0,
+    "errors": 0
+   },
+   "empty_score": 0.0,
+   "empty_public": {
+    "passed": 0,
+    "failed": 0,
+    "errors": 4
+   }
+  },
+  {
+   "task": "sd4-probe-tail-24",
+   "ok": true,
+   "ref_score": 100.0,
+   "ref_total": 264,
+   "ref_public": {
+    "passed": 24,
+    "failed": 0,
+    "errors": 0
+   },
+   "empty_score": 0.0,
+   "empty_public": {
+    "passed": 0,
+    "failed": 0,
+    "errors": 24
+   }
+  }
+ ],
+ "matriz": {
+  "A1": {
+   "sd4-probe-tail-2": 27.2727,
+   "sd4-probe-tail-4": 0.0,
+   "sd4-probe-tail-24": 0.0
+  },
+  "A5": {
+   "sd4-probe-tail-2": 0.0,
+   "sd4-probe-tail-4": 0.0
+  }
+ },
+ "gates": {
+  "R1": {
+   "ok": false,
+   "valor": "2/3",
+   "detalle": "3/3 tareas con A1 y A5 válidas, sin infra_error"
+  },
+  "R2": {
+   "ok": false,
+   "valor": {
+    "media_A1": 13.6364,
+    "A1_lt_100": 2,
+    "min": 3
+   },
+   "detalle": "media A1 <= 10 y 3/3 A1 < 100"
+  },
+  "R3": {
+   "ok": false,
+   "valor": {
+    "media_A1": 13.6364,
+    "media_A5": 0.0,
+    "diferencia": -13.6364,
+    "A5_lt_100": 2,
+    "min": 1
+   },
+   "detalle": "media A5 >= 60, A5 >= A1+10 y >=1/3 A5 < 100"
+  },
+  "R4": {
+   "ok": false,
+   "valor": {
+    "A5_con_escritura": 0,
+    "A5_no_atascada": 2,
+    "min": 2
+   },
+   "detalle": "A5 escribe en >=2/3 y no agota 16 turnos sin escribir"
+  },
+  "R5": {
+   "ok": false,
+   "valor": 290185,
+   "detalle": "coste <= 250000"
+  },
+  "R6": {
+   "ok": false,
+   "valor": {
+    "A5_ge_80": 0,
+    "min": 2
+   },
+   "detalle": "A5 >= 80 en >=2/3 tareas"
+  }
+ },
+ "cumple": false,
+ "medias": {
+  "A1": 13.6364,
+  "A5": 0.0
+ },
+ "diferencia_A1_A5": -13.6364,
+ "A1_lt_100": 2,
+ "A5_lt_100": 2,
+ "A5_ge_80": 0,
+ "A5_writes": 0,
+ "A5_not_stuck": 2,
+ "valid_tasks": [
+  "sd4-probe-tail-2",
+  "sd4-probe-tail-4"
+ ],
+ "coste": {
+  "calls": 16,
+  "prompt_tokens": 238176,
+  "completion_tokens": 52009,
+  "total_tokens": 290185
+ },
+ "celdas": {
+  "A1_sd4-probe-tail-2": {
+   "task": "sd4-probe-tail-2",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "one_shot",
+   "max_turns": 16,
+   "variant_max_turns": 1,
+   "score": 27.2727,
+   "hidden": {
+    "passed": 6,
+    "total": 22
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 91.0,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 7079,
+    "completion_tokens": 6803,
+    "total_tokens": 13882
+   }
+  },
+  "A5_sd4-probe-tail-2": {
+   "task": "sd4-probe-tail-2",
+   "variant": "A5",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "b2",
+   "max_turns": 16,
+   "variant_max_turns": 16,
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 2
+   },
+   "turns": 7,
+   "llm_calls": 7,
+   "tool_calls": 2,
+   "invalid_actions": 5,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act"
+   ],
+   "regulation": [
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia."
+   ],
+   "stopped_by": "presupuesto",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido"
+   ],
+   "final": "",
+   "elapsed_s": 299.7,
+   "writes": 0,
+   "snapshots": {
+    "score@4": 0.0
+   },
+   "usage": {
+    "calls": 7,
+    "prompt_tokens": 70497,
+    "completion_tokens": 20530,
+    "total_tokens": 91027
+   }
+  },
+  "A1_sd4-probe-tail-4": {
+   "task": "sd4-probe-tail-4",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "one_shot",
+   "max_turns": 16,
+   "variant_max_turns": 1,
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 2
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 101.3,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 13968,
+    "completion_tokens": 8192,
+    "total_tokens": 22160
+   }
+  },
+  "A5_sd4-probe-tail-4": {
+   "task": "sd4-probe-tail-4",
+   "variant": "A5",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "b2",
+   "max_turns": 16,
+   "variant_max_turns": 16,
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 4
+   },
+   "turns": 6,
+   "llm_calls": 6,
+   "tool_calls": 4,
+   "invalid_actions": 2,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "presupuesto",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [
+    "JSON invalido",
+    "JSON invalido"
+   ],
+   "final": "",
+   "elapsed_s": 176.5,
+   "writes": 0,
+   "snapshots": {
+    "score@4": 0.0
+   },
+   "usage": {
+    "calls": 6,
+    "prompt_tokens": 63860,
+    "completion_tokens": 8292,
+    "total_tokens": 72152
+   }
+  },
+  "A1_sd4-probe-tail-24": {
+   "task": "sd4-probe-tail-24",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "one_shot",
+   "max_turns": 16,
+   "variant_max_turns": 1,
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 22
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 96.1,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 82772,
+    "completion_tokens": 8192,
+    "total_tokens": 90964
+   }
+  }
+ },
+ "trazas": "evals/sd_pilot/traces_sd4_probe.sqlite",
+ "lock_problems": [],
+ "lock_sha256": "abf732b20a66df66f291052eea5fd902a69873eaeaff6dff33933be7661edc7f",
+ "commits": {
+  "head": "e4639838f04a42d08a67bd628c563d23d2be0cc1",
+  "dirty": true
+ }
+}

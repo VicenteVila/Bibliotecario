@@ -1,0 +1,197 @@
+{
+ "mode": "probe",
+ "cells": {
+  "A1_sd4-probe-tail-2": {
+   "task": "sd4-probe-tail-2",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "one_shot",
+   "max_turns": 16,
+   "variant_max_turns": 1,
+   "score": 27.2727,
+   "hidden": {
+    "passed": 6,
+    "total": 22
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 91.0,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 7079,
+    "completion_tokens": 6803,
+    "total_tokens": 13882
+   }
+  },
+  "A5_sd4-probe-tail-2": {
+   "task": "sd4-probe-tail-2",
+   "variant": "A5",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "b2",
+   "max_turns": 16,
+   "variant_max_turns": 16,
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 2
+   },
+   "turns": 7,
+   "llm_calls": 7,
+   "tool_calls": 2,
+   "invalid_actions": 5,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act",
+    "retry_on_failure",
+    "validate_before_act"
+   ],
+   "regulation": [
+    "[REGULACIÓN] Bucle de acciones repetidas: cambia de estrategia."
+   ],
+   "stopped_by": "presupuesto",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido",
+    "JSON invalido"
+   ],
+   "final": "",
+   "elapsed_s": 299.7,
+   "writes": 0,
+   "snapshots": {
+    "score@4": 0.0
+   },
+   "usage": {
+    "calls": 7,
+    "prompt_tokens": 70497,
+    "completion_tokens": 20530,
+    "total_tokens": 91027
+   }
+  },
+  "A1_sd4-probe-tail-4": {
+   "task": "sd4-probe-tail-4",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "one_shot",
+   "max_turns": 16,
+   "variant_max_turns": 1,
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 2
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 101.3,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 13968,
+    "completion_tokens": 8192,
+    "total_tokens": 22160
+   }
+  },
+  "A5_sd4-probe-tail-4": {
+   "task": "sd4-probe-tail-4",
+   "variant": "A5",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "b2",
+   "max_turns": 16,
+   "variant_max_turns": 16,
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 4
+   },
+   "turns": 6,
+   "llm_calls": 6,
+   "tool_calls": 4,
+   "invalid_actions": 2,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "presupuesto",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [
+    "JSON invalido",
+    "JSON invalido"
+   ],
+   "final": "",
+   "elapsed_s": 176.5,
+   "writes": 0,
+   "snapshots": {
+    "score@4": 0.0
+   },
+   "usage": {
+    "calls": 6,
+    "prompt_tokens": 63860,
+    "completion_tokens": 8292,
+    "total_tokens": 72152
+   }
+  },
+  "A1_sd4-probe-tail-24": {
+   "task": "sd4-probe-tail-24",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "canal": "one_shot",
+   "max_turns": 16,
+   "variant_max_turns": 1,
+   "score": 0.0,
+   "hidden": {
+    "passed": 0,
+    "total": 22
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 96.1,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 82772,
+    "completion_tokens": 8192,
+    "total_tokens": 90964
+   }
+  }
+ }
+}

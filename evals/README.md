@@ -1,6 +1,6 @@
 # `evals/` — qué es cada cosa
 
-84 ficheros en la raíz, más `results/` (106), `logs/` (50) y `preflight/`
+84 ficheros en la raíz, más `results/` (107), `logs/` (51) y `preflight/`
 (186). Esta es la
 clase de cada uno, el decodificador de nombres y las reglas. Los
 **veredictos por hito** no se duplican aquí: viven en la tabla «el Hito N»
@@ -10,11 +10,11 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 
 | clase | n | dónde | qué es | regla |
 |---|---|---|---|---|
-| **Evidencia** `result_*.json` | 106 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
+| **Evidencia** `result_*.json` | 107 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
 | **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
-| **Planes y reportes** `HITO*.md` + specs | 31 | raíz | 25 hitos (`HITO0-2.md` reportes; `HITO3-24_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 **CERRADO NO CUMPLE** (§1 SATURA; §6 B abortado NO VIABLE POR COSTE); HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado; HITO22 **CERRADO 2026-10-25 NO CUMPLE**: SD-2; BUILD 24/24 QA y lock; calibración parada por C2 (A1=100 en 5/5 medidas; 9/24 celdas, 213.859 tok); oficial no ejecutado; HITO23 **CERRADO 2026-10-25 NO CUMPLE**: probe SD-3 6/6 celdas, P2/P3 rojos, 194.453 tok; no se construyen 24 tareas; HITO24 **EN CURSO**: SD-4 cola larga, probe 3 tareas diseñado y con QA 0 LLM, techo 250k ratificado 2026-10-25) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
-| **Logs** `*.log` | 50 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
+| **Planes y reportes** `HITO*.md` + specs | 31 | raíz | 25 hitos (`HITO0-2.md` reportes; `HITO3-24_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 **CERRADO NO CUMPLE** (§1 SATURA; §6 B abortado NO VIABLE POR COSTE); HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado; HITO22 **CERRADO 2026-10-25 NO CUMPLE**: SD-2; BUILD 24/24 QA y lock; calibración parada por C2 (A1=100 en 5/5 medidas; 9/24 celdas, 213.859 tok); oficial no ejecutado; HITO23 **CERRADO 2026-10-25 NO CUMPLE**: probe SD-3 6/6 celdas, P2/P3 rojos, 194.453 tok; no se construyen 24 tareas; HITO24 **CERRADO 2026-10-25 NO CUMPLE**: SD-4 cola larga, 5/6 celdas, R1-R6 rojos, 290.185 tok > techo 250k; A5 se cortó a 4.096 tokens en `write_file`, 0 escrituras) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
+| **Logs** `*.log` | 51 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
 | **Datos** | 9 | `golden_*.jsonl` (datasets gold), `calib_r4_gold.json`, `game_tasks_expanded.yaml` (60 tareas, citado), `CORPUS_LOCK.json` | referenciados por tests/evals → no mover sin barrido |
 
 ## `sd_pilot/` — piloto `Sens(x)` (Hito 19, dominio `software_development`)
@@ -31,15 +31,15 @@ Arnés mínimo conmutable A1-A5 sobre 12 tareas duras; todo congelado en
 | `sd2_sens.py` | HITO22: gates C1-C4 (calibración) y U1-U10 (oficial), bootstrap IC95 (10.000, semilla 20261024) y varianza descriptiva; sin LLM |
 | `run_sd2.py` | HITO22: `--presupuesto` / `--calibracion` (12 dev × A1/A5) / `--oficial` (12 test × A1-A5); verifica lock, Harness Card y calibración C1-C4 antes del oficial |
 | `sd3_tasks.py` | HITO23 (SD-3): 3 IDs probe, ejes, `lint_tasks()`, `qa_task()` y lock `SD3_PROBE_LOCK.json`; dev/test vacíos hasta que el probe pase |
-| `sd4_tasks.py` | HITO24 (SD-4): 3 IDs probe de cola larga, ejes, `lint_tasks()`, `qa_task()` y lock `SD4_PROBE_LOCK.json`; dev/test vacíos |
+| `sd4_tasks.py` | HITO24 (SD-4): 3 IDs probe de cola larga, ejes, `lint_tasks()`, `qa_task()` y lock `SD4_PROBE_LOCK.json`; probe NO CUMPLE, dev/test vacíos |
 | `sd3_sens.py` | HITO23: gates P1-P5 del probe (A1 no saturado, headroom A5, escrituras, coste); sin LLM |
-| `sd4_sens.py` | HITO24: gates R1-R6 del probe SD-4 (A1 ciego a la cola, headroom A5, escrituras, coste); sin LLM |
+| `sd4_sens.py` | HITO24: gates R1-R6 del probe SD-4 (A1 ciego a la cola, headroom A5, escrituras, coste); midió NO CUMPLE; sin LLM |
 | `run_sd3.py` | HITO23: `--presupuesto` / `--probe` (3 tareas × A1/A5, A5 canal b2, cap 80k, techo 250k); verifica lock y QA |
-| `run_sd4.py` | HITO24: `--presupuesto` / `--probe` (3 tareas × A1/A5, A5 canal b2, max_turns 16, cap 70k, techo 250k); verifica lock y QA |
+| `run_sd4.py` | HITO24: `--presupuesto` / `--probe` (3 tareas × A1/A5, A5 canal b2, max_turns 16, cap 70k, techo 250k); probe NO CUMPLE; verifica lock y QA |
 | `sd_tasks_v3/<id>/` | HITO23 probe: 3 tareas desechables (`breadth`, `runtime`, `contract`) con workspace/reference/públicos/ocultos; no son el split final |
 | `SD3_PROBE_LOCK.json` | HITO23: SHA-256 de las 3 tareas probe y su split; congelado antes de medir |
-| `sd_tasks_v4/<id>/` | HITO24 probe: 3 tareas desechables (`tail-2`, `tail-4`, `tail-24`) con cola incompleta fuera del inline de A1; no son el split final |
-| `SD4_PROBE_LOCK.json` | HITO24: SHA-256 de las 3 tareas probe y su split; congelado antes de medir |
+| `sd_tasks_v4/<id>/` | HITO24 probe: 3 tareas desechables (`tail-2`, `tail-4`, `tail-24`) con cola incompleta fuera del inline de A1; probe NO CUMPLE; no son el split final |
+| `SD4_PROBE_LOCK.json` | HITO24: SHA-256 de las 3 tareas probe y su split; congelado antes de medir; probe NO CUMPLE |
 | `sd_tasks_v2/<id>/` | HITO22 BUILD: 24 tareas (8 F1, 8 F2, 8 F3; 4 dominios dev + 4 test), QA 24/24; test congelado en `SD2_LOCK.json` |
 | `SD2_LOCK.json` | HITO22: SHA-256 de los ficheros de las 24 tareas y del split; el runner debe verificar antes de calibrar/oficial |
 | `build_b_tasks.py` | HITO20 §6: genera las 12 tareas B copiando/prefijando dos fixtures H19 (idempotente; no toca las originales) y ejecuta QA |
@@ -77,10 +77,11 @@ HITO23 probe: `results/result_sd3_probe.json` (**NO CUMPLE**, P2/P3;
 6/6 celdas, 194.453 tok), `logs/sd3_probe.log`,
 `sd_pilot/traces_sd3_probe.sqlite`, `_run_state_sd3_probe.json` y
 `sd_pilot/SD3_PROBE_LOCK.json`. No hay Fase 2 ni Harness Card SD-3.
-HITO24 (SD-4) en curso: `HITO24_PLAN.md`, fixtures `sd_tasks_v4/`,
-`SD4_PROBE_LOCK.json`, QA 0 LLM 3/3 (referencia 100, workspace 0) y
-proyección 226.437 tok; techo 250.000 ratificado el 2026-10-25; sin
-`result_sd4_probe.json` hasta lanzar el probe.
+HITO24 probe: `results/result_sd4_probe.json` (**NO CUMPLE**, R1-R6;
+5/6 celdas, 290.185 tok > techo 250.000; A5 `tail-2/4` 0/0 y 0 escrituras,
+`tail-24` no ejecutada), `logs/sd4_probe.log`,
+`sd_pilot/traces_sd4_probe.sqlite`, `_run_state_sd4_probe.json` y
+`sd_pilot/SD4_PROBE_LOCK.json`. No hay Fase 2 ni Harness Card SD-4.
 Tests: `tests/test_sens_sd_pilot.py` (puros, sin LLM), `tests/test_sd2.py`
 (BUILD H22: split 12/12, 8×F1/F2/F3, lint, QA 24/24, lock, gates
 C1-C4/U1-U10 y presupuesto; sin LLM), `tests/test_sd3.py` (probe: 3 IDs,
@@ -113,7 +114,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO24_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **CERRADO 2026-10-24 NO CUMPLE** (§1 SATURA; §6 B **ABORTADO NO VIABLE POR COSTE**: 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; BUILD 12/12 QA y modo `--b` quedan como artefactos); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2; H22 **CERRADO 2026-10-25 NO CUMPLE** — SD-2; BUILD 24/24 QA, lock y test congelado; calibración parada por C2 (A1=100 en 5/5 medidas; 9/24 celdas, 213.859 tok); oficial no ejecutado; H23 **CERRADO 2026-10-25 NO CUMPLE** — probe SD-3, P2/P3 rojos, 6/6 celdas, 194.453 tok; no se construyen 24 tareas; H24 **EN CURSO** — SD-4 cola larga, probe 3 tareas con QA 0 LLM, techo 250k ratificado 2026-10-25) |
+| `HITO3_PLAN.md`…`HITO24_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **CERRADO 2026-10-24 NO CUMPLE** (§1 SATURA; §6 B **ABORTADO NO VIABLE POR COSTE**: 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; BUILD 12/12 QA y modo `--b` quedan como artefactos); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2; H22 **CERRADO 2026-10-25 NO CUMPLE** — SD-2; BUILD 24/24 QA, lock y test congelado; calibración parada por C2 (A1=100 en 5/5 medidas; 9/24 celdas, 213.859 tok); oficial no ejecutado; H23 **CERRADO 2026-10-25 NO CUMPLE** — probe SD-3, P2/P3 rojos, 6/6 celdas, 194.453 tok; no se construyen 24 tareas; H24 **CERRADO 2026-10-25 NO CUMPLE** — SD-4 cola larga, 5/6 celdas, R1-R6 rojos, 290.185 tok > techo 250k) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |
@@ -124,6 +125,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | `result_sens_sd_corridab.json`, `result_b_build_qa.json`, `result_sens_sd_b_abort.json` | **Hito 20** §1 (matriz canal b, SATURA), §6 B (QA de BUILD 0 tokens) y §6 B (aborto por coste: 3/60 celdas, 626.036 tok; no es resultado oficial) |
 | `result_sd2_build_qa.json`, `result_sd2_calibracion.json` | **Hito 22** SD-2: BUILD (0 LLM, 24/24) y calibración dev (**NO CUMPLE**, parada por C2: 9/24 celdas, 213.859 tok); no hay `result_sd2.json` (oficial no ejecutado) |
 | `result_sd3_probe.json` | **Hito 23** SD-3: probe de 3 tareas (**NO CUMPLE**, P2/P3; 6/6 celdas, 194.453 tok); no hay `result_sd3.json` |
+| `result_sd4_probe.json` | **Hito 24** SD-4: probe de cola larga (**NO CUMPLE**, R1-R6; 5/6 celdas, 290.185 tok > techo 250.000; A5 sin escrituras); no hay `result_sd4.json` |
 | `run_<X>.py` → `results/result_<X>.json` + `logs/run_<X>.log` | trío runner → evidencia → stdout del mismo experimento |
 | `*_prev*.json` | corrida anterior conservada antes de repetir (historial, no borrar) |
 
