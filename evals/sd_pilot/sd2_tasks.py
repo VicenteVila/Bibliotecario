@@ -1,7 +1,7 @@
-"""Tareas SD-2 (HITO22): lint y QA de fixtures, sin LLM.
+"""Tareas SD-2 (HITO22): lint, QA y lock de fixtures, sin LLM.
 
-El vertical slice declara una tarea dev y una test de la familia F1. El resto
-se añadirá tras la revisión del slice; el test no se calibra.
+24 tareas: 12 dev (calibración) y 12 test (oficial), 8 por familia F1/F2/F3.
+El test se congela en `SD2_LOCK.json` antes de medir y no se edita después.
 """
 from __future__ import annotations
 
