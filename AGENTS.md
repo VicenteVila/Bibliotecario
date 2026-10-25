@@ -49,7 +49,7 @@ Orden de lectura recomendado:
 
 ```bash
 .venv/bin/python -m ruff check bibliotecario tests evals/sd_pilot/*.py evals/corpus_lock.py scripts
-.venv/bin/python -m pytest tests/ -q          # 542 tests, ~4.5 min
+.venv/bin/python -m pytest tests/ -q          # 549 tests, ~4.8 min
 .venv/bin/python scripts/scan_secrets.py      # 0 coincidencias (ademas del grep manual)
 .venv/bin/python evals/preflight/lint_suites_v2.py   # si se toca preflight/
 .venv/bin/python evals/corpus_lock.py check          # si se tocó el corpus

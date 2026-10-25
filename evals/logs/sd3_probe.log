@@ -1,0 +1,15 @@
+[21:16:15] clave NVIDIA: PILOTO (separada de bibliotecario; valor no mostrado)
+[21:16:36] probe SD-3: 6 celdas, modelo=nvidia/nemotron-3-ultra-550b-a55b, max_turns=12, cap=80000, techo=250000, canal A5=b2
+[21:18:17] A1/sd3-probe-breadth: score=0.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=35678 100.8s
+[21:19:58] A5/sd3-probe-breadth: score=90.0% turns=10 llm=10 tools=33 writes=0 paro=presupuesto tok=80079 101.3s
+[21:20:39] A1/sd3-probe-runtime: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=6116 41.1s
+[21:23:18] A5/sd3-probe-runtime: score=100.0% turns=12 llm=12 tools=23 writes=8 paro=max_turns tok=38425 158.2s
+[21:23:47] A1/sd3-probe-contract: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=6082 29.3s
+[21:25:36] A5/sd3-probe-contract: score=100.0% turns=8 llm=8 tools=23 writes=8 paro=final tok=28073 108.9s
+[21:25:39] resultado: evals/results/result_sd3_probe.json
+[21:25:39]   gate P1: OK valor=3/3
+[21:25:39]   gate P2: FALLA valor={'media_A1': 66.6667, 'A1_lt_100': 1, 'min': 2}
+[21:25:39]   gate P3: FALLA valor={'media_A1': 66.6667, 'media_A5': 96.6667, 'diferencia': 30.0, 'A5_lt_100': 1, 'min': 2}
+[21:25:39]   gate P4: OK valor={'A5_con_escritura': 2, 'A5_no_atascada': 3, 'min': 2}
+[21:25:39]   gate P5: OK valor=194453
+[21:25:39] PROBE CUMPLE=False coste=194453 tokens

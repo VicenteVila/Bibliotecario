@@ -1,6 +1,6 @@
 # HITO 23 — SD-3: probe de constructo y decisión
 
-Fecha: 2026-10-25. Estado: **EN EJECUCIÓN**.
+Fecha: 2026-10-25. Estado: **CERRADO 2026-10-25 NO CUMPLE**.
 Antecedente: H22 cerrado NO CUMPLE (C2 imposible; A1 100 en 5/5 celdas).
 Diagnóstico: `SD3_DIAGNOSTICO.md`.
 
@@ -86,6 +86,40 @@ una celda extra a 16 turnos sobre la peor tarea; **no cuenta** para P3/P4.
 - `evals/sd_pilot/traces_sd3_probe.sqlite`
 - `evals/sd_pilot/_run_state_sd3_probe.json`
 
-## 9. Cierre
+## 9. Cierre — 2026-10-25
 
-(pendiente)
+**Veredicto: NO CUMPLE.** El probe se ejecutó completo (6/6 celdas) con el
+lock congelado antes de medir. No se construyen las 24 tareas ni se lanza
+ningún oficial.
+
+| celda | score | turnos | tools | writes | parada | tokens |
+|---|---:|---:|---:|---:|---|---:|
+| A1 breadth | 0,00 | 1 | 0 | 0 | one_shot | 35.678 |
+| A5 breadth | 90,00 | 10 | 33 | 0 | presupuesto | 80.079 |
+| A1 runtime | 100,00 | 1 | 0 | 0 | one_shot | 6.116 |
+| A5 runtime | 100,00 | 12 | 23 | 8 | max_turns | 38.425 |
+| A1 contract | 100,00 | 1 | 0 | 0 | one_shot | 6.082 |
+| A5 contract | 100,00 | 8 | 23 | 8 | final | 28.073 |
+
+Gates: **P1 ✅** (3/3), **P2 ❌** (`media_A1=66,67`, `A1<100=1/3`),
+**P3 ❌** (`media_A5=96,67`, `A5<100=1/3`), **P4 ✅** (2/3 escriben; 3/3 no
+atascadas), **P5 ✅** (194.453 ≤ 250.000). Coste: 33 llamadas, 172.526
+prompt + 21.927 completion.
+
+Causas:
+
+- A1 solo falla en breadth (0 %): la salida one-shot se agota en 8.192
+  tokens de completion y deja 0 escrituras. No es un fallo limpio del
+  constructo (el corte de salida domina).
+- A5 breadth no convierte esa oportunidad: 0 escrituras, 33 tools y parada
+  por cap de 80k; su 90 % es el estado inicial, no una mejora. No hay celda
+  diagnóstica porque la parada no fue `max_turns` con escritura.
+- Runtime y contract **saturan A1=100 y A5=100**: el contrato exacto sigue
+  permitiendo reescribir sin ejecutar; las máquinas de estado y el contrato
+  parcial no crean headroom.
+- P2/P3 fallan por la misma causa de H22: el one-shot no se rompe de forma
+  general y el bucle no supera donde el one-shot ya acierta.
+
+Evidencia: `results/result_sd3_probe.json`, `logs/sd3_probe.log`,
+`sd_pilot/traces_sd3_probe.sqlite`, `_run_state_sd3_probe.json`,
+`SD3_PROBE_LOCK.json`. No se tocaron fixtures H22 ni el lock H22.

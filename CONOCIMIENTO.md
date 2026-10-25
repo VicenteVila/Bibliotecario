@@ -71,6 +71,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Plan Hito 20 | `evals/HITO20_PLAN.md` — **CERRADO 2026-10-24 NO CUMPLE** (§7): §1 matriz 17×12 canal b + brazo forzado (2.686.674 tok, media 82,47 vs 70,43, Δ+12,04, **E1_ACLARA**, **SATURA**); §6 B **ABORTADO — NO VIABLE POR COSTE** (12 tareas `*-b` multi-paquete, BUILD+QA 12/12, modo `--b`; 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; sin `result_sens_sd_b.json`); C1 medido en §1, insuficiente; 3.390.151 de 7M gastados (incl. §0.3 77.441) |
 | Plan Hito 21 | `evals/HITO21_PLAN.md` — **CERRADO 2026-10-24 NO CUMPLE** (§5: b3 8 celdas, 596.343 tok, **G1/G2/G4/G5/G6 ✅, G3 ❌**; residuales 72,28 vs 38,42 pero controles A2_plugin −35,7 y A4_interval −43,3; **b3 no adoptado**, default vuelve a b2; heartbeat roto corregido post-run) |
 | Plan Hito 22 | `evals/HITO22_PLAN.md` — **CERRADO 2026-10-25 NO CUMPLE** (§7: SD-2 BUILD 24/24 QA y lock; calibración dev parada por **C2 imposible** — A1=100 en 5/5 medidas, 9/24 celdas, 213.859 tok; oficial no ejecutado; sin editar tareas) |
+| Plan Hito 23 | `evals/HITO23_PLAN.md` — **CERRADO 2026-10-25 NO CUMPLE** (§9: probe SD-3 3 tareas × A1/A5, 6/6 celdas, **P2/P3 rojos**, P1/P4/P5 verdes; 194.453 tok; A1 breadth 0 por corte one-shot, A5 breadth 0 writes; runtime/contract A1=A5=100; no se construyen 24 tareas) |
 | Erratas y fracasos declarados | `evals/BLUEPRINT_METRIC_DESIGN.md` — §8.8-§8.13 |
 | Hitos previos | `evals/HITO0.md`, `HITO1.md`, `PLAN_READING.md`, `REPORT_BLIND.md`, `REPORT_COEVOLVE.md` |
 
@@ -123,12 +124,21 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
   `logs/sd2_calibracion.log`, `traces_sd2_calibracion.sqlite` y
   `_run_state_sd2_calibracion.json`; Harness Card
   `evals/HARNESS_CARD_SD2.md`. Rediseño: SD-3.
+- **HITO23 cerrado NO CUMPLE (2026-10-25)**: probe SD-3 de 3 tareas
+  desechables (breadth/runtime/contract) × A1/A5, 6/6 celdas y **194.453
+  tok** de 250.000. P1/P4/P5 ✅; **P2 ❌** (media A1 66,67; A1<100 1/3) y
+  **P3 ❌** (media A5 96,67; A5<100 1/3). A1 breadth 0 % (salida one-shot
+  cortada sin bloques parseables); A5 breadth 90 % con 0 writes y parada por
+  cap; runtime/contract A1=A5=100. No hay Fase 2 ni Harness Card SD-3.
+  Evidencia `evals/results/result_sd3_probe.json`, `logs/sd3_probe.log`,
+  `traces_sd3_probe.sqlite`, `_run_state_sd3_probe.json` y
+  `SD3_PROBE_LOCK.json`.
 - **Endurecimiento Paso 1-2**: escrituras atómicas
   (`evals/sd_pilot/io_atomico.py`), `git_head_start` real por corrida,
   `CANAL_B_VERSION` **b2** (marcador de truncado en `read_file` + hash dorado),
   heartbeat por turno y checkpoint también en el brazo forzado,
   `scripts/scan_secrets.py` en la puerta/CI, cobertura **78,94 %**
-  (`fail_under=78`) y **542 tests**. El canal b1 de §1 queda como evidencia
+  (`fail_under=78`) y **549 tests**. El canal b1 de §1 queda como evidencia
   histórica: comparaciones solo intra-versión.
 
 

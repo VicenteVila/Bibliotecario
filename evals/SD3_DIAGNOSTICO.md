@@ -63,3 +63,11 @@ trabajo que A1 no puede obtener con su contexto inline y su salida one-shot:
 No se editan las tareas H22. SD-3 empieza con un **probe de 3 tareas
 desechables** y gates P1-P5; si el probe no muestra headroom, no se construyen
 las 24 tareas.
+
+## 7. Resultado del probe (2026-10-25)
+
+**NO CUMPLE**: P2 y P3 rojos. A1 solo falla en breadth (0 %, salida one-shot
+cortada sin bloques parseables); runtime y contract dan A1=100. A5 da 90/100/100
+y no supera donde A1 ya acierta; en breadth hace 0 escrituras y se queda en el
+estado inicial. Coste 194.453 tokens. Detalle y evidencia en
+`HITO23_PLAN.md` §9 y `results/result_sd3_probe.json`.
