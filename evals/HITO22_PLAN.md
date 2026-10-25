@@ -166,12 +166,39 @@ Evidencia: `evals/results/result_sd2.json`, log `evals/logs/sd2_oficial.log`,
 
 ## §7 — Cierre
 
-- Si la calibración falla: §7 registra C1-C4, coste, causa y **NO CUMPLE**;
-  no hay §5.
-- Si la oficial se ejecuta: §7 registra gates, IC, varianza, coste y veredicto
-  **CUMPLE / NO CUMPLE**. Un fallo de U8 se reporta como saturación, no como
-  bug.
-- La Harness Card se publica con el resultado; sin ella no hay nota.
+### Cierre H22 — NO CUMPLE (2026-10-25)
+
+La calibración dev se detuvo anticipadamente al comprobar que **C2 era
+imposible**; no se lanzó la corrida oficial y no se editó ninguna tarea.
+
+- **Ejecución**: 9/24 celdas (5 A1 + 4 A5), modelo
+  `nvidia/nemotron-3-ultra-550b-a55b`, `max_turns=12`, cap 100.000/celda.
+  Parada a los **213.859 tokens** de 700.000 (53 llamadas; 185.732 prompt +
+  28.127 completion).
+- **C1** ❌ parcial `4/12` tareas con A1/A5 válidas: la parada impide
+  completar el set; no se usa como veredicto.
+- **C2** ❌ media A1 **100,0**; `0/12` con A1<100. Las **5 celdas A1 medidas
+  dieron 100** (inventory F1/F2/F3 y reservations F1/F2); aunque las 7
+  restantes bajaran de 100, el máximo posible sería `7/12 < 8/12`. **C2
+  imposible**.
+- **C3** ❌ parcial: media A5 **81,6176**; `2/12` con A5<100; A1−A5
+  **18,3824**. No se completa al parar por C2.
+- **C4** ✅ **213.859 ≤ 700.000**.
+- **Causa**: A1 one-shot resolvió inventory y reservations sin iteración;
+  no hay headroom medido. Se para sin editar tareas ni recalibrar el mismo
+  set. **No hay §5**; H22 cierra **NO CUMPLE**. Un rediseño sería **SD-3**.
+- **Evidencia**: `evals/results/result_sd2_calibracion.json`,
+  `evals/logs/sd2_calibracion.log`,
+  `evals/sd_pilot/traces_sd2_calibracion.sqlite` y
+  `evals/sd_pilot/_run_state_sd2_calibracion.json`. Lock
+  `d702ac80ffc9d4f8e43088dd19e669e5cde39dfdebe2a9c7022532f4d6812609`
+  intacto; Harness Card en `evals/HARNESS_CARD_SD2.md`.
+
+Regla general: si la calibración falla, §7 registra C1-C4, coste, causa y
+**NO CUMPLE**; no hay §5. Si la oficial se ejecuta, §7 registra gates, IC,
+varianza, coste y veredicto **CUMPLE / NO CUMPLE**. Un fallo de U8 se reporta
+como saturación, no como bug. La Harness Card se publica con el resultado; sin
+ella no hay nota.
 
 ## §8 — Qué NO se hace
 
@@ -187,3 +214,5 @@ Evidencia: `evals/results/result_sd2.json`, log `evals/logs/sd2_oficial.log`,
 2. Vertical slice (2 tareas, 0 tokens), QA y revisión del constructo.
 3. Si el slice se aprueba: 24 tareas, QA, lock y congelación del test.
 4. Solo entonces: calibración dev; si C1-C4 pasan, oficial.
+5. **H22 cerrado NO CUMPLE 2026-10-25** (§7): calibración parada por C2;
+   oficial no ejecutado. SD-3 no iniciado.

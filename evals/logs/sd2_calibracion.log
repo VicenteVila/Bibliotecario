@@ -1,0 +1,12 @@
+[20:20:16] clave NVIDIA: PILOTO (separada de bibliotecario; valor no mostrado)
+[20:20:20] calibración SD-2: 24 celdas, modelo=nvidia/nemotron-3-ultra-550b-a55b, max_turns=12, cap=100000, techo=700000
+[20:20:31] A1/sd2-dev-f1-inventory: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=2048 10.5s
+[20:22:50] A5/sd2-dev-f1-inventory: score=76.4706% turns=12 llm=12 tools=12 writes=1 paro=max_turns tok=32708 139.0s
+[20:23:02] A1/sd2-dev-f2-inventory: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=1990 11.8s
+[20:25:13] A5/sd2-dev-f2-inventory: score=100.0% turns=12 llm=12 tools=12 writes=1 paro=max_turns tok=49189 131.3s
+[20:25:34] A1/sd2-dev-f3-inventory: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=1869 21.1s
+[20:29:00] A5/sd2-dev-f3-inventory: score=100.0% turns=12 llm=12 tools=10 writes=2 paro=final tok=59494 205.7s
+[20:29:14] A1/sd2-dev-f1-reservations: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=1537 13.7s
+[20:34:24] A5/sd2-dev-f1-reservations: score=50.0% turns=12 llm=12 tools=12 writes=0 paro=max_turns tok=63700 310.3s
+[20:34:34] A1/sd2-dev-f2-reservations: score=100.0% turns=1 llm=1 tools=0 writes=0 paro=one_shot tok=1324 9.4s
+[20:38:15] PARADA ANTICIPADA: C2 imposible (5 A1 medidas=100; max 7/12<8). Celdas=9/24, tokens=213859/700000. Oficial NO lanzado. Evidencia: result_sd2_calibracion.json

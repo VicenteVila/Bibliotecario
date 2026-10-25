@@ -10,11 +10,11 @@ de `CONOCIMIENTO.md` §8 (fuente única).
 
 | clase | n | dónde | qué es | regla |
 |---|---|---|---|---|
-| **Evidencia** `result_*.json` | 103 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
+| **Evidencia** `result_*.json` | 105 | `results/` | salida estructurada de cada corrida (gates, scores, usage, commits) | **intocable**: no se borra ni se edita; es la prueba de lo medido (mudada 2026-10-22) |
 | **Runners** `run_*.py` | 22 | raíz | scripts de una corrida; su pareja es `results/result_<mismo nombre>.json` + `logs/run_<mismo nombre>.log` | se ejecutan con `.venv/bin/python`; los del pasado son de un solo uso (archivados) |
 | **Evaluadores/utilidades** `.py` | 19 | raíz | `corpus_lock.py` (infra citada por código), `eval_q1_r4r5.py`/`eval_end2end.py`/`eval_retrieval.py`, `judge*.py`, calibradores, `diagnose_*`, `validate_golden.py` | `corpus_lock.py` + `CORPUS_LOCK.json` están **citados por `bibliotecario/` y tests** → no moverlos sin barrido |
-| **Planes y reportes** `HITO*.md` + specs | 29 | raíz | 23 hitos (`HITO0-2.md` reportes; `HITO3-22_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 **CERRADO NO CUMPLE** (§1 SATURA; §6 B abortado NO VIABLE POR COSTE); HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado; HITO22 **RATIFICADO 2026-10-24**: SD-2; BUILD 24/24 QA, lock y test congelado; runner/gates/Harness Card listos; pendiente calibración y corrida) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
-| **Logs** `*.log` | 48 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
+| **Planes y reportes** `HITO*.md` + specs | 29 | raíz | 23 hitos (`HITO0-2.md` reportes; `HITO3-22_PLAN.md` planes con §0 estado → §5 cierre/veredicto; HITO20 **CERRADO NO CUMPLE** (§1 SATURA; §6 B abortado NO VIABLE POR COSTE); HITO21 **cerrado NO CUMPLE** 2026-10-24, b3 no adoptado; HITO22 **CERRADO 2026-10-25 NO CUMPLE**: SD-2; BUILD 24/24 QA y lock; calibración parada por C2 (A1=100 en 5/5 medidas; 9/24 celdas, 213.859 tok); oficial no ejecutado) + `BENCHMARK_SPEC.md` (la regla), `BLUEPRINT_METRIC_DESIGN.md` (umbrales/decisiones), `PLAN_READING/POSICIONAL_PLAN/REPORT_BLIND/REPORT_COEVOLVE` | el "código constitucional": se citan por docenas de sitios → no moverlos |
+| **Logs** `*.log` | 49 | `logs/` | stdout de su `run_<mismo nombre>.py` homónimo | históricos; leer como evidencia, no editar (mudados 2026-10-22) |
 | **Datos** | 9 | `golden_*.jsonl` (datasets gold), `calib_r4_gold.json`, `game_tasks_expanded.yaml` (60 tareas, citado), `CORPUS_LOCK.json` | referenciados por tests/evals → no mover sin barrido |
 
 ## `sd_pilot/` — piloto `Sens(x)` (Hito 19, dominio `software_development`)
@@ -59,9 +59,10 @@ cerrada NO CUMPLE por G3; b3 no adoptado). HITO20 §6 B (BUILD + intento abortad
 `results/result_sens_sd_b_abort.json` (3/60 celdas, 626.036 tok,
 extrapolación ~12M; no es resultado oficial).
 HITO22 BUILD: `results/result_sd2_build_qa.json` (24/24 referencia 100 %,
-vacío <100 %, 0 llamadas LLM) y `sd_pilot/SD2_LOCK.json`. Runner/gates
-listos; pendiente calibración dev (`results/result_sd2_calibracion.json`) y
-oficial (`results/result_sd2.json`). Harness Card: `HARNESS_CARD_SD2.md`.
+vacío <100 %, 0 llamadas LLM) y `sd_pilot/SD2_LOCK.json`. Calibración:
+`results/result_sd2_calibracion.json` (**NO CUMPLE**, parada por C2; 9/24
+celdas, 213.859 tok; A1=100 en 5/5 medidas). Oficial no ejecutado. Harness
+Card: `HARNESS_CARD_SD2.md`.
 Tests: `tests/test_sens_sd_pilot.py` (puros, sin LLM) y `tests/test_sd2.py`
 (BUILD H22: split 12/12, 8×F1/F2/F3, lint, QA 24/24, lock, gates
 C1-C4/U1-U10 y presupuesto; sin LLM).
@@ -92,7 +93,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | patrón | significado |
 |---|---|
 | `HITO0.md`…`HITO2.md` | reportes de los hitos fundacionales (no eran planes) |
-| `HITO3_PLAN.md`…`HITO22_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **CERRADO 2026-10-24 NO CUMPLE** (§1 SATURA; §6 B **ABORTADO NO VIABLE POR COSTE**: 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; BUILD 12/12 QA y modo `--b` quedan como artefactos); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2; H22 **RATIFICADO 2026-10-24** — SD-2; BUILD 24/24 QA, lock y test congelado; runner/gates/Harness Card listos; pendiente calibración y corrida) |
+| `HITO3_PLAN.md`…`HITO22_PLAN.md` | plan + cierre del hito N (§5 = veredicto final; H17 cerrado NO CUMPLE 2026-10-22; H18 cerrado **CUMPLE** 2026-10-22; H19 cerrado NO CUMPLE 2026-10-23; H20 **CERRADO 2026-10-24 NO CUMPLE** (§1 SATURA; §6 B **ABORTADO NO VIABLE POR COSTE**: 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; BUILD 12/12 QA y modo `--b` quedan como artefactos); H21 **CERRADO 2026-10-24 NO CUMPLE** — G3, b3 no adoptado, default b2; H22 **CERRADO 2026-10-25 NO CUMPLE** — SD-2; BUILD 24/24 QA, lock y test congelado; calibración parada por C2 (A1=100 en 5/5 medidas; 9/24 celdas, 213.859 tok); oficial no ejecutado) |
 | `result_fase<N>_h<X>.json` | evidencia de la fase N en el intento de hito X (serie de brazos H1…H21 de la fase 1) |
 | `result_fase2_b2.json` | corrida oficial del **Hito 16** (B-2 etapa 2, U1-U6) |
 | `result_q1_r4r5.json` | fila maestra de juicios del juez Q1 (columna `arm` = brazo) |
@@ -101,6 +102,7 @@ HTTP 503 del endpoint (conservados con su coste); `h17_f{1,2,3}_run.log`
 | `result_sens_sd_g0.json`, `result_sens_sd_pilot.json` | G0 humo y corrida oficial del **Hito 19** (`Sens(x)`); su stdout es `logs/sens_sd_g0.log` y `logs/sens_sd_pilot_run.log` |
 | `result_sens_sd_diag_trazas.json`, `result_sens_sd_diag.json` | **Hito 20** §0.1: diagnóstico de celdas truncadas (Parte A 0 tokens, Parte B `max_turns=32`); stdout en `logs/sens_sd_diag_run.log` |
 | `result_sens_sd_corridab.json`, `result_b_build_qa.json`, `result_sens_sd_b_abort.json` | **Hito 20** §1 (matriz canal b, SATURA), §6 B (QA de BUILD 0 tokens) y §6 B (aborto por coste: 3/60 celdas, 626.036 tok; no es resultado oficial) |
+| `result_sd2_build_qa.json`, `result_sd2_calibracion.json` | **Hito 22** SD-2: BUILD (0 LLM, 24/24) y calibración dev (**NO CUMPLE**, parada por C2: 9/24 celdas, 213.859 tok); no hay `result_sd2.json` (oficial no ejecutado) |
 | `run_<X>.py` → `results/result_<X>.json` + `logs/run_<X>.log` | trío runner → evidencia → stdout del mismo experimento |
 | `*_prev*.json` | corrida anterior conservada antes de repetir (historial, no borrar) |
 

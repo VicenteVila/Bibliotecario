@@ -1,8 +1,10 @@
 # Harness Card — SD-2 (HITO22)
 
-Estado: **pre-calibración**. Este documento se congela antes de la corrida
-oficial; cualquier cambio de arnés, prompts, herramientas, variantes, caps o
-scoring exige enmienda ratificada y nueva evidencia.
+Estado: **calibración cerrada NO CUMPLE (2026-10-25); corrida oficial no
+ejecutada**. La calibración se paró al ser C2 imposible (A1=100 en las 5
+celdas medidas); no se editó ninguna tarea. Cualquier cambio de arnés, prompts,
+herramientas, variantes, caps o scoring exige enmienda ratificada y nueva
+evidencia.
 
 ## 1. Modelo y proveedor
 
@@ -90,10 +92,10 @@ one-shot por diseño).
 ## 8. Evidencia
 
 - BUILD: `evals/results/result_sd2_build_qa.json`.
-- Calibración: `evals/results/result_sd2_calibracion.json`,
-  `evals/logs/sd2_calibracion.log`, `evals/sd_pilot/traces_sd2_calibracion.sqlite`.
-- Oficial: `evals/results/result_sd2.json`, `evals/logs/sd2_oficial.log`,
-  `evals/sd_pilot/traces_sd2.sqlite`.
+- Calibración: `evals/results/result_sd2_calibracion.json` (**NO CUMPLE**:
+  parada por C2; 9/24 celdas, 213.859 tok), `evals/logs/sd2_calibracion.log`,
+  `evals/sd_pilot/traces_sd2_calibracion.sqlite`.
+- Oficial: **no ejecutado** (no hay `result_sd2.json` ni `sd2_oficial.log`).
 - Estados reanudables: `evals/sd_pilot/_run_state_sd2_calibracion.json` y
   `evals/sd_pilot/_run_state_sd2.json`.
 

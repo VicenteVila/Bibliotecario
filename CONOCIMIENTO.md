@@ -70,6 +70,7 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Plan Hito 19 | `evals/HITO19_PLAN.md` — **CERRADO 2026-10-23 NO CUMPLE** (§5: piloto `Sens(x)` en `software_development` con arnés mínimo A1-A5 · U1-U6 ✅, **U7 ❌** `media_global 70.43 > 60` · `Sens(x)` >0 en 10/12 (dato) · 5,12M tokens · 4 celdas A5 con error de endpoint sin re-ejecutar · enmiendas 7-8 + modelo ultra ANTES de medir). Artefactos `evals/sd_pilot/` + enmiendas 7-8 de §11 |
 | Plan Hito 20 | `evals/HITO20_PLAN.md` — **CERRADO 2026-10-24 NO CUMPLE** (§7): §1 matriz 17×12 canal b + brazo forzado (2.686.674 tok, media 82,47 vs 70,43, Δ+12,04, **E1_ACLARA**, **SATURA**); §6 B **ABORTADO — NO VIABLE POR COSTE** (12 tareas `*-b` multi-paquete, BUILD+QA 12/12, modo `--b`; 3/60 celdas, 626.036 tok, extrapolación ~12M > techo 4,2M; sin `result_sens_sd_b.json`); C1 medido en §1, insuficiente; 3.390.151 de 7M gastados (incl. §0.3 77.441) |
 | Plan Hito 21 | `evals/HITO21_PLAN.md` — **CERRADO 2026-10-24 NO CUMPLE** (§5: b3 8 celdas, 596.343 tok, **G1/G2/G4/G5/G6 ✅, G3 ❌**; residuales 72,28 vs 38,42 pero controles A2_plugin −35,7 y A4_interval −43,3; **b3 no adoptado**, default vuelve a b2; heartbeat roto corregido post-run) |
+| Plan Hito 22 | `evals/HITO22_PLAN.md` — **CERRADO 2026-10-25 NO CUMPLE** (§7: SD-2 BUILD 24/24 QA y lock; calibración dev parada por **C2 imposible** — A1=100 en 5/5 medidas, 9/24 celdas, 213.859 tok; oficial no ejecutado; sin editar tareas) |
 | Erratas y fracasos declarados | `evals/BLUEPRINT_METRIC_DESIGN.md` — §8.8-§8.13 |
 | Hitos previos | `evals/HITO0.md`, `HITO1.md`, `PLAN_READING.md`, `REPORT_BLIND.md`, `REPORT_COEVOLVE.md` |
 
@@ -113,12 +114,21 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
   activos → varianza. n=1: G3 mezcla causas accionables y varianza. Incidencia: `_run_cell` no pasaba `on_turn` → sin heartbeat en la
   corrida; corregido + test. Evidencia `evals/results/result_hito21.json`,
   `results/informes_hito21/`, `traces_h21.sqlite`, `logs/hito21_run.log`.
+- **HITO22 cerrado NO CUMPLE (2026-10-25)**: SD-2 (12 dev + 12 test) con
+  BUILD 24/24 QA y `SD2_LOCK.json`; calibración dev parada al ser **C2
+  imposible** (A1=100 en las 5 celdas medidas; máximo 7/12<8 con A1<100).
+  9/24 celdas, **213.859 tok** de 700.000; C4 ✅, C1/C2/C3 ❌ (C1/C3
+  parciales por la parada); no se lanzó el oficial y no se editaron tareas.
+  Evidencia `evals/results/result_sd2_calibracion.json`,
+  `logs/sd2_calibracion.log`, `traces_sd2_calibracion.sqlite` y
+  `_run_state_sd2_calibracion.json`; Harness Card
+  `evals/HARNESS_CARD_SD2.md`. Rediseño: SD-3.
 - **Endurecimiento Paso 1-2**: escrituras atómicas
   (`evals/sd_pilot/io_atomico.py`), `git_head_start` real por corrida,
   `CANAL_B_VERSION` **b2** (marcador de truncado en `read_file` + hash dorado),
   heartbeat por turno y checkpoint también en el brazo forzado,
   `scripts/scan_secrets.py` en la puerta/CI, cobertura **78,94 %**
-  (`fail_under=78`) y **531 tests**. El canal b1 de §1 queda como evidencia
+  (`fail_under=78`) y **542 tests**. El canal b1 de §1 queda como evidencia
   histórica: comparaciones solo intra-versión.
 
 

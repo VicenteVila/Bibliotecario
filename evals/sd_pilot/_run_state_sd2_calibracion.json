@@ -1,0 +1,319 @@
+{
+ "mode": "calibracion",
+ "cells": {
+  "A1_sd2-dev-f1-inventory": {
+   "task": "sd2-dev-f1-inventory",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "max_turns": 12,
+   "variant_max_turns": 1,
+   "score": 100.0,
+   "hidden": {
+    "passed": 17,
+    "total": 17
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 10.5,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 1654,
+    "completion_tokens": 394,
+    "total_tokens": 2048
+   }
+  },
+  "A5_sd2-dev-f1-inventory": {
+   "task": "sd2-dev-f1-inventory",
+   "variant": "A5",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "max_turns": 12,
+   "variant_max_turns": 12,
+   "score": 76.4706,
+   "hidden": {
+    "passed": 13,
+    "total": 17
+   },
+   "turns": 12,
+   "llm_calls": 12,
+   "tool_calls": 12,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [
+    "PÚBLICOS: 4 pasan, 3 fallan, 0 errores\nE   AssertionError: assert False is True\n/tmp/opencode/sd2_calibracion/A5_sd2-dev-f1-inventory/tests_public/test_alerts.p",
+    "PÚBLICOS: 4 pasan, 3 fallan, 0 errores\nE   AssertionError: assert False is True\n/tmp/opencode/sd2_calibracion/A5_sd2-dev-f1-inventory/tests_public/test_alerts.p",
+    "PÚBLICOS: 5 pasan, 2 fallan, 0 errores\nE   AssertionError: assert False is True\n/tmp/opencode/sd2_calibracion/A5_sd2-dev-f1-inventory/tests_public/test_alerts.p"
+   ],
+   "final": "",
+   "elapsed_s": 139.0,
+   "writes": 1,
+   "snapshots": {},
+   "usage": {
+    "calls": 12,
+    "prompt_tokens": 31008,
+    "completion_tokens": 1700,
+    "total_tokens": 32708
+   }
+  },
+  "A1_sd2-dev-f2-inventory": {
+   "task": "sd2-dev-f2-inventory",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "max_turns": 12,
+   "variant_max_turns": 1,
+   "score": 100.0,
+   "hidden": {
+    "passed": 11,
+    "total": 11
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 11.8,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 1751,
+    "completion_tokens": 239,
+    "total_tokens": 1990
+   }
+  },
+  "A5_sd2-dev-f2-inventory": {
+   "task": "sd2-dev-f2-inventory",
+   "variant": "A5",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "max_turns": 12,
+   "variant_max_turns": 12,
+   "score": 100.0,
+   "hidden": {
+    "passed": 11,
+    "total": 11
+   },
+   "turns": 12,
+   "llm_calls": 12,
+   "tool_calls": 12,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   Failed: DID NOT RAISE ValueError\n/tmp/opencode/sd2_calibracion/A5_sd2-dev-f2-inventory/tests_public/test_transfers.py"
+   ],
+   "final": "",
+   "elapsed_s": 131.3,
+   "writes": 1,
+   "snapshots": {},
+   "usage": {
+    "calls": 12,
+    "prompt_tokens": 45945,
+    "completion_tokens": 3244,
+    "total_tokens": 49189
+   }
+  },
+  "A1_sd2-dev-f3-inventory": {
+   "task": "sd2-dev-f3-inventory",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "max_turns": 12,
+   "variant_max_turns": 1,
+   "score": 100.0,
+   "hidden": {
+    "passed": 11,
+    "total": 11
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 21.1,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 1501,
+    "completion_tokens": 368,
+    "total_tokens": 1869
+   }
+  },
+  "A5_sd2-dev-f3-inventory": {
+   "task": "sd2-dev-f3-inventory",
+   "variant": "A5",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "max_turns": 12,
+   "variant_max_turns": 12,
+   "score": 100.0,
+   "hidden": {
+    "passed": 11,
+    "total": 11
+   },
+   "turns": 12,
+   "llm_calls": 12,
+   "tool_calls": 10,
+   "invalid_actions": 1,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "final",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [
+    "JSON invalido",
+    "PÚBLICOS: 0 pasan, 0 fallan, 1 errores\nImportError while importing test module '/tmp/opencode/sd2_calibracion/A5_sd2-dev-f3-inventory/tests_public/test_service."
+   ],
+   "final": "Implementada la fachada Inventario en service.py reutilizando las funciones existentes de stock, reservations y alerts. Todos los tests públicos pasan correctamente (7/7).",
+   "elapsed_s": 205.7,
+   "writes": 2,
+   "snapshots": {},
+   "usage": {
+    "calls": 12,
+    "prompt_tokens": 51844,
+    "completion_tokens": 7650,
+    "total_tokens": 59494
+   }
+  },
+  "A1_sd2-dev-f1-reservations": {
+   "task": "sd2-dev-f1-reservations",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "max_turns": 12,
+   "variant_max_turns": 1,
+   "score": 100.0,
+   "hidden": {
+    "passed": 12,
+    "total": 12
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 13.7,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 1153,
+    "completion_tokens": 384,
+    "total_tokens": 1537
+   }
+  },
+  "A5_sd2-dev-f1-reservations": {
+   "task": "sd2-dev-f1-reservations",
+   "variant": "A5",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "max_turns": 12,
+   "variant_max_turns": 12,
+   "score": 50.0,
+   "hidden": {
+    "passed": 6,
+    "total": 12
+   },
+   "turns": 12,
+   "llm_calls": 12,
+   "tool_calls": 12,
+   "invalid_actions": 0,
+   "pf_fires": [
+    "retry_on_failure",
+    "retry_on_failure",
+    "retry_on_failure"
+   ],
+   "regulation": [],
+   "stopped_by": "max_turns",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 8 == 10\n/tmp/opencode/sd2_calibracion/A5_sd2-dev-f1-reservations/tests_public/test_reservation",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 8 == 10\n/tmp/opencode/sd2_calibracion/A5_sd2-dev-f1-reservations/tests_public/test_reservation",
+    "PÚBLICOS: 3 pasan, 3 fallan, 0 errores\nE   AssertionError: assert 8 == 10\n/tmp/opencode/sd2_calibracion/A5_sd2-dev-f1-reservations/tests_public/test_reservation"
+   ],
+   "final": "",
+   "elapsed_s": 310.3,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 12,
+    "prompt_tokens": 49671,
+    "completion_tokens": 14029,
+    "total_tokens": 63700
+   }
+  },
+  "A1_sd2-dev-f2-reservations": {
+   "task": "sd2-dev-f2-reservations",
+   "variant": "A1",
+   "model": "nvidia/nemotron-3-ultra-550b-a55b",
+   "max_turns": 12,
+   "variant_max_turns": 1,
+   "score": 100.0,
+   "hidden": {
+    "passed": 12,
+    "total": 12
+   },
+   "turns": 1,
+   "llm_calls": 1,
+   "tool_calls": 0,
+   "invalid_actions": 0,
+   "pf_fires": [],
+   "regulation": [],
+   "stopped_by": "one_shot",
+   "llm_error": "",
+   "infra_error": false,
+   "errors": [],
+   "final": "",
+   "elapsed_s": 9.4,
+   "writes": 0,
+   "snapshots": {},
+   "usage": {
+    "calls": 1,
+    "prompt_tokens": 1205,
+    "completion_tokens": 119,
+    "total_tokens": 1324
+   }
+  }
+ }
+}
