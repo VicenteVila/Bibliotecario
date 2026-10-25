@@ -1,0 +1,7 @@
+{
+  "id": "sd3-probe-contract",
+  "family": "F1",
+  "version": 1,
+  "descripcion": "Contrato parcial: máquina de estados con especificación incompleta y públicos parciales.",
+  "probe": true
+}

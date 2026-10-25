@@ -1,0 +1,7 @@
+{
+  "id": "sd3-probe-runtime",
+  "family": "F1",
+  "version": 1,
+  "descripcion": "Runtime: máquina de estados con secuencias y cancelación.",
+  "probe": true
+}

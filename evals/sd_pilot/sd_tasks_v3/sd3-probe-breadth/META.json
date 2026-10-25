@@ -1,0 +1,7 @@
+{
+  "id": "sd3-probe-breadth",
+  "family": "F3",
+  "version": 1,
+  "descripcion": "Amplitud: 16 módulos, 10 funciones y un bug local por módulo.",
+  "probe": true
+}
