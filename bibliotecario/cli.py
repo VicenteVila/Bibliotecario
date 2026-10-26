@@ -43,6 +43,17 @@ def cmd_evolve(_a):
     print(json.dumps(API.evolve(), indent=1, ensure_ascii=False, default=str))
 
 
+def cmd_compile(a):
+    import json
+    print(json.dumps(API.compile_knowledge(apply=a.apply), indent=1, ensure_ascii=False, default=str))
+
+
+def cmd_coevolve(a):
+    import json
+    print(json.dumps(API.coevolve_status(rho=a.rho, seed=a.seed),
+                     indent=1, ensure_ascii=False, default=str))
+
+
 def cmd_repl(_a):
     print("Bibliotecario — pregunta sobre papers ('implementa X para Y' genera blueprint; 'salir' termina).")
     API.init()
@@ -82,6 +93,11 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("blueprint"); s.add_argument("technique"); s.add_argument("goal"); s.set_defaults(f=cmd_blueprint)
     s = sub.add_parser("implement"); s.add_argument("technique"); s.add_argument("goal"); s.set_defaults(f=cmd_implement)
     s = sub.add_parser("evolve"); s.set_defaults(f=cmd_evolve)
+    s = sub.add_parser("compile"); s.add_argument("--apply", action="store_true",
+                                                  help="escribe en la DB (default: dry-run)")
+    s.set_defaults(f=cmd_compile)
+    s = sub.add_parser("coevolve"); s.add_argument("--rho", type=float, default=0.2)
+    s.add_argument("--seed", type=int, default=0); s.set_defaults(f=cmd_coevolve)
     s = sub.add_parser("repl"); s.set_defaults(f=cmd_repl)
     return p
 

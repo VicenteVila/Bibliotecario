@@ -77,18 +77,19 @@ class ProceduralSkillLayer:
         self._skills[skill.name] = skill
 
     def load_from_db(self) -> int:
-        """Recarga las auto_skill_* persistidas (Hito 4).
+        """Recarga las skills persistidas (auto_skill_* y tech_skill_*).
 
         La capa vive en memoria y el proceso no: sin esto, una skill creada
-        por meta-evolución desaparecía al reiniciar y la tabla skills se
-        quedaría como registro de solo lectura. Formato de skill_md escrito
-        por el harness: línea 1 `trigger: <firma>`, línea 2 `intervention: …`.
+        por meta-evolución o por el compilador del grafo desaparecía al
+        reiniciar y la tabla skills se quedaría como registro de solo lectura.
+        Formato: línea 1 `trigger: <firma>`, línea 2 `intervention: …`.
         """
         from bibliotecario.core import storage
 
         with storage.get_conn() as conn:
             rows = conn.execute(
-                "SELECT name, skill_md FROM skills WHERE name GLOB 'auto_skill_*'"
+                "SELECT name, skill_md FROM skills "
+                "WHERE name GLOB 'auto_skill_*' OR name GLOB 'tech_skill_*'"
             ).fetchall()
         n = 0
         for r in rows:

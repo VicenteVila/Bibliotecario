@@ -73,10 +73,13 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Plan Hito 22 | `evals/HITO22_PLAN.md` — **CERRADO 2026-10-25 NO CUMPLE** (§7: SD-2 BUILD 24/24 QA y lock; calibración dev parada por **C2 imposible** — A1=100 en 5/5 medidas, 9/24 celdas, 213.859 tok; oficial no ejecutado; sin editar tareas) |
 | Plan Hito 23 | `evals/HITO23_PLAN.md` — **CERRADO 2026-10-25 NO CUMPLE** (§9: probe SD-3 3 tareas × A1/A5, 6/6 celdas, **P2/P3 rojos**, P1/P4/P5 verdes; 194.453 tok; A1 breadth 0 por corte one-shot, A5 breadth 0 writes; runtime/contract A1=A5=100; no se construyen 24 tareas) |
 | Plan Hito 24 | `evals/HITO24_PLAN.md` — **CERRADO 2026-10-25 NO CUMPLE** (§9: probe SD-4 de cola larga, 5/6 celdas, **R1-R6 rojos**; 290.185 tok > techo 250.000; A1 27,27/0/0, A5 0/0 y tail-24 no ejecutada; A5 leyó la cola pero `write_file` se cortó a 4.096 tokens → JSON inválido y 0 escrituras; no se construyen 24 tareas) |
+| Plan Hito 25 | `evals/HITO25_PLAN.md` — **CERRADO 2026-10-25 — auditoría 0 tokens**: H22-H24 no tienen constructo limpio; el one-shot no aplica cap, el cap se comprueba tras el turno, `write_file` completo no cabe en 4.096 tokens y R2 de H24 hereda el hueco de A5; **recomendación: SD parado, sin SD-5**. **Decisión del dueño 2026-10-25: H26-B ratificada** (B-1/B-2 + producto); H26-A descartada salvo nueva decisión |
+| Plan Hito 26 | `evals/HITO26_PLAN.md` — **CERRADO 2026-10-26 — H26-B Fase 1 CERRADA (producto 0 tokens)**: 10 estudios → `memory_items`, 14 técnicas → `skills` `tech_skill_*`, snapshot read-only de coevolve y `recall_memory`; **G1-G6/C1 verdes**, suite 566, 0 tokens; Fase 2 ejecutada en H27 |
+| Plan Hito 27 | `evals/HITO27_PLAN.md` — **CERRADO 2026-10-26 — H26-B Fase 2 CUMPLE (instrumento)**: 4 tareas × control/skills, 8 llamadas, **42.710 tokens** (techo 100k), 0 reparaciones; control 10,22 vs skills 30,22 (**Δ+20,00**), concentrado en `card-memory-precision` (+80); otras 3 tareas empatan y fallan `sin-errores-de-script`; n=4 descriptivo, sin significación; B-2 no usado; suite 574 |
 | Erratas y fracasos declarados | `evals/BLUEPRINT_METRIC_DESIGN.md` — §8.8-§8.13 |
 | Hitos previos | `evals/HITO0.md`, `HITO1.md`, `PLAN_READING.md`, `REPORT_BLIND.md`, `REPORT_COEVOLVE.md` |
 
-### Estado del piloto de agentes — *(2026-10-24)*
+### Estado del piloto de agentes — *(2026-10-26)*
 
 - **HITO20 CERRADO NO CUMPLE (2026-10-24)**: §1 SATURA y §6 B no viable
   por coste; no se alcanza U7. Detalle en §7 del plan.
@@ -144,12 +147,33 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
   Harness Card SD-4. Evidencia `evals/results/result_sd4_probe.json`,
   `logs/sd4_probe.log`, `traces_sd4_probe.sqlite`,
   `_run_state_sd4_probe.json` y `SD4_PROBE_LOCK.json`.
+- **HITO25 cerrado 2026-10-25 — auditoría 0 tokens**: H22-H24 no contienen
+  un constructo limpio. H22 saturó A1 (100 en 5/5); H23 midió los dos
+  extremos (A1/A5 a 100 en runtime/contract; breadth con A5=90 sin escribir
+  y `empty_score=90`); H24 midió el corte de salida (A5 con `write_file` a
+  4.096 tokens, 0 escrituras) y el coste (290.185 > 250.000). Defectos de
+  instrumento: el cap se comprueba tras el turno, el one-shot no lo aplica,
+  el techo permite overshoot y R2 de H24 calcula A1 sobre el subconjunto
+  válido de A5. **Recomendación: SD parado; no lanzar SD-5**. **El dueño
+  ratificó H26-B el 2026-10-25** (B-1/B-2 + producto); H26-A queda descartada
+  salvo nueva decisión. H26-B Fase 1 está cerrada (0 tokens) y la Fase 2 se
+  midió en H27: 42.710 tokens, Δ+20,00 concentrado en card, sin afirmar
+  transferencia general. Detalle: `evals/HITO25_PLAN.md`,
+  `evals/HITO26_PLAN.md` y `evals/HITO27_PLAN.md`.
+- **HITO27 cerrado 2026-10-26 — H26-B Fase 2 CUMPLE (instrumento)**: 4
+  tareas B-1 v2 × control/skills, 8 llamadas, **42.710 tokens** (techo
+  100.000), 0 reparaciones. Control 10,22 vs skills 30,22 (**Δ+20,00**), pero
+  todo el delta está en `card-memory-precision` (+80); las otras 3 tareas
+  empatan y fallan `sin-errores-de-script`. n=4: dato descriptivo, **no**
+  transferencia general. B-2 no usado. Evidencia
+  `evals/results/result_transfer_h26b.json` y
+  `evals/logs/h26b_transfer_run.log`.
 - **Endurecimiento Paso 1-2**: escrituras atómicas
   (`evals/sd_pilot/io_atomico.py`), `git_head_start` real por corrida,
   `CANAL_B_VERSION` **b2** (marcador de truncado en `read_file` + hash dorado),
   heartbeat por turno y checkpoint también en el brazo forzado,
   `scripts/scan_secrets.py` en la puerta/CI, cobertura **78,94 %**
-  (`fail_under=78`) y **558 tests**. El canal b1 de §1 queda como evidencia
+  (`fail_under=78`) y **558 tests** (hoy 574). El canal b1 de §1 queda como evidencia
   histórica: comparaciones solo intra-versión.
 
 
@@ -170,10 +194,11 @@ papers ──► Bibliotecario ──► blueprint ──► arnés ──► ev
 | Resultados del juez nuevo | `evals/results/result_q1_noise_gemini.json`, `evals/results/result_q1_r4_all.json` |
 | `.env` (claves, chmod 600, no trackeado) | `.env` |
 
-### Estado de la DB (2026-10-21, tras higiene 16/17)
+### Estado de la DB (2026-10-25, tras compilación H26-B)
 
 `25 documentos` · `2255 chunks` · `126 nodos` · `180 aristas` · `275 lessons`
-· **`0 skills`** · **`0 memory_items`** · `35 wiki_pages`
+· **`14 skills`** (`tech_skill_*`) · **`10 memory_items`** (estudios) ·
+`49 wiki_pages` (35 + 14 skills)
 
 | capa | docs | chunks |
 |---|---|---|

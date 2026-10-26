@@ -15,6 +15,7 @@ from bibliotecario.core.llm import generate
 from bibliotecario.core.tokens import count_terms, token_list, tokens
 from bibliotecario.knowledge import graph as G
 from bibliotecario.knowledge import pearl as PEARL
+from bibliotecario.memory import memory_tree as MT
 from bibliotecario.memory import retriever
 
 logger = logging.getLogger(__name__)
@@ -875,6 +876,12 @@ def register_skill(name: str, skill_md: str, purpose_md: str = "") -> dict:
     return {"ok": True, "name": name}
 
 
+def recall_memory(query: str, top_k: int = 8) -> dict:
+    """Recupera memoria consolidada por léxico, sin cargar embeddings."""
+    hits = MT.recall_text(query, top_k=max(1, top_k))
+    return {"query": query, "hits": hits, "count": len(hits)}
+
+
 def get_status() -> dict:
     with storage.get_conn() as conn:
         docs = conn.execute("SELECT COUNT(*) c FROM documents").fetchone()["c"]
@@ -924,6 +931,11 @@ TOOLS: dict[str, dict] = {
                            "name": {"type": "string"}, "skill_md": {"type": "string"},
                            "purpose_md": {"type": "string", "default": ""}},
                            "required": ["name", "skill_md"]}},
+    "recall_memory": {"fn": recall_memory, "description": "Recupera lecciones y estudios consolidados "
+                                                         "por léxico (sin embeddings ni coste LLM)",
+                      "parameters": {"type": "object", "properties": {
+                          "query": {"type": "string"}, "top_k": {"type": "integer", "default": 8}},
+                          "required": ["query"]}},
     "get_status": {"fn": get_status, "description": "Estado del sistema (docs, grafo, lessons, runs)",
                    "parameters": {"type": "object", "properties": {}}},
 }

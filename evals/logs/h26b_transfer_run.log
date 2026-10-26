@@ -1,0 +1,36 @@
+HITO27 · H26-B Fase 2 · RUN · 8 celdas · techo 100000
+
+[1/8] card-memory-precision · control
+  card-memory-precision          control       7s  main.gd=sí  BUILD=ok  M=1/10  Score=10.0  tokens=4195
+
+[2/8] card-memory-precision · skills
+  card-memory-precision          skills       12s  main.gd=sí  BUILD=ok  M=9/10  Score=90.0  tokens=6620
+
+[3/8] platformer-torre-rebote · control
+  platformer-torre-rebote        control      10s  main.gd=sí  BUILD=ok  M=1/17  Score=5.88  tokens=5455
+
+[4/8] platformer-torre-rebote · skills
+  platformer-torre-rebote        skills        9s  main.gd=sí  BUILD=ok  M=1/17  Score=5.88  tokens=5251
+
+[5/8] idle-clicker-fabrica · control
+  idle-clicker-fabrica           control      10s  main.gd=sí  BUILD=ok  M=1/8  Score=12.5  tokens=5354
+
+[6/8] idle-clicker-fabrica · skills
+  idle-clicker-fabrica           skills        9s  main.gd=sí  BUILD=ok  M=1/8  Score=12.5  tokens=5255
+
+[7/8] visualnovel-mystery-accusation · control
+  visualnovel-mystery-accusation control      10s  main.gd=sí  BUILD=ok  M=1/8  Score=12.5  tokens=5579
+
+[8/8] visualnovel-mystery-accusation · skills
+  visualnovel-mystery-accusation skills        8s  main.gd=sí  BUILD=ok  M=1/8  Score=12.5  tokens=5001
+
+========================================================================
+  T1  OK     intentos=8/8 · calls_usage=8/8 · tokens=42710 ≤ 100000
+  T2  OK     main.gd parseado=8/8
+  T3  OK     suites=8/8 · BUILD>0=8/8 (≥6)
+  T4  OK     control limpio; skills con briefing; sin ids/suite en el briefing
+  T5  OK     peor request estimado=7774 < TPM 8000 (max_tokens=6000)
+  T6  OK     media delta skills-control=20.0
+  control=10.22 · skills=30.22 · delta=20.0
+  tokens=42710 · veredicto=CUMPLE · /mnt/c/Bibliotecario/evals/results/result_transfer_h26b.json
+========================================================================

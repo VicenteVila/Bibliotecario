@@ -13,6 +13,7 @@ import numpy as np
 
 from bibliotecario.core import storage
 from bibliotecario.core.embeddings import blob_to_vec, embed_blob
+from bibliotecario.core.tokens import tokens as _tokens
 
 TAU_DAYS = 30.0
 ETA = 0.5
@@ -62,6 +63,45 @@ def recall(query_vec: np.ndarray, top_k: int = 8, min_strength: float = 0.05) ->
                 conn.execute("UPDATE memory_items SET strength=MIN(1.0, ?+?), last_access=datetime('now') WHERE id=?",
                              (s, ETA, mid))
     return [{"id": mid, "level": lv, "content": c, "score": round(sc, 3)} for sc, mid, lv, c, _ in top]
+
+
+def recall_text(query: str, top_k: int = 8, min_strength: float = 0.05) -> list[dict]:
+    """Recuperación léxica para memorias sin embedding.
+
+    El MemoryTree nació vectorial, pero `MT.add` permite guardar sin vector
+    (los estudios compilados no cargan el modelo). Sin esta vía esos items
+    existirían y `recall` los ignoraría en silencio. El score es cobertura de
+    tokens de la consulta, atenuado por la fuerza de la memoria; no pretende
+    sustituir al denso, solo hacer usable lo que ya está guardado.
+    """
+    qtok = _tokens(query)
+    if not qtok:
+        return []
+    hits = []
+    with storage.get_conn() as conn:
+        rows = conn.execute(
+            "SELECT id, level, content, strength, last_access FROM memory_items"
+        ).fetchall()
+    for r in rows:
+        s = _decay(r["strength"], r["last_access"])
+        if s < min_strength and r["level"] != "L3":
+            continue
+        overlap = len(qtok & _tokens(r["content"]))
+        if not overlap:
+            continue
+        score = (overlap / len(qtok)) * (0.5 + 0.5 * s)
+        hits.append((score, r["id"], r["level"], r["content"], s))
+    hits.sort(key=lambda x: -x[0])
+    top = hits[:top_k]
+    if top:
+        with storage.get_conn() as conn:
+            for _, mid, _, _, s in top:
+                conn.execute(
+                    "UPDATE memory_items SET strength=MIN(1.0, ?+?), "
+                    "last_access=datetime('now') WHERE id=?",
+                    (s, ETA, mid))
+    return [{"id": mid, "level": lv, "content": c, "score": round(sc, 3)}
+            for sc, mid, lv, c, _ in top]
 
 
 def promote(item_id: int, level: str) -> None:

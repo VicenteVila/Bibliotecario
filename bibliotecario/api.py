@@ -17,6 +17,7 @@ from bibliotecario.agent.tools import (
     verify_and_repair,
 )
 from bibliotecario.background import run_cycle
+from bibliotecario.coevolve import compiler as COCOMP
 from bibliotecario.core import storage
 from bibliotecario.ingest import pipeline
 from bibliotecario.knowledge import seed as SEED
@@ -38,6 +39,8 @@ __all__ = [
     "blueprint_route5",
     "blueprint_verified",
     "build_blueprint",
+    "coevolve_status",
+    "compile_knowledge",
     "evolve",
     "get_paper",
     "get_study",
@@ -185,6 +188,16 @@ def implement(technique: str, goal: str) -> dict:
 def evolve() -> dict:
     """Ciclo de co-evolución en background (consolidar + refinar)."""
     return run_cycle()
+
+
+def compile_knowledge(apply: bool = False) -> dict:
+    """Compila estudios a memoria y grafo a skills. Dry-run por defecto, 0 LLM."""
+    return COCOMP.run(apply=apply)
+
+
+def coevolve_status(rho: float = 0.2, seed: int = 0) -> dict:
+    """Foto read-only del pool Task-CoEvolve; no estima ni lanza tareas."""
+    return COCOMP.snapshot(rho=rho, seed=seed)
 
 
 def status() -> dict:

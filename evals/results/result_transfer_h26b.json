@@ -1,0 +1,413 @@
+{
+  "hito": 27,
+  "fase": "H26-B Fase 2 — transferencia skills → B-1 v2",
+  "fecha": "2026-10-25T23:09:07.110993+00:00",
+  "plan": "/mnt/c/Bibliotecario/evals/HITO27_PLAN.md",
+  "modelo": "openai/gpt-oss-120b",
+  "max_tokens": 6000,
+  "tareas": [
+    "card-memory-precision",
+    "platformer-torre-rebote",
+    "idle-clicker-fabrica",
+    "visualnovel-mystery-accusation"
+  ],
+  "brazos": [
+    "control",
+    "skills"
+  ],
+  "skills": [
+    "tech_skill_agent_as_its_own_optimizer",
+    "tech_skill_harde",
+    "tech_skill_harness_of_harness",
+    "tech_skill_harnessdev",
+    "tech_skill_jaz",
+    "tech_skill_malena",
+    "tech_skill_metaskill",
+    "tech_skill_mixture_of_self_improving_branches",
+    "tech_skill_pearl",
+    "tech_skill_procedural_graphs",
+    "tech_skill_reasearch",
+    "tech_skill_sol_pi",
+    "tech_skill_task_coevolve",
+    "tech_skill_wikiskill"
+  ],
+  "briefing_chars": 4817,
+  "techo_tokens": 100000,
+  "usage_total": {
+    "calls": 8,
+    "total_tokens": 42710
+  },
+  "gates": {
+    "T1": {
+      "ok": true,
+      "detalle": "intentos=8/8 · calls_usage=8/8 · tokens=42710 ≤ 100000"
+    },
+    "T2": {
+      "ok": true,
+      "detalle": "main.gd parseado=8/8"
+    },
+    "T3": {
+      "ok": true,
+      "detalle": "suites=8/8 · BUILD>0=8/8 (≥6)"
+    },
+    "T4": {
+      "ok": true,
+      "detalle": "control limpio; skills con briefing; sin ids/suite en el briefing"
+    },
+    "T5": {
+      "ok": true,
+      "detalle": "peor request estimado=7774 < TPM 8000 (max_tokens=6000)"
+    },
+    "T6": {
+      "ok": true,
+      "detalle": "media delta skills-control=20.0"
+    }
+  },
+  "resumen": {
+    "por_brazo": {
+      "control": {
+        "n": 4,
+        "media": 10.22,
+        "scores": [
+          10.0,
+          5.88,
+          12.5,
+          12.5
+        ],
+        "build_ok": 4,
+        "main_gd": 4
+      },
+      "skills": {
+        "n": 4,
+        "media": 30.22,
+        "scores": [
+          90.0,
+          5.88,
+          12.5,
+          12.5
+        ],
+        "build_ok": 4,
+        "main_gd": 4
+      }
+    },
+    "por_tarea": {
+      "card-memory-precision": {
+        "scores": {
+          "control": 10.0,
+          "skills": 90.0
+        },
+        "delta_skills_control": 80.0
+      },
+      "platformer-torre-rebote": {
+        "scores": {
+          "control": 5.88,
+          "skills": 5.88
+        },
+        "delta_skills_control": 0.0
+      },
+      "idle-clicker-fabrica": {
+        "scores": {
+          "control": 12.5,
+          "skills": 12.5
+        },
+        "delta_skills_control": 0.0
+      },
+      "visualnovel-mystery-accusation": {
+        "scores": {
+          "control": 12.5,
+          "skills": 12.5
+        },
+        "delta_skills_control": 0.0
+      }
+    },
+    "delta_global_skills_control": 20.0,
+    "nota": "n=4; dato descriptivo, sin afirmación de significación"
+  },
+  "celdas": [
+    {
+      "task": "card-memory-precision",
+      "arm": "control",
+      "prompt_chars": 2273,
+      "prompt_tokens_est": 569,
+      "llm_s": 7.5,
+      "cooldown_s": 70,
+      "respuesta_chars": 8412,
+      "main_gd": true,
+      "ficheros": [
+        "main.gd"
+      ],
+      "error": "",
+      "usage": {
+        "calls": 1,
+        "prompt_tokens": 661,
+        "completion_tokens": 3534,
+        "models": [
+          "openai/gpt-oss-120b"
+        ],
+        "total_tokens": 4195,
+        "calls_tokens_unknown": 0
+      },
+      "suite": {
+        "m": "1/10",
+        "score": 10.0,
+        "fails": [
+          "sin-errores-de-script"
+        ],
+        "fallan": "hud-tiempo, hud-pareja, hud-intento, hud-combo, hud-visible, victoria-existe, reinicio-existe, cota-pareja, sin-errores-de-script",
+        "script_errors": [
+          "[FAIL] sin-errores-de-script — primer error de script: SCRIPT ERROR: Parse Error: Preload file \"res://icon.png\" does not exist."
+        ],
+        "build_ok": true
+      }
+    },
+    {
+      "task": "card-memory-precision",
+      "arm": "skills",
+      "prompt_chars": 7091,
+      "prompt_tokens_est": 1773,
+      "llm_s": 11.6,
+      "cooldown_s": 70,
+      "respuesta_chars": 7291,
+      "main_gd": true,
+      "ficheros": [
+        "main.gd"
+      ],
+      "error": "",
+      "usage": {
+        "calls": 1,
+        "prompt_tokens": 1570,
+        "completion_tokens": 5050,
+        "models": [
+          "openai/gpt-oss-120b"
+        ],
+        "total_tokens": 6620,
+        "calls_tokens_unknown": 0
+      },
+      "suite": {
+        "m": "9/10",
+        "score": 90.0,
+        "fails": [],
+        "fallan": "victoria-existe",
+        "script_errors": [],
+        "build_ok": true
+      }
+    },
+    {
+      "task": "platformer-torre-rebote",
+      "arm": "control",
+      "prompt_chars": 2255,
+      "prompt_tokens_est": 564,
+      "llm_s": 10.1,
+      "cooldown_s": 70,
+      "respuesta_chars": 11383,
+      "main_gd": true,
+      "ficheros": [
+        "main.gd"
+      ],
+      "error": "",
+      "usage": {
+        "calls": 1,
+        "prompt_tokens": 649,
+        "completion_tokens": 4806,
+        "models": [
+          "openai/gpt-oss-120b"
+        ],
+        "total_tokens": 5455,
+        "calls_tokens_unknown": 0
+      },
+      "suite": {
+        "m": "1/17",
+        "score": 5.88,
+        "fails": [
+          "sin-errores-de-script"
+        ],
+        "fallan": "jugador-existe, avatar-cuerpo-fisico, meta-existe, cuerpo-colision, hud-vida, hud-altura, hud-moneda, hud-visible, victoria-existe, reinicio-existe, moves, jump, falls, camera_follows, settles, sin-errores-de-script",
+        "script_errors": [
+          "[FAIL] sin-errores-de-script — primer error de script: SCRIPT ERROR: Parse Error: Member \"velocity\" redefined (original in native class 'CharacterBody2D')"
+        ],
+        "build_ok": true
+      }
+    },
+    {
+      "task": "platformer-torre-rebote",
+      "arm": "skills",
+      "prompt_chars": 7073,
+      "prompt_tokens_est": 1769,
+      "llm_s": 8.8,
+      "cooldown_s": 70,
+      "respuesta_chars": 10267,
+      "main_gd": true,
+      "ficheros": [
+        "main.gd"
+      ],
+      "error": "",
+      "usage": {
+        "calls": 1,
+        "prompt_tokens": 1558,
+        "completion_tokens": 3693,
+        "models": [
+          "openai/gpt-oss-120b"
+        ],
+        "total_tokens": 5251,
+        "calls_tokens_unknown": 0
+      },
+      "suite": {
+        "m": "1/17",
+        "score": 5.88,
+        "fails": [
+          "sin-errores-de-script"
+        ],
+        "fallan": "jugador-existe, avatar-cuerpo-fisico, meta-existe, cuerpo-colision, hud-vida, hud-altura, hud-moneda, hud-visible, victoria-existe, reinicio-existe, moves, jump, falls, camera_follows, settles, sin-errores-de-script",
+        "script_errors": [
+          "[FAIL] sin-errores-de-script — primer error de script: SCRIPT ERROR: Parse Error: Member \"velocity\" redefined (original in native class 'CharacterBody2D')"
+        ],
+        "build_ok": true
+      }
+    },
+    {
+      "task": "idle-clicker-fabrica",
+      "arm": "control",
+      "prompt_chars": 2169,
+      "prompt_tokens_est": 543,
+      "llm_s": 10.0,
+      "cooldown_s": 70,
+      "respuesta_chars": 8451,
+      "main_gd": true,
+      "ficheros": [
+        "main.gd"
+      ],
+      "error": "",
+      "usage": {
+        "calls": 1,
+        "prompt_tokens": 629,
+        "completion_tokens": 4725,
+        "models": [
+          "openai/gpt-oss-120b"
+        ],
+        "total_tokens": 5354,
+        "calls_tokens_unknown": 0
+      },
+      "suite": {
+        "m": "1/8",
+        "score": 12.5,
+        "fails": [
+          "sin-errores-de-script"
+        ],
+        "fallan": "hud-moneda, hud-ingreso, hud-clic, hud-visible, victoria-existe, reinicio-existe, sin-errores-de-script",
+        "script_errors": [
+          "[FAIL] sin-errores-de-script — primer error de script: SCRIPT ERROR: Parse Error: Unexpected identifier \"async\" in class body."
+        ],
+        "build_ok": true
+      }
+    },
+    {
+      "task": "idle-clicker-fabrica",
+      "arm": "skills",
+      "prompt_chars": 6987,
+      "prompt_tokens_est": 1747,
+      "llm_s": 8.8,
+      "cooldown_s": 70,
+      "respuesta_chars": 5183,
+      "main_gd": true,
+      "ficheros": [
+        "main.gd"
+      ],
+      "error": "",
+      "usage": {
+        "calls": 1,
+        "prompt_tokens": 1538,
+        "completion_tokens": 3717,
+        "models": [
+          "openai/gpt-oss-120b"
+        ],
+        "total_tokens": 5255,
+        "calls_tokens_unknown": 0
+      },
+      "suite": {
+        "m": "1/8",
+        "score": 12.5,
+        "fails": [
+          "sin-errores-de-script"
+        ],
+        "fallan": "hud-moneda, hud-ingreso, hud-clic, hud-visible, victoria-existe, reinicio-existe, sin-errores-de-script",
+        "script_errors": [
+          "[FAIL] sin-errores-de-script — primer error de script: SCRIPT ERROR: Parse Error: Unexpected \"?\" in source. If you want a ternary operator, use \"truthy_value if"
+        ],
+        "build_ok": true
+      }
+    },
+    {
+      "task": "visualnovel-mystery-accusation",
+      "arm": "control",
+      "prompt_chars": 2276,
+      "prompt_tokens_est": 569,
+      "llm_s": 10.5,
+      "cooldown_s": 70,
+      "respuesta_chars": 7364,
+      "main_gd": true,
+      "ficheros": [
+        "main.gd"
+      ],
+      "error": "",
+      "usage": {
+        "calls": 1,
+        "prompt_tokens": 648,
+        "completion_tokens": 4931,
+        "models": [
+          "openai/gpt-oss-120b"
+        ],
+        "total_tokens": 5579,
+        "calls_tokens_unknown": 0
+      },
+      "suite": {
+        "m": "1/8",
+        "score": 12.5,
+        "fails": [
+          "sin-errores-de-script"
+        ],
+        "fallan": "hud-hora, hud-pista, hud-confianza, hud-visible, victoria-existe, reinicio-existe, sin-errores-de-script",
+        "script_errors": [
+          "[FAIL] sin-errores-de-script — primer error de script: SCRIPT ERROR: Parse Error: Function \"get_signal_sender()\" not found in base self."
+        ],
+        "build_ok": true
+      }
+    },
+    {
+      "task": "visualnovel-mystery-accusation",
+      "arm": "skills",
+      "prompt_chars": 7094,
+      "prompt_tokens_est": 1774,
+      "llm_s": 7.5,
+      "cooldown_s": 70,
+      "respuesta_chars": 8127,
+      "main_gd": true,
+      "ficheros": [
+        "main.gd"
+      ],
+      "error": "",
+      "usage": {
+        "calls": 1,
+        "prompt_tokens": 1557,
+        "completion_tokens": 3444,
+        "models": [
+          "openai/gpt-oss-120b"
+        ],
+        "total_tokens": 5001,
+        "calls_tokens_unknown": 0
+      },
+      "suite": {
+        "m": "1/8",
+        "score": 12.5,
+        "fails": [
+          "sin-errores-de-script"
+        ],
+        "fallan": "hud-hora, hud-pista, hud-confianza, hud-visible, victoria-existe, reinicio-existe, sin-errores-de-script",
+        "script_errors": [
+          "[FAIL] sin-errores-de-script — primer error de script: SCRIPT ERROR: Parse Error: Preload file \"res://icon.svg\" does not exist."
+        ],
+        "build_ok": true
+      }
+    }
+  ],
+  "veredicto": "CUMPLE"
+}
